@@ -1,0 +1,62 @@
+.chat-input,
+.chat-output {
+  width: 70vw; /* Using viewport widths to ensure it's based on the size of the screen */
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+/* Increase the height for the input and output textareas */
+.chat-input {
+  height: 10vh; /* Adjust the height here */
+}
+
+.chat-output {
+  height: 40vh; /* And here */
+}Ø
+
+.centered-container .chat-button,
+.centered-container .chat-dropdown {
+  width: auto; /* remove the fixed width */
+  display: block;
+}
+
+.centered-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.background-info-input {
+  height: 10vh; /* Adjust height as needed */
+  display: block;
+}
+
+.chat-input,
+.background-info-input {
+  width: 100%; /* Set width to 100% of the parent container */
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+/* Other styles remain unchanged */
+
+/* Add custom padding to the columns if needed */
+.pr-2 { /* Right padding for the left column */
+  padding-right: 0.5rem; /* Adjust as needed */
+}
+
+.pl-2 { /* Left padding for the right column */
+  padding-left: 0.5rem; /* Adjust as needed */
+}
+.dropdowns {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+.feedback-textarea {
+  height: 100px; /* Adjust the height as needed */
+}

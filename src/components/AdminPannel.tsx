@@ -52,7 +52,7 @@ const AdminPannel = () => {
     axios
       .post(
         `http${HTTP_PREFIX}://${API_URL}/save_user`,
-        { user_config: data },
+        { generic_dict: data },
         {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`,

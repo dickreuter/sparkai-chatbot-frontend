@@ -176,10 +176,7 @@ const Chatbot = () => {
                 value={choice}
                 onChange={(e) => setChoice(e.target.value)}
               >
-                <option value="2">Answer Question from Q/A pair</option>
-                <option value="3">
-                  Question about uploaded PDFs and plain text
-                </option>
+                <option value="2">Answer Question from Q/A pair or PDFs</option>
                 <option value="1">Continue Answer (Copilot)</option>
               </Form.Select>
             </Form.Group>

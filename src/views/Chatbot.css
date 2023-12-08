@@ -60,3 +60,22 @@
 .feedback-textarea {
   height: 100px; /* Adjust the height as needed */
 }
+
+.dataset-folders {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Centers the folders horizontally */
+  gap: 20px; /* Adjust as needed */
+  align-items: center;
+}
+
+.dataset-folder {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adjust as needed */
+  border: 2px dashed transparent; /* For consistent spacing and drop zone indication */
+}
+
+.dataset-folder.drag-over {
+  border-color: blue; /* Highlight color when dragging over */
+}

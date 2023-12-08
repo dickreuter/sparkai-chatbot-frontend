@@ -63,6 +63,19 @@ const Chatbot = () => {
     get_collections();
   }, []);
 
+  const handleTextHighlight = async () => {
+    const selectedText = window.getSelection().toString();
+    if (selectedText) {
+      setInputText(selectedText);
+      setChoice("1"); // Set choice to Copilot
+
+      // Wait for state update before sending the question
+      await new Promise(resolve => setTimeout(resolve, 0));
+      sendQuestion(); // Call sendQuestion function to simulate submit
+    }
+  };
+
+
   const sendQuestion = async () => {
     setQuestionAsked(true);
     setResponse("");
@@ -219,6 +232,7 @@ const Chatbot = () => {
               className="chat-output"
               readOnly
               value={response}
+              onMouseUp={handleTextHighlight} 
             />
           </Form.Group>
         </Col>

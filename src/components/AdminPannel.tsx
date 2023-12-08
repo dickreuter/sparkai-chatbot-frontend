@@ -255,13 +255,13 @@ const AdminPannel = () => {
           onChange={(e) => handleChange("prompt2", e.target.value)}
         />
       </div>
-      <div className="prompt">
+      {/* <div className="prompt">
         <label>Prompt3 (PDF/Text Questioning)</label>
         <textarea
           value={data.prompt3}
           onChange={(e) => handleChange("prompt3", e.target.value)}
         />
-      </div>
+      </div> */}
 
       {/* Submit button */}
       <div className="submit-btn">

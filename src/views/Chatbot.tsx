@@ -171,6 +171,39 @@ const Chatbot = () => {
 
   return (
     <Container fluid="md" className="mt-4">
+      <Row className="justify-content-md-center mt-4">
+        <Col md={12}>
+          <div className="dataset-folders">
+            {availableCollections.map((collection, index) => (
+              <div
+                key={index}
+                className={`dataset-folder ${
+                  activeDragFolder === collection ? "drag-over" : ""
+                }`}
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  setActiveDragFolder(collection);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  setActiveDragFolder(null);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setActiveDragFolder(null);
+                  const file = e.dataTransfer.files[0];
+                  handleDatasetFileDrop(collection, file);
+                }}
+              >
+                <CreateNewFolderIcon /> <span>{collection}</span>
+              </div>
+            ))}
+          </div>
+        </Col>
+      </Row>
       <Row className="justify-content-md-center">
         <Col md={9}>
           {" "}
@@ -310,37 +343,7 @@ const Chatbot = () => {
           </div>
         </Col>
       </Row>
-      <Row className="justify-content-md-center mt-4">
-    <Col md={12}>
-      <div className="dataset-folders">
-        {availableCollections.map((collection, index) => (
-          <div 
-            key={index} 
-            className={`dataset-folder ${activeDragFolder === collection ? 'drag-over' : ''}`}
-            onDragEnter={e => {
-              e.preventDefault();
-              setActiveDragFolder(collection);
-            }}
-            onDragOver={e => {
-              e.preventDefault();
-            }}
-            onDragLeave={e => {
-              e.preventDefault();
-              setActiveDragFolder(null);
-            }}
-            onDrop={e => {
-              e.preventDefault();
-              setActiveDragFolder(null);
-              const file = e.dataTransfer.files[0];
-              handleDatasetFileDrop(collection, file);
-            }}
-          >
-            <CreateNewFolderIcon /> <span>{collection}</span>
-          </div>
-        ))}
-      </div>
-    </Col>
-  </Row>
+      
     </Container>
   );
 };

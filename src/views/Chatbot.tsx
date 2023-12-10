@@ -1,14 +1,15 @@
-import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap";
-import { displayAlert } from "../helper/Alert";
+import Tooltip from "@mui/material/Tooltip"; // Correct import for Tooltip
+import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import withAuth from "../routes/withAuth";
 import "./Chatbot.css";
 
 const Chatbot = () => {
+  const [folderContents, setFolderContents] = useState({});
   const [selectedFile, setSelectedFile] = useState(null);
   const [profileName, setProfileName] = useState("default");
   const [isUploading, setIsUploading] = useState(false);
@@ -168,6 +169,20 @@ const Chatbot = () => {
       // Handle error
     }
   };
+  const fetchFolderFilenames = async (folderName) => {
+    if (!isLoading) {
+      try {
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
+          { collection_name: folderName },
+          { headers: { Authorization: `Bearer ${tokenRef.current}` } }
+        );
+        setFolderContents({ ...folderContents, [folderName]: response.data });
+      } catch (error) {
+        console.error("Error fetching folder filenames:", error);
+      }
+    }
+  };
 
   return (
     <Container fluid="md" className="mt-4">
@@ -175,31 +190,35 @@ const Chatbot = () => {
         <Col md={12}>
           <div className="dataset-folders">
             {availableCollections.map((collection, index) => (
-              <div
-                key={index}
-                className={`dataset-folder ${
-                  activeDragFolder === collection ? "drag-over" : ""
-                }`}
-                onDragEnter={(e) => {
-                  e.preventDefault();
-                  setActiveDragFolder(collection);
-                }}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                }}
-                onDragLeave={(e) => {
-                  e.preventDefault();
-                  setActiveDragFolder(null);
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setActiveDragFolder(null);
-                  const file = e.dataTransfer.files[0];
-                  handleDatasetFileDrop(collection, file);
-                }}
-              >
-                <CreateNewFolderIcon /> <span>{collection}</span>
-              </div>
+              <Tooltip
+              key={index}
+              title={Array.isArray(folderContents[collection]) ? folderContents[collection].join(", ") : "Loading..."}
+              onOpen={() => fetchFolderFilenames(collection)}
+            >
+                <div
+                  className={`dataset-folder ${
+                    activeDragFolder === collection ? "drag-over" : ""
+                  }`}
+                  onDragEnter={(e) => {
+                    e.preventDefault();
+                    setActiveDragFolder(collection);
+                  }}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    setActiveDragFolder(null);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setActiveDragFolder(null);
+                    const file = e.dataTransfer.files[0];
+                    handleDatasetFileDrop(collection, file); // Use collection for folderName
+                  }}
+                >
+                  <CreateNewFolderIcon />
+                  <span>{collection}</span>
+                </div>
+              </Tooltip>
             ))}
           </div>
         </Col>
@@ -314,7 +333,7 @@ const Chatbot = () => {
           </Form.Group>
         </Col>
       </Row>
-      {/* Feedback Section */}
+
       {/* Feedback Section */}
       <Row className="justify-content-md-center">
         <Col md={12}>
@@ -343,7 +362,6 @@ const Chatbot = () => {
           </div>
         </Col>
       </Row>
-      
     </Container>
   );
 };

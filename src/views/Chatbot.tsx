@@ -1,15 +1,20 @@
-import React, { useEffect, useRef, useState } from "react";
+import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import Tooltip from "@mui/material/Tooltip"; // Correct import for Tooltip
 import axios from "axios";
+import { useEffect, useRef, useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap";
-import Tooltip from "@mui/material/Tooltip"; // Correct import for Tooltip
-import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import { Editor } from "react-draft-wysiwyg";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import { ContentState, EditorState, Modifier } from "draft-js";
+import { Document, Packer, Paragraph } from "docx";
 import withAuth from "../routes/withAuth";
+import "../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import "./Chatbot.css";
 
 const Chatbot = () => {
   const [folderContents, setFolderContents] = useState({});
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [profileName, setProfileName] = useState("default");
   const [isUploading, setIsUploading] = useState(false);
@@ -27,6 +32,9 @@ const Chatbot = () => {
   const [availableCollections, setAvailableCollections] = useState<string[]>(
     []
   );
+  const [editorState, setEditorState] = useState(
+    EditorState.createWithContent(ContentState.createFromText(""))
+  );
 
   const [feedback, setFeedback] = useState("");
   const [questionAsked, setQuestionAsked] = useState(false);
@@ -35,6 +43,62 @@ const Chatbot = () => {
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
   const email = auth?.email || "default";
+
+  const onEditorStateChange = (editorState) => {
+    setEditorState(editorState);
+  };
+
+  const downloadDocument = () => {
+    const doc = new Document();
+
+    // Splitting the text into paragraphs
+    const paragraphs = editorState
+      .getCurrentContent()
+      .getPlainText()
+      .split("\n")
+      .map((text) => new Paragraph(text));
+    doc.addSection({ children: paragraphs });
+
+    // Used to download the document
+    Packer.toBlob(doc).then((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "document.docx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  };
+  const appendToEditor = () => {
+    const currentContent = editorState.getCurrentContent();
+    const currentContentBlock = currentContent.getBlockMap().last();
+
+    const lengthOfLastBlock = currentContentBlock.getLength();
+    // If there is already text, add a newline before appending
+    const modifiedText = lengthOfLastBlock > 0 ? `\n${response}` : response;
+
+    const selectionState = editorState.getSelection().merge({
+      anchorKey: currentContentBlock.getKey(),
+      anchorOffset: lengthOfLastBlock,
+      focusKey: currentContentBlock.getKey(),
+      focusOffset: lengthOfLastBlock,
+    });
+
+    const newContentState = Modifier.insertText(
+      currentContent,
+      selectionState,
+      modifiedText
+    );
+
+    const newEditorState = EditorState.push(
+      editorState,
+      newContentState,
+      "insert-characters"
+    );
+
+    setEditorState(newEditorState);
+  };
 
   useEffect(() => {
     let interval = null;
@@ -191,10 +255,14 @@ const Chatbot = () => {
           <div className="dataset-folders">
             {availableCollections.map((collection, index) => (
               <Tooltip
-              key={index}
-              title={Array.isArray(folderContents[collection]) ? folderContents[collection].join(", ") : "Loading..."}
-              onOpen={() => fetchFolderFilenames(collection)}
-            >
+                key={index}
+                title={
+                  Array.isArray(folderContents[collection])
+                    ? folderContents[collection].join(", ")
+                    : "Loading..."
+                }
+                onOpen={() => fetchFolderFilenames(collection)}
+              >
                 <div
                   className={`dataset-folder ${
                     activeDragFolder === collection ? "drag-over" : ""
@@ -360,6 +428,25 @@ const Chatbot = () => {
               Submit Feedback
             </Button>
           </div>
+        </Col>
+      </Row>
+      <Row className="justify-content-md-center">
+        <Col md={12}>
+          <Button
+            variant="primary"
+            onClick={appendToEditor}
+            className="chat-button"
+          >
+            Add response to Text Editor
+          </Button>
+          <Editor
+            editorState={editorState}
+            onEditorStateChange={onEditorStateChange}
+            toolbarClassName="toolbarClassName"
+            wrapperClassName="wrapperClassName editor-style"
+            editorClassName="editorClassName"
+          />
+          {/* <Button onClick={downloadDocument}>Download as Word</Button> */}
         </Col>
       </Row>
     </Container>

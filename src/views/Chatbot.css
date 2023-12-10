@@ -12,7 +12,7 @@
 }
 
 .chat-output {
-  height: 40vh; /* And here */
+  height: 30vh; /* And here */
 }Ø
 
 .centered-container .chat-button,
@@ -78,4 +78,10 @@
 
 .dataset-folder.drag-over {
   border-color: blue; /* Highlight color when dragging over */
+}
+
+.editor-style, .answer-style {
+  width: 100%;      /* Adjust the width as needed */
+  height: 300px;    /* Adjust the height as needed */
+  resize: vertical; /* Allows vertical resizing, remove if not needed */
 }

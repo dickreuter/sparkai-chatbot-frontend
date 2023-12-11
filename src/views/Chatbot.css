@@ -85,3 +85,12 @@
   height: 300px;    /* Adjust the height as needed */
   resize: vertical; /* Allows vertical resizing, remove if not needed */
 }
+
+
+.add-new-folder {
+  cursor: pointer;
+}
+
+.add-new-folder:hover {
+
+}

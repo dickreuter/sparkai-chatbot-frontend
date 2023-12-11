@@ -1,16 +1,17 @@
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import Tooltip from "@mui/material/Tooltip"; // Correct import for Tooltip
 import axios from "axios";
+import { Document, Packer, Paragraph } from "docx";
+import { ContentState, EditorState, Modifier } from "draft-js";
 import { useEffect, useRef, useState } from "react";
 import { useAuthUser } from "react-auth-kit";
 import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap";
 import { Editor } from "react-draft-wysiwyg";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
-import { ContentState, EditorState, Modifier } from "draft-js";
-import { Document, Packer, Paragraph } from "docx";
-import withAuth from "../routes/withAuth";
 import "../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import withAuth from "../routes/withAuth";
 import "./Chatbot.css";
+import { displayAlert } from "../helper/Alert";
 
 const Chatbot = () => {
   const [folderContents, setFolderContents] = useState({});
@@ -100,6 +101,10 @@ const Chatbot = () => {
     setEditorState(newEditorState);
   };
 
+  const countWords = (str) => {
+    return str.split(/\s+/).filter(Boolean).length;
+  };
+
   useEffect(() => {
     let interval = null;
     if (isLoading && startTime) {
@@ -134,6 +139,32 @@ const Chatbot = () => {
   useEffect(() => {
     get_collections();
   }, []);
+
+  const handleAddNewFolderClick = () => {
+    const newFolderName = window.prompt("Enter the name for the new folder:");
+    if (newFolderName) {
+      addNewFolder(newFolderName);
+    }
+  };
+
+  const addNewFolder = async (folderName) => {
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/add_folder`,
+        { folder_name: folderName },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        }
+      );
+      // Handle successful response, update folder list
+      get_collections(); // Assuming this fetches the updated list of collections
+    } catch (error) {
+      console.error("Error adding new folder:", error);
+      // Handle error
+    }
+  };
 
   const handleTextHighlight = async () => {
     const selectedText = window.getSelection().toString();
@@ -227,6 +258,7 @@ const Chatbot = () => {
       await axios.post(`http${HTTP_PREFIX}://${API_URL}/uploadtext`, formData, {
         headers: { Authorization: `Bearer ${tokenRef.current}` },
       });
+      displayAlert("Feedback upolload successful", "success");
       // Handle successful submission, e.g., clear feedback or show a message
     } catch (error) {
       console.error("Error sending feedback:", error);
@@ -258,8 +290,8 @@ const Chatbot = () => {
                 key={index}
                 title={
                   Array.isArray(folderContents[collection])
-                    ? folderContents[collection].join(", ")
-                    : "Loading..."
+                    ? folderContents[collection].join("\n")
+                    : ""
                 }
                 onOpen={() => fetchFolderFilenames(collection)}
               >
@@ -288,6 +320,12 @@ const Chatbot = () => {
                 </div>
               </Tooltip>
             ))}
+            <div
+              className="dataset-folder add-new-folder"
+              onClick={handleAddNewFolderClick}
+            >
+              <span>Add Folder</span>
+            </div>
           </div>
         </Col>
       </Row>
@@ -398,6 +436,9 @@ const Chatbot = () => {
               value={response}
               onMouseUp={handleTextHighlight}
             />
+            <Form.Text className="text-muted">
+              Word Count: {countWords(response)}
+            </Form.Text>
           </Form.Group>
         </Col>
       </Row>

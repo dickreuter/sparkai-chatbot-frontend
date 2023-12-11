@@ -28,7 +28,8 @@
     "react-dom": "^18.2.0",
     "react-draft-wysiwyg": "^1.15.0",
     "react-plotly.js": "^2.6.0",
-    "react-router-dom": "^6.17.0"
+    "react-router-dom": "^6.17.0",
+    "react-tooltip": "^5.25.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.29",

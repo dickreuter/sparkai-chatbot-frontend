@@ -7,7 +7,8 @@ import {
   HTTP_PREFIX,
   prompt1_default,
   prompt2_default,
-  prompt3_default,
+  prompt3a_default,
+  prompt3b_default,
 } from "../helper/Constants";
 import withAuthAdmin from "../routes/withAuthAdmin";
 import "./AdminPannel.css";
@@ -17,7 +18,8 @@ interface IAttributesConfig {
   password: string;
   prompt1: string;
   prompt2: string;
-  prompt3: string;
+  prompt3a: string;
+  prompt3b: string;
 }
 
 const defaultAttributesConfig: IAttributesConfig = {
@@ -25,7 +27,8 @@ const defaultAttributesConfig: IAttributesConfig = {
   password: "",
   prompt1: prompt1_default,
   prompt2: prompt2_default,
-  prompt3: prompt3_default,
+  prompt3a: prompt3a_default,
+  prompt3b: prompt3b_default,
 };
 
 const AddUser = () => {

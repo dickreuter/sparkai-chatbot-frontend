@@ -30,7 +30,22 @@ Question: {question}
 Helpful Answer:
 `
 
-export const prompt3_default = `
+export const prompt3a_default = `
+This is the background that you should consider when answering the question. Make sure to tailor your response accordingly:
+{extra_instructions}
+
+*** This is the most relevant context retrieved from the database that you need to use to answer the question:
+{context}
+
+***
+This is the question: 
+Question: {question}
+
+Generate a list of sub topics that we can then explore further. Create 2-7 sub topics that are relevant to the question and return the result (and nothing else) directly a comma separated list.
+
+`
+
+export const prompt3b_default = `
 This is the background that you should consider when answering the question. Make sure to tailor your response accordingly:
 {extra_instructions}
 
@@ -40,6 +55,8 @@ This is the background that you should consider when answering the question. Mak
 ***
 This is the question you need to answer: 
 Question: {question}
+
+Focus your answer only on the following sub topic (when creating your response, begin it by mentioning this as a header, but also consider that this is part of a larger answer, that will be concatenated, so avoid any introductory description or enumeration, but focus only this sub_topic in answer the question): {sub_topic}
 
 Helpful Answer:
 `

@@ -15,7 +15,8 @@ interface IAttributesConfig {
   password: string;
   prompt1: string;
   prompt2: string;
-  prompt3: string;
+  prompt3a: string;
+  prompt3b: string;
   selectedModelType: string;
 }
 
@@ -255,14 +256,21 @@ const AdminPannel = () => {
           onChange={(e) => handleChange("prompt2", e.target.value)}
         />
       </div>
-      {/* <div className="prompt">
-        <label>Prompt3 (PDF/Text Questioning)</label>
+      <div className="prompt">
+        <label>Prompt3a: get relevant topic headers</label>
         <textarea
-          value={data.prompt3}
-          onChange={(e) => handleChange("prompt3", e.target.value)}
+          value={data.prompt3a}
+          onChange={(e) => handleChange("prompt3a", e.target.value)}
         />
-      </div> */}
+      </div>
 
+      <div className="prompt">
+        <label>Prompt3b: use headers to generate subsection</label>
+        <textarea
+          value={data.prompt3b}
+          onChange={(e) => handleChange("prompt3b", e.target.value)}
+        />
+      </div>
       {/* Submit button */}
       <div className="submit-btn">
         <button onClick={saveUser}>Save</button>{" "}

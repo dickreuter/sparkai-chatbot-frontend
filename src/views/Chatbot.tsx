@@ -8,10 +8,10 @@ import { useAuthUser } from "react-auth-kit";
 import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap";
 import { Editor } from "react-draft-wysiwyg";
 import "../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { displayAlert } from "../helper/Alert";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import withAuth from "../routes/withAuth";
 import "./Chatbot.css";
-import { displayAlert } from "../helper/Alert";
 
 const Chatbot = () => {
   const [folderContents, setFolderContents] = useState({});
@@ -39,6 +39,8 @@ const Chatbot = () => {
 
   const [feedback, setFeedback] = useState("");
   const [questionAsked, setQuestionAsked] = useState(false);
+  const [apiChoices, setApiChoices] = useState([]);
+  const [selectedChoices, setSelectedChoices] = useState([]);
 
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -71,6 +73,7 @@ const Chatbot = () => {
       document.body.removeChild(link);
     });
   };
+
   const appendToEditor = () => {
     const currentContent = editorState.getCurrentContent();
     const currentContentBlock = currentContent.getBlockMap().last();
@@ -218,16 +221,18 @@ const Chatbot = () => {
       displayAlert("Failed to save", "danger");
     }
   };
+
   const sendQuestion = async () => {
     setQuestionAsked(true);
     setResponse("");
     setIsLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
+
     try {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question`,
         {
-          choice: choice,
+          choice: choice === "3" ? "3a" : choice,
           broadness: broadness,
           input_text: inputText,
           extra_instructions: backgroundInfo,
@@ -239,13 +244,55 @@ const Chatbot = () => {
           },
         }
       );
-      setResponse(result.data);
+      if (choice != "3") {
+        setResponse(result.data);
+      }
+      if (choice === "3") {
+        let choicesArray = [];
+
+        // Check if result.data contains comma-separated values
+        if (result.data && result.data.includes(",")) {
+          choicesArray = result.data.split(",").map((choice) => choice.trim());
+        }
+        console.log("Choices Array: " + choicesArray);
+
+        setApiChoices(choicesArray);
+      }
     } catch (error) {
       console.error("Error sending question:", error);
       setResponse(error.message);
     }
     setIsLoading(false);
   };
+
+  const handleChoiceSelection = (selectedChoice) => {
+    // Toggle selection logic
+    if (selectedChoices.includes(selectedChoice)) {
+      setSelectedChoices(
+        selectedChoices.filter((choice) => choice !== selectedChoice)
+      );
+    } else {
+      setSelectedChoices([...selectedChoices, selectedChoice]);
+    }
+  };
+
+  const renderChoices = () => {
+    return (
+      <div className="choices-container">
+        {apiChoices.map((choice, index) => (
+          <Form.Check
+            className="choice-item"
+            type="checkbox"
+            label={choice}
+            key={index}
+            checked={selectedChoices.includes(choice)}
+            onChange={() => handleChoiceSelection(choice)}
+          />
+        ))}
+      </div>
+    );
+  };
+  
 
   const submitFeedback = async () => {
     const formData = new FormData();
@@ -265,6 +312,7 @@ const Chatbot = () => {
       // Handle error
     }
   };
+  
   const fetchFolderFilenames = async (folderName) => {
     if (!isLoading) {
       try {
@@ -278,6 +326,36 @@ const Chatbot = () => {
         console.error("Error fetching folder filenames:", error);
       }
     }
+  };
+
+  const submitSelections = async () => {
+    setIsLoading(true);
+    setStartTime(Date.now()); // Set start time for the timer
+    try {
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
+        {
+          choice: "3b",
+          broadness: broadness,
+          input_text: inputText,
+          extra_instructions: backgroundInfo,
+          selected_choices: selectedChoices,
+          dataset,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        }
+      );
+      setResponse(result.data); // Assuming this is the final answer
+      setApiChoices([]); // Clear choices
+      setSelectedChoices([]); // Clear selected choices
+    } catch (error) {
+      console.error("Error submitting selections:", error);
+      setResponse(error.message);
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -391,8 +469,11 @@ const Chatbot = () => {
                 value={choice}
                 onChange={(e) => setChoice(e.target.value)}
               >
-                <option value="2">Answer Question from Q/A pair or PDFs</option>
+                <option value="2">Answer Question</option>
                 <option value="1">Continue Answer (Copilot)</option>
+                <option value="3">
+                  Answer Question with multi-step Topic Selection
+                </option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">
@@ -426,7 +507,19 @@ const Chatbot = () => {
               <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
             </div>
           )}
-
+          {choice === "3" && apiChoices.length > 0 && (
+            <div>
+              {renderChoices()}
+              <Button
+                variant="primary"
+                onClick={submitSelections}
+                className="chat-button"
+                disabled={selectedChoices.length === 0}
+              >
+                Generate answers for selected subsections
+              </Button>
+            </div>
+          )}
           <Form.Group className="mb-3">
             <Form.Label>Response:</Form.Label>
             <Form.Control
@@ -480,6 +573,7 @@ const Chatbot = () => {
           >
             Add response to Text Editor
           </Button>
+
           <Editor
             editorState={editorState}
             onEditorStateChange={onEditorStateChange}

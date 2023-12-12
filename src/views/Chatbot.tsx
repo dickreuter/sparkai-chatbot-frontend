@@ -172,14 +172,23 @@ const Chatbot = () => {
   const handleTextHighlight = async () => {
     const selectedText = window.getSelection().toString();
     if (selectedText) {
-      setInputText(selectedText);
-      setChoice("1"); // Set choice to Copilot
-
-      // Wait for state update before sending the question
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      sendQuestion(); // Call sendQuestion function to simulate submit
+      // Add a confirmation popup
+      const confirmAction = window.confirm("Do you want to use Copilot for this selection?");
+      if (confirmAction) {
+        // User clicked 'OK', continue with the process
+        setInputText(selectedText);
+        setChoice("1"); // Set choice to Copilot
+  
+        // Wait for state update before sending the question
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        sendQuestion(); // Call sendQuestion function to simulate submit
+      } else {
+        // User clicked 'Cancel', exit the function
+        return;
+      }
     }
   };
+  
 
   const handleDatasetFileDrop = async (collectionName, file) => {
     // This function will handle the file drop on a specific dataset folder

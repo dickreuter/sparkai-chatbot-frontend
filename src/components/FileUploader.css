@@ -1,0 +1,31 @@
+.file-uploader {
+    padding: 20px;
+  }
+  
+  .drop-zone {
+    border: 2px dashed #cccccc;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin: 10px 0;
+    position: relative;
+  }
+  
+  .drop-zone.active {
+    background-color: #f8f8f8;
+  }
+  
+  .upload-label {
+    cursor: pointer;
+  }
+  
+  #file-upload {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+  }
+  
+  .selected-files {
+    margin-top: 15px;
+  }
+  

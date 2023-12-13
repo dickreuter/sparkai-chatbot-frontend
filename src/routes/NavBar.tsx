@@ -128,22 +128,27 @@ const NavBar = () => {
                     Admin Pannel{" "}
                   </Link>
                 </li>
-
-                <li className="nav-item">
-                  <Link className="nav-link" to="/qlog">
-                    Question Log{" "}
-                  </Link>
-                </li>
               </>
             )
           ) : (
             <></>
           )}
-          <li className="nav-item">
-            <Link className="nav-link" to="/flog">
-              Feedback Log{" "}
-            </Link>
-          </li>
+          {auth ? (
+            <>
+              <li className="nav-item">
+                <Link className="nav-link" to="/qlog">
+                  Question Log{" "}
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/flog">
+                  Feedback Log{" "}
+                </Link>
+              </li>
+            </>
+          ) : (
+            <></>
+          )}
         </ul>
       </div>
     </nav>

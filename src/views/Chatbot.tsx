@@ -21,7 +21,7 @@ const Chatbot = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [activeDragFolder, setActiveDragFolder] = useState(null);
 
-  const [choice, setChoice] = useState("2");
+  const [choice, setChoice] = useState("3");
   const [broadness, setBroadness] = useState("1");
   const [dataset, setDataset] = useState("default");
   const [inputText, setInputText] = useState("");
@@ -478,11 +478,12 @@ const Chatbot = () => {
                 value={choice}
                 onChange={(e) => setChoice(e.target.value)}
               >
-                <option value="2">Answer Question</option>
-                <option value="1">Continue Answer (Copilot)</option>
                 <option value="3">
                   Answer Question with multi-step Topic Selection
                 </option>
+                <option value="2">Answer Question</option>
+                <option value="1">Continue Answer (Copilot)</option>
+
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">

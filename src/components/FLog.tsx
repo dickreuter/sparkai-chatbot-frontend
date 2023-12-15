@@ -88,7 +88,7 @@ const FLog = () => {
                   <td key={cellIndex}>{log[column]}</td>
                 ))}
                 <td>
-                  <button onClick={() => handleDelete(log._id)}>X</button>{" "}
+                  {/* <button onClick={() => handleDelete(log._id)}>X</button>{" "} */}
                   {/* Delete button */}
                 </td>
               </tr>

@@ -219,8 +219,8 @@ const AdminPannel = () => {
         >
           <option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k (£0.02 / request)</option>
           <option value="gpt-4-1106-preview">gpt-4-1106-preview-128k (£0.50 / request)</option>
-          <option value="gemini-pro">Google gmini pro</option>
-          <option value="microsoft/Orce-2-13b">Microsoft Ocrba-2 13b</option>
+          <option value="gemini-pro">Google Gemini pro</option>
+          <option value="microsoft/Orca-2-13b">Microsoft Orca-2 13b</option>
         </select>
       </div>
 

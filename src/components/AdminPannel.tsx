@@ -17,6 +17,7 @@ interface IAttributesConfig {
   prompt2: string;
   prompt3a: string;
   prompt3b: string;
+  forbidden: string;
   selectedModelType: string;
 }
 
@@ -271,6 +272,14 @@ const AdminPannel = () => {
         <textarea
           value={data.prompt3b}
           onChange={(e) => handleChange("prompt3b", e.target.value)}
+        />
+      </div>
+
+      <div className="prompt">
+        <label>Comma separated words that are replaced with [ ] </label>
+        <textarea
+          value={data.forbidden}
+          onChange={(e) => handleChange("forbidden", e.target.value)}
         />
       </div>
       {/* Submit button */}

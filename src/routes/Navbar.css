@@ -1,0 +1,84 @@
+/* Set the background of the navbar to black */
+
+.navbar {
+    background: linear-gradient(90deg, rgb(28, 27, 27) 0%, rgb(26, 23, 23) 100%) !important;
+    height: 80px;
+    align-items: center;
+}
+
+
+/* Set the color of the navbar brand and links to white */
+
+.navbar-brand,
+.nav-link {
+    color: white !important;
+    font-family: 'Roboto', sans-serif;
+    /* Roboto is widely used for its modern and clean appearance */
+    font-weight: 500;
+    /* A medium weight looks good for most modern fonts */
+}
+
+.nav-link {
+    font-size: 16px;
+}
+
+.navbar-brand {
+    margin-left: 1rem;
+    font-size: 1.8rem;
+    /* This size is generally visible and stands out */
+}
+
+
+/* Add a right margin to the last nav item */
+
+.navbar-nav .nav-item:last-child .nav-link {
+    margin-right: 1rem;
+    /* Adjust the value as needed */
+}
+
+
+/* Override the bootstrap navbar-toggler icon color to white */
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.1);
+    /* Optional: changes the toggler border color */
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+
+/* Use media query to set the collapse background color for small screens */
+
+@media (max-width: 768px) {
+    .navbar-collapse {
+        background-color: black;
+    }
+}
+
+
+/* Set the hover, focus, and active state colors for the nav links */
+
+.nav-link:hover,
+.nav-link:focus {
+    color: #ddd;
+    /* Lighter shade for hover/focus states */
+    border-bottom: 3px solid white;
+    /* Adds the white line under the text */
+}
+
+.navbar-brand:hover,
+.navbar-brand:focus {
+    color: #ddd;
+    transition: all 0.2s ease-out;
+    /* Lighter shade for hover/focus states */
+}
+
+.navbar-nav .nav-link.active {
+    text-decoration: none !important;
+}
+
+.navbar-nav {
+    margin-left: auto;
+}

@@ -1,9 +1,11 @@
+
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 import { useEffect, useRef, useState } from "react";
 import { useAuthUser, useSignOut } from "react-auth-kit";
 import { Link } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import './Navbar.css';
 
 const NavBar = () => {
   const getAuth = useAuthUser();
@@ -69,13 +71,18 @@ const NavBar = () => {
         <span className="navbar-toggler-icon"></span>
       </button>
       <a className="navbar-brand" href="/">
-        Spark-Ai Chatbot
+         
+         
+           SPARK AI 
+           &nbsp;
+           <i className="far fa-comments"></i> 
       </a>
+
       <div
         className={`collapse navbar-collapse ${isOpen ? "show" : ""}`}
         id="navbarTogglerDemo03"
       >
-        <ul className="navbar-nav mr-auto d-flex ml-auto">
+        <ul className="navbar-nav ml-auto">
           {" "}
           {/* Apply ml-auto here */}
           {auth ? (

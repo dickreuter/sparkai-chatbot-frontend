@@ -18,6 +18,7 @@ interface IAttributesConfig {
   prompt3a: string;
   prompt3b: string;
   forbidden: string;
+  numbers_allowed_prefixes: string;
   selectedModelType: string;
 }
 
@@ -280,6 +281,14 @@ const AdminPannel = () => {
         <textarea
           value={data.forbidden}
           onChange={(e) => handleChange("forbidden", e.target.value)}
+        />
+      </div>
+
+      <div className="prompt">
+        <label>Replace numbers from the context with [number] except when they have the following prefixes (comma separated list)</label>
+        <textarea
+          value={data.numbers_allowed_prefixes}
+          onChange={(e) => handleChange("numbers_allowed_prefixes", e.target.value)}
         />
       </div>
       {/* Submit button */}

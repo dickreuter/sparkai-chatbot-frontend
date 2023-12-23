@@ -5,10 +5,6 @@ import { useAuthHeader, useAuthUser } from "react-auth-kit";
 import {
   API_URL,
   HTTP_PREFIX,
-  prompt1_default,
-  prompt2_default,
-  prompt3a_default,
-  prompt3b_default,
 } from "../helper/Constants";
 import withAuthAdmin from "../routes/withAuthAdmin";
 import "./AdminPannel.css";
@@ -16,19 +12,11 @@ import "./AdminPannel.css";
 interface IAttributesConfig {
   login: string;
   password: string;
-  prompt1: string;
-  prompt2: string;
-  prompt3a: string;
-  prompt3b: string;
 }
 
 const defaultAttributesConfig: IAttributesConfig = {
   login: "",
   password: "",
-  prompt1: prompt1_default,
-  prompt2: prompt2_default,
-  prompt3a: prompt3a_default,
-  prompt3b: prompt3b_default,
 };
 
 const AddUser = () => {

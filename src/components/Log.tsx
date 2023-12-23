@@ -7,6 +7,7 @@ import './Log.css';
 const Log = () => {
   const [logs, setLogs] = useState([]);
   const [columns, setColumns] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -14,20 +15,22 @@ const Log = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
+        setIsLoading(true); // Start loading
         const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_log/`, 
         {}, {  
-        headers: {
+          headers: {
             Authorization: `Bearer ${tokenRef.current}`,
           },
         });
 
         if (response.data && response.data.length > 0) {
           setLogs(response.data);
-          // Infer column names from the first log entry
           setColumns(Object.keys(response.data[0]));
         }
       } catch (error) {
         console.error('Error fetching logs:', error);
+      } finally {
+        setIsLoading(false); // Stop loading whether success or error
       }
     };
 
@@ -36,24 +39,28 @@ const Log = () => {
 
   return (
     <div className="log-table">
-      <table>
-        <thead>
-          <tr>
-            {columns.map((column, index) => (
-              <th key={index}>{column}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {logs.map((log, index) => (
-            <tr key={index}>
-              {columns.map((column, cellIndex) => (
-                <td key={cellIndex}>{log[column]}</td>
+      {isLoading ? (
+        <div className="loading-spinner">Loading...</div> // Display loading spinner
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              {columns.map((column, index) => (
+                <th key={index}>{column}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {logs.map((log, index) => (
+              <tr key={index}>
+                {columns.map((column, cellIndex) => (
+                  <td key={cellIndex}>{log[column]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };

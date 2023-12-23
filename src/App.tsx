@@ -8,11 +8,11 @@ function App() {
   return (
     <>
       <AuthProvider authType={"localstorage"} authName={"sparkaichatbot"}>
-      <BrowserRouter>
+        <BrowserRouter>
+
             <NavBar />
-            <div className="main-content">
-              <Routing />
-            </div>
+            <Routing />
+
         </BrowserRouter>
       </AuthProvider>
     </>

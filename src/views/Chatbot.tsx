@@ -360,7 +360,7 @@ const Chatbot = () => {
 
   return (
     <Container fluid="md" className="mt-4">
-      <Row className="justify-content-md-center mt-4">
+      <Row className="justify-content-md-center mt-5">
         <Col md={12}>
           <div className="dataset-folders">
             {availableCollections.map((collection, index) => (
@@ -407,7 +407,7 @@ const Chatbot = () => {
           </div>
         </Col>
       </Row>
-      <Row className="justify-content-md-center">
+      <Row className="justify-content-md-center mt-4">
         <Col md={9}>
           {" "}
           {/* Adjusted width for the question box */}

@@ -1,0 +1,187 @@
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+div,
+figure {
+    margin: 0;
+    padding: 0;
+}
+
+.cards-container {
+    display: flex;
+    min-height: 70vh;
+    max-height: 89.5vh;
+    margin-top: 80px !important;
+    width: 100%;
+    padding: 0 !important;
+    /* If you want spacing around the outer edge of the cards container, add padding here */
+    box-sizing: border-box;
+    justify-content: center !important;
+    /* This will add space between the flex items */
+}
+
+.cardcustom {
+    flex: 1;
+    box-sizing: border-box;
+    width: 49.5vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.cardcustom.light-grey {
+    background-color: #e8eae7;
+    border-radius: 15px 0 0 15px;
+    position: relative;
+    /* Needed for z-index to work */
+    z-index: 2;
+    /* Higher z-index so this card appears on top */
+    /* Other styles as needed */
+}
+
+.cardcustom.off-white {
+    background-color: #ffffff;
+    border-radius: 0 15px 15px 0;
+    position: relative;
+    /* Needed for z-index to work */
+    z-index: 1;
+    /* Lower z-index so this card appears below the grey card */
+    /* Other styles as needed */
+}
+
+.image-container {
+    /* Set to the background color of the card for seamless appearance */
+    padding: 10px;
+    /* Add some padding around the image if desired */
+    display: flex;
+    justify-content: center;
+    /* Center the image horizontally */
+    align-items: center;
+    /* Center the image vertically */
+    max-width: 10%;
+    /* Adjust the width of the image container */
+    margin: 0 auto;
+    /* Center the container within the card */
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    transform: translateY(-10%);
+    /* This moves the content up by 10% of the container's height */
+}
+
+.card-image {
+    mix-blend-mode: multiply!important;
+    max-width: 50%;
+    /* Adjust the width as necessary */
+    height: auto;
+    /* Maintain aspect ratio */
+    margin-bottom: 20px;
+    /* Add space between the image and the text */
+}
+
+.card-text {
+    text-align: center;
+    /* Center the text horizontally */
+    /* No need for absolute positioning here as flexbox is used */
+}
+
+.card-text h1 {
+    font-size: 2em;
+    /* Adjust the font size to make it larger */
+    font-weight: bold;
+    /* Makes the font bold */
+    /* Additional styling like color, margin, etc., can be added if needed */
+}
+
+
+/* Optional: Responsive design for smaller screens */
+
+@media (max-width: 600px) {
+    .cards-container {
+        flex-direction: column;
+        border-radius: 15px 0 0 15px;
+    }
+}
+
+.cardmini {
+    background-color: white;
+    padding: 120px;
+    /* Increased padding for more internal space */
+    border-radius: 4px;
+    max-width: 600px;
+    width: 50vw;
+    height: 80vh;
+    /* Increased max-width for a larger card */
+    margin: 40px auto;
+    /* Adjust the margin as needed to center the card */
+}
+
+
+/* The rest of your CSS can remain unchanged */
+
+.cardmini-text h2 {
+    font-size: 1.6em;
+    /* Adjust the font size to make it larger */
+    font-weight: bold;
+    text-align: left;
+    /* Align the text to the left */
+    padding-left: 0px;
+    /* This value should be adjusted to match the TextField's left padding */
+    margin-top: 0;
+    margin-bottom: 30px;
+    /* Adjust as needed for your design */
+}
+
+.cardmini-text p {
+    /* Styles for the paragraph text can also be defined here */
+    /* For example, you can control the size, spacing, and color */
+    text-align: left;
+    /* Align the text to the left */
+    padding-left: 0px;
+    /* This value should be adjusted to match the TextField's left padding */
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+.input-field {
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.login-button {
+    width: 100%;
+    padding: 8px 0;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    background-color: black!important;
+    /* Light black background */
+    color: white;
+    /* Text color */
+    /* Other styles */
+}
+
+
+/* Add a hover effect if you like */
+
+.login-button:hover {
+    background-color: #707070;
+}
+
+.login-button:hover {
+    background-color: #707070;
+    /* Slightly lighter shade for hover state */
+}

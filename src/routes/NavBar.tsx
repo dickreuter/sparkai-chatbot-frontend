@@ -73,7 +73,7 @@ const NavBar = () => {
       <a className="navbar-brand" href="/">
          
          
-           SPARK AI 
+           mytender.io 
            &nbsp;
            <i className="far fa-comments"></i> 
       </a>

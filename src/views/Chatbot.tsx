@@ -314,7 +314,7 @@ const Chatbot = () => {
       await axios.post(`http${HTTP_PREFIX}://${API_URL}/uploadtext`, formData, {
         headers: { Authorization: `Bearer ${tokenRef.current}` },
       });
-      displayAlert("Feedback upolload successful", "success");
+      displayAlert("Feedback upload successful", "success");
       // Handle successful submission, e.g., clear feedback or show a message
     } catch (error) {
       console.error("Error sending feedback:", error);

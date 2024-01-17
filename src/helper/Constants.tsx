@@ -1,5 +1,5 @@
 export const API_URL = import.meta.env.VITE_REACT_APP_API_URL || '44.208.84.199:7860';
-export const HTTP_PREFIX = import.meta.env.VITE_REACT_APP_HTTP_PREFIX || '';
+export const HTTP_PREFIX = import.meta.env.VITE_REACT_APP_API_URL_PREFIX_HTTPS? '' : '';
 
 export const placeholder_upload=`
 Enter your QUESTION/ANSWER text here. Separate questions and answers with a new line. For example:

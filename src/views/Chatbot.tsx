@@ -175,19 +175,28 @@ const Chatbot = () => {
       // Add a confirmation popup
       const confirmAction = window.confirm("Do you want to use Copilot for this selection?");
       if (confirmAction) {
-        // User clicked 'OK', continue with the process
-        setInputText(selectedText);
-        setChoice("1"); // Set choice to Copilot
+        // User clicked 'OK', ask for further instructions
+        const instructions = window.prompt("Please enter instructions how to enhance the selected text:");
+        if (instructions) {
+          // User entered instructions, proceed with the process
+          setInputText(selectedText);
+          setBackgroundInfo(instructions); // Set the instructions
+          setChoice("1"); // Set choice to Copilot
   
-        // Wait for state update before sending the question
-        await new Promise((resolve) => setTimeout(resolve, 0));
-        sendQuestion(); // Call sendQuestion function to simulate submit
+          // Wait for state update before sending the question
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          sendQuestion(); // Call sendQuestion function to simulate submit
+        } else {
+          // User clicked 'Cancel' in the instructions prompt, exit the function
+          return;
+        }
       } else {
-        // User clicked 'Cancel', exit the function
+        // User clicked 'Cancel' in the initial confirmation, exit the function
         return;
       }
     }
   };
+  
   
 
   const handleDatasetFileDrop = async (collectionName, file) => {

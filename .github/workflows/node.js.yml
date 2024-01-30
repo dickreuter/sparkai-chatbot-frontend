@@ -20,7 +20,12 @@ jobs:
       run: npm install
 
     - name: Build
-      run: npm run build
+      run: |
+        if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+          npm run build:dev
+        else
+          npm run build:prod
+        fi
 
     - name: Set Target Directory
       run: |

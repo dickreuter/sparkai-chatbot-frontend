@@ -512,3 +512,4 @@ default*.*
 *code-workspace
 package-lock.json
 db/
+.env.*

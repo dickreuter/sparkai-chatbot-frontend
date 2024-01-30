@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   build:
@@ -22,13 +22,20 @@ jobs:
     - name: Build
       run: npm run build
 
+    - name: Set Target Directory
+      id: set-target
+      run: |
+        if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+          echo "TARGET_DIR=/home/ec2-user/www-dev" >> $GITHUB_ENV
+        else
+          echo "TARGET_DIR=/home/ec2-user/www" >> $GITHUB_ENV
+
     - name: Deploy to Server
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.DEPLOYMENT_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan 44.208.84.199 >> ~/.ssh/known_hosts
-        scp -i ~/.ssh/id_rsa -r ./dist/* ec2-user@44.208.84.199:/home/ec2-user/www
+        scp -i ~/.ssh/id_rsa -r ./dist/* ec2-user@44.208.84.199:$TARGET_DIR
       env:
         DEPLOY_KEY: ${{ secrets.DEPLOYMENT_KEY }}
-    

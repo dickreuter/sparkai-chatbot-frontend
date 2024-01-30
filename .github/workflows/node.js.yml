@@ -23,12 +23,12 @@ jobs:
       run: npm run build
 
     - name: Set Target Directory
-      id: set-target
       run: |
         if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
           echo "TARGET_DIR=/home/ec2-user/www-dev" >> $GITHUB_ENV
         else
           echo "TARGET_DIR=/home/ec2-user/www" >> $GITHUB_ENV
+        fi
 
     - name: Deploy to Server
       run: |

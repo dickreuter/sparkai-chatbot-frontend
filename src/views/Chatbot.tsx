@@ -311,8 +311,7 @@ const Chatbot = () => {
                 <option value="3">
                   Answer Question with multi-step Topic Selection
                 </option>
-                <option value="2">Answer Question</option>
-                <option value="1">Continue Answer (Copilot)</option>
+                <option value="2">One Step Question answering</option>
               </Form.Select>
             </Form.Group>
             <Form.Group className="mb-3">

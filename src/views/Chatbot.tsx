@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import axios from "axios";
-import { ContentState, EditorState } from "draft-js";
-import { useAuthUser } from "react-auth-kit";
-import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap";
+import {useAuthUser} from "react-auth-kit";
+import {Button, Col, Container, Form, Row, Spinner} from "react-bootstrap";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { displayAlert } from "../helper/Alert";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import {displayAlert} from "../helper/Alert";
+import {API_URL, HTTP_PREFIX} from "../helper/Constants";
 import withAuth from "../routes/withAuth";
 import "./Chatbot.css";
 import FolderLogic from "../components/Folders";

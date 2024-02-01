@@ -1,15 +1,15 @@
+import React, {useEffect, useRef, useState} from 'react';
 import axios from "axios";
-import {ContentState, EditorState, Modifier} from "draft-js";
-import {useEffect, useRef, useState} from "react";
+import {ContentState, EditorState} from "draft-js";
 import {useAuthUser} from "react-auth-kit";
 import {Button, Col, Container, Form, Row, Spinner} from "react-bootstrap";
-import {Editor} from "react-draft-wysiwyg";
-import "../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import {displayAlert} from "../helper/Alert";
 import {API_URL, HTTP_PREFIX} from "../helper/Constants";
 import withAuth from "../routes/withAuth";
 import "./Chatbot.css";
 import FolderLogic from "../components/Folders";
+import CustomEditor from "../components/TextEditor.tsx";
 
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
@@ -26,52 +26,21 @@ const Chatbot = () => {
     const [availableCollections, setAvailableCollections] = useState<string[]>(
         []
     );
-    const [editorState, setEditorState] = useState(
-        EditorState.createWithContent(ContentState.createFromText(""))
-    );
 
     const [feedback, setFeedback] = useState("");
     const [questionAsked, setQuestionAsked] = useState(false);
     const [apiChoices, setApiChoices] = useState([]);
     const [selectedChoices, setSelectedChoices] = useState([]);
+    // Define a new state to trigger the append action
+    const [appendResponse, setAppendResponse] = useState(false);
 
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
-
-    const onEditorStateChange = (editorState) => {
-        setEditorState(editorState);
+    const handleAppendResponseToEditor = () => {
+        setAppendResponse(prevState => !prevState); // Toggle to trigger useEffect in CustomEditor
     };
 
-    const appendToEditor = () => {
-        const currentContent = editorState.getCurrentContent();
-        const currentContentBlock = currentContent.getBlockMap().last();
-
-        const lengthOfLastBlock = currentContentBlock.getLength();
-        // If there is already text, add a newline before appending
-        const modifiedText = lengthOfLastBlock > 0 ? `\n${response}` : response;
-
-        const selectionState = editorState.getSelection().merge({
-            anchorKey: currentContentBlock.getKey(),
-            anchorOffset: lengthOfLastBlock,
-            focusKey: currentContentBlock.getKey(),
-            focusOffset: lengthOfLastBlock,
-        });
-
-        const newContentState = Modifier.insertText(
-            currentContent,
-            selectionState,
-            modifiedText
-        );
-
-        const newEditorState = EditorState.push(
-            editorState,
-            newContentState,
-            "insert-characters"
-        );
-
-        setEditorState(newEditorState);
-    };
 
     const countWords = (str) => {
         return str.split(/\s+/).filter(Boolean).length;
@@ -412,22 +381,10 @@ const Chatbot = () => {
             </Row>
             <Row className="justify-content-md-center">
                 <Col md={12}>
-                    <Button
-                        variant="primary"
-                        onClick={appendToEditor}
-                        className="chat-button"
-                    >
+                    <CustomEditor response={response} appendResponse={appendResponse}/>
+                    <Button variant="primary" onClick={handleAppendResponseToEditor} className="mt-3">
                         Add response to Text Editor
                     </Button>
-
-                    <Editor
-                        editorState={editorState}
-                        onEditorStateChange={onEditorStateChange}
-                        toolbarClassName="toolbarClassName"
-                        wrapperClassName="wrapperClassName editor-style"
-                        editorClassName="editorClassName"
-                    />
-                    {/* <Button onClick={downloadDocument}>Download as Word</Button> */}
                 </Col>
             </Row>
         </Container>

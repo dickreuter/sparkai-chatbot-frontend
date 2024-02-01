@@ -513,3 +513,4 @@ default*.*
 package-lock.json
 db/
 .env.*
+.idea

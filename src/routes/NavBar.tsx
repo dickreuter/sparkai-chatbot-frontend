@@ -158,6 +158,15 @@ const NavBar = () => {
           ) : (
             <></>
           )}
+           {auth ? (
+            <li className="nav-item">
+              <Link className="nav-link" to="/bids">
+                Bids
+              </Link>
+            </li>
+          ) : (
+            <></>
+          )}
           {auth ? (
             email === "adminuser" && (
               <>

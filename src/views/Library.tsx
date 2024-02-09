@@ -4,6 +4,7 @@ import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import {Button, Col, Container, Form, Row, Spinner, Card} from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import UploadPDF from './UploadPDF';
@@ -11,6 +12,10 @@ import "./Library.css";
 =======
 
 >>>>>>> 20f51b1 (sidebar)
+=======
+import {Button, Col, Container, Form, Row, Spinner} from "react-bootstrap";
+import { Link } from 'react-router-dom';
+>>>>>>> beb6724 (button)
 
 const Library = () => {
     return (
@@ -89,6 +94,14 @@ const Library = () => {
           
 =======
           <h1>Library</h1>
+          <Link to="/">
+          <Button
+            variant="primary"
+            className="chat-button mt-3"
+          >
+            New Bid
+          </Button>
+        </Link>
           <table className="bids-table">
             <thead>
               <tr>

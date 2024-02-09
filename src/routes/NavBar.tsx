@@ -96,6 +96,15 @@ const NavBar = () => {
               </li>
             </>
           )}
+           {auth ? (
+            <li className="nav-item">
+              <Link className="nav-link" to="/library">
+                Library
+              </Link>
+            </li>
+          ) : (
+            <></>
+          )}
           {auth ? (
             <li className="nav-item">
               <Link className="nav-link" to="/chatbot">
@@ -126,6 +135,15 @@ const NavBar = () => {
             <li className="nav-item">
               <Link className="nav-link" to="/uploadtemplatetext">
                 Template uploads
+              </Link>
+            </li>
+          ) : (
+            <></>
+          )}
+           {auth ? (
+            <li className="nav-item">
+              <Link className="nav-link" to="/bids">
+                Bids
               </Link>
             </li>
           ) : (

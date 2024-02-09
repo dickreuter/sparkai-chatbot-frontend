@@ -122,6 +122,14 @@ const NavBar = () => {
             </li>
           ) : (
             <></>
+          )} {auth ? (
+            <li className="nav-item">
+              <Link className="nav-link" to="/uploadtemplatetext">
+                Template uploads
+              </Link>
+            </li>
+          ) : (
+            <></>
           )}
           {auth ? (
             email === "adminuser" && (

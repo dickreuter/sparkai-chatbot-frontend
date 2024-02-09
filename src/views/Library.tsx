@@ -3,12 +3,21 @@ import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
-
+import {Button, Col, Container, Form, Row, Spinner} from "react-bootstrap";
+import { Link } from 'react-router-dom';
 
 const Library = () => {
     return (
         <div className="App">
           <h1>Library</h1>
+          <Link to="/">
+          <Button
+            variant="primary"
+            className="chat-button mt-3"
+          >
+            New Bid
+          </Button>
+        </Link>
           <table className="bids-table">
             <thead>
               <tr>

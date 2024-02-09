@@ -10,6 +10,7 @@ import "./Chatbot.css";
 import FolderLogic from "../components/Folders";
 import CustomEditor from "../components/TextEditor.tsx";
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
+import TemplateLoader from "../components/TemplateLoader.tsx";
 
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
@@ -41,6 +42,9 @@ const Chatbot = () => {
         setAppendResponse({question: inputText, answer: response}); // Include both question and answer
     };
 
+    const handleSelect = (selectedKey) => {
+        setResponse(selectedKey);
+    };
     const countWords = (str) => {
         return str.split(/\s+/).filter(Boolean).length;
     };
@@ -365,6 +369,7 @@ const Chatbot = () => {
                     )}
                     <Form.Group className="mb-3">
                         <Form.Label>Response:</Form.Label>
+                        <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
                         <Form.Control
                             as="textarea"
                             className="chat-output"
@@ -421,6 +426,7 @@ const Chatbot = () => {
                     <div>
                         <VerticalAlignBottomIcon/>
                     </div>
+
                     <CustomEditor response={response} appendResponse={appendResponse}/>
 
                 </Col>

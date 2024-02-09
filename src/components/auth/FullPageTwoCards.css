@@ -54,8 +54,6 @@ figure {
     position: relative;
     /* Needed for z-index to work */
     z-index: 1;
-    /* Lower z-index so this card appears below the grey card */
-    /* Other styles as needed */
 }
 
 .image-container {

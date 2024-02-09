@@ -9,6 +9,8 @@ import UploadText from "../views/UploadText"
 import Log from "../components/Log"
 import FLog from "../components/FLog"
 import UploadTemplateText from "../components/UploadTemplateText.tsx";
+import Bids from "../views/Bids"
+import Library from "../views/Library"
 
 
 function Routing() {
@@ -26,6 +28,9 @@ function Routing() {
                 <Route path="/uploadtemplatetext" element={<UploadTemplateText />} />
                 <Route path="/qlog" element={<Log />} />
                 <Route path="/flog" element={<FLog />} />
+                <Route path="/bids" element={<Bids />} />
+                <Route path="/library" element={<Library />} />
+
             </Routes>
         </div>
     )

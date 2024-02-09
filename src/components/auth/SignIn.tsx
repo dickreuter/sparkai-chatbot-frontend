@@ -34,18 +34,8 @@ const FullScreenTwoCards = () => {
 
   return (
     <div className="cards-container">
-        <div className="cardcustom light-grey ">
-          <div className="content-wrapper">
-          <img src="https://drive.google.com/uc?export=view&id=1euxPXCtPAXmPby7vWBnQomcQTkby2GIO" alt="Your Image Description" className="card-image"/>
-
-            <div className="card-text">
-            <h1>MyTender.io</h1>
-            <p>All in one tender management</p>
-          </div>
-          </div>
-        </div>
-
-        <div className="cardcustom off-white">
+     
+        <div className="cardcustom">
           <div className="mb-3">
             <div className="cardmini">
                 <div className="cardmini-text">

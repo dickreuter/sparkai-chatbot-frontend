@@ -8,7 +8,8 @@ import UploadPDF from "../views/UploadPDF"
 import UploadText from "../views/UploadText"
 import Log from "../components/Log"
 import FLog from "../components/FLog"
-
+import Bids from "../views/Bids"
+import Library from "../views/Library"
 
 function Routing() {
     return (
@@ -24,6 +25,9 @@ function Routing() {
                 <Route path="/uploadtext" element={<UploadText />} />
                 <Route path="/qlog" element={<Log />} />
                 <Route path="/flog" element={<FLog />} />
+                <Route path="/bids" element={<Bids />} />
+                <Route path="/library" element={<Library />} />
+
             </Routes>
         </div>
     )

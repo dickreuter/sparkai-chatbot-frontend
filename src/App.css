@@ -18,20 +18,6 @@
     }
 }
 
-.card {
-    padding: 1em;
-    min-height: 30em;
-    min-width: 10em;
-}
-
-.card:hover {
-    background-color: blue;
-    color: white;
-    /* Changing the text color to white for better visibility on blue background */
-    transition: background-color .5s ease;
-    /* Smooth transition effect */
-}
-
 .dropdowns-container {
     display: flex;
     justify-content: center;
@@ -54,5 +40,6 @@
 }
 
 .main-content {
-    margin-top: 90px; /* Adjust this value based on your navbar's height */
+    margin-top: 90px;
+    /* Adjust this value based on your navbar's height */
 }

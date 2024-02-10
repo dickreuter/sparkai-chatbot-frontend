@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import axios from "axios";
 import {useAuthUser} from "react-auth-kit";
-import {Button, Col, Container, Form, Row, Spinner} from "react-bootstrap";
+import {Button, Col, Container, Form, Row, Spinner, Card} from "react-bootstrap";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import {displayAlert} from "../helper/Alert";
 import {API_URL, HTTP_PREFIX} from "../helper/Constants";
@@ -240,6 +240,15 @@ const Chatbot = () => {
 
     return (
         <Container fluid="md" className="mt-4">
+            <Row className="justify-content-md-center mt-4">
+                    <Card className="flex-fill">
+                        
+                        <Card.Body>
+                            Bid Name
+                            Contract Information
+                        </Card.Body>
+                  </Card>
+            </Row>
             <Row className="justify-content-md-center mt-4">
                 <Col md={12}>
                     <FolderLogic

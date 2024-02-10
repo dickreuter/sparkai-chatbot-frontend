@@ -8,8 +8,11 @@ import Routing from './routes/Routing';
 const Layout = () => {
   const location = useLocation();
   
-  // Check if the current location is not the Bids page
-  const showNavBar = location.pathname !== '/bids'; // Adjust '/bids' to the exact path of your Bids page
+  // List of paths where the NavBar should be hidden
+  const hideNavBarPaths = ['/bids', '/chatbot'];
+  
+  // Check if the current location's pathname is NOT in the list of paths
+  const showNavBar = !hideNavBarPaths.includes(location.pathname);
   
   return (
     <>

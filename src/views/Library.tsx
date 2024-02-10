@@ -13,7 +13,7 @@ const Library = () => {
         <div className="App">
 
           <h1>Library</h1>
-          <Link to="/">
+          <Link to="/chatbot">
             <Button
               variant="primary"
               className="chat-button mt-3"

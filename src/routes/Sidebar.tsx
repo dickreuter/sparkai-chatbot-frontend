@@ -5,9 +5,9 @@ import "./Sidebar.css";
 const SideBar = () => {
   return (
     <div className="sidebar">
-      <Link to="/">Home</Link>
-      <Link to="/bid1">Bid 1</Link>
-      <Link to="/bid2">Bid 2</Link>
+      <Link to="/library">Home</Link>
+      <Link to="/chatbot">Chatbot</Link>
+      <Link to="/bids">Bids</Link>
       // Add additional links as necessary
     </div>
   );

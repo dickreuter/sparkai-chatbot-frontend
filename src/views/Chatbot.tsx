@@ -243,215 +243,236 @@ const Chatbot = () => {
         <div id="chatbot-page">
             <SideBar />
         
-        
-        <Container fluid="md">
-            <Row >
-                    <div className="custom-card">
-                        <Form.Group className="mb-3">
-                            <Form.Label className="custom-label">Bid Name...</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                className="background-info-input"
-                                value={backgroundInfo}
-                                onChange={(e) => setBackgroundInfo(e.target.value)}
-                            />
-                        </Form.Group>
+            <div className="chatbot-container">
 
-                        {" "}
-                        {/* New column for background information 
-                        used to be Additional instructions (optional)*/}
-                        <Form.Group className="mb-3">
-                            <Form.Label className="custom-label" >Contract Information...</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                className="background-info-input"
-                                value={backgroundInfo}
-                                onChange={(e) => setBackgroundInfo(e.target.value)}
-                            />
-                        </Form.Group>
-                    </div>
-            </Row>
-            <Row className="justify-content-md-center mt-4">
-               
-                    <FolderLogic
-                        tokenRef={tokenRef}
-                        setAvailableCollections={setAvailableCollections}
-                        setFolderContents={setFolderContents}
-                        availableCollections={availableCollections}
-                        folderContents={folderContents}
-                    />
-              
-            </Row>
-            <Row className="justify-content-md-center">
-               
-                    {" "}
-                    {/* Adjusted width for the question box */}
-                    <Form.Group className="mb-3">
-                        <Form.Label>Enter your question or input:</Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            className="chat-input"
-                            value={inputText}
-                            onChange={(e) => setInputText(e.target.value)}
-                        />
-                        <Form.Text className="text-muted">
-                            Word Count: {inputText.split(/\s+/).filter(Boolean).length}
-                        </Form.Text>
-                    </Form.Group>
-                
-                   
-             
-            </Row>
+           
+                <Container fluid="md">
+                    <Row >
+                            <div className="custom-card">
+                                  {/* Need to add Bid Name field*/}
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="custom-label">Bid Name...</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        className="background-info-input"
+                                        
+                                    />
+                                </Form.Group>
 
-            <Row className="justify-content-md-center">
-                <Col md={12}>
-                    <div className="dropdowns">
-                        <Form.Group className="mb-3">
-                            <Form.Label>Select dataset:</Form.Label>
-                            <Form.Select
-                                aria-label="Dataset selection"
-                                className="w-100 mx-auto chat-dropdown"
-                                value={dataset}
-                                onChange={(e) => setDataset(e.target.value)}
-                            >
-                                <option value="" disabled>
-                                    Select a dataset
-                                </option>
                                 {" "}
-                                {/* This option is added */}
-                                {availableCollections.map((collection) => (
-                                    <option key={collection} value={collection}>
-                                        {collection}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Select Function:</Form.Label>
-                            <Form.Select
-                                aria-label="Function selection"
-                                className="w-100 mx-auto chat-dropdown"
-                                value={choice}
-                                onChange={(e) => setChoice(e.target.value)}
-                            >
-                                <option value="3">
-                                    Answer Question with multi-step Topic Selection
-                                </option>
-                                <option value="2">One Step Question answering</option>
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Broadness of database search:</Form.Label>
-                            <Form.Select
-                                aria-label="Function selection"
-                                className="w-100 mx-auto chat-dropdown"
-                                value={broadness}
-                                onChange={(e) => setBroadness(e.target.value)}
-                            >
-                                <option value="1">Narrow (single database entry)</option>
-                                <option value="2">Extended (up to 2 entries)</option>
-                                <option value="3">Broad (up to 3 entries)</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </div>
+                                {/* New column for background information 
+                                used to be Additional instructions (optional)*/}
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="custom-label" >Contract Information...</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        className="background-info-input"
+                                        value={backgroundInfo}
+                                        onChange={(e) => setBackgroundInfo(e.target.value)}
+                                    />
+                                </Form.Group>
+                            </div>
+                    </Row>
+                    <Row className="justify-content-md-center mt-4">
+                    
+                            <FolderLogic
+                                tokenRef={tokenRef}
+                                setAvailableCollections={setAvailableCollections}
+                                setFolderContents={setFolderContents}
+                                availableCollections={availableCollections}
+                                folderContents={folderContents}
+                            />
+                    
+                    </Row>
+                    <Row className="justify-content-md-center">
+                        <Col md={8}>
+                            {" "}
+                            {/* Adjusted width for the question box */}
+                            <Form.Group className="mb-3">
+                                <Form.Label>Enter your question or input:</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    className="chat-input"
+                                    value={inputText}
+                                    onChange={(e) => setInputText(e.target.value)}
+                                />
+                                <Form.Text className="text-muted">
+                                    Word Count: {inputText.split(/\s+/).filter(Boolean).length}
+                                </Form.Text>
+                            </Form.Group>
+                            <div className="d-flex  mb-3">
+                                <VerticalAlignBottomIcon/>
+                                <Button
+                                    variant="primary"
+                                    onClick={sendQuestion}
+                                    className="chat-button"
+                                >
+                                    Submit
+                                </Button>
+                                <VerticalAlignBottomIcon/>
 
-                    <div className="d-flex justify-content-center mb-3">
-                        <VerticalAlignBottomIcon/>
-                        <Button
-                            variant="primary"
-                            onClick={sendQuestion}
-                            className="chat-button"
-                        >
-                            Submit
-                        </Button>
-                        <VerticalAlignBottomIcon/>
+                            </div>
+                        </Col>
+                        <Col md={4}>
+                            <div className="dropdowns">
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Select dataset:</Form.Label>
+                                        <Form.Select
+                                            aria-label="Dataset selection"
+                                            className="w-100 mx-auto chat-dropdown"
+                                            value={dataset}
+                                            onChange={(e) => setDataset(e.target.value)}
+                                        >
+                                            <option value="" disabled>
+                                                Select a dataset
+                                            </option>
+                                            {" "}
+                                            {/* This option is added */}
+                                            {availableCollections.map((collection) => (
+                                                <option key={collection} value={collection}>
+                                                    {collection}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Select Function:</Form.Label>
+                                        <Form.Select
+                                            aria-label="Function selection"
+                                            className="w-100 mx-auto chat-dropdown"
+                                            value={choice}
+                                            onChange={(e) => setChoice(e.target.value)}
+                                        >
+                                            <option value="3">
+                                                Answer Question with multi-step Topic Selection
+                                            </option>
+                                            <option value="2">One Step Question answering</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Broadness of database search:</Form.Label>
+                                        <Form.Select
+                                            aria-label="Function selection"
+                                            className="w-100 mx-auto chat-dropdown"
+                                            value={broadness}
+                                            onChange={(e) => setBroadness(e.target.value)}
+                                        >
+                                            <option value="1">Narrow (single database entry)</option>
+                                            <option value="2">Extended (up to 2 entries)</option>
+                                            <option value="3">Broad (up to 3 entries)</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </div>
+                        </Col>
+                        
+                        
+                    
+                    </Row>
 
-                    </div>
+                    <Row className="justify-content-md-center">
+                        <Col md={8}>
+                            
 
-                    {isLoading && (
-                        <div className="text-center my-3">
-                            <Spinner animation="border"/>
-                            <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
+                            {isLoading && (
+                                <div className="my-3">
+                                    <Spinner animation="border"/>
+                                    <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
+                                </div>
+                            )}
+                            {choice === "3" && apiChoices.length > 0 && (
+                                <div>
+                                    {renderChoices()}
+                                    <Button
+                                        variant="primary"
+                                        onClick={submitSelections}
+                                        className="chat-button"
+                                        disabled={selectedChoices.length === 0}
+                                    >
+                                        Generate answers for selected subsections
+                                    </Button>
+                                </div>
+                            )}
+                            <Form.Group className="mb-3">
+                                <Form.Label>Response:</Form.Label>
+                                <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
+                                <Form.Control
+                                    as="textarea"
+                                    className="chat-output mt-3"
+                                    value={response}
+                                    onChange={(e) => setResponse(e.target.value)}
+                                    onMouseUp={handleTextHighlight}
+                                />
+                                <Form.Text className="text-muted">
+                                    Word Count: {countWords(response)}
+                                </Form.Text>
+                            </Form.Group>
+                        </Col>
+                        <Col md={4}>
+                        <div className="container">
+                        <button >Copilot button</button>
+                        <div className="co-pilot-task mt-2">Copilot task...</div>
+                        <ul className="options-list">
+                            <li>Option 1</li>
+                            <li>Option 2</li>
+                            <li>Option 3</li>
+                            <li>Option 4</li>
+                            <li>Option 5</li>
+                        </ul>
                         </div>
-                    )}
-                    {choice === "3" && apiChoices.length > 0 && (
-                        <div>
-                            {renderChoices()}
+
+                        </Col>
+                    </Row>
+
+                    {/* Feedback Section */}
+                    <Row className="justify-content-md-center">
+                        <Col md={12}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>
+                                    Feedback: (describe how the question can be answered better in the
+                                    future){" "}
+                                </Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    className="feedback-textarea"
+                                    value={feedback}
+                                    onChange={(e) => setFeedback(e.target.value)}
+                                    disabled={!questionAsked} // Disabled until a question is asked
+                                />
+                            </Form.Group>
+                            <div className="d-flex justify-content-center mb-3">
+                                <Button
+                                    variant="primary"
+                                    onClick={submitFeedback}
+                                    className="chat-button"
+                                    disabled={!questionAsked} // Disabled until a question is asked
+                                >
+                                    Submit Feedback
+                                </Button>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row className="justify-content-md-center text-center">
+                        <Col md={12}>
                             <Button
                                 variant="primary"
-                                onClick={submitSelections}
-                                className="chat-button"
-                                disabled={selectedChoices.length === 0}
+                                onClick={handleAppendResponseToEditor}
+                                className="mt-3"
                             >
-                                Generate answers for selected subsections
+                                Add question/answer to Text Editor
+                                {/*down arrow */}
+
                             </Button>
-                        </div>
-                    )}
-                    <Form.Group className="mb-3 text-center ">
-                        <Form.Label>Response:</Form.Label>
-                        <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
-                        <Form.Control
-                            as="textarea"
-                            className="chat-output mt-3"
-                            value={response}
-                            onChange={(e) => setResponse(e.target.value)}
-                            onMouseUp={handleTextHighlight}
-                        />
-                        <Form.Text className="text-muted">
-                            Word Count: {countWords(response)}
-                        </Form.Text>
-                    </Form.Group>
-                </Col>
-            </Row>
+                            <div>
+                                <VerticalAlignBottomIcon/>
+                            </div>
+                            <div className="d-flex justify-content-center mb-3">
+                            <CustomEditor response={response} appendResponse={appendResponse}/>
+                            </div>
+                        </Col>
+                    </Row>
+                </Container>
 
-            {/* Feedback Section */}
-            <Row className="justify-content-md-center">
-                <Col md={12}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>
-                            Feedback: (describe how the question can be answered better in the
-                            future){" "}
-                        </Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            className="feedback-textarea"
-                            value={feedback}
-                            onChange={(e) => setFeedback(e.target.value)}
-                            disabled={!questionAsked} // Disabled until a question is asked
-                        />
-                    </Form.Group>
-                    <div className="d-flex justify-content-center mb-3">
-                        <Button
-                            variant="primary"
-                            onClick={submitFeedback}
-                            className="chat-button"
-                            disabled={!questionAsked} // Disabled until a question is asked
-                        >
-                            Submit Feedback
-                        </Button>
-                    </div>
-                </Col>
-            </Row>
-            <Row className="justify-content-md-center text-center">
-                <Col md={12}>
-                    <Button
-                        variant="primary"
-                        onClick={handleAppendResponseToEditor}
-                        className="mt-3"
-                    >
-                        Add question/answer to Text Editor
-                        {/*down arrow */}
-
-                    </Button>
-                    <div>
-                        <VerticalAlignBottomIcon/>
-                    </div>
-                    <div className="d-flex justify-content-center mb-3">
-                    <CustomEditor response={response} appendResponse={appendResponse}/>
-                    </div>
-                </Col>
-            </Row>
-        </Container>
+            </div>
         </div>
     );
 };

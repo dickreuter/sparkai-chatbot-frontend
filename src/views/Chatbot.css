@@ -1,5 +1,6 @@
-#chatbot-page .main-content {
+.chatbot-container {
     margin-top: 0;
+    margin-left: 100px;
     /* or whatever value you desire for the chatbot page */
 }
 
@@ -61,7 +62,7 @@
 /* Increase the height for the input and output textareas */
 
 .chat-input {
-    height: 10vh;
+    height: 27vh;
     /* Adjust the height here */
 }
 
@@ -90,6 +91,7 @@
 }
 
 .chat-input,
+.chat-output,
 .background-info-input {
     width: 100%;
     /* Set width to 100% of the parent container */
@@ -118,7 +120,7 @@
 
 .dropdowns {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     flex-wrap: nowrap;
 }
@@ -180,4 +182,30 @@
     align-items: center;
     justify-content: center;
     margin: 5px 0;
+}
+
+.container {
+    border: 1px dashed black;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Adds a subtle shadow */
+    margin: 1rem;
+    padding: 1rem;
+    height: 40vh;
+}
+
+.co-pilot-task {
+    border: 1px dashed black;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+}
+
+.options-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.options-list li {
+    margin-bottom: 5px;
 }

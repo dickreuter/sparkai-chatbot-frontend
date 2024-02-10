@@ -1,0 +1,42 @@
+.library-container {
+    display: flex;
+    /* Align the tops of the two children */
+}
+
+.library-table {
+    flex: 1;
+    min-height: 50vh;
+    max-height: 50vh;
+    display: flex;
+    /* Takes up the remaining space */
+}
+
+.upload-component {
+    margin-left: 20px;
+    /* Spacing between table and upload component */
+    display: flex;
+    min-height: 50vh;
+    max-height: 50vh;
+    /* Adjust the width of the upload component as needed */
+}
+
+.bids-table {
+    width: 90%;
+    width: 90vh;
+    /* Adjust to the desired width */
+    margin: 20px auto;
+    /* Centers the table with a margin above and below */
+    border-collapse: collapse;
+}
+
+.bids-table th,
+.bids-table td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+    /* Align text to the left within cells */
+}
+
+.bids-table th {
+    background-color: #f2f2f2;
+}

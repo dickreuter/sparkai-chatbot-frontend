@@ -71,7 +71,7 @@ const NavBar = () => {
       </button>
       <a className="navbar-brand" href="/">
         mytender.io &nbsp;
-        <i className="far fa-comments"></i>
+       
       </a>
 
       <div

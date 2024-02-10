@@ -71,7 +71,7 @@ const NavBar = () => {
       </button>
       <a className="navbar-brand" href="/">
         mytender.io &nbsp;
-        <i className="far fa-comments"></i>
+       
       </a>
 
       <div
@@ -95,6 +95,15 @@ const NavBar = () => {
                 </Link>
               </li>
             </>
+          )}
+           {auth ? (
+            <li className="nav-item">
+              <Link className="nav-link" to="/library">
+                Library
+              </Link>
+            </li>
+          ) : (
+            <></>
           )}
           {auth ? (
             <li className="nav-item">
@@ -131,6 +140,17 @@ const NavBar = () => {
           ) : (
             <></>
           )}
+           {auth ? (
+            <li className="nav-item">
+              <Link className="nav-link" to="/bids">
+                Bids
+              </Link>
+            </li>
+          ) : (
+            <></>
+          )}
+         
+       
           {auth ? (
             email === "adminuser" && (
               <>

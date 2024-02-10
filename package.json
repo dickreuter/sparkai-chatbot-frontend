@@ -34,15 +34,15 @@
         "react-tooltip": "^5.25.0"
     },
     "devDependencies": {
-        "@types/react": "^18.2.29",
-        "@types/react-dom": "^18.2.14",
+        "@types/react": "^18.2.55",
+        "@types/react-dom": "^18.2.19",
         "@typescript-eslint/eslint-plugin": "^6.8.0",
         "@typescript-eslint/parser": "^6.8.0",
         "@vitejs/plugin-react": "^4.1.0",
         "eslint": "^8.51.0",
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-react-refresh": "^0.4.3",
-        "typescript": "^5.2.2",
+        "typescript": "^5.3.3",
         "vite": "^4.5.0"
     }
 }

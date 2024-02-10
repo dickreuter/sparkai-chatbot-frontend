@@ -1,6 +1,5 @@
 #root {
     margin: 0 auto;
-    text-align: center;
 }
 
 @keyframes logo-spin {
@@ -40,6 +39,6 @@
 }
 
 .main-content {
-    margin-top: 90px;
+    padding: 30px;
     /* Adjust this value based on your navbar's height */
 }

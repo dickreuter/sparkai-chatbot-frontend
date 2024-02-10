@@ -8,6 +8,7 @@ const SideBar = () => {
       <Link to="/library">Home</Link>
       <Link to="/chatbot">Chatbot</Link>
       <Link to="/bids">Bids</Link>
+      <Link to="/feedback">Feedback</Link>
       // Add additional links as necessary
     </div>
   );

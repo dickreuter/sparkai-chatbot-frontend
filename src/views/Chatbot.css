@@ -1,6 +1,14 @@
 .chatbot-container {
     margin-top: 0;
-    margin-left: 100px;
+    width: 80vw;
+    height: 100%;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 1rem;
+    margin-left: 90px;
+    padding: 2rem;
+    border: 1px dashed #000;
+    justify-content: center;
     /* or whatever value you desire for the chatbot page */
 }
 
@@ -19,12 +27,8 @@
 
 .custom-card {
     background-color: #f7d5b2;
-    /* This sets the background to orange */
     border-radius: 4px;
-    /* Gives the card rounded corners */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Adds a subtle shadow */
-    margin: 1rem;
     padding: 1rem;
     border: 1px dashed #000;
     /* Dashed border */
@@ -37,7 +41,6 @@
 .custom-card-title,
 .custom-card-content {
     border-bottom: 1px dashed #000;
-    /* Dashed line under the title and content */
     margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
 }
@@ -52,14 +55,10 @@
 .chat-input,
 .chat-output {
     width: 70vw;
-    /* Using viewport widths to ensure it's based on the size of the screen */
     margin-left: auto;
     margin-right: auto;
     display: block;
 }
-
-
-/* Increase the height for the input and output textareas */
 
 .chat-input {
     height: 27vh;
@@ -100,12 +99,6 @@
     display: block;
 }
 
-
-/* Other styles remain unchanged */
-
-
-/* Add custom padding to the columns if needed */
-
 .pr-2 {
     /* Right padding for the left column */
     padding-right: 0.5rem;
@@ -125,18 +118,11 @@
     flex-wrap: nowrap;
 }
 
-.feedback-textarea {
-    height: 100px;
-    /* Adjust the height as needed */
-}
-
 .dataset-folders {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    /* Centers the folders horizontally */
     gap: 20px;
-    /* Adjust as needed */
     align-items: center;
 }
 
@@ -144,9 +130,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    /* Adjust as needed */
     border: 2px dashed transparent;
-    /* For consistent spacing and drop zone indication */
 }
 
 .dataset-folder.drag-over {

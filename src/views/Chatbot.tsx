@@ -190,24 +190,7 @@ const Chatbot = () => {
         );
     };
 
-    const submitFeedback = async () => {
-        const formData = new FormData();
-        formData.append("text", `Question: ${inputText} \n Feedback: ${feedback}`);
-        formData.append("profile_name", dataset); // Assuming email is the profile_name
-        formData.append("mode", "feedback");
-        console.log(formData);
-
-        try {
-            await axios.post(`http${HTTP_PREFIX}://${API_URL}/uploadtext`, formData, {
-                headers: {Authorization: `Bearer ${tokenRef.current}`},
-            });
-            displayAlert("Feedback upload successful", "success");
-            // Handle successful submission, e.g., clear feedback or show a message
-        } catch (error) {
-            console.error("Error sending feedback:", error);
-            // Handle error
-        }
-    };
+ 
 
     const submitSelections = async () => {
         setIsLoading(true);
@@ -423,53 +406,7 @@ const Chatbot = () => {
                         </Col>
                     </Row>
 
-                    {/* Feedback Section */}
-                    <Row className="justify-content-md-center">
-                        <Col md={12}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>
-                                    Feedback: (describe how the question can be answered better in the
-                                    future){" "}
-                                </Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    className="feedback-textarea"
-                                    value={feedback}
-                                    onChange={(e) => setFeedback(e.target.value)}
-                                    disabled={!questionAsked} // Disabled until a question is asked
-                                />
-                            </Form.Group>
-                            <div className="d-flex justify-content-center mb-3">
-                                <Button
-                                    variant="primary"
-                                    onClick={submitFeedback}
-                                    className="chat-button"
-                                    disabled={!questionAsked} // Disabled until a question is asked
-                                >
-                                    Submit Feedback
-                                </Button>
-                            </div>
-                        </Col>
-                    </Row>
-                    <Row className="justify-content-md-center text-center">
-                        <Col md={12}>
-                            <Button
-                                variant="primary"
-                                onClick={handleAppendResponseToEditor}
-                                className="mt-3"
-                            >
-                                Add question/answer to Text Editor
-                                {/*down arrow */}
-
-                            </Button>
-                            <div>
-                                <VerticalAlignBottomIcon/>
-                            </div>
-                            <div className="d-flex justify-content-center mb-3">
-                            <CustomEditor response={response} appendResponse={appendResponse}/>
-                            </div>
-                        </Col>
-                    </Row>
+                 
                 </Container>
 
             </div>

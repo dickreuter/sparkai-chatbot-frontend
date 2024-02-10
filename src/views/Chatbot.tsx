@@ -11,6 +11,7 @@ import FolderLogic from "../components/Folders";
 import CustomEditor from "../components/TextEditor.tsx";
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import TemplateLoader from "../components/TemplateLoader.tsx";
+import SideBar from '../routes/Sidebar.tsx' 
 
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
@@ -239,18 +240,39 @@ const Chatbot = () => {
     };
 
     return (
-        <Container fluid="md" className="mt-4">
-            <Row className="justify-content-md-center mt-4">
-                    <Card className="flex-fill">
-                        
-                        <Card.Body>
-                            Bid Name
-                            Contract Information
-                        </Card.Body>
-                  </Card>
+        <div id="chatbot-page">
+            <SideBar />
+        
+        
+        <Container fluid="md">
+            <Row >
+                    <div className="custom-card">
+                        <Form.Group className="mb-3">
+                            <Form.Label className="custom-label">Bid Name...</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                className="background-info-input"
+                                value={backgroundInfo}
+                                onChange={(e) => setBackgroundInfo(e.target.value)}
+                            />
+                        </Form.Group>
+
+                        {" "}
+                        {/* New column for background information 
+                        used to be Additional instructions (optional)*/}
+                        <Form.Group className="mb-3">
+                            <Form.Label className="custom-label" >Contract Information...</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                className="background-info-input"
+                                value={backgroundInfo}
+                                onChange={(e) => setBackgroundInfo(e.target.value)}
+                            />
+                        </Form.Group>
+                    </div>
             </Row>
             <Row className="justify-content-md-center mt-4">
-                <Col md={12}>
+               
                     <FolderLogic
                         tokenRef={tokenRef}
                         setAvailableCollections={setAvailableCollections}
@@ -258,10 +280,10 @@ const Chatbot = () => {
                         availableCollections={availableCollections}
                         folderContents={folderContents}
                     />
-                </Col>
+              
             </Row>
             <Row className="justify-content-md-center">
-                <Col md={9}>
+               
                     {" "}
                     {/* Adjusted width for the question box */}
                     <Form.Group className="mb-3">
@@ -276,20 +298,9 @@ const Chatbot = () => {
                             Word Count: {inputText.split(/\s+/).filter(Boolean).length}
                         </Form.Text>
                     </Form.Group>
-                </Col>
-                <Col md={3}>
-                    {" "}
-                    {/* New column for background information */}
-                    <Form.Group className="mb-3">
-                        <Form.Label>Additional instructions (optional):</Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            className="background-info-input"
-                            value={backgroundInfo}
-                            onChange={(e) => setBackgroundInfo(e.target.value)}
-                        />
-                    </Form.Group>
-                </Col>
+                
+                   
+             
             </Row>
 
             <Row className="justify-content-md-center">
@@ -376,12 +387,12 @@ const Chatbot = () => {
                             </Button>
                         </div>
                     )}
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-3 text-center ">
                         <Form.Label>Response:</Form.Label>
                         <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
                         <Form.Control
                             as="textarea"
-                            className="chat-output"
+                            className="chat-output mt-3"
                             value={response}
                             onChange={(e) => setResponse(e.target.value)}
                             onMouseUp={handleTextHighlight}
@@ -421,7 +432,7 @@ const Chatbot = () => {
                     </div>
                 </Col>
             </Row>
-            <Row className="justify-content-md-center">
+            <Row className="justify-content-md-center text-center">
                 <Col md={12}>
                     <Button
                         variant="primary"
@@ -435,12 +446,13 @@ const Chatbot = () => {
                     <div>
                         <VerticalAlignBottomIcon/>
                     </div>
-
+                    <div className="d-flex justify-content-center mb-3">
                     <CustomEditor response={response} appendResponse={appendResponse}/>
-
+                    </div>
                 </Col>
             </Row>
         </Container>
+        </div>
     );
 };
 

@@ -1,109 +1,183 @@
+#chatbot-page .main-content {
+    margin-top: 0;
+    /* or whatever value you desire for the chatbot page */
+}
+
+.custom-label {
+    font-size: 1.25rem;
+    /* This sets the font size to be larger */
+    text-align: left !important;
+    font-weight: bold;
+    /* This aligns the text to the left */
+}
+
+.background-info-input {
+    text-align: left;
+    /* Ensures the text within the form starts at the left */
+}
+
+.custom-card {
+    background-color: #f7d5b2;
+    /* This sets the background to orange */
+    border-radius: 4px;
+    /* Gives the card rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Adds a subtle shadow */
+    margin: 1rem;
+    padding: 1rem;
+    border: 1px dashed #000;
+    /* Dashed border */
+}
+
+.custom-card-body {
+    padding: 1rem;
+}
+
+.custom-card-title,
+.custom-card-content {
+    border-bottom: 1px dashed #000;
+    /* Dashed line under the title and content */
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.custom-card-title:last-child,
+.custom-card-content:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
 .chat-input,
 .chat-output {
-  width: 70vw; /* Using viewport widths to ensure it's based on the size of the screen */
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
+    width: 70vw;
+    /* Using viewport widths to ensure it's based on the size of the screen */
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
 }
 
+
 /* Increase the height for the input and output textareas */
+
 .chat-input {
-  height: 10vh; /* Adjust the height here */
+    height: 10vh;
+    /* Adjust the height here */
 }
 
 .chat-output {
-  height: 30vh; /* And here */
-}Ø
+    height: 30vh;
+    /* And here */
+}
 
-.centered-container .chat-button,
+Ø .centered-container .chat-button,
 .centered-container .chat-dropdown {
-  width: auto; /* remove the fixed width */
-  display: block;
+    width: auto;
+    /* remove the fixed width */
+    display: block;
 }
 
 .centered-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .background-info-input {
-  height: 10vh; /* Adjust height as needed */
-  display: block;
+    height: 10vh;
+    /* Adjust height as needed */
+    display: block;
 }
 
 .chat-input,
 .background-info-input {
-  width: 100%; /* Set width to 100% of the parent container */
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
+    width: 100%;
+    /* Set width to 100% of the parent container */
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
 }
+
 
 /* Other styles remain unchanged */
 
+
 /* Add custom padding to the columns if needed */
-.pr-2 { /* Right padding for the left column */
-  padding-right: 0.5rem; /* Adjust as needed */
+
+.pr-2 {
+    /* Right padding for the left column */
+    padding-right: 0.5rem;
+    /* Adjust as needed */
 }
 
-.pl-2 { /* Left padding for the right column */
-  padding-left: 0.5rem; /* Adjust as needed */
+.pl-2 {
+    /* Left padding for the right column */
+    padding-left: 0.5rem;
+    /* Adjust as needed */
 }
+
 .dropdowns {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  flex-wrap: nowrap;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: nowrap;
 }
 
 .feedback-textarea {
-  height: 100px; /* Adjust the height as needed */
+    height: 100px;
+    /* Adjust the height as needed */
 }
 
 .dataset-folders {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* Centers the folders horizontally */
-  gap: 20px; /* Adjust as needed */
-  align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    /* Centers the folders horizontally */
+    gap: 20px;
+    /* Adjust as needed */
+    align-items: center;
 }
 
 .dataset-folder {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* Adjust as needed */
-  border: 2px dashed transparent; /* For consistent spacing and drop zone indication */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Adjust as needed */
+    border: 2px dashed transparent;
+    /* For consistent spacing and drop zone indication */
 }
 
 .dataset-folder.drag-over {
-  border-color: blue; /* Highlight color when dragging over */
+    border-color: blue;
+    /* Highlight color when dragging over */
 }
 
-.editor-style, .answer-style {
-  width: 100%;      /* Adjust the width as needed */
-  height: 300px;    /* Adjust the height as needed */
-  resize: vertical; /* Allows vertical resizing, remove if not needed */
+.editor-style,
+.answer-style {
+    width: 100%;
+    /* Adjust the width as needed */
+    height: 300px;
+    /* Adjust the height as needed */
+    resize: vertical;
+    /* Allows vertical resizing, remove if not needed */
 }
-
 
 .add-new-folder {
-  cursor: pointer;
+    cursor: pointer;
 }
 
-.add-new-folder:hover {
+.add-new-folder:hover {}
 
-}
 .choices-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
 .choice-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 5px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px 0;
 }

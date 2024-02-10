@@ -12,7 +12,6 @@ import UploadTemplateText from "../components/UploadTemplateText.tsx";
 import Bids from "../views/Bids"
 import Library from "../views/Library"
 
-
 function Routing() {
     return (
         <div>

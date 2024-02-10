@@ -29,6 +29,7 @@ How to contribute
 * Your pull request will be reviewed and merged
 
 Keep your branch up to date with the dev branch of the original repo by running `git pull origin dev` while on your branch:
+
 * Add the original repo as a second remote: `git remote add upstream
 * Fetch the dev branch of the original repo: `git fetch upstream dev`
 * rebase your feature branch on the dev branch of the original repo: `git rebase upstream/dev`

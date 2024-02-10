@@ -1,29 +1,73 @@
-import React, { useEffect, useState } from 'react';
-import { Editor } from 'react-draft-wysiwyg';
-import { EditorState, ContentState, Modifier } from 'draft-js';
+import {useEffect, useState} from 'react';
+import {Editor} from 'react-draft-wysiwyg';
+import {EditorState, Modifier, RichUtils, SelectionState} from 'draft-js';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
-function CustomEditor({ response, appendResponse }) {
+function CustomEditor({response, appendResponse}) {
     const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
 
-    useEffect(() => {
-        if (appendResponse) {
-            const currentContent = editorState.getCurrentContent();
-            const currentContentBlock = currentContent.getBlockMap().last();
-            const lengthOfLastBlock = currentContentBlock.getLength();
+useEffect(() => {
+    if (appendResponse) {
+        const currentContent = editorState.getCurrentContent();
+        const currentContentBlock = currentContent.getBlockMap().last();
+        const lengthOfLastBlock = currentContentBlock.getLength();
 
-            const selectionState = editorState.getSelection().merge({
-                anchorKey: currentContentBlock.getKey(),
-                anchorOffset: lengthOfLastBlock,
-                focusKey: currentContentBlock.getKey(),
-                focusOffset: lengthOfLastBlock,
-            });
+        const selectionState = editorState.getSelection().merge({
+            anchorKey: currentContentBlock.getKey(),
+            anchorOffset: lengthOfLastBlock,
+            focusKey: currentContentBlock.getKey(),
+            focusOffset: lengthOfLastBlock,
+        });
 
-            const newContentState = Modifier.insertText(currentContent, selectionState, `\n${response}`);
-            const newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
-            setEditorState(newEditorState);
-        }
-    }, [response, appendResponse]);
+        let newContentState = Modifier.insertText(
+            currentContent,
+            selectionState,
+            `\nQuestion:\n${appendResponse.question}\n\nAnswer:\n${appendResponse.answer}\n\n` // Added an extra newline character here
+        );
+
+        let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
+
+        // Apply 'BOLD' style to the words "Question" and "Answer"
+        const blockKey = newEditorState.getSelection().getStartKey();
+        const blockLength = newEditorState.getCurrentContent().getBlockForKey(blockKey).getLength();
+
+        // Create selection range for the word "Question"
+        const questionRange = new SelectionState({
+            anchorKey: blockKey,
+            anchorOffset: lengthOfLastBlock + 1, // start of the word "Question"
+            focusKey: blockKey,
+            focusOffset: lengthOfLastBlock + 9, // end of the word "Question"
+        });
+
+        // Create selection range for the word "Answer"
+        const answerRange = new SelectionState({
+            anchorKey: blockKey,
+            anchorOffset: lengthOfLastBlock + 14 + appendResponse.question.length, // start of the word "Answer"
+            focusKey: blockKey,
+            focusOffset: lengthOfLastBlock + 20 + appendResponse.question.length, // end of the word "Answer"
+        });
+
+        // Apply 'BOLD' style to the word "Question"
+        newContentState = Modifier.applyInlineStyle(
+            newEditorState.getCurrentContent(),
+            questionRange,
+            'BOLD'
+        );
+
+        newEditorState = EditorState.push(newEditorState, newContentState, 'change-inline-style');
+
+        // Apply 'BOLD' style to the word "Answer"
+        newContentState = Modifier.applyInlineStyle(
+            newEditorState.getCurrentContent(),
+            answerRange,
+            'BOLD'
+        );
+
+        newEditorState = EditorState.push(newEditorState, newContentState, 'change-inline-style');
+
+        setEditorState(newEditorState);
+    }
+}, [appendResponse]);
 
     const onEditorStateChange = (newEditorState) => {
         setEditorState(newEditorState);

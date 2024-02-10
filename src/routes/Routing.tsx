@@ -8,6 +8,7 @@ import UploadPDF from "../views/UploadPDF"
 import UploadText from "../views/UploadText"
 import Log from "../components/Log"
 import FLog from "../components/FLog"
+import UploadTemplateText from "../components/UploadTemplateText.tsx";
 import Bids from "../views/Bids"
 import Library from "../views/Library"
 
@@ -23,6 +24,7 @@ function Routing() {
                 <Route path="/adminpannel" element={<Pannels />} />
                 <Route path="/uploadpdf" element={<UploadPDF />} />
                 <Route path="/uploadtext" element={<UploadText />} />
+                <Route path="/uploadtemplatetext" element={<UploadTemplateText />} />
                 <Route path="/qlog" element={<Log />} />
                 <Route path="/flog" element={<FLog />} />
                 <Route path="/bids" element={<Bids />} />

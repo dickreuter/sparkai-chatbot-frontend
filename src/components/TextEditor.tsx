@@ -1,10 +1,23 @@
 import {useEffect, useState} from 'react';
 import {Editor} from 'react-draft-wysiwyg';
-import {EditorState, Modifier, RichUtils, SelectionState} from 'draft-js';
+import {EditorState, Modifier, RichUtils, SelectionState, convertToRaw, convertFromRaw}} from 'draft-js';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
-function CustomEditor({response, appendResponse}) {
-    const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
+function CustomEditor({content, onContentChange}) {
+    // Initialize editorState with empty state or from localStorage
+    const [editorState, setEditorState] = useState(() => {
+        const storedState = localStorage.getItem('editorContent');
+        return storedState
+            ? EditorState.createWithContent(convertFromRaw(JSON.parse(storedState)))
+            : EditorState.createEmpty();
+    });
+
+    // Save the content to localStorage whenever it changes
+    useEffect(() => {
+        const contentState = editorState.getCurrentContent();
+        localStorage.setItem('editorContent', JSON.stringify(convertToRaw(contentState)));
+    }, [editorState]);
+
 
 useEffect(() => {
     if (appendResponse) {

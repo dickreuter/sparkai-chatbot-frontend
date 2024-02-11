@@ -15,9 +15,9 @@ const Bids = () => {
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
     return (
-      <div className="App">
-         <SideBar />
-        <h1>Bid Tracker</h1>
+      <div className="App text-center">
+         
+        <h1 className='fw-bold'>Bid Tracker</h1>
         <table className="bids-table">
           <thead>
             <tr>

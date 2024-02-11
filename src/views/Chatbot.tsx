@@ -12,6 +12,7 @@ import CustomEditor from "../components/TextEditor.tsx";
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import TemplateLoader from "../components/TemplateLoader.tsx";
 import SideBar from '../routes/Sidebar.tsx' 
+import { useLocation } from 'react-router-dom';
 
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
@@ -93,6 +94,24 @@ const Chatbot = () => {
         const questionStatus = localStorage.getItem('questionAsked') === 'true';
         setQuestionAsked(questionStatus);
     }, []);
+
+    const location = useLocation();
+
+    useEffect(() => {
+        // Check if there is a hash in the URL
+        if (location.hash) {
+          const id = location.hash.replace('#', '');
+          const element = document.getElementById(id);
+          if (element) {
+            // Scroll to the element with options
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+            
+          }
+        }
+      }, [location]); // Re-run the effect if the location changes
+      
+
 
     const handleTextHighlight = async () => {
         const selectedText = window.getSelection().toString();
@@ -283,6 +302,9 @@ const Chatbot = () => {
 
            
                 <Container fluid="md">
+                <section id="bidinfo">
+                        
+                        
                     <Row >
                             <div className="custom-card">
                                   {/* Need to add Bid Name field*/}
@@ -311,6 +333,7 @@ const Chatbot = () => {
                                 </Form.Group>
                             </div>
                     </Row>
+                </section>
                     <Row className="justify-content-md-center mt-4">
                     
                             <FolderLogic
@@ -322,12 +345,14 @@ const Chatbot = () => {
                             />
                     
                     </Row>
+
+                    <section id="inputquestion">
                     <Row className="justify-content-md-center">
                         <Col md={8}>
                             {" "}
                             {/* Adjusted width for the question box */}
                             <Form.Group className="mb-3">
-                                <Form.Label>Enter your question or input:</Form.Label>
+                                <Form.Label className="fw-bold" style={{ fontSize: '18px' }}>Enter your question or input:</Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     className="chat-input"
@@ -428,12 +453,14 @@ const Chatbot = () => {
                         
                     
                     </Row>
-
-                    <Row className="justify-content-md-center">
+                </section>
+                <section id="response">
+                    <Row className="justify-content-md-center mt-2">
                         <Col md={8}>
                             
                             <Form.Group className="mb-3">
-                                <Form.Label>Response:</Form.Label>
+                            <Form.Label className="fw-bold" style={{ fontSize: '18px' }}>Response:</Form.Label>
+
                                 <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
                                 <Form.Control
                                     as="textarea"
@@ -446,6 +473,15 @@ const Chatbot = () => {
                                     Word Count: {countWords(response)}
                                 </Form.Text>
                             </Form.Group>
+                            <Button
+                                variant="primary"
+                                onClick={handleAppendResponseToEditor}
+                                
+                            >
+                                Add to Proposal
+                                {/*down arrow */}
+
+                            </Button>
                         </Col>
                         <Col md={4}>
                         <div className="container">
@@ -462,20 +498,9 @@ const Chatbot = () => {
 
                         </Col>
                     </Row>
-                    <h3 className="text-center mb-2 fw-bold">Text Editor</h3>
-                    <div className="feedback-container">
-                    
-                    <Row className="justify-content-md-center">
-                        
-                        <Col md={12}>
-                            <div className="d-flex justify-content-center mb-3">
-
-                                <CustomEditor response={response} appendResponse={appendResponse}/>
-                            </div>
-                           
-                        </Col>
-                    </Row>
-                    </div>
+                </section>
+                   
+                   
                     <Row className="mt-3">
                         <Col md={12}>
                         <Form.Group className="mb-3">
@@ -504,17 +529,7 @@ const Chatbot = () => {
                             <div className="d-flex">
                                 
                             </div>
-                            <Button
-                                variant="primary"
-                                onClick={handleAppendResponseToEditor}
-                                className="mt-3"
-                            >
-                                Add question/answer to Text Editor
-                                {/*down arrow */}
-
-                            </Button>
                             
-                           
                         </Col>
                         
                     </Row>

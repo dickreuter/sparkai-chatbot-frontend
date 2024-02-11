@@ -22,7 +22,7 @@ const Library = () => {
               variant="primary"
               className="chat-button mt-3"
             >
-              New Bid
+              Response Generator
             </Button>
           </Link>
           </div>
@@ -83,7 +83,7 @@ const Library = () => {
               <Col md={4}>
               <div className="upload-component">
                   <Card className="flex-fill">
-                    <Card.Header>Train AI on Documents</Card.Header>
+                    <Card.Header>Train AI on PDF Documents</Card.Header>
                       <Card.Body className='text-center'>
                         <UploadPDF />
                       </Card.Body>
@@ -97,7 +97,7 @@ const Library = () => {
                 <Col md={12}>
                 <div className="mt-3">
                     <Card className="flex-fill">
-                      <Card.Header>Train AI on Documents</Card.Header>
+                      <Card.Header>Train AI on Text</Card.Header>
                         <Card.Body className='text-center'>
                           <UploadText />
                         </Card.Body>

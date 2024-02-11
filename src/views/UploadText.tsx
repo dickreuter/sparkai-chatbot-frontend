@@ -61,6 +61,7 @@ const UploadText = () => {
       <div>
         Text format:
         <select
+          className="mx-3 my-3"
           value={textFormat}
           onChange={(e) => setTextFormat(e.target.value)}
         >
@@ -72,6 +73,7 @@ const UploadText = () => {
       <div>
         Profile name:
         <input
+         className="mx-3 mb-3"
           type="text"
           placeholder="Enter Profile Name"
           value={profileName}

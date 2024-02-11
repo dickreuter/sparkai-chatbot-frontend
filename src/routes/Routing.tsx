@@ -11,6 +11,7 @@ import FLog from "../components/FLog"
 import UploadTemplateText from "../components/UploadTemplateText.tsx";
 import Bids from "../views/Bids"
 import Library from "../views/Library"
+import Feedback from "../views/Feedback.tsx"
 
 function Routing() {
     return (

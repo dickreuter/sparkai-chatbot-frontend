@@ -19,12 +19,27 @@ const Chatbot = () => {
     const [choice, setChoice] = useState("3");
     const [broadness, setBroadness] = useState("1");
     const [dataset, setDataset] = useState("default");
-    const [inputText, setInputText] = useState("");
-    const [response, setResponse] = useState("");
+
+    const [inputText, setInputText] = useState(
+        localStorage.getItem('inputText') || ''
+      );
+
+    const [response, setResponse] = useState(
+        localStorage.getItem('response') || ''
+      );
+
+
     const [isLoading, setIsLoading] = useState(false);
     const [startTime, setStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
-    const [backgroundInfo, setBackgroundInfo] = useState("");
+
+    const [backgroundInfo, setBackgroundInfo] = useState(
+        localStorage.getItem('backgroundInfo') || ''
+      );
+    const [bidInfo, setBidInfo] = useState(
+        localStorage.getItem('bidInfo') || ''
+      );
+
     const [availableCollections, setAvailableCollections] = useState<string[]>(
         []
     );
@@ -50,6 +65,18 @@ const Chatbot = () => {
         return str.split(/\s+/).filter(Boolean).length;
     };
 
+
+    useEffect(() => {
+        // Save to local storage whenever backgroundInfo changes
+        localStorage.setItem('backgroundInfo', backgroundInfo);
+        localStorage.setItem('bidInfo', bidInfo);
+        localStorage.setItem('inputText', inputText);
+        localStorage.setItem('response', response);
+      }, [backgroundInfo, ,bidInfo,inputText, response]);
+      
+      
+ 
+      
     useEffect(() => {
         let interval = null;
         if (isLoading && startTime) {
@@ -61,6 +88,11 @@ const Chatbot = () => {
         }
         return () => clearInterval(interval);
     }, [isLoading, startTime]);
+
+    useEffect(() => {
+        const questionStatus = localStorage.getItem('questionAsked') === 'true';
+        setQuestionAsked(questionStatus);
+    }, []);
 
     const handleTextHighlight = async () => {
         const selectedText = window.getSelection().toString();
@@ -81,8 +113,28 @@ const Chatbot = () => {
         }
     };
 
+    const submitFeedback = async () => {
+        const formData = new FormData();
+        formData.append("text", `Question: ${inputText} \n Feedback: ${feedback}`);
+        formData.append("profile_name", dataset); // Assuming email is the profile_name
+        formData.append("mode", "feedback");
+        console.log(formData);
+
+        try {
+            await axios.post(`http${HTTP_PREFIX}://${API_URL}/uploadtext`, formData, {
+                headers: {Authorization: `Bearer ${tokenRef.current}`},
+            });
+            displayAlert("Feedback upload successful", "success");
+            // Handle successful submission, e.g., clear feedback or show a message
+        } catch (error) {
+            console.error("Error sending feedback:", error);
+            // Handle error
+        }
+    };
+
     const askCopilot = async (copilotInput: string, instructions: string) => {
         setQuestionAsked(true);
+        localStorage.setItem('questionAsked', 'true');
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
 
@@ -121,6 +173,7 @@ const Chatbot = () => {
 
     const sendQuestion = async () => {
         setQuestionAsked(true);
+        localStorage.setItem('questionAsked', 'true');
         setResponse("");
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
@@ -190,24 +243,7 @@ const Chatbot = () => {
         );
     };
 
-    const submitFeedback = async () => {
-        const formData = new FormData();
-        formData.append("text", `Question: ${inputText} \n Feedback: ${feedback}`);
-        formData.append("profile_name", dataset); // Assuming email is the profile_name
-        formData.append("mode", "feedback");
-        console.log(formData);
-
-        try {
-            await axios.post(`http${HTTP_PREFIX}://${API_URL}/uploadtext`, formData, {
-                headers: {Authorization: `Bearer ${tokenRef.current}`},
-            });
-            displayAlert("Feedback upload successful", "success");
-            // Handle successful submission, e.g., clear feedback or show a message
-        } catch (error) {
-            console.error("Error sending feedback:", error);
-            // Handle error
-        }
-    };
+ 
 
     const submitSelections = async () => {
         setIsLoading(true);
@@ -254,7 +290,9 @@ const Chatbot = () => {
                                     <Form.Label className="custom-label">Bid Name...</Form.Label>
                                     <Form.Control
                                         as="textarea"
-                                        className="background-info-input"
+                                        className="bid-name-input"
+                                        value={bidInfo}
+                                        onChange={(e) => setBidInfo(e.target.value)}
                                         
                                     />
                                 </Form.Group>
@@ -310,7 +348,29 @@ const Chatbot = () => {
                                     Submit
                                 </Button>
                                 <VerticalAlignBottomIcon/>
+                                
 
+                            </div>
+                            <div className="text-center mb-3">
+                            {isLoading && (
+                                <div className="my-3">
+                                    <Spinner animation="border"/>
+                                    <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
+                                </div>
+                            )}
+                            {choice === "3" && apiChoices.length > 0 && (
+                                <div>
+                                    {renderChoices()}
+                                    <Button
+                                        variant="primary"
+                                        onClick={submitSelections}
+                                        className="chat-button mt-3"
+                                        disabled={selectedChoices.length === 0}
+                                    >
+                                        Generate answers for selected subsections
+                                    </Button>
+                                </div>
+                            )}
                             </div>
                         </Col>
                         <Col md={4}>
@@ -372,26 +432,6 @@ const Chatbot = () => {
                     <Row className="justify-content-md-center">
                         <Col md={8}>
                             
-
-                            {isLoading && (
-                                <div className="my-3">
-                                    <Spinner animation="border"/>
-                                    <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
-                                </div>
-                            )}
-                            {choice === "3" && apiChoices.length > 0 && (
-                                <div>
-                                    {renderChoices()}
-                                    <Button
-                                        variant="primary"
-                                        onClick={submitSelections}
-                                        className="chat-button"
-                                        disabled={selectedChoices.length === 0}
-                                    >
-                                        Generate answers for selected subsections
-                                    </Button>
-                                </div>
-                            )}
                             <Form.Group className="mb-3">
                                 <Form.Label>Response:</Form.Label>
                                 <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
@@ -422,11 +462,23 @@ const Chatbot = () => {
 
                         </Col>
                     </Row>
-
-                    {/* Feedback Section */}
+                    <h3 className="text-center mb-2 fw-bold">Text Editor</h3>
+                    <div className="feedback-container">
+                    
                     <Row className="justify-content-md-center">
+                        
                         <Col md={12}>
-                            <Form.Group className="mb-3">
+                            <div className="d-flex justify-content-center mb-3">
+
+                                <CustomEditor response={response} appendResponse={appendResponse}/>
+                            </div>
+                           
+                        </Col>
+                    </Row>
+                    </div>
+                    <Row className="mt-3">
+                        <Col md={12}>
+                        <Form.Group className="mb-3">
                                 <Form.Label>
                                     Feedback: (describe how the question can be answered better in the
                                     future){" "}
@@ -439,7 +491,7 @@ const Chatbot = () => {
                                     disabled={!questionAsked} // Disabled until a question is asked
                                 />
                             </Form.Group>
-                            <div className="d-flex justify-content-center mb-3">
+                            <div className="d-flex">
                                 <Button
                                     variant="primary"
                                     onClick={submitFeedback}
@@ -449,10 +501,9 @@ const Chatbot = () => {
                                     Submit Feedback
                                 </Button>
                             </div>
-                        </Col>
-                    </Row>
-                    <Row className="justify-content-md-center text-center">
-                        <Col md={12}>
+                            <div className="d-flex">
+                                
+                            </div>
                             <Button
                                 variant="primary"
                                 onClick={handleAppendResponseToEditor}
@@ -462,14 +513,13 @@ const Chatbot = () => {
                                 {/*down arrow */}
 
                             </Button>
-                            <div>
-                                <VerticalAlignBottomIcon/>
-                            </div>
-                            <div className="d-flex justify-content-center mb-3">
-                            <CustomEditor response={response} appendResponse={appendResponse}/>
-                            </div>
+                            
+                           
                         </Col>
+                        
                     </Row>
+
+                 
                 </Container>
 
             </div>

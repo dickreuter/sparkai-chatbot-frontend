@@ -69,7 +69,7 @@ const NavBar = () => {
       >
         <span className="navbar-toggler-icon"></span>
       </button>
-      <a className="navbar-brand" href="/">
+      <a className="navbar-brand" href="/library">
         mytender.io &nbsp;
        
       </a>
@@ -81,21 +81,7 @@ const NavBar = () => {
         <ul className="navbar-nav ml-auto">
           {" "}
           {/* Apply ml-auto here */}
-          {auth ? (
-            <li className="nav-item">
-              <Link className="nav-link" to="/logout">
-                Logout
-              </Link>
-            </li>
-          ) : (
-            <>
-              <li className="nav-item">
-                <Link className="nav-link" to="/login">
-                  Login
-                </Link>
-              </li>
-            </>
-          )}
+         
            {auth ? (
             <li className="nav-item">
               <Link className="nav-link" to="/library">
@@ -105,33 +91,8 @@ const NavBar = () => {
           ) : (
             <></>
           )}
+       
           {auth ? (
-            <li className="nav-item">
-              <Link className="nav-link" to="/chatbot">
-                Chatbot
-              </Link>
-            </li>
-          ) : (
-            <></>
-          )}
-          {auth ? (
-            <li className="nav-item">
-              <Link className="nav-link" to="/uploadpdf">
-                Upload PDFs
-              </Link>
-            </li>
-          ) : (
-            <></>
-          )}
-          {auth ? (
-            <li className="nav-item">
-              <Link className="nav-link" to="/uploadtext">
-                Upload Text
-              </Link>
-            </li>
-          ) : (
-            <></>
-          )} {auth ? (
             <li className="nav-item">
               <Link className="nav-link" to="/uploadtemplatetext">
                 Template uploads
@@ -179,6 +140,21 @@ const NavBar = () => {
             </>
           ) : (
             <></>
+          )}
+           {auth ? (
+            <li className="nav-item">
+              <Link className="nav-link" to="/logout">
+                Logout
+              </Link>
+            </li>
+          ) : (
+            <>
+              <li className="nav-item">
+                <Link className="nav-link" to="/login">
+                  Login
+                </Link>
+              </li>
+            </>
           )}
         </ul>
       </div>

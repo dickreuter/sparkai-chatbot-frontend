@@ -67,8 +67,8 @@ const Feedback = () => {
                     </Row>
                 </div>
 
-                    <Row className="justify-content-md-center text-center">
-                        <Col md={12}>
+                    <Row className="mt-3">
+                        <Col md={8}>
                         <Form.Group className="mb-3">
                                 <Form.Label>
                                     Feedback: (describe how the question can be answered better in the
@@ -82,7 +82,7 @@ const Feedback = () => {
                                     disabled={!questionAsked} // Disabled until a question is asked
                                 />
                             </Form.Group>
-                            <div className="d-flex justify-content-center mb-3">
+                            <div className="d-flex mb-3">
                                 <Button
                                     variant="primary"
                                     onClick={submitFeedback}
@@ -104,6 +104,20 @@ const Feedback = () => {
                             <div>
                                 <VerticalAlignBottomIcon/>
                             </div>
+                           
+                        </Col>
+                        <Col md={4}>
+                        <Form.Group className="mb-3">
+                                <Form.Label>
+                                   Enter Section to Bid {" "}
+                                </Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    className="feedback-textarea"
+                                    
+                                />
+                        </Form.Group>
+                          
                            
                         </Col>
                     </Row>

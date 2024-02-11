@@ -8,11 +8,9 @@
     width: 85vw;
     height: 100%;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin: 1rem;
     margin-left: 90px;
     padding: 2rem;
-    border: 1px dashed #000;
     justify-content: center;
     /* or whatever value you desire for the chatbot page */
 }

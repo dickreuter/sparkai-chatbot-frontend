@@ -19,12 +19,23 @@ const Chatbot = () => {
     const [choice, setChoice] = useState("3");
     const [broadness, setBroadness] = useState("1");
     const [dataset, setDataset] = useState("default");
-    const [inputText, setInputText] = useState("");
-    const [response, setResponse] = useState("");
+
+    const [inputText, setInputText] = useState(
+        localStorage.getItem('inputText') || ''
+      );
+
+    const [response, setResponse] = useState(
+        localStorage.getItem('response') || ''
+      );
+
+
     const [isLoading, setIsLoading] = useState(false);
     const [startTime, setStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
-    const [backgroundInfo, setBackgroundInfo] = useState("");
+    const [backgroundInfo, setBackgroundInfo] = useState(
+        localStorage.getItem('backgroundInfo') || ''
+      );
+
     const [availableCollections, setAvailableCollections] = useState<string[]>(
         []
     );
@@ -50,6 +61,23 @@ const Chatbot = () => {
         return str.split(/\s+/).filter(Boolean).length;
     };
 
+
+    useEffect(() => {
+        // Save to local storage whenever backgroundInfo changes
+        localStorage.setItem('backgroundInfo', backgroundInfo);
+      }, [backgroundInfo]);
+
+    useEffect(() => {
+        // Save to local storage whenever backgroundInfo changes
+        localStorage.setItem('inputText', inputText);
+      }, [inputText]);
+
+    useEffect(() => {
+        // Save to local storage whenever backgroundInfo changes
+        localStorage.setItem('response', response);
+      }, [response]);
+ 
+      
     useEffect(() => {
         let interval = null;
         if (isLoading && startTime) {
@@ -293,7 +321,29 @@ const Chatbot = () => {
                                     Submit
                                 </Button>
                                 <VerticalAlignBottomIcon/>
+                                
 
+                            </div>
+                            <div className="text-center mb-3">
+                            {isLoading && (
+                                <div className="my-3">
+                                    <Spinner animation="border"/>
+                                    <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
+                                </div>
+                            )}
+                            {choice === "3" && apiChoices.length > 0 && (
+                                <div>
+                                    {renderChoices()}
+                                    <Button
+                                        variant="primary"
+                                        onClick={submitSelections}
+                                        className="chat-button mt-3"
+                                        disabled={selectedChoices.length === 0}
+                                    >
+                                        Generate answers for selected subsections
+                                    </Button>
+                                </div>
+                            )}
                             </div>
                         </Col>
                         <Col md={4}>
@@ -355,26 +405,6 @@ const Chatbot = () => {
                     <Row className="justify-content-md-center">
                         <Col md={8}>
                             
-
-                            {isLoading && (
-                                <div className="my-3">
-                                    <Spinner animation="border"/>
-                                    <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
-                                </div>
-                            )}
-                            {choice === "3" && apiChoices.length > 0 && (
-                                <div>
-                                    {renderChoices()}
-                                    <Button
-                                        variant="primary"
-                                        onClick={submitSelections}
-                                        className="chat-button"
-                                        disabled={selectedChoices.length === 0}
-                                    >
-                                        Generate answers for selected subsections
-                                    </Button>
-                                </div>
-                            )}
                             <Form.Group className="mb-3">
                                 <Form.Label>Response:</Form.Label>
                                 <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>

@@ -2,13 +2,18 @@
     height: 100%;
     width: 200px;
     /* Adjust width as needed */
+    width: 200px;
+    /* Adjust width as needed */
     position: fixed;
     z-index: 1;
     top: 0;
     left: 0;
     background: linear-gradient(90deg, rgb(28, 27, 27) 0%, rgb(26, 23, 23) 100%);
+    background: linear-gradient(90deg, rgb(28, 27, 27) 0%, rgb(26, 23, 23) 100%);
     overflow-x: hidden;
     padding-top: 20px;
+    padding-left: 10px;
+    /* Add some padding to the left */
     padding-left: 10px;
     /* Add some padding to the left */
 }
@@ -16,7 +21,21 @@
 .sidebar a {
     padding: 10px;
     /* Adjust padding for the size of the rectangle */
+    padding: 10px;
+    /* Adjust padding for the size of the rectangle */
     text-decoration: none;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    margin-right: 10px;
+    /* Adds margin around the links for space from the edges */
+    border-radius: 10px;
+    /* Rounded edges for the rectangle */
+    transition: background-color 0.3s;
+    /* Smooth transition for background color */
     color: white;
     font-family: 'Roboto', sans-serif;
     font-weight: 500;
@@ -42,6 +61,5 @@
     margin-right: 10px;
     margin-left: 5px;
     width: 20px;
-    /* Adjust size as needed */
-    height: auto;
+    height: 20px;
 }

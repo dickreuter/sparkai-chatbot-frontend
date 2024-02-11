@@ -70,6 +70,7 @@ const NavBar = () => {
         <span className="navbar-toggler-icon"></span>
       </button>
       <a className="navbar-brand" href="/library">
+      <a className="navbar-brand" href="/library">
         mytender.io &nbsp;
        
       </a>
@@ -82,6 +83,7 @@ const NavBar = () => {
           {" "}
           {/* Apply ml-auto here */}
          
+         
            {auth ? (
             <li className="nav-item">
               <Link className="nav-link" to="/library">
@@ -92,15 +94,6 @@ const NavBar = () => {
             <></>
           )}
        
-          {auth ? (
-            <li className="nav-item">
-              <Link className="nav-link" to="/uploadtemplatetext">
-                Template uploads
-              </Link>
-            </li>
-          ) : (
-            <></>
-          )}
            {auth ? (
             <li className="nav-item">
               <Link className="nav-link" to="/bids">
@@ -140,6 +133,21 @@ const NavBar = () => {
             </>
           ) : (
             <></>
+          )}
+           {auth ? (
+            <li className="nav-item">
+              <Link className="nav-link" to="/logout">
+                Logout
+              </Link>
+            </li>
+          ) : (
+            <>
+              <li className="nav-item">
+                <Link className="nav-link" to="/login">
+                  Login
+                </Link>
+              </li>
+            </>
           )}
            {auth ? (
             <li className="nav-item">

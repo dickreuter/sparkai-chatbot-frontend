@@ -11,7 +11,7 @@ import FLog from "../components/FLog"
 import UploadTemplateText from "../components/UploadTemplateText.tsx";
 import Bids from "../views/Bids"
 import Library from "../views/Library"
-import Feedback from "../views/Feedback.tsx"
+import Proposal from "../views/Proposal.tsx"
 
 function Routing() {
     return (
@@ -30,6 +30,7 @@ function Routing() {
                 <Route path="/flog" element={<FLog />} />
                 <Route path="/bids" element={<Bids />} />
                 <Route path="/library" element={<Library />} />
+                <Route path="/proposal" element={<Proposal />} />
 
             </Routes>
         </div>

@@ -74,6 +74,7 @@ const Chatbot = () => {
         localStorage.setItem('response', response);
       }, [backgroundInfo, ,bidInfo,inputText, response]);
       
+      
  
       
     useEffect(() => {
@@ -132,7 +133,7 @@ const Chatbot = () => {
     };
 
     const askCopilot = async (copilotInput: string, instructions: string) => {
-        //setQuestionAsked(true);
+        setQuestionAsked(true);
         localStorage.setItem('questionAsked', 'true');
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
@@ -171,7 +172,7 @@ const Chatbot = () => {
     };
 
     const sendQuestion = async () => {
-        //setQuestionAsked(true);
+        setQuestionAsked(true);
         localStorage.setItem('questionAsked', 'true');
         setResponse("");
         setIsLoading(true);
@@ -461,11 +462,14 @@ const Chatbot = () => {
 
                         </Col>
                     </Row>
+                    <h3 className="text-center mb-2 fw-bold">Text Editor</h3>
                     <div className="feedback-container">
-
+                    
                     <Row className="justify-content-md-center">
+                        
                         <Col md={12}>
                             <div className="d-flex justify-content-center mb-3">
+
                                 <CustomEditor response={response} appendResponse={appendResponse}/>
                             </div>
                            
@@ -473,7 +477,7 @@ const Chatbot = () => {
                     </Row>
                     </div>
                     <Row className="mt-3">
-                        <Col md={8}>
+                        <Col md={12}>
                         <Form.Group className="mb-3">
                                 <Form.Label>
                                     Feedback: (describe how the question can be answered better in the
@@ -487,7 +491,7 @@ const Chatbot = () => {
                                     disabled={!questionAsked} // Disabled until a question is asked
                                 />
                             </Form.Group>
-                            <div className="d-flex mb-3">
+                            <div className="d-flex">
                                 <Button
                                     variant="primary"
                                     onClick={submitFeedback}
@@ -496,6 +500,9 @@ const Chatbot = () => {
                                 >
                                     Submit Feedback
                                 </Button>
+                            </div>
+                            <div className="d-flex">
+                                
                             </div>
                             <Button
                                 variant="primary"
@@ -506,9 +513,7 @@ const Chatbot = () => {
                                 {/*down arrow */}
 
                             </Button>
-                            <div>
-                                <VerticalAlignBottomIcon/>
-                            </div>
+                            
                            
                         </Col>
                         

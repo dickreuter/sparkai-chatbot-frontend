@@ -9,8 +9,8 @@ const SideBar = () => {
   return (
     <div className="sidebar">
       <Link to="/library" className='sidebarlink'><FontAwesomeIcon icon={faHome} /> Home</Link>
-      <Link to="/chatbot" className='sidebarlink'><FontAwesomeIcon icon={faCode} /> Chatbot</Link>
       <Link to="/bids" className='sidebarlink'><FontAwesomeIcon icon={faGavel} /> Bids</Link>
+      <Link to="/chatbot" className='sidebarlink'><FontAwesomeIcon icon={faCode} /> Chatbot</Link>
       <Link to="/feedback" className='sidebarlink'><FontAwesomeIcon icon={faComments} /> Feedback</Link>
     </div>
   );

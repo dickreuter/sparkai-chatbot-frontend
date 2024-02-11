@@ -1,11 +1,11 @@
 .chatbot-container {
     margin-top: 0;
-    width: 80vw;
+    width: 83vw;
     height: 100%;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin: 1rem;
-    margin-left: 240px;
+    margin-left: 200px;
     padding: 2rem;
     border: 1px dashed #000;
     justify-content: center;

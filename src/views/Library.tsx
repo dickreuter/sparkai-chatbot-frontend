@@ -9,7 +9,6 @@ import UploadPDF from './UploadPDF';
 import UploadText from './UploadText';
 import "./Library.css";
 import UploadTemplateText from '../components/UploadTemplateText';
-import UploadTemplateText from '../components/UploadTemplateText';
 
 const Library = () => {
     const getAuth = useAuthUser();
@@ -24,7 +23,6 @@ const Library = () => {
               variant="primary"
               className="chat-button mt-3"
             >
-              Response Generator
               Response Generator
             </Button>
           </Link>
@@ -88,44 +86,11 @@ const Library = () => {
                   <Card className="flex-fill">
                     <Card.Header>Train AI on PDF Documents</Card.Header>
                       <Card.Body className='text-center'>
-                    <Card.Header>Train AI on PDF Documents</Card.Header>
-                      <Card.Body className='text-center'>
                         <UploadPDF />
                       </Card.Body>
                   </Card>
 
                 </div>
-              </Col>
-             
-              </Row>
-              <Row>
-                <Col md={12}>
-                <div className="mt-3">
-                    <Card className="flex-fill">
-                      <Card.Header>Train AI on Text</Card.Header>
-                        <Card.Body className='text-center'>
-                          <UploadText />
-                        </Card.Body>
-                    </Card>
-
-                  </div>
-                  </Col>
-              </Row>
-              <Row>
-                <Col md={12}>
-                <div className="mt-3">
-                    <Card className="flex-fill">
-                      <Card.Header>Add Templates</Card.Header>
-                        <Card.Body className='text-center'>
-                          <UploadTemplateText />
-                        </Card.Body>
-                    </Card>
-
-                  </div>
-                  </Col>
-              </Row>
-            
-
               </Col>
              
               </Row>

@@ -43,4 +43,15 @@
     margin-left: 5px;
     width: 20px;
     height: 20px;
+    color: white;
+    /* Keep text color white on hover */
+    background-color: #757575;
+    /* Grey background on hover */
+}
+
+.sidebar a svg {
+    margin-right: 10px;
+    margin-left: 5px;
+    width: 20px;
+    height: 20px;
 }

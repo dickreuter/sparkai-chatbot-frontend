@@ -17,7 +17,7 @@ const SideBar = () => {
       <Link to="/chatbot#bidinfo" className='sidebarlink'><FontAwesomeIcon icon={faFileAlt} /> Bid Info</Link>
       <Link to="/chatbot#inputquestion" className='sidebarlink'><FontAwesomeIcon icon={faFileCircleQuestion} /> Question</Link>
       <Link to="/chatbot#response" className='sidebarlink'><FontAwesomeIcon icon={faReply} /> Response</Link>
-      <Link to="/proposal" className='sidebarlink'><FontAwesomeIcon icon={faFileContract} /> Proposal</Link>
+      <Link to="/chatbot#proposal" className='sidebarlink'><FontAwesomeIcon icon={faFileContract} /> Proposal</Link>
     </div>
   );
 };

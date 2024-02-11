@@ -67,17 +67,14 @@ const Proposal = () => {
             <div className="chat-container">
                 <h3 className="text-center mb-2 fw-bold">Text Editor</h3>
                 <div className="proposal-container">
-                        <Row className="justify-content-md-center">
-                            <Col md={12}>
-                                <div className="d-flex justify-content-center mb-3">
-                                    {/* Pass editorContent and setEditorContent to CustomEditor */}
-                                    <CustomEditor 
-                                        content={editorContent} 
-                                        onContentChange={setEditorContent} 
-                                    />
-                                </div>
-                            </Col>
-                        </Row>
+                    <Row className="justify-content-md-center">
+                        <Col md={12}>
+                            <div className="d-flex justify-content-center mb-3">
+                                <CustomEditor response={response} appendResponse={appendResponse}/>
+                            </div>
+                           
+                        </Col>
+                    </Row>
                 </div>
             </div>
         </div>

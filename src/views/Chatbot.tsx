@@ -473,16 +473,12 @@ const Chatbot = () => {
                                     Word Count: {countWords(response)}
                                 </Form.Text>
                             </Form.Group>
-                            <Button
-                                variant="primary"
-                                onClick={handleAppendResponseToEditor}
-                                
-                            >
-                                Add to Proposal
-                                {/*down arrow */}
+                           
 
-                            </Button>
+                    
                         </Col>
+                        
+                   
                         <Col md={4}>
                         <div className="container">
                         <button >Copilot button</button>
@@ -499,7 +495,26 @@ const Chatbot = () => {
                         </Col>
                     </Row>
                 </section>
-                   
+                <section id="proposal">
+                <div className="proposal-header mb-3">
+                    <Button variant="primary" onClick={handleAppendResponseToEditor}>
+                        Add to Proposal
+                        {/*down arrow */}
+                    </Button>
+                    <h3 className="fw-bold proposal-title text-center">Proposal Editor</h3>
+                </div>
+                <div className="proposal-container">
+                        <Row className="justify-content-md-center">
+                            <Col md={12}>
+                                <div className="d-flex justify-content-center mb-3">
+                                    <CustomEditor response={response} appendResponse={appendResponse}/>
+                                </div>
+                            
+                            </Col>
+                        </Row>
+                    </div>
+                </section>
+                
                    
                     <Row className="mt-3">
                         <Col md={12}>
@@ -533,6 +548,7 @@ const Chatbot = () => {
                         </Col>
                         
                     </Row>
+                 
 
                  
                 </Container>

@@ -7,7 +7,6 @@ import {Button, Col, Container, Form, Row, Spinner, Card} from "react-bootstrap"
 import { Link } from 'react-router-dom';
 import UploadPDF from './UploadPDF';
 import UploadText from './UploadText';
-import UploadText from './UploadText';
 import "./Library.css";
 import UploadTemplateText from '../components/UploadTemplateText';
 
@@ -15,13 +14,8 @@ const Library = () => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
-    const getAuth = useAuthUser();
-    const auth = getAuth();
-    const tokenRef = useRef(auth?.token || "default");
     return (
         <div className="App">
-           <div className="text-center">
-          <h1 className='fw-bold'>Library</h1>
            <div className="text-center">
           <h1 className='fw-bold'>Library</h1>
           <Link to="/chatbot">
@@ -33,16 +27,10 @@ const Library = () => {
             </Button>
           </Link>
           </div>
-          </div>
           <div className="library-container mt-3">
              <Row>
               <Col md={8}>
-             <Row>
-              <Col md={8}>
                 <div className="library-table">
-                  
-
-                 
                   
 
                  
@@ -92,9 +80,6 @@ const Library = () => {
                     </Card.Body>
                   </Card>
                 </div>
-              </Col>
-              <Col md={4}>
-              <div className="upload-component">
               </Col>
               <Col md={4}>
               <div className="upload-component">

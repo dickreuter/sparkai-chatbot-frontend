@@ -65,17 +65,14 @@ const Chatbot = () => {
     useEffect(() => {
         // Save to local storage whenever backgroundInfo changes
         localStorage.setItem('backgroundInfo', backgroundInfo);
-      }, [backgroundInfo]);
-
-    useEffect(() => {
-        // Save to local storage whenever backgroundInfo changes
+        
+        // Save to local storage whenever inputText changes
         localStorage.setItem('inputText', inputText);
-      }, [inputText]);
-
-    useEffect(() => {
-        // Save to local storage whenever backgroundInfo changes
+        
+        // Save to local storage whenever response changes
         localStorage.setItem('response', response);
-      }, [response]);
+      }, [backgroundInfo, inputText, response]);
+      
  
       
     useEffect(() => {
@@ -110,7 +107,8 @@ const Chatbot = () => {
     };
 
     const askCopilot = async (copilotInput: string, instructions: string) => {
-        setQuestionAsked(true);
+        //setQuestionAsked(true);
+        localStorage.setItem('questionAsked', 'true');
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
 
@@ -148,7 +146,8 @@ const Chatbot = () => {
     };
 
     const sendQuestion = async () => {
-        setQuestionAsked(true);
+        //setQuestionAsked(true);
+        localStorage.setItem('questionAsked', 'true');
         setResponse("");
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer

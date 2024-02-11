@@ -49,6 +49,12 @@ const Feedback = () => {
         }
     };
 
+    // In your feedback form's component
+    useEffect(() => {
+        const questionStatus = localStorage.getItem('questionAsked') === 'true';
+        setQuestionAsked(questionStatus);
+    }, []);
+
 
 
     return (

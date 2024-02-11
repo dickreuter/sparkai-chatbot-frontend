@@ -6,13 +6,17 @@ import { useAuthUser } from 'react-auth-kit';
 import {Button, Col, Container, Form, Row, Spinner, Card} from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import UploadPDF from './UploadPDF';
+import UploadText from './UploadText';
 import "./Library.css";
 
 const Library = () => {
+    const getAuth = useAuthUser();
+    const auth = getAuth();
+    const tokenRef = useRef(auth?.token || "default");
     return (
         <div className="App">
-
-          <h1>Library</h1>
+           <div className="text-center">
+          <h1 className='fw-bold'>Library</h1>
           <Link to="/chatbot">
             <Button
               variant="primary"
@@ -21,8 +25,14 @@ const Library = () => {
               New Bid
             </Button>
           </Link>
+          </div>
           <div className="library-container mt-3">
+             <Row>
+              <Col md={8}>
                 <div className="library-table">
+                  
+
+                 
                   <Card className="flex-fill mr-3"> {/* Add margin-right as needed */}
                     <Card.Header>Knowledge Base</Card.Header>
                     <Card.Body>
@@ -69,15 +79,35 @@ const Library = () => {
                     </Card.Body>
                   </Card>
                 </div>
-                <div className="upload-component">
+              </Col>
+              <Col md={4}>
+              <div className="upload-component">
                   <Card className="flex-fill">
                     <Card.Header>Train AI on Documents</Card.Header>
-                      <Card.Body>
+                      <Card.Body className='text-center'>
                         <UploadPDF />
                       </Card.Body>
                   </Card>
 
                 </div>
+              </Col>
+             
+              </Row>
+              <Row>
+                <Col md={12}>
+                <div className="mt-3">
+                    <Card className="flex-fill">
+                      <Card.Header>Train AI on Documents</Card.Header>
+                        <Card.Body className='text-center'>
+                          <UploadText />
+                        </Card.Body>
+                    </Card>
+
+                  </div>
+                  </Col>
+              </Row>
+            
+
                   
 
           </div>

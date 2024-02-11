@@ -27,7 +27,7 @@ const useAuthSignIn = () => {
           token: res.data.access_token,
         }
       })) {
-        navigate('/chatbot');
+        navigate('/library');
         return { success: true, message: 'Log in successful!' };
       } else {
         setError('Log in unsuccessful');

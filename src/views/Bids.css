@@ -1,36 +1,3 @@
-body,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-ul,
-ol,
-div,
-figure {
-    margin: 0;
-    padding: 0;
-}
-
-.App {
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    box-sizing: border-box;
-    text-align: center;
-    min-height: 70vh;
-    max-height: 87vh;
-    justify-content: center !important;
-    /* Center the title */
-}
-
-.App>h1 {
-    margin-top: 20px;
-    /* Or adjust as needed for your layout */
-}
-
 .bids-table {
     width: 90%;
     width: 90vh;

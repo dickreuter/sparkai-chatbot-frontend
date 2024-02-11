@@ -32,8 +32,12 @@ const Chatbot = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [startTime, setStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
+
     const [backgroundInfo, setBackgroundInfo] = useState(
         localStorage.getItem('backgroundInfo') || ''
+      );
+    const [bidInfo, setBidInfo] = useState(
+        localStorage.getItem('bidInfo') || ''
       );
 
     const [availableCollections, setAvailableCollections] = useState<string[]>(
@@ -65,13 +69,10 @@ const Chatbot = () => {
     useEffect(() => {
         // Save to local storage whenever backgroundInfo changes
         localStorage.setItem('backgroundInfo', backgroundInfo);
-        
-        // Save to local storage whenever inputText changes
+        localStorage.setItem('bidInfo', bidInfo);
         localStorage.setItem('inputText', inputText);
-        
-        // Save to local storage whenever response changes
         localStorage.setItem('response', response);
-      }, [backgroundInfo, inputText, response]);
+      }, [backgroundInfo, ,bidInfo,inputText, response]);
       
  
       
@@ -86,6 +87,11 @@ const Chatbot = () => {
         }
         return () => clearInterval(interval);
     }, [isLoading, startTime]);
+
+    useEffect(() => {
+        const questionStatus = localStorage.getItem('questionAsked') === 'true';
+        setQuestionAsked(questionStatus);
+    }, []);
 
     const handleTextHighlight = async () => {
         const selectedText = window.getSelection().toString();
@@ -103,6 +109,25 @@ const Chatbot = () => {
                 // User clicked 'Cancel' in the instructions prompt, exit the function
                 return;
             }
+        }
+    };
+
+    const submitFeedback = async () => {
+        const formData = new FormData();
+        formData.append("text", `Question: ${inputText} \n Feedback: ${feedback}`);
+        formData.append("profile_name", dataset); // Assuming email is the profile_name
+        formData.append("mode", "feedback");
+        console.log(formData);
+
+        try {
+            await axios.post(`http${HTTP_PREFIX}://${API_URL}/uploadtext`, formData, {
+                headers: {Authorization: `Bearer ${tokenRef.current}`},
+            });
+            displayAlert("Feedback upload successful", "success");
+            // Handle successful submission, e.g., clear feedback or show a message
+        } catch (error) {
+            console.error("Error sending feedback:", error);
+            // Handle error
         }
     };
 
@@ -264,7 +289,9 @@ const Chatbot = () => {
                                     <Form.Label className="custom-label">Bid Name...</Form.Label>
                                     <Form.Control
                                         as="textarea"
-                                        className="background-info-input"
+                                        className="bid-name-input"
+                                        value={bidInfo}
+                                        onChange={(e) => setBidInfo(e.target.value)}
                                         
                                     />
                                 </Form.Group>
@@ -433,6 +460,58 @@ const Chatbot = () => {
                         </div>
 
                         </Col>
+                    </Row>
+                    <div className="feedback-container">
+
+                    <Row className="justify-content-md-center">
+                        <Col md={12}>
+                            <div className="d-flex justify-content-center mb-3">
+                                <CustomEditor response={response} appendResponse={appendResponse}/>
+                            </div>
+                           
+                        </Col>
+                    </Row>
+                    </div>
+                    <Row className="mt-3">
+                        <Col md={8}>
+                        <Form.Group className="mb-3">
+                                <Form.Label>
+                                    Feedback: (describe how the question can be answered better in the
+                                    future){" "}
+                                </Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    className="feedback-textarea"
+                                    value={feedback}
+                                    onChange={(e) => setFeedback(e.target.value)}
+                                    disabled={!questionAsked} // Disabled until a question is asked
+                                />
+                            </Form.Group>
+                            <div className="d-flex mb-3">
+                                <Button
+                                    variant="primary"
+                                    onClick={submitFeedback}
+                                    className="chat-button"
+                                    disabled={!questionAsked} // Disabled until a question is asked
+                                >
+                                    Submit Feedback
+                                </Button>
+                            </div>
+                            <Button
+                                variant="primary"
+                                onClick={handleAppendResponseToEditor}
+                                className="mt-3"
+                            >
+                                Add question/answer to Text Editor
+                                {/*down arrow */}
+
+                            </Button>
+                            <div>
+                                <VerticalAlignBottomIcon/>
+                            </div>
+                           
+                        </Col>
+                        
                     </Row>
 
                  

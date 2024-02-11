@@ -30,7 +30,6 @@ function Routing() {
                 <Route path="/flog" element={<FLog />} />
                 <Route path="/bids" element={<Bids />} />
                 <Route path="/library" element={<Library />} />
-                <Route path="feedback" element={<Feedback />} />
 
             </Routes>
         </div>

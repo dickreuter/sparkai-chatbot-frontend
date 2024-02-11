@@ -5,11 +5,26 @@
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin: 1rem;
-    margin-left: 90px;
+    margin-left: 240px;
     padding: 2rem;
     border: 1px dashed #000;
     justify-content: center;
     /* or whatever value you desire for the chatbot page */
+}
+
+.feedback-container {
+    margin-top: 0;
+    height: 100%;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    border: 1px dashed #000;
+    justify-content: center;
+}
+
+.feedback-textarea {
+    height: 100px;
+    /* Adjust the height as needed */
 }
 
 .custom-label {
@@ -22,6 +37,12 @@
 
 .background-info-input {
     text-align: left;
+    /* Ensures the text within the form starts at the left */
+}
+
+.bid-name-input {
+    text-align: left;
+    height: 10px;
     /* Ensures the text within the form starts at the left */
 }
 

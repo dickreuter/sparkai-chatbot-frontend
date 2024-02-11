@@ -11,6 +11,9 @@ import React, { useState, useEffect, useRef } from 'react';
 
 
 const Bids = () => {
+    const getAuth = useAuthUser();
+    const auth = getAuth();
+    const tokenRef = useRef(auth?.token || "default");
     return (
       <div className="App">
          <SideBar />

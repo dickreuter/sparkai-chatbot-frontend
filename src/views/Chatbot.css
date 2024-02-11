@@ -214,3 +214,20 @@
 .options-list li {
     margin-bottom: 5px;
 }
+
+.proposal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+}
+
+.proposal-title {
+    margin: 0;
+}
+
+.proposal-header button {
+    position: absolute;
+    left: 0;
+}

@@ -12,6 +12,7 @@ import CustomEditor from "../components/TextEditor.tsx";
 import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import TemplateLoader from "../components/TemplateLoader.tsx";
 import SideBar from '../routes/Sidebar.tsx' 
+import { useLocation } from 'react-router-dom';
 
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
@@ -29,9 +30,27 @@ const Chatbot = () => {
       );
 
 
+
+    const [inputText, setInputText] = useState(
+        localStorage.getItem('inputText') || ''
+      );
+
+    const [response, setResponse] = useState(
+        localStorage.getItem('response') || ''
+      );
+
+
     const [isLoading, setIsLoading] = useState(false);
     const [startTime, setStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
+
+    const [backgroundInfo, setBackgroundInfo] = useState(
+        localStorage.getItem('backgroundInfo') || ''
+      );
+    const [bidInfo, setBidInfo] = useState(
+        localStorage.getItem('bidInfo') || ''
+      );
+
 
     const [backgroundInfo, setBackgroundInfo] = useState(
         localStorage.getItem('backgroundInfo') || ''
@@ -77,6 +96,19 @@ const Chatbot = () => {
       
  
       
+
+
+    useEffect(() => {
+        // Save to local storage whenever backgroundInfo changes
+        localStorage.setItem('backgroundInfo', backgroundInfo);
+        localStorage.setItem('bidInfo', bidInfo);
+        localStorage.setItem('inputText', inputText);
+        localStorage.setItem('response', response);
+      }, [backgroundInfo, ,bidInfo,inputText, response]);
+      
+      
+ 
+      
     useEffect(() => {
         let interval = null;
         if (isLoading && startTime) {
@@ -93,6 +125,24 @@ const Chatbot = () => {
         const questionStatus = localStorage.getItem('questionAsked') === 'true';
         setQuestionAsked(questionStatus);
     }, []);
+
+    const location = useLocation();
+
+    useEffect(() => {
+        // Check if there is a hash in the URL
+        if (location.hash) {
+          const id = location.hash.replace('#', '');
+          const element = document.getElementById(id);
+          if (element) {
+            // Scroll to the element with options
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+            
+          }
+        }
+      }, [location]); // Re-run the effect if the location changes
+      
+
 
     const handleTextHighlight = async () => {
         const selectedText = window.getSelection().toString();
@@ -132,8 +182,28 @@ const Chatbot = () => {
         }
     };
 
+    const submitFeedback = async () => {
+        const formData = new FormData();
+        formData.append("text", `Question: ${inputText} \n Feedback: ${feedback}`);
+        formData.append("profile_name", dataset); // Assuming email is the profile_name
+        formData.append("mode", "feedback");
+        console.log(formData);
+
+        try {
+            await axios.post(`http${HTTP_PREFIX}://${API_URL}/uploadtext`, formData, {
+                headers: {Authorization: `Bearer ${tokenRef.current}`},
+            });
+            displayAlert("Feedback upload successful", "success");
+            // Handle successful submission, e.g., clear feedback or show a message
+        } catch (error) {
+            console.error("Error sending feedback:", error);
+            // Handle error
+        }
+    };
+
     const askCopilot = async (copilotInput: string, instructions: string) => {
         setQuestionAsked(true);
+        localStorage.setItem('questionAsked', 'true');
         localStorage.setItem('questionAsked', 'true');
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
@@ -173,6 +243,7 @@ const Chatbot = () => {
 
     const sendQuestion = async () => {
         setQuestionAsked(true);
+        localStorage.setItem('questionAsked', 'true');
         localStorage.setItem('questionAsked', 'true');
         setResponse("");
         setIsLoading(true);
@@ -244,6 +315,7 @@ const Chatbot = () => {
     };
 
  
+ 
 
     const submitSelections = async () => {
         setIsLoading(true);
@@ -283,6 +355,9 @@ const Chatbot = () => {
 
            
                 <Container fluid="md">
+                <section id="bidinfo">
+                        
+                        
                     <Row >
                             <div className="custom-card">
                                   {/* Need to add Bid Name field*/}
@@ -290,6 +365,9 @@ const Chatbot = () => {
                                     <Form.Label className="custom-label">Bid Name...</Form.Label>
                                     <Form.Control
                                         as="textarea"
+                                        className="bid-name-input"
+                                        value={bidInfo}
+                                        onChange={(e) => setBidInfo(e.target.value)}
                                         className="bid-name-input"
                                         value={bidInfo}
                                         onChange={(e) => setBidInfo(e.target.value)}
@@ -311,6 +389,7 @@ const Chatbot = () => {
                                 </Form.Group>
                             </div>
                     </Row>
+                </section>
                     <Row className="justify-content-md-center mt-4">
                     
                             <FolderLogic
@@ -322,12 +401,14 @@ const Chatbot = () => {
                             />
                     
                     </Row>
+
+                    <section id="inputquestion">
                     <Row className="justify-content-md-center">
                         <Col md={8}>
                             {" "}
                             {/* Adjusted width for the question box */}
                             <Form.Group className="mb-3">
-                                <Form.Label>Enter your question or input:</Form.Label>
+                                <Form.Label className="fw-bold" style={{ fontSize: '18px' }}>Enter your question or input:</Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     className="chat-input"
@@ -348,6 +429,29 @@ const Chatbot = () => {
                                     Submit
                                 </Button>
                                 <VerticalAlignBottomIcon/>
+                                
+
+                            </div>
+                            <div className="text-center mb-3">
+                            {isLoading && (
+                                <div className="my-3">
+                                    <Spinner animation="border"/>
+                                    <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
+                                </div>
+                            )}
+                            {choice === "3" && apiChoices.length > 0 && (
+                                <div>
+                                    {renderChoices()}
+                                    <Button
+                                        variant="primary"
+                                        onClick={submitSelections}
+                                        className="chat-button mt-3"
+                                        disabled={selectedChoices.length === 0}
+                                    >
+                                        Generate answers for selected subsections
+                                    </Button>
+                                </div>
+                            )}
                                 
 
                             </div>
@@ -428,12 +532,14 @@ const Chatbot = () => {
                         
                     
                     </Row>
-
-                    <Row className="justify-content-md-center">
+                </section>
+                <section id="response">
+                    <Row className="justify-content-md-center mt-2">
                         <Col md={8}>
                             
                             <Form.Group className="mb-3">
-                                <Form.Label>Response:</Form.Label>
+                            <Form.Label className="fw-bold" style={{ fontSize: '18px' }}>Response:</Form.Label>
+
                                 <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
                                 <Form.Control
                                     as="textarea"
@@ -446,7 +552,12 @@ const Chatbot = () => {
                                     Word Count: {countWords(response)}
                                 </Form.Text>
                             </Form.Group>
+                           
+
+                    
                         </Col>
+                        
+                   
                         <Col md={4}>
                         <div className="container">
                         <button >Copilot button</button>
@@ -462,22 +573,31 @@ const Chatbot = () => {
 
                         </Col>
                     </Row>
-                    <h3 className="text-center mb-2 fw-bold">Text Editor</h3>
-                    <div className="feedback-container">
-                    
-                    <Row className="justify-content-md-center">
-                        
-                        <Col md={12}>
-                            <div className="d-flex justify-content-center mb-3">
-
-                                <CustomEditor response={response} appendResponse={appendResponse}/>
-                            </div>
-                           
-                        </Col>
-                    </Row>
+                </section>
+                <section id="proposal">
+                <div className="proposal-header mb-3">
+                    <Button variant="primary" onClick={handleAppendResponseToEditor}>
+                        Add to Proposal
+                        {/*down arrow */}
+                    </Button>
+                    <h3 className="fw-bold proposal-title text-center">Proposal Editor</h3>
+                </div>
+                <div className="proposal-container">
+                        <Row className="justify-content-md-center">
+                            <Col md={12}>
+                                <div className="d-flex justify-content-center mb-3">
+                                    <CustomEditor response={response} appendResponse={appendResponse}/>
+                                </div>
+                            
+                            </Col>
+                        </Row>
                     </div>
+                </section>
+                
+                   
                     <Row className="mt-3">
                         <Col md={12}>
+                        <Form.Group className="mb-3">
                         <Form.Group className="mb-3">
                                 <Form.Label>
                                     Feedback: (describe how the question can be answered better in the
@@ -492,6 +612,7 @@ const Chatbot = () => {
                                 />
                             </Form.Group>
                             <div className="d-flex">
+                            <div className="d-flex">
                                 <Button
                                     variant="primary"
                                     onClick={submitFeedback}
@@ -504,20 +625,12 @@ const Chatbot = () => {
                             <div className="d-flex">
                                 
                             </div>
-                            <Button
-                                variant="primary"
-                                onClick={handleAppendResponseToEditor}
-                                className="mt-3"
-                            >
-                                Add question/answer to Text Editor
-                                {/*down arrow */}
-
-                            </Button>
                             
-                           
                         </Col>
                         
+                        
                     </Row>
+                 
 
                  
                 </Container>

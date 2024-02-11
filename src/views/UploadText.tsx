@@ -85,6 +85,7 @@ const UploadText = () => {
           placeholder={placeholder_upload}
           value={text}
           onChange={(e) => setText(e.target.value)}
+          className="mb-2"
         />
       </div>
       <button

@@ -64,6 +64,7 @@ const UploadTemplateText = () => {
                     placeholder=""
                     value={profileName}
                     onChange={(e) => setProfileName(e.target.value)}
+                    className="mt-3 mb-3"
                 />
             </div>
             <div>
@@ -71,6 +72,7 @@ const UploadTemplateText = () => {
             placeholder=""
             value={text}
             onChange={(e) => setText(e.target.value)}
+            className="mb-2"
         />
             </div>
             <button

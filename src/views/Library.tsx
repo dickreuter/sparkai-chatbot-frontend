@@ -7,9 +7,14 @@ import {Button, Col, Container, Form, Row, Spinner, Card} from "react-bootstrap"
 import { Link } from 'react-router-dom';
 import UploadPDF from './UploadPDF';
 import UploadText from './UploadText';
+import UploadText from './UploadText';
 import "./Library.css";
+import UploadTemplateText from '../components/UploadTemplateText';
 
 const Library = () => {
+    const getAuth = useAuthUser();
+    const auth = getAuth();
+    const tokenRef = useRef(auth?.token || "default");
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
@@ -17,19 +22,27 @@ const Library = () => {
         <div className="App">
            <div className="text-center">
           <h1 className='fw-bold'>Library</h1>
+           <div className="text-center">
+          <h1 className='fw-bold'>Library</h1>
           <Link to="/chatbot">
             <Button
               variant="primary"
               className="chat-button mt-3"
             >
-              New Bid
+              Response Generator
             </Button>
           </Link>
+          </div>
           </div>
           <div className="library-container mt-3">
              <Row>
               <Col md={8}>
+             <Row>
+              <Col md={8}>
                 <div className="library-table">
+                  
+
+                 
                   
 
                  
@@ -82,8 +95,11 @@ const Library = () => {
               </Col>
               <Col md={4}>
               <div className="upload-component">
+              </Col>
+              <Col md={4}>
+              <div className="upload-component">
                   <Card className="flex-fill">
-                    <Card.Header>Train AI on Documents</Card.Header>
+                    <Card.Header>Train AI on PDF Documents</Card.Header>
                       <Card.Body className='text-center'>
                         <UploadPDF />
                       </Card.Body>
@@ -97,9 +113,22 @@ const Library = () => {
                 <Col md={12}>
                 <div className="mt-3">
                     <Card className="flex-fill">
-                      <Card.Header>Train AI on Documents</Card.Header>
+                      <Card.Header>Train AI on Text</Card.Header>
                         <Card.Body className='text-center'>
                           <UploadText />
+                        </Card.Body>
+                    </Card>
+
+                  </div>
+                  </Col>
+              </Row>
+              <Row>
+                <Col md={12}>
+                <div className="mt-3">
+                    <Card className="flex-fill">
+                      <Card.Header>Add Templates</Card.Header>
+                        <Card.Body className='text-center'>
+                          <UploadTemplateText />
                         </Card.Body>
                     </Card>
 

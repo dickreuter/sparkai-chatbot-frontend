@@ -30,9 +30,27 @@ const Chatbot = () => {
       );
 
 
+
+    const [inputText, setInputText] = useState(
+        localStorage.getItem('inputText') || ''
+      );
+
+    const [response, setResponse] = useState(
+        localStorage.getItem('response') || ''
+      );
+
+
     const [isLoading, setIsLoading] = useState(false);
     const [startTime, setStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
+
+    const [backgroundInfo, setBackgroundInfo] = useState(
+        localStorage.getItem('backgroundInfo') || ''
+      );
+    const [bidInfo, setBidInfo] = useState(
+        localStorage.getItem('bidInfo') || ''
+      );
+
 
     const [backgroundInfo, setBackgroundInfo] = useState(
         localStorage.getItem('backgroundInfo') || ''
@@ -65,6 +83,19 @@ const Chatbot = () => {
     const countWords = (str) => {
         return str.split(/\s+/).filter(Boolean).length;
     };
+
+
+    useEffect(() => {
+        // Save to local storage whenever backgroundInfo changes
+        localStorage.setItem('backgroundInfo', backgroundInfo);
+        localStorage.setItem('bidInfo', bidInfo);
+        localStorage.setItem('inputText', inputText);
+        localStorage.setItem('response', response);
+      }, [backgroundInfo, ,bidInfo,inputText, response]);
+      
+      
+ 
+      
 
 
     useEffect(() => {
@@ -151,8 +182,28 @@ const Chatbot = () => {
         }
     };
 
+    const submitFeedback = async () => {
+        const formData = new FormData();
+        formData.append("text", `Question: ${inputText} \n Feedback: ${feedback}`);
+        formData.append("profile_name", dataset); // Assuming email is the profile_name
+        formData.append("mode", "feedback");
+        console.log(formData);
+
+        try {
+            await axios.post(`http${HTTP_PREFIX}://${API_URL}/uploadtext`, formData, {
+                headers: {Authorization: `Bearer ${tokenRef.current}`},
+            });
+            displayAlert("Feedback upload successful", "success");
+            // Handle successful submission, e.g., clear feedback or show a message
+        } catch (error) {
+            console.error("Error sending feedback:", error);
+            // Handle error
+        }
+    };
+
     const askCopilot = async (copilotInput: string, instructions: string) => {
         setQuestionAsked(true);
+        localStorage.setItem('questionAsked', 'true');
         localStorage.setItem('questionAsked', 'true');
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
@@ -192,6 +243,7 @@ const Chatbot = () => {
 
     const sendQuestion = async () => {
         setQuestionAsked(true);
+        localStorage.setItem('questionAsked', 'true');
         localStorage.setItem('questionAsked', 'true');
         setResponse("");
         setIsLoading(true);
@@ -263,6 +315,7 @@ const Chatbot = () => {
     };
 
  
+ 
 
     const submitSelections = async () => {
         setIsLoading(true);
@@ -312,6 +365,9 @@ const Chatbot = () => {
                                     <Form.Label className="custom-label">Bid Name...</Form.Label>
                                     <Form.Control
                                         as="textarea"
+                                        className="bid-name-input"
+                                        value={bidInfo}
+                                        onChange={(e) => setBidInfo(e.target.value)}
                                         className="bid-name-input"
                                         value={bidInfo}
                                         onChange={(e) => setBidInfo(e.target.value)}
@@ -373,6 +429,29 @@ const Chatbot = () => {
                                     Submit
                                 </Button>
                                 <VerticalAlignBottomIcon/>
+                                
+
+                            </div>
+                            <div className="text-center mb-3">
+                            {isLoading && (
+                                <div className="my-3">
+                                    <Spinner animation="border"/>
+                                    <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
+                                </div>
+                            )}
+                            {choice === "3" && apiChoices.length > 0 && (
+                                <div>
+                                    {renderChoices()}
+                                    <Button
+                                        variant="primary"
+                                        onClick={submitSelections}
+                                        className="chat-button mt-3"
+                                        disabled={selectedChoices.length === 0}
+                                    >
+                                        Generate answers for selected subsections
+                                    </Button>
+                                </div>
+                            )}
                                 
 
                             </div>
@@ -519,6 +598,7 @@ const Chatbot = () => {
                     <Row className="mt-3">
                         <Col md={12}>
                         <Form.Group className="mb-3">
+                        <Form.Group className="mb-3">
                                 <Form.Label>
                                     Feedback: (describe how the question can be answered better in the
                                     future){" "}
@@ -531,6 +611,7 @@ const Chatbot = () => {
                                     disabled={!questionAsked} // Disabled until a question is asked
                                 />
                             </Form.Group>
+                            <div className="d-flex">
                             <div className="d-flex">
                                 <Button
                                     variant="primary"
@@ -546,6 +627,7 @@ const Chatbot = () => {
                             </div>
                             
                         </Col>
+                        
                         
                     </Row>
                  

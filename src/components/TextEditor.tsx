@@ -1,10 +1,25 @@
-import {useEffect, useState} from 'react';
-import {Editor} from 'react-draft-wysiwyg';
-import {EditorState, Modifier, RichUtils, SelectionState} from 'draft-js';
+import React, { useEffect, useState } from 'react';
+import { Editor } from 'react-draft-wysiwyg';
+import { EditorState, convertToRaw, convertFromRaw, Modifier, SelectionState, ContentState } from 'draft-js';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
-function CustomEditor({response, appendResponse}) {
-    const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
+function CustomEditor({ bidText, response, appendResponse }) {
+    const [editorState, setEditorState] = useState(() => {
+        try {
+            const savedData = localStorage.getItem('editorState');
+            if (savedData) {
+                const rawContentState = JSON.parse(savedData);
+                const contentState = convertFromRaw(rawContentState);
+                return EditorState.createWithContent(contentState);
+            }
+        } catch (error) {
+            console.error("Error loading editor state:", error);
+            // Handle the error or set a fallback editor state
+        }
+        return EditorState.createEmpty();
+    });
+    
+    
 
 useEffect(() => {
     if (appendResponse) {
@@ -22,10 +37,11 @@ useEffect(() => {
         let newContentState = Modifier.insertText(
             currentContent,
             selectionState,
-            `\nQuestion:\n${appendResponse.question}\n\nAnswer:\n${appendResponse.answer}\n\n` // Added an extra newline character here
+            `\nQuestion:\n${appendResponse.question}\n\nAnswer:\n${appendResponse.answer}\n\n`
         );
 
         let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
+        setEditorState(newEditorState);
 
         // Apply 'BOLD' style to the words "Question" and "Answer"
         const blockKey = newEditorState.getSelection().getStartKey();
@@ -67,21 +83,38 @@ useEffect(() => {
 
         setEditorState(newEditorState);
     }
-}, [appendResponse]);
+}, [appendResponse, editorState]);
+
+    useEffect(() => {
+        // Save the editor state to localStorage whenever it changes
+        const contentState = editorState.getCurrentContent();
+        localStorage.setItem('editorState', JSON.stringify(convertToRaw(contentState)));
+    }, [editorState]);
+
+    useEffect(() => {
+        if (bidText) {
+            let contentState = ContentState.createFromText(bidText);
+            let newEditorState = EditorState.createWithContent(contentState);
+            setEditorState(newEditorState);
+        }
+    }, [bidText]);
 
     const onEditorStateChange = (newEditorState) => {
         setEditorState(newEditorState);
     };
 
+    
+
     return (
         <Editor
             editorState={editorState}
             onEditorStateChange={onEditorStateChange}
+
             toolbarClassName="toolbarClassName"
             wrapperClassName="wrapperClassName"
             editorClassName="editorClassName"
         />
     );
-}
+    }
 
 export default CustomEditor;

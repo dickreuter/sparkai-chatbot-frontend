@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from "react";
 import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import withAuth from '../routes/withAuth';
@@ -9,11 +9,59 @@ import UploadPDF from './UploadPDF';
 import UploadText from './UploadText';
 import "./Library.css";
 import UploadTemplateText from '../components/UploadTemplateText';
+import Tooltip from "@mui/material/Tooltip";
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+
+
 
 const Library = () => {
-    const getAuth = useAuthUser();
-    const auth = getAuth();
-    const tokenRef = useRef(auth?.token || "default");
+  const getAuth = useAuthUser();
+  const auth = getAuth();
+  const tokenRef = useRef(auth?.token || "default");
+
+  const [availableCollections, setAvailableCollections] = useState([]);
+  const [folderContents, setFolderContents] = useState({});
+
+  const fetchFolderFilenames = async (folderName) => {
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
+        { collection_name: folderName },
+        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
+      );
+
+      console.log(response.data);
+      // Ensure response.data structure is correctly handled here
+      setFolderContents(prevContents => ({
+        ...prevContents,
+        [folderName]: response.data // Adjust according to actual response structure
+      }));
+    } catch (error) {
+      console.error("Error fetching folder filenames:", error);
+    }
+  };
+
+useEffect(() => {
+  const get_collections = async () => {
+    try {
+      const res = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_collections`,
+        {},
+        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
+      );
+      setAvailableCollections(res.data.collections || []);
+      // Immediately fetch filenames for all collections
+      for (const collection of res.data.collections || []) {
+        await fetchFolderFilenames(collection);
+      }
+    } catch (error) {
+      console.error("Error fetching collections:", error);
+    }
+  };
+  get_collections();
+}, []); // Removed tokenRef from dependencies to avoid refetching on token change
+
+
     return (
         <div className="App">
            <div className="text-center">
@@ -28,59 +76,46 @@ const Library = () => {
           </Link>
           </div>
           <div className="library-container mt-3">
+
+       
+
+
              <Row>
               <Col md={8}>
                 <div className="library-table">
                   
 
                  
-                  <Card className="flex-fill mr-3"> {/* Add margin-right as needed */}
-                    <Card.Header>Knowledge Base</Card.Header>
-                    <Card.Body>
-                      <table className="bids-table">
-                          <thead>
-                            <tr>
-                              <th>Company Library</th>
-                              <th>History</th>
-                              <th>Actions</th>
-                            
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Staff Structure</td>
-                              <td>Last opened: 07/02/2024</td>
-                              <td>View Delete</td>
-                           
-                            </tr>
-                            {/* Additional dummy bids */}
-                            <tr>
-                              <td>Bid Structure</td>
-                              <td>Last opened: 06/02/2024</td>
-                              <td>View Delete</td>
-                            </tr>
-                            <tr>
-                              <td> Company Culture</td>
-                              <td>Last opened: 05/02/2024</td>
-                              <td>View Delete</td>
-                            </tr>
-                            <tr>
-                              <td>Sales Material</td>
-                              <td>Last opened: 04/02/2024</td>
-                              <td>View Delete</td>
-                            </tr>
-                            <tr>
-                              <td>GANT Chart</td>
-                              <td>Last opened: 03/02/2024</td>
-                              <td>View Delete</td>
-                            </tr>
-                          
-                          </tbody>
-                      </table>
-                    </Card.Body>
-                  </Card>
+                <Card className="flex-fill mr-3">
+              <Card.Header>Knowledge Base</Card.Header>
+              <Card.Body>
+                <table className="bids-table">
+                  <thead>
+                    <tr>
+                      <th>Filename</th>
+                      <th>Folder</th>
+                      <th className="text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(folderContents).map(([folderName, files]) => 
+                      files.map((file, index) => (
+                        <tr key={index}>
+                          <td>{file}</td>
+                          <td>{folderName}</td>
+                          <td className="text-center">
+                            <Button variant="primary">View</Button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </Card.Body>
+            </Card>
                 </div>
               </Col>
+
               <Col md={4}>
               <div className="upload-component">
                   <Card className="flex-fill">

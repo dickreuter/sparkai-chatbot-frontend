@@ -47,7 +47,7 @@
 }
 
 .custom-card {
-    background-color: #f7d5b2;
+    background-color: #F29131;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 1rem;
@@ -230,4 +230,16 @@
 .proposal-header button {
     position: absolute;
     left: 0;
+}
+
+.saved-button:disabled {
+    opacity: 1;
+    /* Override default opacity for disabled buttons */
+}
+
+.wrapperClassName {
+    height: 300px;
+    /* Adjust the height as needed */
+    overflow-y: auto;
+    /* Make it scrollable */
 }

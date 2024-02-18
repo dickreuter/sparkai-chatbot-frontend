@@ -238,7 +238,7 @@
 }
 
 .wrapperClassName {
-    height: 900px;
+    height: 800px;
     /* Adjust the height as needed */
     overflow-y: auto;
     /* Make it scrollable */

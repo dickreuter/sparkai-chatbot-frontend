@@ -56,9 +56,10 @@ const Chatbot = () => {
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
 
-    
+
     const handleAppendResponseToEditor = () => {
         // Use a timestamp as a simple unique identifier
+        // had to add to fix infinte append rsponse bug due to state being persisted
         const uniqueId = Date.now(); 
         setAppendResponse({ 
             id: uniqueId, // Unique identifier for each append action
@@ -626,6 +627,9 @@ const Chatbot = () => {
                                     response={response}
                                     appendResponse={appendResponse}
                                     navigatedFromBidsTable={localStorage.getItem('navigatedFromBidsTable') === 'true'}
+                                    editorClassName="customEditorClassName"
+                                    wrapperClassName="wrapperClassName"
+                                
                                 />
 
 

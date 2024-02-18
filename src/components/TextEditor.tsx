@@ -4,7 +4,7 @@ import { EditorState, convertToRaw, convertFromRaw, Modifier, SelectionState, Co
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 
-function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTable }) {
+function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTable, editorClassName,  wrapperClassName}) {
 
     const appendedIds = useRef(new Set()); // Track IDs of appended responses
 

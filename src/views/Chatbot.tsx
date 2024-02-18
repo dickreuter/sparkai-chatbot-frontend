@@ -13,6 +13,7 @@ import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import TemplateLoader from "../components/TemplateLoader.tsx";
 import SideBar from '../routes/Sidebar.tsx' 
 import { useLocation } from 'react-router-dom';
+import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-js';
 
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
@@ -28,7 +29,6 @@ const Chatbot = () => {
     const [response, setResponse] = useState(
         localStorage.getItem('response') || ''
       );
-
 
     const [isLoading, setIsLoading] = useState(false);
     const [startTime, setStartTime] = useState(null);
@@ -55,9 +55,19 @@ const Chatbot = () => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
+
+
     const handleAppendResponseToEditor = () => {
-        setAppendResponse({question: inputText, answer: response}); // Include both question and answer
+        // Use a timestamp as a simple unique identifier
+        // had to add to fix infinte append rsponse bug due to state being persisted
+        const uniqueId = Date.now(); 
+        setAppendResponse({ 
+            id: uniqueId, // Unique identifier for each append action
+            question: inputText, 
+            answer: response 
+        });
     };
+    
 
     const handleSelect = (selectedKey) => {
         setResponse(selectedKey);
@@ -66,18 +76,119 @@ const Chatbot = () => {
         return str.split(/\s+/).filter(Boolean).length;
     };
 
+  
+    const [isSaved, setIsSaved] = useState(false);
+
+    
+    const saveProposal = async () => {
+       
+    
+        // Retrieve the saved editor state from local storage
+        const savedData = localStorage.getItem('editorState');
+        let editorText = '';
+        if (savedData) {
+            const contentState = convertFromRaw(JSON.parse(savedData));
+            editorText = contentState.getBlocksAsArray().map(block => block.getText()).join('\n');
+        }
+
+        const formData = new FormData();
+        formData.append('bid_title', bidInfo);
+        formData.append('text', editorText);
+        formData.append('status', 'ongoing');
+        formData.append('contract_information', backgroundInfo);
+
+        console.log(formData);
+    
+        try {
+            const result = await axios.post(
+                `http${HTTP_PREFIX}://${API_URL}/upload_bids`,
+                formData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${tokenRef.current}`,
+                        'Content-Type': 'multipart/form-data', // This might be needed depending on your backend setup
+                    },
+                }
+            );
+    
+            console.log("Proposal saved successfully:", result.data);
+            setIsSaved(true);
+            setTimeout(() => setIsSaved(false), 3000); // Reset after 3 seconds
+        } catch (error) {
+            console.error("Error saving proposal:", error);
+            setResponse(error.message);
+        }
+    
+    };
+    
+    const location = useLocation();
+    const bidData = location.state?.bid || ''; // Retrieve the passed bid data
 
     useEffect(() => {
-        // Save to local storage whenever backgroundInfo changes
-        localStorage.setItem('backgroundInfo', backgroundInfo);
+
+        console.log(bidData);
+        // Check if the component navigated from the bids table with bid data
+        
+        
+        const navigatedFromBidsTable = localStorage.getItem('navigatedFromBidsTable');
+        console.log(navigatedFromBidsTable)
+  
+        if (navigatedFromBidsTable === 'true' && location.state?.fromBidsTable && bidData) {
+            console.log("Navigated from bids table with bid data:", bidData);
+        
+            // Indicate that data has been loaded from navigation
+         
+            // Update form states with data from navigation or provide default values
+            setBidInfo(bidData?.bid_title || '');
+            setBackgroundInfo(bidData?.contract_information || '');
+            setInputText('');
+            setResponse('');
+        
+            // Update local storage to match the navigation data
+            localStorage.setItem('bidInfo', bidData?.bid_title || '');
+            localStorage.setItem('backgroundInfo', bidData?.contract_information || '');
+            localStorage.setItem('inputText', '');
+            localStorage.setItem('response', '');
+
+            localStorage.setItem('navigatedFromBidsTable', 'false');
+            
+            localStorage.getItem('bidInfo') || '';
+            localStorage.getItem('backgroundInfo') || '';
+            localStorage.getItem('inputText') || '';
+            localStorage.getItem('response') || '';
+        
+            // Handle editor state from bidData, if available
+            try {
+                if (bidData?.text) {
+                    const contentState = ContentState.createFromText(bidData.text);
+                    const newEditorState = EditorState.createWithContent(contentState);
+                    localStorage.setItem('editorState', JSON.stringify(convertToRaw(newEditorState.getCurrentContent())));
+                
+                }
+            } catch (error) {
+                console.error("Error processing editor state:", error);
+            }
+        } else {
+            console.log("Loading data from local storage or post-edit");
+            // Function to load data from local storage
+           
+        }
+    }, [location, bidData]);
+    
+    
+
+    // Update local storage and handle session flag on form changes
+    useEffect(() => {
         localStorage.setItem('bidInfo', bidInfo);
+        localStorage.setItem('backgroundInfo', backgroundInfo);
         localStorage.setItem('inputText', inputText);
         localStorage.setItem('response', response);
-      }, [backgroundInfo, ,bidInfo,inputText, response]);
+      }, [bidInfo, backgroundInfo, inputText, response]);
+    
+  
       
-      
- 
-      
+  
+
     useEffect(() => {
         let interval = null;
         if (isLoading && startTime) {
@@ -90,13 +201,13 @@ const Chatbot = () => {
         return () => clearInterval(interval);
     }, [isLoading, startTime]);
 
+
     useEffect(() => {
         const questionStatus = localStorage.getItem('questionAsked') === 'true';
         setQuestionAsked(questionStatus);
     }, []);
 
-    const location = useLocation();
-
+   
     useEffect(() => {
         // Check if there is a hash in the URL
         if (location.hash) {
@@ -111,7 +222,6 @@ const Chatbot = () => {
         }
       }, [location]); // Re-run the effect if the location changes
       
-
 
     const handleTextHighlight = async () => {
         const selectedText = window.getSelection().toString();
@@ -131,6 +241,8 @@ const Chatbot = () => {
             }
         }
     };
+
+    
 
     const submitFeedback = async () => {
         const formData = new FormData();
@@ -191,6 +303,7 @@ const Chatbot = () => {
     };
 
     const sendQuestion = async () => {
+        console.log("question asked");
         setQuestionAsked(true);
         localStorage.setItem('questionAsked', 'true');
         setResponse("");
@@ -223,6 +336,8 @@ const Chatbot = () => {
                 if (result.data && result.data.includes(",")) {
                     choicesArray = result.data.split(",").map((choice) => choice.trim());
                 }
+                console.log("API Response:", result);
+
                 console.log("Choices Array: " + choicesArray);
 
                 setApiChoices(choicesArray);
@@ -507,13 +622,39 @@ const Chatbot = () => {
                         <Row className="justify-content-md-center">
                             <Col md={12}>
                                 <div className="d-flex justify-content-center mb-3">
-                                    <CustomEditor response={response} appendResponse={appendResponse}/>
+                                <CustomEditor
+                                    bidText={bidData.text}
+                                    response={response}
+                                    appendResponse={appendResponse}
+                                    navigatedFromBidsTable={localStorage.getItem('navigatedFromBidsTable') === 'true'}
+                                    editorClassName="customEditorClassName"
+                                    wrapperClassName="wrapperClassName"
+                                
+                                />
+
+
                                 </div>
+                                
                             
                             </Col>
+                            
                         </Row>
-                    </div>
+
+                </div>
                 </section>
+                <Row className="mt-3">
+                            <div className="text-center">
+                            <Button
+                                variant={isSaved ? "success" : "primary"}
+                                onClick={saveProposal}
+                                className={`chat-button ${isSaved && 'saved-button'}`}
+                                disabled={isLoading || isSaved} // Consider disabling the button while saving or after saved
+                            >
+                                {isSaved ? "Saved" : "Save Proposal"}
+                            </Button>
+
+                            </div>
+                </Row>
                 
                    
                     <Row className="mt-3">

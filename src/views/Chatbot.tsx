@@ -421,7 +421,7 @@ const Chatbot = () => {
                         
                         
                     <Row >
-                            <div className="custom-card">
+                            <div className="custom-card text-white">
                                   {/* Need to add Bid Name field*/}
                                 <Form.Group className="mb-3">
                                     <Form.Label className="custom-label">Bid Name...</Form.Label>

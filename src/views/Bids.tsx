@@ -4,12 +4,19 @@ import axios from 'axios';
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { Link } from "react-router-dom";
 import "./Bids.css";
+import { useNavigate } from 'react-router-dom';
 
 const Bids = () => {
     const [bids, setBids] = useState([]);
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
+    const navigate = useNavigate()
+
+    const navigateToChatbot = (bid) => {
+      localStorage.setItem('navigatedFromBidsTable', 'true');
+      navigate('/chatbot', { state: { bid: bid, fromBidsTable: true } });
+    };
 
     // Encapsulate the bid-fetching logic into its own function
     const fetchBids = async () => {
@@ -72,9 +79,9 @@ const Bids = () => {
                   {bids.map((bid, index) => (
                     <tr key={index}>
                       <td>
-                        <Link to="/chatbot" state={{ bid: bid, fromBidsTable: true }}>
-                          {bid.bid_title}
-                        </Link>
+                      <Link to="/chatbot" state={{ bid: bid, fromBidsTable: true }} onClick={() => navigateToChatbot(bid)}>
+                        {bid.bid_title}
+                      </Link>
                       </td>
                       <td>Last edited: {new Date(bid.timestamp).toLocaleDateString()}</td>
                       <td><span className={`status ${bid.status.toLowerCase()}`}>{bid.status}</span></td>

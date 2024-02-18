@@ -30,7 +30,6 @@ const Chatbot = () => {
         localStorage.getItem('response') || ''
       );
 
-
     const [isLoading, setIsLoading] = useState(false);
     const [startTime, setStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
@@ -113,74 +112,72 @@ const Chatbot = () => {
     };
     
     const location = useLocation();
-    const bidData = location.state?.bid; // Retrieve the passed bid data
+    const bidData = location.state?.bid || ''; // Retrieve the passed bid data
 
-    // Handle loading from navigation or local storage
     useEffect(() => {
-        const loadedFromNavigation = sessionStorage.getItem('loadedFromNavigation');
-    
-        if (location.state?.fromBidsTable && bidData) {
+
+        console.log(bidData);
+        // Check if the component navigated from the bids table with bid data
+        
+        
+        const navigatedFromBidsTable = localStorage.getItem('navigatedFromBidsTable');
+        console.log(navigatedFromBidsTable)
+  
+        if (navigatedFromBidsTable === 'true' && location.state?.fromBidsTable && bidData) {
             console.log("Navigated from bids table with bid data:", bidData);
         
             // Indicate that data has been loaded from navigation
-            sessionStorage.setItem('loadedFromNavigation', 'true');
-        
-            // Update form states with data from navigation
-            setBidInfo(bidData.bid_title || '');
-            setBackgroundInfo(bidData.contract_information || '');
+         
+            // Update form states with data from navigation or provide default values
+            setBidInfo(bidData?.bid_title || '');
+            setBackgroundInfo(bidData?.contract_information || '');
             setInputText('');
             setResponse('');
         
             // Update local storage to match the navigation data
-            localStorage.setItem('bidInfo', bidData.bid_title || '');
-            localStorage.setItem('backgroundInfo', bidData.contract_information || '');
-            localStorage.setItem('inputText', ''); // Assuming you want to clear the input text
-            localStorage.setItem('response', ''); // Assuming you want to clear the response
+            localStorage.setItem('bidInfo', bidData?.bid_title || '');
+            localStorage.setItem('backgroundInfo', bidData?.contract_information || '');
+            localStorage.setItem('inputText', '');
+            localStorage.setItem('response', '');
+
+            localStorage.setItem('navigatedFromBidsTable', 'false');
+            
+            localStorage.getItem('bidInfo') || '';
+            localStorage.getItem('backgroundInfo') || '';
+            localStorage.getItem('inputText') || '';
+            localStorage.getItem('response') || '';
         
-            // Handle editor state from bidData
+            // Handle editor state from bidData, if available
             try {
-                const contentState = ContentState.createFromText(bidData.text || '');
-                const newEditorState = EditorState.createWithContent(contentState);
-                localStorage.setItem('editorState', JSON.stringify(convertToRaw(newEditorState.getCurrentContent())));
+                if (bidData?.text) {
+                    const contentState = ContentState.createFromText(bidData.text);
+                    const newEditorState = EditorState.createWithContent(contentState);
+                    localStorage.setItem('editorState', JSON.stringify(convertToRaw(newEditorState.getCurrentContent())));
+                
+                }
             } catch (error) {
                 console.error("Error processing editor state:", error);
             }
-        } else if (!loadedFromNavigation) {
+        } else {
             console.log("Loading data from local storage or post-edit");
-        
-            // Load data from local storage or maintain edits
-            loadFormDataFromLocalStorage();
+            // Function to load data from local storage
+           
         }
     }, [location, bidData]);
+    
+    
 
     // Update local storage and handle session flag on form changes
     useEffect(() => {
-        // Update all the relevant pieces of local storage in one effect
         localStorage.setItem('bidInfo', bidInfo);
         localStorage.setItem('backgroundInfo', backgroundInfo);
         localStorage.setItem('inputText', inputText);
         localStorage.setItem('response', response);
-
-        // If edits are made, assume we're moving away from the initial navigation state
-        if (sessionStorage.getItem('loadedFromNavigation')) {
-            console.log("Clearing loadedFromNavigation flag due to form edits");
-            sessionStorage.removeItem('loadedFromNavigation');
-        }
-    }, [bidInfo, backgroundInfo, inputText, response]);
-
-    const loadFormDataFromLocalStorage = () => {
-        const savedBidInfo = localStorage.getItem('bidInfo') || '';
-        const savedBackgroundInfo = localStorage.getItem('backgroundInfo') || '';
-        const savedInputText = localStorage.getItem('inputText') || '';
-        const savedResponse = localStorage.getItem('response') || '';
-
-        setBidInfo(savedBidInfo);
-        setBackgroundInfo(savedBackgroundInfo);
-        setInputText(savedInputText);
-        setResponse(savedResponse);
-    };
-
+      }, [bidInfo, backgroundInfo, inputText, response]);
+    
+  
       
+  
 
     useEffect(() => {
         let interval = null;
@@ -619,8 +616,9 @@ const Chatbot = () => {
                                     bidText={bidData.text}
                                     response={response}
                                     appendResponse={appendResponse}
-                                   
+                                    navigatedFromBidsTable={localStorage.getItem('navigatedFromBidsTable') === 'true'}
                                 />
+
 
                                 </div>
                                 

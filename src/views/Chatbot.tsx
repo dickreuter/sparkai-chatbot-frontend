@@ -55,9 +55,18 @@ const Chatbot = () => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
+
+    
     const handleAppendResponseToEditor = () => {
-        setAppendResponse({question: inputText, answer: response}); // Include both question and answer
+        // Use a timestamp as a simple unique identifier
+        const uniqueId = Date.now(); 
+        setAppendResponse({ 
+            id: uniqueId, // Unique identifier for each append action
+            question: inputText, 
+            answer: response 
+        });
     };
+    
 
     const handleSelect = (selectedKey) => {
         setResponse(selectedKey);

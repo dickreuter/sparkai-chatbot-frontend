@@ -5,6 +5,9 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 
 function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTable }) {
+
+    const appendedIds = useRef(new Set()); // Track IDs of appended responses
+
     const initializeEditorState = () => {
         // First, attempt to load from localStorage if available
         const savedData = localStorage.getItem('editorState');
@@ -46,7 +49,7 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
 
 
     useEffect(() => {
-        if (appendResponse) {
+        if (appendResponse && !appendedIds.current.has(appendResponse.id)) {
             const currentContent = editorState.getCurrentContent();
             const currentContentBlock = currentContent.getBlockMap().last();
             const lengthOfLastBlock = currentContentBlock.getLength();
@@ -106,6 +109,7 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
             newEditorState = EditorState.push(newEditorState, newContentState, 'change-inline-style');
 
             setEditorState(newEditorState);
+            appendedIds.current.add(appendResponse.id);
         }
     }, [appendResponse, editorState]);
 

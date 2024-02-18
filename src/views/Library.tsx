@@ -88,8 +88,8 @@ useEffect(() => {
                  
                 <Card className="flex-fill mr-3">
               <Card.Header>Knowledge Base</Card.Header>
-              <Card.Body>
-                <table className="bids-table">
+              <Card.Body style={{ overflowY: 'auto'}}>
+                <table className="bids-table mb-3">
                   <thead>
                     <tr>
                       <th>Filename</th>

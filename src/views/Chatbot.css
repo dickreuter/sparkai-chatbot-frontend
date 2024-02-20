@@ -243,3 +243,14 @@
     overflow-y: auto;
     /* Make it scrollable */
 }
+
+.toolbarClassName {
+    position: -webkit-sticky;
+    /* For Safari */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    /* Make sure the navbar is above other content */
+    background-color: white;
+    /* Ensures the navbar background is not transparent */
+}

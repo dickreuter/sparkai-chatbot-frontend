@@ -627,7 +627,7 @@ const Chatbot = () => {
                                     response={response}
                                     appendResponse={appendResponse}
                                     navigatedFromBidsTable={localStorage.getItem('navigatedFromBidsTable') === 'true'}
-                                    editorClassName="customEditorClassName"
+                                    toolbarClassName="toolbarClassName"
                                     wrapperClassName="wrapperClassName"
                                 
                                 />

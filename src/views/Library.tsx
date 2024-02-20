@@ -3,7 +3,7 @@ import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
-import {Button, Col, Container, Form, Row, Spinner, Card} from "react-bootstrap";
+import {Button, Col, Container, Form, Row, Spinner, Card, Modal} from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import UploadPDF from './UploadPDF';
 import UploadText from './UploadText';
@@ -18,9 +18,32 @@ const Library = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
+  const [profileName, setProfileName] = useState("default");
 
   const [availableCollections, setAvailableCollections] = useState([]);
   const [folderContents, setFolderContents] = useState({});
+
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState('');
+
+  
+  // Modal component to display file content
+  const FileContentModal = () => (
+    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>File Content</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <pre>{modalContent}</pre> {/* Use <pre> for preformatted text, or customize as needed */}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={() => setShowModal(false)}>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+  
 
   const fetchFolderFilenames = async (folderName) => {
     try {
@@ -30,7 +53,9 @@ const Library = () => {
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
 
+      console.log("fetchfoldernames");
       console.log(response.data);
+
       // Ensure response.data structure is correctly handled here
       setFolderContents(prevContents => ({
         ...prevContents,
@@ -41,6 +66,35 @@ const Library = () => {
     }
   };
 
+
+  const viewFile = async (fileName, folderName) => {
+
+    const formData = new FormData();
+    formData.append('file_name', fileName);
+    formData.append("profile_name", folderName);
+    console.log(folderName);
+    console.log(fileName);
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/show_file_content`,
+        formData,
+        {
+            headers: {
+                'Authorization': `Bearer ${tokenRef.current}`
+               // This might be needed depending on your backend setup
+            },
+        }
+      );
+      // Update modal content and show modal
+      console.log(response.data);
+      setModalContent(response.data); // Assume response.data is the content you want to display
+      setShowModal(true);
+    } catch (error) {
+      console.error('Error viewing file:', error);
+    }
+  };
+
+
 useEffect(() => {
   const get_collections = async () => {
     try {
@@ -49,6 +103,8 @@ useEffect(() => {
         {},
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
+      console.log("response");
+      console.log(res.data);
       setAvailableCollections(res.data.collections || []);
       // Immediately fetch filenames for all collections
       for (const collection of res.data.collections || []) {
@@ -60,6 +116,31 @@ useEffect(() => {
   };
   get_collections();
 }, []); // Removed tokenRef from dependencies to avoid refetching on token change
+
+const renderFilesOrCollectionName = (files, folderName) => {
+  // If no files are present or an error occurred fetching files,
+  // display a row with the folderName as the file name
+  if (!files || files.length === 0) {
+    return (
+      <tr>
+        <td>{folderName}</td>
+        <td>{folderName}</td> {/* Display folderName as filename if no files */}
+        <td className="text-center">N/A</td> {/* Adjust action as needed */}
+      </tr>
+    );
+  }
+  // If files are present, render them as usual
+  return files.map((file, index) => (
+    <tr key={index}>
+      <td>{file}</td>
+      <td>{folderName}</td>
+      <td className="text-center">
+        <Button variant="primary" onClick={() => viewFile(file, folderName)}>View</Button>
+      </td>
+    </tr>
+  ));
+};
+
 
 
     return (
@@ -89,28 +170,25 @@ useEffect(() => {
                 <Card className="flex-fill mr-3">
               <Card.Header>Knowledge Base</Card.Header>
               <Card.Body style={{ overflowY: 'auto'}}>
-                <table className="bids-table mb-3">
-                  <thead>
+              <table className="bids-table mb-3">
+                <thead>
+                  <tr>
+                    <th>Filename</th>
+                    <th>Folder</th>
+                    <th className="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {Object.entries(folderContents).length > 0 ? 
+                  Object.entries(folderContents).map(([folderName, files]) => 
+                    renderFilesOrCollectionName(files, folderName)
+                  ) : (
                     <tr>
-                      <th>Filename</th>
-                      <th>Folder</th>
-                      <th className="text-center">Action</th>
+                      <td colSpan="3" className="text-center">No collections or files available</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(folderContents).map(([folderName, files]) => 
-                      files.map((file, index) => (
-                        <tr key={index}>
-                          <td>{file}</td>
-                          <td>{folderName}</td>
-                          <td className="text-center">
-                            <Button variant="primary">View</Button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                  )}
+                </tbody>
+              </table>
               </Card.Body>
             </Card>
                 </div>
@@ -160,7 +238,7 @@ useEffect(() => {
                   
 
           </div>
-          
+          <FileContentModal />
         </div>
       );
 }

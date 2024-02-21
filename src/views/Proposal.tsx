@@ -6,7 +6,7 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import withAuth from "../routes/withAuth";
 import CustomEditor from "../components/TextEditor.tsx";
 import SideBar from '../routes/Sidebar.tsx' ;
-import "./Propsal.css";
+
 
 const Proposal = () => {
   

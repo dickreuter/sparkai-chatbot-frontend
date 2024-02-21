@@ -71,7 +71,7 @@ const Bids = () => {
                         <th>Bid Title</th>
                         <th>Last edited</th>
                         <th>Status</th>
-                        <th>Contract Information</th>
+                      
                         <th>Delete Bid</th>
                     </tr>
                 </thead>
@@ -85,7 +85,7 @@ const Bids = () => {
                       </td>
                       <td>Last edited: {new Date(bid.timestamp).toLocaleDateString()}</td>
                       <td><span className={`status ${bid.status.toLowerCase()}`}>{bid.status}</span></td>
-                      <td>{bid.contract_information}</td>
+                     
                       <td>
                         <button
                           onClick={() => deleteBid(bid.bid_title)}

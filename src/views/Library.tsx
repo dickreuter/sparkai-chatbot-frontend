@@ -146,17 +146,17 @@ const renderFilesOrCollectionName = (files, folderName) => {
     return (
         <div className="App">
            <div className="text-center">
-          <h1 className='fw-bold'>Library</h1>
+          <h1 className='fw-bold'>Company Library</h1>
           <Link to="/chatbot">
             <Button
               variant="primary"
-              className="chat-button mt-3"
+              className="chat-button mt-4"
             >
               Response Generator
             </Button>
           </Link>
           </div>
-          <div className="library-container mt-3">
+          <div className="library-container mt-4">
 
        
 
@@ -209,7 +209,7 @@ const renderFilesOrCollectionName = (files, folderName) => {
               </Row>
               <Row>
                 <Col md={12}>
-                <div className="mt-3">
+                <div className="mt-4">
                     <Card className="flex-fill">
                       <Card.Header>Train AI on Text</Card.Header>
                         <Card.Body className='text-center'>
@@ -222,7 +222,7 @@ const renderFilesOrCollectionName = (files, folderName) => {
               </Row>
               <Row>
                 <Col md={12}>
-                <div className="mt-3">
+                <div className="mt-4">
                     <Card className="flex-fill">
                       <Card.Header>Add Templates</Card.Header>
                         <Card.Body className='text-center'>

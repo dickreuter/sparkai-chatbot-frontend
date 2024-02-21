@@ -424,7 +424,7 @@ const Chatbot = () => {
                             <div className="custom-card text-white">
                                   {/* Need to add Bid Name field*/}
                                 <Form.Group className="mb-3">
-                                    <Form.Label className="custom-label">Bid Name...</Form.Label>
+                                    <Form.Label className="custom-label">Bid Name</Form.Label>
                                     <Form.Control
                                         as="textarea"
                                         className="bid-name-input"
@@ -438,7 +438,7 @@ const Chatbot = () => {
                                 {/* New column for background information 
                                 used to be Additional instructions (optional)*/}
                                 <Form.Group className="mb-3">
-                                    <Form.Label className="custom-label" >Contract Information...</Form.Label>
+                                    <Form.Label className="custom-label" >Contract Information</Form.Label>
                                     <Form.Control
                                         as="textarea"
                                         className="background-info-input"
@@ -449,28 +449,31 @@ const Chatbot = () => {
                             </div>
                     </Row>
                 </section>
-                    <Row className="justify-content-md-center mt-4">
-                    
-                            <FolderLogic
-                                tokenRef={tokenRef}
-                                setAvailableCollections={setAvailableCollections}
-                                setFolderContents={setFolderContents}
-                                availableCollections={availableCollections}
-                                folderContents={folderContents}
-                            />
-                    
+                  
+                    <section id="inputquestion">
+                    <Row
+                        className="justify-content-md-center mt-4"
+                        style={{ visibility: 'hidden', height: 0, overflow: 'hidden' }}
+                    >
+                        <FolderLogic
+                            tokenRef={tokenRef}
+                            setAvailableCollections={setAvailableCollections}
+                            setFolderContents={setFolderContents}
+                            availableCollections={availableCollections}
+                            folderContents={folderContents}
+                        />
                     </Row>
 
-                    <section id="inputquestion">
-                    <Row className="justify-content-md-center">
+                
+                    <Row className="justify-content-md-center mt-4">
                         <Col md={8}>
                             {" "}
                             {/* Adjusted width for the question box */}
                             <Form.Group className="mb-3">
-                                <Form.Label className="fw-bold" style={{ fontSize: '18px' }}>Enter your question or input:</Form.Label>
+                                <Form.Label className="" style={{ fontSize: '22px' }}>Enter your question or input:</Form.Label>
                                 <Form.Control
                                     as="textarea"
-                                    className="chat-input"
+                                    className="chat-input mb-2"
                                     value={inputText}
                                     onChange={(e) => setInputText(e.target.value)}
                                 />
@@ -478,40 +481,8 @@ const Chatbot = () => {
                                     Word Count: {inputText.split(/\s+/).filter(Boolean).length}
                                 </Form.Text>
                             </Form.Group>
-                            <div className="d-flex  mb-3">
-                                <VerticalAlignBottomIcon/>
-                                <Button
-                                    variant="primary"
-                                    onClick={sendQuestion}
-                                    className="chat-button"
-                                >
-                                    Submit
-                                </Button>
-                                <VerticalAlignBottomIcon/>
-                                
-
-                            </div>
-                            <div className="text-center mb-3">
-                            {isLoading && (
-                                <div className="my-3">
-                                    <Spinner animation="border"/>
-                                    <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
-                                </div>
-                            )}
-                            {choice === "3" && apiChoices.length > 0 && (
-                                <div>
-                                    {renderChoices()}
-                                    <Button
-                                        variant="primary"
-                                        onClick={submitSelections}
-                                        className="chat-button mt-3"
-                                        disabled={selectedChoices.length === 0}
-                                    >
-                                        Generate answers for selected subsections
-                                    </Button>
-                                </div>
-                            )}
-                            </div>
+                           
+                           
                         </Col>
                         <Col md={4}>
                             <div className="dropdowns">
@@ -568,13 +539,48 @@ const Chatbot = () => {
                         
                     
                     </Row>
+                    <Row>
+                    <div className="text-center mb-3">
+
+                        <Button
+                                variant="primary"
+                                onClick={sendQuestion}
+                                className="sub-button mb-2"
+                            
+                                
+                            >
+                                Submit
+                            </Button>
+                            
+                        {isLoading && (
+                            <div className="my-3">
+                                <Spinner animation="border"/>
+                                <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
+                            </div>
+                        )}
+                        {choice === "3" && apiChoices.length > 0 && (
+                            <div>
+                                {renderChoices()}
+                                <Button
+                                    variant="primary"
+                                    onClick={submitSelections}
+                                    className="chat-button mt-3"
+                                    disabled={selectedChoices.length === 0}
+                                >
+                                    Generate answers for selected subsections
+                                </Button>
+                            </div>
+                        )}
+                        </div>
+                    </Row>
+                   
                 </section>
                 <section id="response">
-                    <Row className="justify-content-md-center mt-2">
-                        <Col md={8}>
+                    <Row className="justify-content-md-center">
+                        <Col md={12}>
                             
                             <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold" style={{ fontSize: '18px' }}>Response:</Form.Label>
+                            <Form.Label className="" style={{ fontSize: '22px' }}>Response:</Form.Label>
 
                                 <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
                                 <Form.Control
@@ -593,6 +599,7 @@ const Chatbot = () => {
                     
                         </Col>
                         
+                   {/*
                    
                         <Col md={4}>
                         <div className="container">
@@ -608,15 +615,20 @@ const Chatbot = () => {
                         </div>
 
                         </Col>
+                                            */} 
                     </Row>
                 </section>
                 <section id="proposal">
-                <div className="proposal-header mb-3">
-                    <Button variant="primary" onClick={handleAppendResponseToEditor}>
+                    <div className="text-center">
+                    <Button variant="primary" onClick={handleAppendResponseToEditor}  style={{ fontSize: '16px' }}>
                         Add to Proposal
                         {/*down arrow */}
                     </Button>
-                    <h3 className="fw-bold proposal-title text-center">Proposal Editor</h3>
+                    </div>
+                
+                <div className="proposal-header mb-3">
+                   
+                    <h3 className="proposal-title mt-3">Proposal Editor</h3>
                 </div>
                 <div className="proposal-container">
                         <Row className="justify-content-md-center">
@@ -631,11 +643,7 @@ const Chatbot = () => {
                                     wrapperClassName="wrapperClassName"
                                 
                                 />
-
-
                                 </div>
-                                
-                            
                             </Col>
                             
                         </Row>
@@ -647,7 +655,7 @@ const Chatbot = () => {
                             <Button
                                 variant={isSaved ? "success" : "primary"}
                                 onClick={saveProposal}
-                                className={`chat-button ${isSaved && 'saved-button'}`}
+                                className={`mt-1 chat-button ${isSaved && 'saved-button'}`}
                                 disabled={isLoading || isSaved} // Consider disabling the button while saving or after saved
                             >
                                 {isSaved ? "Saved" : "Save Proposal"}
@@ -676,7 +684,7 @@ const Chatbot = () => {
                                 <Button
                                     variant="primary"
                                     onClick={submitFeedback}
-                                    className="chat-button"
+                                    className="chat-button mt-1"
                                     disabled={!questionAsked} // Disabled until a question is asked
                                 >
                                     Submit Feedback

@@ -12,7 +12,11 @@ const UploadText = () => {
   const tokenRef = useRef(auth?.token || "default");
 
   const [text, setText] = useState("");
+
+
+
   const [profileName, setProfileName] = useState("default");
+  const [fileName, setFileName] = useState("default");
   const [textFormat, setTextFormat] = useState("plain");
   const [isUploading, setIsUploading] = useState(false);
 
@@ -20,6 +24,7 @@ const UploadText = () => {
     const formData = new FormData();
     setIsUploading(true);
     formData.append("text", text);
+    formData.append("filename", fileName);
     formData.append("profile_name", profileName);
     formData.append("mode", textFormat);
 
@@ -56,46 +61,64 @@ const UploadText = () => {
   // ...
 
   return (
-    <div className="App">
-      <h1>Text Uploader</h1>
-      <div>
-        Text format:
-        <select
-          className="mx-3 my-3"
-          value={textFormat}
-          onChange={(e) => setTextFormat(e.target.value)}
-        >
-          <option value="plain">Plain Text</option>
-          <option value="feedback">Feedback</option>
-          <option value="qa">Question / Answer Pairs</option>
-        </select>
-      </div>
-      <div>
-        Profile name:
-        <input
-         className="mx-3 mb-3"
-          type="text"
-          placeholder="Enter Profile Name"
-          value={profileName}
-          onChange={(e) => setProfileName(e.target.value)}
-        />
-      </div>
-      <div>
-        <textarea
-          placeholder={placeholder_upload}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          className="mb-2"
-        />
-      </div>
-      <button
-        onClick={handleTextSubmit}
-        disabled={isUploading}
-        className={isUploading ? "btn-disabled" : ""}
+
+<div className="App">
+  <h1>Text Uploader</h1>
+  <div className="input-options-container mt-4 mb-4">
+    <div>
+      Text format:
+      <select
+        value={textFormat}
+        onChange={(e) => setTextFormat(e.target.value)}
+        className="ml-3"
       >
-        Upload Data
-      </button>
+        <option value="plain">Plain Text</option>
+        <option value="feedback">Feedback</option>
+        <option value="qa">Question / Answer Pairs</option>
+      </select>
     </div>
+    <div>
+      Profile name:
+      <input
+       className="ml-3"
+        type="text"
+        placeholder="Enter Profile Name"
+        value={profileName}
+        onChange={(e) => setProfileName(e.target.value)}
+      />
+    </div>
+    <div>
+      File name:
+      <input
+       className="ml-3"
+        id="fileName"
+        type="text"
+        placeholder="Enter File Name"
+        value={fileName}
+        onChange={(e) => setFileName(e.target.value)}
+      />
+    </div>
+  </div>
+  <div>
+    <textarea
+      placeholder={placeholder_upload}
+      value={text}
+      className="mb-4"
+      onChange={(e) => setText(e.target.value)}
+    />
+  </div>
+  <button
+    onClick={handleTextSubmit}
+    disabled={isUploading}
+    className={isUploading ? "btn-disabled" : ""}
+  >
+    Upload Data
+  </button>
+</div>
+
+
+
+
   );
 };
 

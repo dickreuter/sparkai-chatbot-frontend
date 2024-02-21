@@ -7,7 +7,7 @@
     margin: 1rem;
     margin-left: 200px;
     padding: 2rem;
-    border: 1px dashed #000;
+    background-color: #faf7f7;
     justify-content: center;
     /* or whatever value you desire for the chatbot page */
 }
@@ -51,7 +51,14 @@
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 1rem;
-    border: 1px dashed #000;
+    /* Dashed border */
+}
+
+.white-card {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
     /* Dashed border */
 }
 
@@ -77,12 +84,14 @@
 .chat-output {
     width: 70vw;
     margin-left: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-right: auto;
     display: block;
 }
 
 .chat-input {
-    height: 27vh;
+    height: 33vh;
     /* Adjust the height here */
 }
 
@@ -96,6 +105,15 @@
     width: auto;
     /* remove the fixed width */
     display: block;
+}
+
+.sub-button {
+    font-size: 16px;
+    transform: translateY(-60%);
+}
+
+.chat-button {
+    margin-top: 0;
 }
 
 .centered-container {
@@ -134,9 +152,13 @@
 
 .dropdowns {
     display: flex;
+    background-color: #f7d5b2;
+    padding: 4%;
     flex-direction: column;
     justify-content: center;
     flex-wrap: nowrap;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .dataset-folders {
@@ -218,18 +240,30 @@
 .proposal-header {
     display: flex;
     align-items: center;
-    justify-content: center;
     position: relative;
     width: 100%;
 }
 
 .proposal-title {
     margin: 0;
+    font-size: 22px;
 }
 
 .proposal-header button {
     position: absolute;
     left: 0;
+}
+
+.proposal-container {
+    background-color: white;
+    border: none;
+    margin-top: 0;
+    height: 100%;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    ;
+    justify-content: center;
 }
 
 .saved-button:disabled {

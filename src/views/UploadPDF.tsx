@@ -46,7 +46,7 @@ const UploadPDF = () => {
 
     return (
         <div className="App">
-            <h1>PDF Uploader</h1>
+            <h1 className='mb-4'>PDF Uploader</h1>
             <input 
                 type="text" 
                 placeholder="Enter Profile Name" 

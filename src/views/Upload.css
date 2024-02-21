@@ -1,4 +1,16 @@
-textarea{
+textarea {
     width: 70vw;
     height: 30vw;
+}
+
+.input-options-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Adjusts space between the input options */
+    align-items: center;
+    /* Vertically centers the items */
+    /* Ensures responsiveness */
+    gap: 20px;
+    /* Adds some space between the items */
 }

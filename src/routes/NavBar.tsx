@@ -91,6 +91,16 @@ const NavBar = () => {
           ) : (
             <></>
           )}
+
+          {auth ? (
+            <li className="nav-item">
+              <Link className="nav-link" to="/chatbot">
+                Response Generator
+              </Link>
+            </li>
+          ) : (
+            <></>
+          )}
        
        
            {auth ? (

@@ -545,7 +545,7 @@ const Chatbot = () => {
                         <Button
                                 variant="primary"
                                 onClick={sendQuestion}
-                                className="sub-button mb-2"
+                                className="sub-button mt-4 mb-2"
                             
                                 
                             >

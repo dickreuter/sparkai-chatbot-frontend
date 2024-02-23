@@ -7,11 +7,13 @@
     min-height: 50vh;
     max-height: 50vh;
     display: flex;
-    /* Takes up the remaining space */
+    overflow-y: auto;
+    /* Allows vertical scrolling if content overflows */
+    overflow-x: hidden;
+    /* Prevents horizontal scrolling */
 }
 
 .upload-component {
-    /* Spacing between table and upload component */
     display: flex;
     min-height: 50vh;
     max-height: 50vh;
@@ -19,9 +21,10 @@
 }
 
 .bids-table {
-    width: 90%;
-    width: 90vh;
-    /* Adjust to the desired width */
+    width: 100%;
+    /* Use 100% to fill the container */
+    table-layout: fixed;
+    /* Enables fixed table layout */
     margin: 20px auto;
     /* Centers the table with a margin above and below */
     border-collapse: collapse;
@@ -32,9 +35,22 @@
     border: 1px solid black;
     padding: 8px;
     text-align: left;
-    /* Align text to the left within cells */
+    word-wrap: break-word;
+    /* Allows long words to break and wrap onto the next line */
+    /* Specify a max-width for cells if necessary, depending on your design */
 }
 
 .bids-table th {
     background-color: #f2f2f2;
+}
+
+
+/* Specifically target the Action column to make it narrower */
+
+.bids-table th:last-child,
+.bids-table td:last-child {
+    width: 12%;
+    /* Assign a smaller width to the Action column */
+    text-align: center;
+    /* Center-align the action buttons or text */
 }

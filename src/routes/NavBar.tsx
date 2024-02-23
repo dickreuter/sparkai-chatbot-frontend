@@ -81,17 +81,6 @@ const NavBar = () => {
         <ul className="navbar-nav ml-auto">
           {" "}
           {/* Apply ml-auto here */}
-         
-           {auth ? (
-            <li className="nav-item">
-              <Link className="nav-link" to="/library">
-                Library
-              </Link>
-            </li>
-          ) : (
-            <></>
-          )}
-
           {auth ? (
             <li className="nav-item">
               <Link className="nav-link" to="/chatbot">
@@ -102,6 +91,15 @@ const NavBar = () => {
             <></>
           )}
        
+           {auth ? (
+            <li className="nav-item">
+              <Link className="nav-link" to="/library">
+                Library
+              </Link>
+            </li>
+          ) : (
+            <></>
+          )}
        
            {auth ? (
             <li className="nav-item">

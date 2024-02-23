@@ -8,7 +8,7 @@ import Routing from './routes/Routing';
 const Layout = () => {
   const location = useLocation();
   
-  // List of paths where the NavBar should be hidden  const hideNavBarPaths = [ '/chatbot', '/proposal', '/'];
+  // List of paths where the NavBar should be hidden  const hideNavBarPaths = [ '/chatbot', '/proposal', '/']; m
   
   const hideNavBarPaths = [];
   

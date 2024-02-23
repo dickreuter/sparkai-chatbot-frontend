@@ -27,23 +27,22 @@ const Library = () => {
   const [modalContent, setModalContent] = useState('');
 
   
-  // Modal component to display file content
-  const FileContentModal = () => (
-    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>File Content</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <pre>{modalContent}</pre> {/* Use <pre> for preformatted text, or customize as needed */}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={() => setShowModal(false)}>
-          Close
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-  
+// Modal component to display file content
+const FileContentModal = () => (
+  <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+    <Modal.Header closeButton>
+      <Modal.Title>File Content</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <pre style={{ textAlign: 'center' }}>{modalContent}</pre> {/* Centered text */}
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant="secondary" onClick={() => setShowModal(false)}>
+        Close
+      </Button>
+    </Modal.Footer>
+  </Modal>
+);
 
   const fetchFolderFilenames = async (folderName) => {
     try {

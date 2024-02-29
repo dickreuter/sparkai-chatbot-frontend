@@ -7,10 +7,14 @@
     min-height: 50vh;
     max-height: 50vh;
     display: flex;
+    /* Prevents 
+    horizontal scrolling */
+}
+
+.cardbodytable {
     overflow-y: auto;
     /* Allows vertical scrolling if content overflows */
     overflow-x: hidden;
-    /* Prevents horizontal scrolling */
 }
 
 .upload-component {

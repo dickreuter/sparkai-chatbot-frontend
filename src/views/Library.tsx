@@ -168,7 +168,7 @@ const renderFilesOrCollectionName = (files, folderName) => {
                  
                 <Card className="flex-fill mr-3">
               <Card.Header>Knowledge Base</Card.Header>
-              <Card.Body>
+              <Card.Body className="cardbodytable">
               <table className="bids-table mb-3">
                 <thead>
                   <tr>

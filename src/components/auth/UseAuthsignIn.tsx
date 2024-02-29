@@ -27,7 +27,11 @@ const useAuthSignIn = () => {
           token: res.data.access_token,
         }
       })) {
+<<<<<<< HEAD
         navigate('/chatbot');
+=======
+        navigate('/library');
+>>>>>>> 4fc4254 (clearstorageonsignin)
         localStorage.clear();
         return { success: true, message: 'Log in successful!' };
       } else {

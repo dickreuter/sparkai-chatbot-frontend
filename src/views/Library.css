@@ -29,23 +29,49 @@
     /* Use 100% to fill the container */
     table-layout: fixed;
     /* Enables fixed table layout */
-    margin: 20px auto;
+    margin-top: 0;
     /* Centers the table with a margin above and below */
-    border-collapse: collapse;
+    border-collapse: separate;
+    /* Adjust for border-radius application */
+    border-spacing: 0;
+    /* Adjust to remove spacing between cells */
+    border-radius: 8px;
+    /* Rounded corners for the table */
+    overflow: hidden;
+    /* Ensures the rounded corners are visible */
 }
 
 .bids-table th,
 .bids-table td {
-    border: 1px solid black;
     padding: 8px;
     text-align: left;
-    word-wrap: break-word;
-    /* Allows long words to break and wrap onto the next line */
-    /* Specify a max-width for cells if necessary, depending on your design */
+    white-space: nowrap;
+    /* Keep the text on a single line */
+    overflow: hidden;
+    /* Hide overflow content */
+    text-overflow: ellipsis;
+    /* Add ellipsis to overflow content */
+}
+
+
+/* Remove all borders from th and td */
+
+.bids-table th,
+.bids-table td {
+    border: none;
+    /* Remove borders from cells */
+}
+
+.bids-table thead {
+    background-color: black;
+    border-radius: 8px 8px 0 0;
+    /* Rounded corners for the top of the table */
 }
 
 .bids-table th {
-    background-color: #f2f2f2;
+    color: white;
+    background-color: black;
+    /* Text color for headers */
 }
 
 
@@ -57,4 +83,11 @@
     /* Assign a smaller width to the Action column */
     text-align: center;
     /* Center-align the action buttons or text */
+}
+
+.pagination-controls button {
+    padding: 5px 10px;
+    margin-right: 5px;
+    background-color: black;
+    color: white;
 }

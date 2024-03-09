@@ -8,16 +8,15 @@ import Routing from './routes/Routing';
 const Layout = () => {
   const location = useLocation();
   
-  // List of paths where the NavBar should be hidden  const hideNavBarPaths = [ '/chatbot', '/proposal', '/'];
-  
-  const hideNavBarPaths = [];
-  
-  // Check if the current location's pathname is NOT in the list of paths
-  const showNavBar = !hideNavBarPaths.includes(location.pathname);
-  
+  // List of paths where the NavBar should be hidden
+  const hideNavBarPaths = ['/login']; // Added '/login' to the array
+ 
+  // Check if the current path is in the list of paths to hide the NavBar
+  const shouldHideNavBar = hideNavBarPaths.includes(location.pathname);
+
   return (
     <>
-      {showNavBar && <NavBar />}
+      {!shouldHideNavBar && <NavBar />}
       <div className="main-content">
         <Routing />
       </div>

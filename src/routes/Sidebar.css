@@ -1,46 +1,88 @@
 .sidebar {
-    height: 100%;
-    width: 200px;
+    /* Adjust height as needed or consider using min-height for dynamic content */
+    min-height: 100%;
+    width: 210px;
     /* Adjust width as needed */
     position: fixed;
     z-index: 1;
-    top: 0;
+    bottom: 0;
+    /* Anchor to the bottom */
     left: 0;
-    background: linear-gradient(90deg, rgb(28, 27, 27) 0%, rgb(26, 23, 23) 100%);
+    z-index: 100;
+    background: #f0f0f0;
     overflow-x: hidden;
     padding-top: 20px;
-    padding-left: 10px;
+    margin-left: 90px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    /* Add a border to the right side of the sidebar */
+    border-right: 1px solid #ddd;
     /* Add some padding to the left */
 }
 
-.sidebar a {
+.heavy {
+    font-weight: 600;
+}
+
+.toggle-icon {
+    font-size: 0.7em;
+    /* Smaller icon size */
+    margin-left: auto;
+    margin-right: 0.2rem;
+    /* Pushes the icon to the far right */
+}
+
+
+/* Ensure the sidebar title container is a flexbox to align items properly */
+
+.sidebar-top-title,
+.sidebar-title {
+    display: flex;
+    justify-content: space-between;
+    /* Distribute space between title and icon */
+    align-items: center;
+    /* Center items vertically */
+}
+
+.sidebar-top-title {
+    margin-top: 40px;
+    font-size: 24px;
+    font-weight: 600;
+    /* Adjust the font size as needed */
+    color: black;
     padding: 10px;
+    padding-bottom: 0;
+    /* Adjust the text color as needed */
+    /* Adds space below the title */
+    /* Aligns title with the links */
+}
+
+.sidebar-title {
+    font-size: 24px;
+    font-weight: 600;
+    /* Adjust the font size as needed */
+    color: black;
+    padding: 10px;
+    padding-bottom: 0;
+    /* Adjust the text color as needed */
+    /* Adds space below the title */
+    /* Aligns title with the links */
+}
+
+.sidebar a {
+    padding: 11px;
     /* Adjust padding for the size of the rectangle */
     text-decoration: none;
-    color: white;
-    font-family: 'Roboto', sans-serif;
+    color: black;
     font-weight: 500;
     display: flex;
     align-items: center;
-    font-size: 20px;
-    margin-right: 10px;
-    /* Adds margin around the links for space from the edges */
-    border-radius: 10px;
-    /* Rounded edges for the rectangle */
-    transition: background-color 0.3s;
+    font-size: 1rem;
     /* Smooth transition for background color */
 }
 
 .sidebar a:hover {
-    color: white;
+    color: black;
     /* Keep text color white on hover */
-    background-color: #757575;
+    background-color: orange;
     /* Grey background on hover */
-}
-
-.sidebar a svg {
-    margin-right: 10px;
-    margin-left: 5px;
-    width: 20px;
-    height: 20px;
 }

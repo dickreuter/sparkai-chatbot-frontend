@@ -27,7 +27,7 @@ const useAuthSignIn = () => {
           token: res.data.access_token,
         }
       })) {
-        navigate('/library');
+        navigate('/chatbot');
         localStorage.clear();
         return { success: true, message: 'Log in successful!' };
       } else {

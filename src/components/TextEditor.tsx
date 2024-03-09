@@ -136,7 +136,7 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
                 onEditorStateChange={onEditorStateChange}
                 toolbarClassName="toolbarClassName"
                 wrapperClassName="wrapperClassName"
-                editorClassName="editorClassName"
+                
             />
         );
         }

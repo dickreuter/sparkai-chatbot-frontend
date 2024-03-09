@@ -66,6 +66,14 @@
 
 .sidebar a {
     padding: 10px;
+    padding-bottom: 0;
+    /* Adjust the text color as needed */
+    /* Adds space below the title */
+    /* Aligns title with the links */
+}
+
+.sidebar a {
+    padding: 11px;
     /* Adjust padding for the size of the rectangle */
     text-decoration: none;
     color: black;

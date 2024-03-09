@@ -1,27 +1,49 @@
 .chatbot-container {
+<<<<<<< HEAD
     width: 100%;
     height: 100%;
     margin-top: 40px;
     margin-bottom: 0;
     margin-left: 300px;
+=======
+    width: 79.5vw;
+    height: 100%;
+    border-radius: 4px;
+    margin-top: 40px;
+    margin-bottom: 0;
+    margin-left: 280px;
+>>>>>>> b3c28fb (cleaner ui)
     background-color: white;
     justify-content: center;
     padding: 1rem;
     padding-top: 0rem;
+<<<<<<< HEAD
     padding-right: 290px;
+=======
+>>>>>>> b3c28fb (cleaner ui)
     /* or whatever value you desire for the chatbot page */
 }
 
 .lib-container {
+<<<<<<< HEAD
     width: 100%;
     height: 100%;
     margin-top: 40px;
     margin-bottom: 0;
     margin-left: 65px;
+=======
+    width: 94.5vw;
+    height: 100%;
+    border-radius: 4px;
+    margin-top: 40px;
+    margin-bottom: 0;
+    margin-left: 60px;
+>>>>>>> b3c28fb (cleaner ui)
     background-color: white;
     justify-content: center;
     padding: 1rem;
     padding-top: 0rem;
+<<<<<<< HEAD
     padding-right: 55px;
     /* or whatever value you desire for the chatbot page */
 }
@@ -44,6 +66,11 @@
     animation: fadeInScaleUp 0.1s ease-out;
 }
 
+=======
+    /* or whatever value you desire for the chatbot page */
+}
+
+>>>>>>> b3c28fb (cleaner ui)
 .navbar-container {
     width: 94vw;
     height: 100%;
@@ -78,6 +105,7 @@
     /* This aligns the text to the left */
 }
 
+<<<<<<< HEAD
 .margin-container {
     margin-top: 15px;
     margin-left: 15px;
@@ -91,6 +119,19 @@
 .bid-name-input {
     text-align: left;
     height: 10px;
+=======
+.bid-name-input {
+    text-align: left;
+    height: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ced4da;
+    /* Ensures the text within the form starts at the left */
+}
+
+.custom-card {
+    background-color: black;
+>>>>>>> b3c28fb (cleaner ui)
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border: 1px solid #ced4da;

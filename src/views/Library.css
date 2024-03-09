@@ -1,6 +1,4 @@
-<<<<<<< HEAD
-=======
-.library-container {
+<<<<<<< HEAD=======.library-container {
     /* Align the tops of the two children */
 }
 
@@ -19,8 +17,7 @@
     overflow-x: hidden;
 }
 
->>>>>>> 4fc4254 (clearstorageonsignin)
-.upload-component {
+>>>>>>>4fc4254 (clearstorageonsignin) .upload-component {
     display: flex;
     min-height: 50vh;
     max-height: 50vh;

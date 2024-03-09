@@ -28,10 +28,14 @@ const useAuthSignIn = () => {
         }
       })) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         navigate('/chatbot');
 =======
         navigate('/library');
 >>>>>>> 4fc4254 (clearstorageonsignin)
+=======
+        navigate('/chatbot');
+>>>>>>> b3c28fb (cleaner ui)
         localStorage.clear();
         return { success: true, message: 'Log in successful!' };
       } else {

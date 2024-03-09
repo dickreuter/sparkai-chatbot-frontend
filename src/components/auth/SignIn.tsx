@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import './FullPageTwoCards.css'; // Make sure to import the CSS file
+import './Signin.css'; // Make sure to import the CSS file
 import { Alert, Button, Snackbar, TextField, Box, Grid, Card, CardContent, Typography  } from '@mui/material';
 import useAuthSignIn from './UseAuthsignIn';
 import AuthState from './AuthState';
@@ -33,10 +33,10 @@ const FullScreenTwoCards = () => {
 
 
   return (
-    <div className="cards-container">
+    <div className="cards-container text-center">
      
-        <div className="cardcustom">
-          <div className="mb-3">
+       
+         
             <div className="cardmini">
                 <div className="cardmini-text">
                   <h2>Login</h2>
@@ -85,10 +85,10 @@ const FullScreenTwoCards = () => {
                 <AuthState />
 
 
-            </div>
+          
           </div>
         </div>
-    </div>
+   
   );
 };
 export default FullScreenTwoCards;

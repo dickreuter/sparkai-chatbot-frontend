@@ -15,6 +15,8 @@ import SideBar from '../routes/Sidebar.tsx'
 import { useLocation } from 'react-router-dom';
 import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-js';
 
+import SideBarSmall from '../routes/SidebarSmall.tsx' ;
+
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
 
@@ -411,18 +413,22 @@ const Chatbot = () => {
 
     return (
         <div id="chatbot-page">
-            <SideBar />
+            <SideBarSmall />
+            <SideBar/>
         
-            <div className="chatbot-container">
+            
+          <div className="chatbot-container">
+    
+                <h1 className='heavy'>New Bid</h1>
+                
+                <div className="library-container mt-4">
 
-           
-                <Container fluid="md">
                 <section id="bidinfo">
                         
                         
                     <Row >
-                            <div className="custom-card text-white">
-                                  {/* Need to add Bid Name field*/}
+                        <Col md={6}>
+                                    {/* Need to add Bid Name field*/}
                                 <Form.Group className="mb-3">
                                     <Form.Label className="custom-label">Bid Name</Form.Label>
                                     <Form.Control
@@ -446,48 +452,11 @@ const Chatbot = () => {
                                         onChange={(e) => setBackgroundInfo(e.target.value)}
                                     />
                                 </Form.Group>
-                            </div>
-                    </Row>
-                </section>
-                  
-                    <section id="inputquestion">
-                    <Row
-                        className="justify-content-md-center mt-4"
-                        style={{ visibility: 'hidden', height: 0, overflow: 'hidden' }}
-                    >
-                        <FolderLogic
-                            tokenRef={tokenRef}
-                            setAvailableCollections={setAvailableCollections}
-                            setFolderContents={setFolderContents}
-                            availableCollections={availableCollections}
-                            folderContents={folderContents}
-                        />
-                    </Row>
-
-                
-                    <Row className="justify-content-md-center mt-4">
-                        <Col md={8}>
-                            {" "}
-                            {/* Adjusted width for the question box */}
-                            <Form.Group className="mb-3">
-                                <Form.Label className="" style={{ fontSize: '22px' }}>Enter your question or input:</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    className="chat-input mb-2"
-                                    value={inputText}
-                                    onChange={(e) => setInputText(e.target.value)}
-                                />
-                                <Form.Text className="text-muted">
-                                    Word Count: {inputText.split(/\s+/).filter(Boolean).length}
-                                </Form.Text>
-                            </Form.Group>
-                           
-                           
                         </Col>
-                        <Col md={4}>
+                        <Col md={6}>
                             <div className="dropdowns">
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Select dataset:</Form.Label>
+                                        <Form.Label className="custom-label">Select dataset:</Form.Label>
                                         <Form.Select
                                             aria-label="Dataset selection"
                                             className="w-100 mx-auto chat-dropdown"
@@ -507,7 +476,7 @@ const Chatbot = () => {
                                         </Form.Select>
                                     </Form.Group>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Select Function:</Form.Label>
+                                        <Form.Label className="custom-label">Select Function:</Form.Label>
                                         <Form.Select
                                             aria-label="Function selection"
                                             className="w-100 mx-auto chat-dropdown"
@@ -521,7 +490,7 @@ const Chatbot = () => {
                                         </Form.Select>
                                     </Form.Group>
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Broadness of database search:</Form.Label>
+                                        <Form.Label className="custom-label">Broadness of database search:</Form.Label>
                                         <Form.Select
                                             aria-label="Function selection"
                                             className="w-100 mx-auto chat-dropdown"
@@ -535,6 +504,52 @@ const Chatbot = () => {
                                     </Form.Group>
                                 </div>
                         </Col>
+                            
+                    </Row>
+                </section>
+                  
+                    <section id="inputquestion">
+                    <Row
+                        className="justify-content-md-center mt-4"
+                        style={{ visibility: 'hidden', height: 0, overflow: 'hidden' }}
+                    >
+                        <FolderLogic
+                            tokenRef={tokenRef}
+                            setAvailableCollections={setAvailableCollections}
+                            setFolderContents={setFolderContents}
+                            availableCollections={availableCollections}
+                            folderContents={folderContents}
+                        />
+                    </Row>
+
+                
+                    <Row className="justify-content-md-center">
+                        <Col md={12}>
+                            {" "}
+                            {/* Adjusted width for the question box */}
+                            <Form.Group className="mb-3">
+                                <Form.Label className="custom-label">Enter your question or input:</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    className="chat-input"
+                                    value={inputText}
+                                    onChange={(e) => setInputText(e.target.value)}
+                                />
+                                <Form.Text className="text-muted">
+                                    Word Count: {inputText.split(/\s+/).filter(Boolean).length}
+                                </Form.Text>
+                            </Form.Group>
+                            <Button 
+                                onClick={sendQuestion}
+                                variant="primary"
+                            >
+                                Submit
+                            </Button>
+                            
+                           
+                           
+                        </Col>
+                        
                         
                         
                     
@@ -542,16 +557,7 @@ const Chatbot = () => {
                     <Row>
                     <div className="text-center mb-3">
 
-                        <Button
-                                variant="primary"
-                                onClick={sendQuestion}
-                                className="sub-button mt-4 mb-2"
-                            
-                                
-                            >
-                                Submit
-                            </Button>
-                            
+                       
                         {isLoading && (
                             <div className="my-3">
                                 <Spinner animation="border"/>
@@ -578,27 +584,30 @@ const Chatbot = () => {
                 <section id="response">
                     <Row className="justify-content-md-center">
                         <Col md={12}>
-                            
-                            <Form.Group className="mb-3">
-                            <Form.Label className="" style={{ fontSize: '22px' }}>Response:</Form.Label>
-
+                            <Form.Group className="mb-3 d-flex justify-content-between align-items-center">
+                                <Form.Label className="custom-label mb-0">Response:</Form.Label>
                                 <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
-                                <Form.Control
-                                    as="textarea"
-                                    className="chat-output mt-3"
-                                    value={response}
-                                    onChange={(e) => setResponse(e.target.value)}
-                                    onMouseUp={handleTextHighlight}
-                                />
-                                <Form.Text className="text-muted">
-                                    Word Count: {countWords(response)}
-                                </Form.Text>
                             </Form.Group>
+                            <Form.Control
+                                as="textarea"
+                                className="chat-output mt-3"
+                                value={response}
+                                onChange={(e) => setResponse(e.target.value)}
+                                onMouseUp={handleTextHighlight}
+                            />
+                            <Form.Text className="text-muted">
+                                Word Count: {countWords(response)}
+                            </Form.Text>
                            
-
-                    
                         </Col>
+                        <div>
+                        <Button variant="primary mt-2" onClick={handleAppendResponseToEditor}>
+                                Add to Proposal
+                                {/* down arrow */}
+                            </Button>
+                        </div>
                         
+                                            
                    {/*
                    
                         <Col md={4}>
@@ -619,16 +628,11 @@ const Chatbot = () => {
                     </Row>
                 </section>
                 <section id="proposal">
-                    <div className="text-center">
-                    <Button variant="primary" onClick={handleAppendResponseToEditor}  style={{ fontSize: '16px' }}>
-                        Add to Proposal
-                        {/*down arrow */}
-                    </Button>
-                    </div>
+                
                 
                 <div className="proposal-header mb-3">
                    
-                    <h3 className="proposal-title mt-3">Proposal Editor</h3>
+                    <h3 className="custom-label mt-4">Proposal Editor</h3>
                 </div>
                 <div className="proposal-container">
                         <Row className="justify-content-md-center">
@@ -651,7 +655,7 @@ const Chatbot = () => {
                 </div>
                 </section>
                 <Row className="mt-3">
-                            <div className="text-center">
+                            <div >
                             <Button
                                 variant={isSaved ? "success" : "primary"}
                                 onClick={saveProposal}
@@ -700,8 +704,8 @@ const Chatbot = () => {
                  
 
                  
-                </Container>
-
+               
+            </div>
             </div>
         </div>
     );

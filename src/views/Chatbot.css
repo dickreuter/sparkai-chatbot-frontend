@@ -1,14 +1,39 @@
 .chatbot-container {
-    margin-top: 0;
-    width: 83vw;
+    width: 79.5vw;
     height: 100%;
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 1rem;
-    margin-left: 200px;
-    padding: 2rem;
-    background-color: #faf7f7;
+    margin-top: 40px;
+    margin-bottom: 0;
+    margin-left: 280px;
+    background-color: white;
     justify-content: center;
+    padding: 1rem;
+    padding-top: 0rem;
+    /* or whatever value you desire for the chatbot page */
+}
+
+.lib-container {
+    width: 94.5vw;
+    height: 100%;
+    border-radius: 4px;
+    margin-top: 40px;
+    margin-bottom: 0;
+    margin-left: 60px;
+    background-color: white;
+    justify-content: center;
+    padding: 1rem;
+    padding-top: 0rem;
+    /* or whatever value you desire for the chatbot page */
+}
+
+.navbar-container {
+    width: 94vw;
+    height: 100%;
+    margin-left: 60px;
+    margin-top: 0;
+    margin-bottom: 0;
+    justify-content: center;
+    background-color: white;
     /* or whatever value you desire for the chatbot page */
 }
 
@@ -28,21 +53,19 @@
 }
 
 .custom-label {
-    font-size: 1.1rem;
+    font-size: 1rem;
     /* This sets the font size to be larger */
     text-align: left !important;
-    font-weight: bold;
+    font-weight: 500;
     /* This aligns the text to the left */
-}
-
-.background-info-input {
-    text-align: left;
-    /* Ensures the text within the form starts at the left */
 }
 
 .bid-name-input {
     text-align: left;
     height: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ced4da;
     /* Ensures the text within the form starts at the left */
 }
 
@@ -86,6 +109,7 @@
     margin-left: auto;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ced4da;
     margin-right: auto;
     display: block;
 }
@@ -121,12 +145,6 @@
     align-items: center;
 }
 
-.background-info-input {
-    height: 10vh;
-    /* Adjust height as needed */
-    display: block;
-}
-
 .chat-input,
 .chat-output,
 .background-info-input {
@@ -135,6 +153,17 @@
     margin-left: auto;
     margin-right: auto;
     display: block;
+}
+
+.background-info-input {
+    height: 190px;
+    /* Adjust height as needed */
+    display: block;
+    text-align: left;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ced4da;
+    /* Ensures the text within the form starts at the left */
 }
 
 .pr-2 {
@@ -150,14 +179,16 @@
 }
 
 .dropdowns {
+    text-align: left;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ced4da;
     display: flex;
-    background-color: #f7d5b2;
     padding: 4%;
+    height: 308px;
     flex-direction: column;
     justify-content: center;
     flex-wrap: nowrap;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .dataset-folders {
@@ -254,15 +285,20 @@
 }
 
 .proposal-container {
-    background-color: white;
-    border: none;
-    margin-top: 0;
-    height: 100%;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 2rem;
-    ;
+    border: 1px solid #ced4da;
+    margin-top: 0;
+    height: 100%;
+    padding: 0rem;
     justify-content: center;
+    overflow: hidden;
+    padding: 1%;
+    min-height: 800px;
+}
+
+.wrapperClassName {
+    width: 100%;
 }
 
 .saved-button:disabled {
@@ -270,20 +306,14 @@
     /* Override default opacity for disabled buttons */
 }
 
-.wrapperClassName {
-    height: 800px;
-    /* Adjust the height as needed */
-    overflow-y: auto;
-    /* Make it scrollable */
+.btn-blue {
+    border: none;
+    width: 90px;
+    border-radius: 12px;
+    font-weight: 600;
 }
 
-.toolbarClassName {
-    position: -webkit-sticky;
-    /* For Safari */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    /* Make sure the navbar is above other content */
-    background-color: white;
-    /* Ensures the navbar background is not transparent */
+.btn-blue {
+    background-color: black;
+    color: white;
 }

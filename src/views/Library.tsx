@@ -11,8 +11,9 @@ import "./Library.css";
 import UploadTemplateText from '../components/UploadTemplateText';
 import Tooltip from "@mui/material/Tooltip";
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
-
-
+import SideBar from '../routes/Sidebar.tsx'; 
+import SideBarSmall from '../routes/SidebarSmall.tsx' ;
+import NavBar from '../routes/NavBar';
 
 const Library = () => {
   const getAuth = useAuthUser();
@@ -25,6 +26,29 @@ const Library = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState('');
+
+  //pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 5;
+
+
+  // Function to change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    // Calculate the rows to display
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = Object.entries(folderContents).slice(indexOfFirstRow, indexOfLastRow);
+
+// This creates a flat list of { fileName, folderName } objects for all files
+const flatFiles = Object.entries(folderContents).reduce((acc, [folderName, files]) => {
+  const folderFiles = files.map(fileName => ({ folderName, fileName }));
+  return [...acc, ...folderFiles];
+}, []);
+
+// Now apply pagination to flatFiles
+const totalRows = flatFiles.length;
+const totalPages = Math.ceil(totalRows / rowsPerPage);
+const currentFiles = flatFiles.slice(indexOfFirstRow, indexOfLastRow);
 
   
 // Modal component to display file content
@@ -142,104 +166,116 @@ const renderFilesOrCollectionName = (files, folderName) => {
 
 
 
-    return (
-        <div className="App">
-           <div className="text-center">
-          <h1 className='fw-bold'>Company Library</h1>
-          <Link to="/chatbot">
-            <Button
-              variant="primary"
-              className="chat-button mt-4"
-            >
-              Response Generator
-            </Button>
-          </Link>
-          </div>
-          <div className="library-container mt-4">
-
-       
+return (
+      <div id="chatbot-page">
+        <SideBarSmall />
+        
+    
+          <div className="lib-container">
+    
+                <h1  className='heavy'>Company Library</h1>
+                
+                <div className="library-container mt-4">
+                
 
 
-             <Row>
-              <Col md={8}>
-                <div className="library-table">
+                  <Row>
+                    <Col md={8}>
+                   
+
+                      
+                         
+                          <table className="bids-table mb-3">
+                            <thead>
+                              <tr>
+                                <th>Filename</th>
+                                <th>Folder</th>
+                                <th className="text-center">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                          {currentFiles.length > 0 ? currentFiles.map(({ fileName, folderName }, index) => (
+                            // Directly render each file's row, as each file now includes its folder context
+                            <tr key={index}>
+                              <td>{fileName}</td>
+                              <td>{folderName}</td>
+                              <td className="text-center">
+                                <Button variant="primary" onClick={() => viewFile(fileName, folderName)}>View</Button>
+                              </td>
+                            </tr>
+                          )) : (
+                            <tr>
+                              <td colSpan="3" className="text-center">No collections or files available</td>
+                            </tr>
+                          )}
+                        </tbody>
+
+
+                          </table>
+
+                          <div className="pagination-controls">
+                            {[...Array(totalPages)].map((e, i) => (
+                              <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1}>
+                                {i + 1}
+                              </button>
+                            ))}
+                          </div>
+
+                        
+                     
+                    </Col>
+
+                    <Col md={4}>
+                    <div className="upload-component">
+                        <Card className="flex-fill">
+                          <Card.Header>Train AI on PDF Documents</Card.Header>
+                            <Card.Body className='text-center'>
+                              <UploadPDF />
+                            </Card.Body>
+                        </Card>
+
+                      </div>
+                    </Col>
+                  
+                    </Row>
+                    <Row>
+                      <Col md={12}>
+                      <div className="mt-4">
+                          <Card className="flex-fill">
+                            <Card.Header>Train AI on Text</Card.Header>
+                              <Card.Body className='text-center'>
+                                <UploadText />
+                              </Card.Body>
+                          </Card>
+
+                        </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                      <Col md={12}>
+                      <div className="mt-4">
+                          <Card className="flex-fill">
+                            <Card.Header>Add Templates</Card.Header>
+                              <Card.Body className='text-center'>
+                                <UploadTemplateText />
+                              </Card.Body>
+                          </Card>
+
+                        </div>
+                        </Col>
+                    </Row>
                   
 
-                 
-                <Card className="flex-fill mr-3">
-              <Card.Header>Knowledge Base</Card.Header>
-              <Card.Body className="cardbodytable">
-              <table className="bids-table mb-3">
-                <thead>
-                  <tr>
-                    <th>Filename</th>
-                    <th>Folder</th>
-                    <th className="text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                {Object.entries(folderContents).length > 0 ? 
-                  Object.entries(folderContents).map(([folderName, files]) => 
-                    renderFilesOrCollectionName(files, folderName)
-                  ) : (
-                    <tr>
-                      <td colSpan="3" className="text-center">No collections or files available</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-              </Card.Body>
-            </Card>
-                </div>
-              </Col>
-
-              <Col md={4}>
-              <div className="upload-component">
-                  <Card className="flex-fill">
-                    <Card.Header>Train AI on PDF Documents</Card.Header>
-                      <Card.Body className='text-center'>
-                        <UploadPDF />
-                      </Card.Body>
-                  </Card>
+                        
 
                 </div>
-              </Col>
-             
-              </Row>
-              <Row>
-                <Col md={12}>
-                <div className="mt-4">
-                    <Card className="flex-fill">
-                      <Card.Header>Train AI on Text</Card.Header>
-                        <Card.Body className='text-center'>
-                          <UploadText />
-                        </Card.Body>
-                    </Card>
-
-                  </div>
-                  </Col>
-              </Row>
-              <Row>
-                <Col md={12}>
-                <div className="mt-4">
-                    <Card className="flex-fill">
-                      <Card.Header>Add Templates</Card.Header>
-                        <Card.Body className='text-center'>
-                          <UploadTemplateText />
-                        </Card.Body>
-                    </Card>
-
-                  </div>
-                  </Col>
-              </Row>
-            
-
-                  
-
+                <FileContentModal />
+               
           </div>
-          <FileContentModal />
-        </div>
-      );
+        
+      </div>
+
+  );
 }
 
 export default withAuth(Library);

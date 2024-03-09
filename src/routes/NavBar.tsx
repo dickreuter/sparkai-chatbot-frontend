@@ -70,7 +70,7 @@ const NavBar = () => {
         <span className="navbar-toggler-icon"></span>
       </button>
       <a className="navbar-brand" href="/">
-        mytender.io &nbsp;
+        MyTender.io &nbsp;
        
       </a>
 
@@ -81,35 +81,7 @@ const NavBar = () => {
         <ul className="navbar-nav ml-auto">
           {" "}
           {/* Apply ml-auto here */}
-          {auth ? (
-            <li className="nav-item">
-              <Link className="nav-link" to="/chatbot">
-                Response Generator
-              </Link>
-            </li>
-          ) : (
-            <></>
-          )}
-       
-           {auth ? (
-            <li className="nav-item">
-              <Link className="nav-link" to="/library">
-                Library
-              </Link>
-            </li>
-          ) : (
-            <></>
-          )}
-       
-           {auth ? (
-            <li className="nav-item">
-              <Link className="nav-link" to="/bids">
-                Bids
-              </Link>
-            </li>
-          ) : (
-            <></>
-          )}
+          
          
        
           {auth ? (
@@ -125,9 +97,10 @@ const NavBar = () => {
           ) : (
             <></>
           )}
-          {auth ? (
-            <>
-              <li className="nav-item">
+           {auth ? (
+            email === "adminuser" && (
+              <>
+                 <li className="nav-item">
                 <Link className="nav-link" to="/qlog">
                   Question Log{" "}
                 </Link>
@@ -137,25 +110,40 @@ const NavBar = () => {
                   Feedback Log{" "}
                 </Link>
               </li>
-            </>
+              </>
+            )
           ) : (
             <></>
           )}
-           {auth ? (
-            <li className="nav-item">
-              <Link className="nav-link" to="/logout">
-                Logout
-              </Link>
-            </li>
-          ) : (
-            <>
-              <li className="nav-item">
-                <Link className="nav-link" to="/login">
-                  Login
-                </Link>
-              </li>
-            </>
-          )}
+       {auth ? (
+  <li className="nav-item">
+    <Link to="/chatbot" className="btn btn-white nav-link" >
+      New Bid
+    </Link>
+  </li>
+) : <></>}
+       
+          
+       {auth ? (
+        <li className="nav-item ">
+          <Link to="/login">
+            <button onClick={signOut} className="btn btn-dark nav-link">
+            Logout
+          </button>
+        </Link>
+        </li>
+      ) : (
+        <>
+          <li className="nav-item">
+          <Link to="/login">
+          <button className="btn btn-dark nav-link">
+            Login
+          </button>
+        </Link>
+          </li>
+        </>
+      )}
+
         </ul>
       </div>
     </nav>

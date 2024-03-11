@@ -1,21 +1,30 @@
 import axios from "axios";
-import {useRef, useState} from "react";
+import {useRef, useState, useEffect} from "react";
 import {useAuthUser} from "react-auth-kit";
 import {API_URL, HTTP_PREFIX} from "../helper/Constants.tsx";
 import withAuth from "../routes/withAuth.tsx";
 import "../views/Upload.css";
 import {displayAlert} from "../helper/Alert.tsx";
-
+import TextField from '@mui/material/TextField';
+import CustomTextField from "./CustomTextField.tsx";
 const UploadTemplateText = () => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
 
     const [text, setText] = useState("");
-    const [profileName, setProfileName] = useState("default");
+    const [profileName, setProfileName] = useState(null);
     const [textFormat, setTextFormat] = useState("plain");
     const [isUploading, setIsUploading] = useState(false);
+    const [isFormFilled, setIsFormFilled] = useState(false); // 
 
+    useEffect(() => {
+      // Check if any field is either null or an empty string
+      const checkFormFilled = profileName && text;
+      setIsFormFilled(checkFormFilled);
+    }, [profileName, text]); // React to changes in these states
+    
+  
     const handleTextSubmit = async () => {
         const formData = new FormData();
         setIsUploading(true);
@@ -54,36 +63,52 @@ const UploadTemplateText = () => {
     };
 
     return (
-        <div className="App">
-            <h1>Template Uploader</h1>
-
-            <div>
-                Template Headline:
-                <input
-                    type="text"
-                    placeholder=""
-                    value={profileName}
-                    onChange={(e) => setProfileName(e.target.value)}
-                    className="mt-3 mb-3"
-                />
-            </div>
-            <div>
-        <textarea
-            placeholder=""
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="mb-2"
-        />
-            </div>
-            <button
-                onClick={handleTextSubmit}
-                disabled={isUploading}
-                className={isUploading ? "btn-disabled" : ""}
-            >
-                Upload Text Template
-            </button>
+        <div className="App" style={{ textAlign: "left" }}>
+    
+          <div className="input-options-container mt-3">
+            <CustomTextField
+              fullWidth
+              label="Template Headline"
+              variant="outlined"
+              value={profileName}
+              className="uploader-input"
+              onChange={(e) => setProfileName(e.target.value)}
+              
+            />
+          
+          
+            <TextField
+              fullWidth
+              label="Paste Template Material Here..."
+              variant="outlined"
+              multiline
+              rows={4}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': { // Target the root of the outlined input
+                
+                  fontFamily: '"ClashDisplay", sans-serif', // Apply font family
+                
+      
+                },
+                '& .MuiInputLabel-root': { // Target the label of the TextField
+                  fontFamily: '"ClashDisplay", sans-serif', // Apply font family to the label
+                }
+              }}
+            />
+            
+         
+          <button
+            onClick={handleTextSubmit}
+            disabled={!isFormFilled}
+            className={isUploading ? "upload-button btn-disabled mb-4" : "upload-button mb-4"}
+          >
+            Upload Template
+          </button>
+          </div>
         </div>
-    );
+      );
 };
 
 export default withAuth(UploadTemplateText);

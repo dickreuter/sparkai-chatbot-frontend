@@ -9,14 +9,14 @@ const Layout = () => {
   const location = useLocation();
   
   // List of paths where the NavBar should be hidden
-  const hideNavBarPaths = ['/login']; // Added '/login' to the array
+  const showNavBarPaths = ['/library', '/chatbot', '/bids']; // Added '/login' to the array
  
   // Check if the current path is in the list of paths to hide the NavBar
-  const shouldHideNavBar = hideNavBarPaths.includes(location.pathname);
+  const shouldShowNavBar = showNavBarPaths.includes(location.pathname);
 
   return (
     <>
-      {!shouldHideNavBar && <NavBar />}
+      {shouldShowNavBar && <NavBar />}
       <div className="main-content">
         <Routing />
       </div>

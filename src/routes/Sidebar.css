@@ -1,14 +1,14 @@
 .sidebar {
     /* Adjust height as needed or consider using min-height for dynamic content */
     min-height: 100%;
-    width: 210px;
+    width: 235px;
     /* Adjust width as needed */
     position: fixed;
     z-index: 1;
     bottom: 0;
     /* Anchor to the bottom */
     left: 0;
-    z-index: 100;
+    z-index: 0;
     background: #f0f0f0;
     overflow-x: hidden;
     padding-top: 20px;
@@ -24,7 +24,7 @@
 }
 
 .toggle-icon {
-    font-size: 0.7em;
+    font-size: 0.9rem;
     /* Smaller icon size */
     margin-left: auto;
     margin-right: 0.2rem;
@@ -45,31 +45,27 @@
 
 .sidebar-top-title {
     margin-top: 40px;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 600;
     /* Adjust the font size as needed */
     color: black;
     padding: 10px;
     padding-bottom: 0;
-    /* Adjust the text color as needed */
-    /* Adds space below the title */
-    /* Aligns title with the links */
+    margin-left: 10px;
 }
 
 .sidebar-title {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 600;
     /* Adjust the font size as needed */
     color: black;
     padding: 10px;
     padding-bottom: 0;
-    /* Adjust the text color as needed */
-    /* Adds space below the title */
-    /* Aligns title with the links */
+    margin-left: 10px;
 }
 
 .sidebar a {
-    padding: 11px;
+    padding: 10px;
     /* Adjust padding for the size of the rectangle */
     text-decoration: none;
     color: black;
@@ -77,6 +73,7 @@
     display: flex;
     align-items: center;
     font-size: 1rem;
+    padding-left: 20px;
     /* Smooth transition for background color */
 }
 

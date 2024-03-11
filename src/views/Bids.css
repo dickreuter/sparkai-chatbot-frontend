@@ -1,52 +1,73 @@
+.status-dropdown {
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #fff;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    /* Remove default border */
+    cursor: pointer;
+    /* Indicate it's selectable */
+}
+
+.status-dropdown.ongoing {
+    background-color: #F7AE36;
+    /* Yellow for ongoing */
+}
+
+.status-dropdown.complete {
+    background-color: black;
+    /* Green for complete */
+}
+
 .bids-table {
-    width: 90%;
-    width: 90vh;
-    /* Adjust to the desired width */
-    margin: 20px auto;
-    /* Centers the table with a margin above and below */
+    width: 100%;
+    table-layout: fixed;
+    margin: 0;
+    padding: 0;
     border-collapse: collapse;
+    /* Updated for border application */
+    border-spacing: 0;
+    margin: 20px auto;
+    overflow: hidden;
+    margin-bottom: 0;
 }
 
 .bids-table th,
 .bids-table td {
-    border: 1px solid black;
-    padding: 8px;
     text-align: left;
-    /* Align text to the left within cells */
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 8px;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid #ddd;
+    /* Add horizontal line between rows */
+}
+
+
+/* Add left margin to the first column */
+
+.bids-table td:first-child,
+.bids-table th:first-child {
+    padding-left: 16px;
+    /* Increase left padding for the first column */
 }
 
 .bids-table th {
     background-color: #f2f2f2;
+    font-weight: 500;
+    color: black;
 }
 
-.status {
-    padding: 5px 10px;
-    border-radius: 5px;
-    color: #fff;
-    font-weight: bold;
+
+/* Specifically target the Action column to make it narrower */
+
+.bids-table th:last-child,
+.bids-table td:last-child {
+    width: 8%;
 }
 
-.status.new {
-    background-color: #007bff;
-}
-
-.status.ongoing {
-    background-color: #ffc107;
-}
-
-.status.complete {
-    background-color: #28a745;
-}
-
-.delete-button {
-    padding: 5px 10px;
-    margin: 0;
-    font-size: 14px;
-    cursor: pointer;
-    background-color: black;
-    /* Red */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
+.bids-table tr:last-child td {
+    border-bottom: none;
 }

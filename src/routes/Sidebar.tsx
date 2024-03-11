@@ -9,6 +9,7 @@ import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons
 import ReactGA from "react-ga4";
 
 
+<<<<<<< HEAD
 const handleGAEvent = (category, action, label) => {
     ReactGA.event({
       category: category,
@@ -18,6 +19,8 @@ const handleGAEvent = (category, action, label) => {
   };
 
 
+=======
+>>>>>>> 2f2dbbd (closing most frontend issues)
 const Sidebar = () => {
   const [isActiveVisible, setIsActiveVisible] = useState(true);
   const [isOngoingVisible, setIsOngoingVisible] = useState(true);

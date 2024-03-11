@@ -12,7 +12,11 @@ const Layout = () => {
   const location = useLocation();
   
   // List of paths where the NavBar should be hidden
+<<<<<<< HEAD
   const showNavBarPaths = ['/library', '/chatbot', '/bids', '/']; // Added '/login' to the array
+=======
+  const showNavBarPaths = ['/library', '/chatbot', '/bids']; // Added '/login' to the array
+>>>>>>> 2f2dbbd (closing most frontend issues)
  
   // Check if the current path is in the list of paths to hide the NavBar
   const shouldShowNavBar = showNavBarPaths.includes(location.pathname);

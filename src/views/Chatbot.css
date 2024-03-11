@@ -1,29 +1,47 @@
 .chatbot-container {
-    width: 79.5vw;
+    width: 100%;
     height: 100%;
-    border-radius: 4px;
     margin-top: 40px;
     margin-bottom: 0;
-    margin-left: 280px;
+    margin-left: 300px;
     background-color: white;
     justify-content: center;
     padding: 1rem;
     padding-top: 0rem;
+    padding-right: 290px;
     /* or whatever value you desire for the chatbot page */
 }
 
 .lib-container {
-    width: 94.5vw;
+    width: 100%;
     height: 100%;
-    border-radius: 4px;
     margin-top: 40px;
     margin-bottom: 0;
-    margin-left: 60px;
+    margin-left: 65px;
     background-color: white;
     justify-content: center;
     padding: 1rem;
     padding-top: 0rem;
+    padding-right: 55px;
     /* or whatever value you desire for the chatbot page */
+}
+
+@keyframes fadeInScaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.99);
+        /* Start slightly smaller */
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+        /* Scale to actual size */
+    }
+}
+
+.chatbot-container,
+.lib-container {
+    animation: fadeInScaleUp 0.1s ease-out;
 }
 
 .navbar-container {
@@ -60,6 +78,16 @@
     /* This aligns the text to the left */
 }
 
+.margin-container {
+    margin-top: 15px;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.padded {
+    padding: 20px;
+}
+
 .bid-name-input {
     text-align: left;
     height: 10px;
@@ -69,38 +97,12 @@
     /* Ensures the text within the form starts at the left */
 }
 
-.custom-card {
-    background-color: black;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 1rem;
-    /* Dashed border */
-}
-
 .white-card {
     background-color: white;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 1rem;
     /* Dashed border */
-}
-
-.custom-card-body {
-    padding: 1rem;
-}
-
-.custom-card-title,
-.custom-card-content {
-    border-bottom: 1px dashed #000;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
-}
-
-.custom-card-title:last-child,
-.custom-card-content:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
 }
 
 .chat-input,

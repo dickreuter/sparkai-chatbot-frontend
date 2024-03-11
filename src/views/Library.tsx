@@ -50,21 +50,31 @@ const totalRows = flatFiles.length;
 const totalPages = Math.ceil(totalRows / rowsPerPage);
 const currentFiles = flatFiles.slice(indexOfFirstRow, indexOfLastRow);
 
-  
+const [showUploadPdfModal, setShowUploadPdfModal] = useState(false);
+// Rest of your component logic
+
+// Modal Component for UploadPDF
+const UploadPdfModal = () => (
+  <Modal  show={showUploadPdfModal} onHide={() => setShowUploadPdfModal(false)} size="lg">
+    <Modal.Header closeButton>
+      <Modal.Title>PDF Uploader</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      <UploadPDF /> {/* Your UploadPDF component here */}
+    </Modal.Body>
+    
+  </Modal>
+);
 // Modal component to display file content
 const FileContentModal = () => (
-  <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+  <Modal  show={showModal} onHide={() => setShowModal(false)} size="lg">
     <Modal.Header closeButton>
       <Modal.Title>File Content</Modal.Title>
     </Modal.Header>
     <Modal.Body>
       <pre style={{ textAlign: 'center' }}>{modalContent}</pre> {/* Centered text */}
     </Modal.Body>
-    <Modal.Footer>
-      <Button variant="secondary" onClick={() => setShowModal(false)}>
-        Close
-      </Button>
-    </Modal.Footer>
+    
   </Modal>
 );
 
@@ -140,31 +150,6 @@ useEffect(() => {
   get_collections();
 }, []); // Removed tokenRef from dependencies to avoid refetching on token change
 
-const renderFilesOrCollectionName = (files, folderName) => {
-  // If no files are present or an error occurred fetching files,
-  // display a row with the folderName as the file name
-  if (!files || files.length === 0) {
-    return (
-      <tr>
-        <td>{folderName}</td>
-        <td>{folderName}</td> {/* Display folderName as filename if no files */}
-        <td className="text-center">N/A</td> {/* Adjust action as needed */}
-      </tr>
-    );
-  }
-  // If files are present, render them as usual
-  return files.map((file, index) => (
-    <tr key={index}>
-      <td>{file}</td>
-      <td>{folderName}</td>
-      <td className="text-center">
-        <Button variant="primary" onClick={() => viewFile(file, folderName)}>View</Button>
-      </td>
-    </tr>
-  ));
-};
-
-
 
 return (
       <div id="chatbot-page">
@@ -180,96 +165,83 @@ return (
 
 
                   <Row>
-                    <Col md={8}>
-                   
-
-                      
-                         
-                          <table className="bids-table mb-3">
-                            <thead>
-                              <tr>
-                                <th>Filename</th>
-                                <th>Folder</th>
-                                <th className="text-center">Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                          {currentFiles.length > 0 ? currentFiles.map(({ fileName, folderName }, index) => (
-                            // Directly render each file's row, as each file now includes its folder context
-                            <tr key={index}>
-                              <td>{fileName}</td>
-                              <td>{folderName}</td>
-                              <td className="text-center">
-                                <Button variant="primary" onClick={() => viewFile(fileName, folderName)}>View</Button>
-                              </td>
-                            </tr>
-                          )) : (
-                            <tr>
-                              <td colSpan="3" className="text-center">No collections or files available</td>
-                            </tr>
-                          )}
-                        </tbody>
-
-
-                          </table>
-
-                          <div className="pagination-controls">
-                            {[...Array(totalPages)].map((e, i) => (
-                              <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1}>
-                                {i + 1}
-                              </button>
-                            ))}
-                          </div>
-
-                        
-                     
-                    </Col>
-
-                    <Col md={4}>
-                    <div className="upload-component">
-                        <Card className="flex-fill">
-                          <Card.Header>Train AI on PDF Documents</Card.Header>
-                            <Card.Body className='text-center'>
-                              <UploadPDF />
-                            </Card.Body>
-                        </Card>
-
+                  <Col md={12}>
+                  <Card className="lib-custom-card">
+                    <Card.Body>
+                      <div className="header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h1 className="lib-custom-card-title">Resources</h1>
+                        <Button className="upload-button" onClick={() => setShowUploadPdfModal(true)}>Upload PDF</Button>
+      <UploadPdfModal /> {/* This line includes the modal in your component */}
                       </div>
-                    </Col>
-                  
+                      <table className="library-table">
+                          <thead>
+                            <tr>
+                              <th>Filename</th>
+                              <th>Folder</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {currentFiles.length > 0 ? currentFiles.map(({ fileName, folderName }, index) => (
+                              <tr key={index}>
+                                <td>{fileName}</td>
+                                <td>{folderName}</td>
+                                <td >
+                                  <Button className="upload-button" style={{backgroundColor: 'black'}} onClick={() => viewFile(fileName, folderName)}>View</Button>
+                                </td>
+                              </tr>
+                            )) : (
+                              <tr>
+                                <td colSpan="3" className="text-center">No collections or files available</td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+
+                        <div className="pagination-controls">
+                          {[...Array(totalPages)].map((e, i) => (
+                            <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
+                              {i + 1}
+                            </button>
+                          ))}
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                  </Row>
+                   
+                    <Row>
+                      <Col md={12}>
+                          <Card className="lib-custom-card mt-4">
+                          <h1 className="lib-custom-card-title" >Text Uploader</h1>
+                            <Card.Body >
+                              <UploadText />
+                            </Card.Body>
+                          </Card>
+                        
+                      </Col>
                     </Row>
                     <Row>
                       <Col md={12}>
-                      <div className="mt-4">
-                          <Card className="flex-fill">
-                            <Card.Header>Train AI on Text</Card.Header>
-                              <Card.Body className='text-center'>
-                                <UploadText />
-                              </Card.Body>
+                        <div className="mt-4">
+                          <Card className="lib-custom-card mt-4">
+                          <h1 className="lib-custom-card-title" >Template Uploader</h1>
+                            <Card.Body>
+                              <UploadTemplateText></UploadTemplateText>
+                            </Card.Body>
                           </Card>
-
                         </div>
-                        </Col>
-                    </Row>
-                    <Row>
-                      <Col md={12}>
-                      <div className="mt-4">
-                          <Card className="flex-fill">
-                            <Card.Header>Add Templates</Card.Header>
-                              <Card.Body className='text-center'>
-                                <UploadTemplateText />
-                              </Card.Body>
-                          </Card>
-
-                        </div>
-                        </Col>
+                      </Col>
                     </Row>
                   
-
+                   
+                  
+                   
                         
 
                 </div>
                 <FileContentModal />
+               
                
           </div>
         

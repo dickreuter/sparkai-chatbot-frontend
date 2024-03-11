@@ -1,12 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useAuthUser } from 'react-auth-kit';
+import axios from 'axios';
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { Link } from 'react-router-dom';
 import "./Sidebar.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-const SideBar = () => {
+
+const Sidebar = () => {
   const [isActiveVisible, setIsActiveVisible] = useState(true);
   const [isOngoingVisible, setIsOngoingVisible] = useState(true);
+  const getAuth = useAuthUser();
+  const auth = getAuth();
+  const [bids, setBids] = useState([]);
+  // Adjust this useRef to obtain the token from your authentication context or state
+  const tokenRef = useRef(auth?.token || "default");
+
+  useEffect(() => {
+    fetchBids();
+  }, []);
+
+  const fetchBids = async () => {
+    try {
+      const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        });
+      if (response.data && response.data.bids) {
+        setBids(response.data.bids);
+        console.log(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching bids:", error);
+    }
+  };
+
+  const recentOngoingBids = bids
+    .filter(bid => bid.status.toLowerCase() === 'ongoing')
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    .slice(0, 4);
 
   const toggleActive = () => setIsActiveVisible(!isActiveVisible);
   const toggleOngoing = () => setIsOngoingVisible(!isOngoingVisible);
@@ -28,10 +64,11 @@ const SideBar = () => {
       </div>
       {isActiveVisible && (
         <div className="sidebar-links">
-          <Link onClick={scrollToTop}  to="/chatbot#bidinfo" className='sidebarlink'>Bid Info</Link>
-          <Link to="/chatbot#inputquestion" className='sidebarlink'>Question</Link>
-          <Link to="/chatbot#response" className='sidebarlink'>Response</Link>
-          <Link to="/chatbot#proposal" className='sidebarlink'>Proposal</Link>
+          {/* You might want to adjust these links based on your app's routing */}
+          <Link onClick={scrollToTop} to="/chatbot#bidinfo" className='sidebar-link'>Bid Info</Link>
+          <Link to="/chatbot#inputquestion" className='sidebar-link'>Question</Link>
+          <Link to="/chatbot#response" className='sidebar-link'>Response</Link>
+          <Link to="/chatbot#proposal" className='sidebar-link'>Proposal</Link>
         </div>
       )}
       <div className="sidebar-title" onClick={toggleOngoing}>
@@ -42,13 +79,15 @@ const SideBar = () => {
       </div>
       {isOngoingVisible && (
         <div className="sidebar-links">
-          <Link to="/chatbot#bidinfo" className='sidebarlink'>Bid 1</Link>
-          <Link to="/chatbot#inputquestion" className='sidebarlink'>Bid 2</Link>
-          <Link to="/chatbot#response" className='sidebarlink'>Bid 3</Link>
+          {recentOngoingBids.map((bid, index) => (
+            <Link key={index} to={`/chatbot#${bid.bid_title}`} onClick={scrollToTop} className='sidebar-link'>
+              {bid.bid_title}
+            </Link>
+          ))}
         </div>
       )}
     </div>
   );
 };
 
-export default SideBar;
+export default Sidebar;

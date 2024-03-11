@@ -1,22 +1,3 @@
-.library-container {
-    /* Align the tops of the two children */
-}
-
-.library-table {
-    flex: 1;
-    min-height: 50vh;
-    max-height: 50vh;
-    display: flex;
-    /* Prevents 
-    horizontal scrolling */
-}
-
-.cardbodytable {
-    overflow-y: auto;
-    /* Allows vertical scrolling if content overflows */
-    overflow-x: hidden;
-}
-
 .upload-component {
     display: flex;
     min-height: 50vh;
@@ -24,65 +5,67 @@
     /* Adjust the width of the upload component as needed */
 }
 
-.bids-table {
-    width: 100%;
-    /* Use 100% to fill the container */
-    table-layout: fixed;
-    /* Enables fixed table layout */
-    margin-top: 0;
-    /* Centers the table with a margin above and below */
-    border-collapse: separate;
-    /* Adjust for border-radius application */
-    border-spacing: 0;
-    /* Adjust to remove spacing between cells */
-    border-radius: 8px;
-    /* Rounded corners for the table */
-    overflow: hidden;
-    /* Ensures the rounded corners are visible */
+.header-container {
+    margin-top: 15px;
+    margin-right: 15px;
 }
 
-.bids-table th,
-.bids-table td {
-    padding: 8px;
+.library-table {
+    width: 100%;
+    table-layout: fixed;
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse;
+    /* Updated for border application */
+    border-spacing: 0;
+    margin: 20px auto;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+.library-table th,
+.library-table td {
     text-align: left;
     white-space: nowrap;
-    /* Keep the text on a single line */
     overflow: hidden;
-    /* Hide overflow content */
+    padding: 8px;
     text-overflow: ellipsis;
-    /* Add ellipsis to overflow content */
+    border-bottom: 1px solid #ddd;
+    /* Add horizontal line between rows */
 }
 
 
-/* Remove all borders from th and td */
+/* Add left margin to the first column */
 
-.bids-table th,
-.bids-table td {
-    border: none;
-    /* Remove borders from cells */
+.library-table td:first-child,
+.library-table th:first-child {
+    padding-left: 16px;
+    /* Increase left padding for the first column */
 }
 
-.bids-table thead {
-    background-color: black;
-    border-radius: 8px 8px 0 0;
-    /* Rounded corners for the top of the table */
-}
-
-.bids-table th {
-    color: white;
-    background-color: black;
-    /* Text color for headers */
+.library-table th {
+    background-color: #f2f2f2;
+    font-weight: 500;
+    color: black;
 }
 
 
 /* Specifically target the Action column to make it narrower */
 
-.bids-table th:last-child,
-.bids-table td:last-child {
-    width: 12%;
-    /* Assign a smaller width to the Action column */
-    text-align: center;
-    /* Center-align the action buttons or text */
+.library-table th:last-child,
+.library-table td:last-child {
+    width: 6.5%;
+}
+
+.library-table tr:last-child td {
+    border-bottom: none;
+}
+
+.pagination-controls {
+    margin-left: 15px;
+    padding-top: 0;
+    margin-top: 0;
+    margin-bottom: 20px;
 }
 
 .pagination-controls button {
@@ -90,4 +73,25 @@
     margin-right: 5px;
     background-color: black;
     color: white;
+}
+
+.lib-custom-card {
+    background-color: white;
+    border: none;
+    width: 100%;
+    /* Remove borders */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Add a subtle shadow */
+}
+
+.lib-custom-card-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-left: 15px;
+    margin-top: 20px;
+}
+
+.lib-custom-card .card-body {
+    padding: 0px;
+    /* Adjust padding as needed */
 }

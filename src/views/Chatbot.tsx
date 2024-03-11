@@ -14,8 +14,16 @@ import TemplateLoader from "../components/TemplateLoader.tsx";
 import SideBar from '../routes/Sidebar.tsx' 
 import { useLocation } from 'react-router-dom';
 import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-js';
-
+import ReactGA from 'react-ga4';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
+
+const handleGAEvent = (category, action, label) => {
+    ReactGA.event({
+      category: category,
+      action: action,
+      label: label,
+    });
+  };
 
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
@@ -60,6 +68,7 @@ const Chatbot = () => {
 
 
     const handleAppendResponseToEditor = () => {
+         handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
         // Use a timestamp as a simple unique identifier
         // had to add to fix infinte append rsponse bug due to state being persisted
         const uniqueId = Date.now(); 
@@ -86,6 +95,7 @@ const Chatbot = () => {
        
     
         // Retrieve the saved editor state from local storage
+        handleGAEvent('Chatbot', 'Save Proposal', 'Save Proposal Button');
         const savedData = localStorage.getItem('editorState');
         let editorText = '';
         if (savedData) {
@@ -247,6 +257,7 @@ const Chatbot = () => {
     
 
     const submitFeedback = async () => {
+        handleGAEvent('Chatbot', 'Submit Feedback', 'Submit Feedback Button');
         const formData = new FormData();
         formData.append("text", `Question: ${inputText} \n Feedback: ${feedback}`);
         formData.append("profile_name", dataset); // Assuming email is the profile_name
@@ -306,6 +317,7 @@ const Chatbot = () => {
 
     const sendQuestion = async () => {
         console.log("question asked");
+        handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
         setQuestionAsked(true);
         localStorage.setItem('questionAsked', 'true');
         setResponse("");

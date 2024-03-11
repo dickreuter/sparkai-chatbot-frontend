@@ -232,15 +232,33 @@
 .choices-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 100%;
+    /* Adjust left margin as needed */
+    margin-top: 15px;
 }
 
 .choice-item {
+    margin-bottom: 5px;
+    /* Adds space between each checkbox */
+}
+
+.form-check {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin: 5px 0;
+    /* Ensures vertical alignment */
+}
+
+.form-check-input {
+    margin-right: 10px;
+    /* Adds some distance between the checkbox and the text */
+    margin-top: 0;
+    /* Aligns checkbox vertically centered to its label */
+    align-self: center;
+    /* Additional alignment control */
+}
+
+.form-check-label {
+    margin-bottom: 0;
+    /* Removes bottom margin from label if any */
 }
 
 .container {

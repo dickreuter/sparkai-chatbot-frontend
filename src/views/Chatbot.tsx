@@ -531,7 +531,7 @@ const Chatbot = () => {
                                 <Form.Label className="custom-label">Enter your question or input:</Form.Label>
                                 <Form.Control
                                     as="textarea"
-                                    className="chat-input"
+                                    className="chat-input mb-2"
                                     value={inputText}
                                     onChange={(e) => setInputText(e.target.value)}
                                 />
@@ -555,7 +555,7 @@ const Chatbot = () => {
                     
                     </Row>
                     <Row>
-                    <div className="text-center mb-3">
+                    <div className="mb-3" style={{textAlign: "left"}}>
 
                        
                         {isLoading && (
@@ -591,7 +591,7 @@ const Chatbot = () => {
                             </Form.Group>
                             <Form.Control
                                 as="textarea"
-                                className="chat-output mt-3"
+                                className="chat-output mt-3 mb-2"
                                 value={response}
                                 onChange={(e) => setResponse(e.target.value)}
                                 onMouseUp={handleTextHighlight}

@@ -63,6 +63,34 @@ const Bids = () => {
         }
     };
 
+    const updateBidStatus = async (bidTitle, newStatus) => {
+        try {
+            const formData = new FormData();
+            formData.append('bid_title', bidTitle);
+            formData.append('status', newStatus);
+    
+            await axios.post(`http${HTTP_PREFIX}://${API_URL}/update_bid_status/`,
+                formData, {
+                    headers: {
+                        'Authorization': `Bearer ${tokenRef.current}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+            console.log("Bid status updated successfully");
+    
+            // Optimistically update the local state
+            setTimeout(fetchBids, 500);
+            
+        } catch (error) {
+            console.error("Error updating bid status:", error);
+            // Optionally revert the optimistic update in case of error
+            // fetchBids();
+        }
+    };
+    
+    
+    
+
     return (
         <div id="chatbot-page">
             <SideBarSmall />
@@ -89,12 +117,23 @@ const Bids = () => {
                         </Link>
                         </td>
                         <td>Last edited: {new Date(bid.timestamp).toLocaleDateString()}</td>
-                        <td><span className={`status ${bid.status.toLowerCase()}`}>{bid.status}</span></td>
-                        
                         <td>
+                            <select
+                                className={`status-dropdown ${bid.status.toLowerCase()}`}
+                                value={bid.status.toLowerCase()}
+                                onChange={(e) => updateBidStatus(bid.bid_title, e.target.value)}
+                            >
+                                <option value="ongoing">Ongoing</option>
+                                <option value="complete">Complete</option>
+                            </select>
+                        </td>
+
+                        <td>
+
                             <button
                             onClick={() => deleteBid(bid.bid_title)}
-                            className="delete-button"
+                            className="upload-button"
+                            style={{backgroundColor: 'black'}}
                             >
                             Delete
                             </button>

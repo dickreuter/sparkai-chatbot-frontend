@@ -1,29 +1,39 @@
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useAuthUser } from "react-auth-kit";
 import { API_URL, HTTP_PREFIX, placeholder_upload } from "../helper/Constants";
 import withAuth from "../routes/withAuth";
 import "./Upload.css";
 import { displayAlert } from "../helper/Alert";
+import CustomTextField from "../components/CustomTextField";
+import TextField from '@mui/material/TextField';
 
 const UploadText = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const [text, setText] = useState("");
+  const [text, setText] = useState(null);
 
 
-
-  const [profileName, setProfileName] = useState("default");
-  const [fileName, setFileName] = useState("default");
+  
+  const [profileName, setProfileName] = useState(null);
+  const [fileName, setFileName] = useState(null);
   const [textFormat, setTextFormat] = useState("plain");
   const [isUploading, setIsUploading] = useState(false);
+  const [isFormFilled, setIsFormFilled] = useState(false); // 
+
+  useEffect(() => {
+    // Check if any field is either null or an empty string
+    const checkFormFilled = profileName && fileName && text;
+    setIsFormFilled(checkFormFilled);
+  }, [profileName, fileName, text]); // React to changes in these states
+  
 
   const handleTextSubmit = async () => {
     const formData = new FormData();
     setIsUploading(true);
-    formData.append("text", text);
+    formData.append("text", "plain");
     formData.append("filename", fileName);
     formData.append("profile_name", profileName);
     formData.append("mode", textFormat);
@@ -60,65 +70,46 @@ const UploadText = () => {
 
   // ...
 
+  
   return (
-
-<div className="App">
-  <h1>Text Uploader</h1>
-  <div className="input-options-container mt-4 mb-4">
-    <div>
-      Text format:
-      <select
-        value={textFormat}
-        onChange={(e) => setTextFormat(e.target.value)}
-        className="ml-3"
-      >
-        <option value="plain">Plain Text</option>
-        <option value="feedback">Feedback</option>
-        <option value="qa">Question / Answer Pairs</option>
-      </select>
+    <div className="App" style={{ textAlign: 'left' }}>
+      <div className="input-options-container mt-3">
+        <CustomTextField
+          fullWidth
+          label="Folder"
+          variant="outlined"
+          value={profileName}
+          onChange={(e) => setProfileName(e.target.value)}
+        />
+        <CustomTextField
+          fullWidth
+          label="File name"
+          variant="outlined"
+          value={fileName}
+          onChange={(e) => setFileName(e.target.value)}
+        />
+        <TextField
+          fullWidth
+          label="Paste Bid Material Here.."
+          variant="outlined"
+          multiline
+          rows={4}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          sx={{
+            '& .MuiOutlinedInput-root': { fontFamily: '"ClashDisplay", sans-serif' },
+            '& .MuiInputLabel-root': { fontFamily: '"ClashDisplay", sans-serif' },
+          }}
+        />
+        <button
+          onClick={handleTextSubmit}
+          disabled={!isFormFilled} // Button is disabled if not all fields are filled
+          className="upload-button mb-4"
+        >
+          Upload Data
+        </button>
+      </div>
     </div>
-    <div>
-      Profile name:
-      <input
-       className="ml-3"
-        type="text"
-        placeholder="Enter Profile Name"
-        value={profileName}
-        onChange={(e) => setProfileName(e.target.value)}
-      />
-    </div>
-    <div>
-      File name:
-      <input
-       className="ml-3"
-        id="fileName"
-        type="text"
-        placeholder="Enter File Name"
-        value={fileName}
-        onChange={(e) => setFileName(e.target.value)}
-      />
-    </div>
-  </div>
-  <div>
-    <textarea
-      placeholder={placeholder_upload}
-      value={text}
-      className="mb-4"
-      onChange={(e) => setText(e.target.value)}
-    />
-  </div>
-  <button
-    onClick={handleTextSubmit}
-    disabled={isUploading}
-    className={isUploading ? "btn-disabled" : ""}
-  >
-    Upload Data
-  </button>
-</div>
-
-
-
-
   );
 };
 

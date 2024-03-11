@@ -5,11 +5,11 @@
     background-image: linear-gradient(to right, #ffa500, #ff7f50);
     margin: 0;
     width: 100%;
-    margin-left: 90px;
     margin-bottom: 0;
     border-bottom: 1px solid #ddd;
     /* Adds a light grey border at the bottom */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 100;
 }
 
 .navbar-brand,
@@ -19,28 +19,14 @@
 }
 
 .navbar-brand {
-    margin-left: 1rem;
     font-size: 1.9rem;
     font-weight: 600;
+    margin-left: 110px;
 }
 
 .navbar-nav .nav-item:last-child .nav-link {
-    margin-right: 6.5rem;
-    margin-left: 0.5rem;
-}
-
-.navbar-toggler {
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-}
-
-@media (max-width: 768px) {
-    .navbar-collapse {
-        background-color: black;
-    }
+    margin-right: 15px;
+    margin-left: 10px;
 }
 
 .navbar-brand:hover,

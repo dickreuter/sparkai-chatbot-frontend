@@ -6,16 +6,16 @@ import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import {displayAlert} from "../helper/Alert";
 
+
 const UploadPDF = () => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || 'default');
 
     const [selectedFile, setSelectedFile] = useState(null);
-    const [profileName, setProfileName] = useState('default');
     const [isUploading, setIsUploading] = useState(false);
 
-    const handleFileSelect = async (file) => {
+    const handleFileSelect = async (file, profileName) => {
         setSelectedFile(file);
         const formData = new FormData();
         formData.append('file', file);
@@ -46,13 +46,7 @@ const UploadPDF = () => {
 
     return (
         <div className="App">
-            <h1 className='mb-4'>PDF Uploader</h1>
-            <input 
-                type="text" 
-                placeholder="Enter Profile Name" 
-                value={profileName}
-                onChange={(e) => setProfileName(e.target.value)}
-            />
+
             <FileUploader onFileSelect={handleFileSelect} />
         </div>
     );

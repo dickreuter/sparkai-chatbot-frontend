@@ -1,16 +1,36 @@
-textarea {
-    width: 70vw;
-    height: 30vw;
-}
-
 .input-options-container {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    /* Adjusts space between the input options */
-    align-items: center;
-    /* Vertically centers the items */
-    /* Ensures responsiveness */
+    justify-content: flex-start;
+    align-items: flex-start;
     gap: 20px;
-    /* Adds some space between the items */
+    margin-left: 15px;
+    margin-right: 15px;
+    padding: 0;
+    font-family: "ClashDisplay", sans-serif;
+}
+
+.upload-button {
+    background-color: #007bff;
+    /* Example primary button color */
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 8px;
+}
+
+.uploader-input {
+    width: 700px !important;
+    font-family: "ClashDisplay", sans-serif !important;
+    font-weight: bolder;
+}
+
+.upload-button:disabled,
+.upload-button.btn-disabled {
+    background-color: #70b3fa;
+    color: white;
+    cursor: not-allowed;
 }

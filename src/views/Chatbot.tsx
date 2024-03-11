@@ -527,7 +527,7 @@ const Chatbot = () => {
                         <Col md={12}>
                             {" "}
                             {/* Adjusted width for the question box */}
-                            <Form.Group className="mb-3">
+                            <Form.Group >
                                 <Form.Label className="custom-label">Enter your question or input:</Form.Label>
                                 <Form.Control
                                     as="textarea"
@@ -541,7 +541,7 @@ const Chatbot = () => {
                             </Form.Group>
                             <Button 
                                 onClick={sendQuestion}
-                                variant="primary"
+                                className="upload-button mt-2"
                             >
                                 Submit
                             </Button>
@@ -570,7 +570,7 @@ const Chatbot = () => {
                                 <Button
                                     variant="primary"
                                     onClick={submitSelections}
-                                    className="chat-button mt-3"
+                                    className="upload-button mt-3"
                                     disabled={selectedChoices.length === 0}
                                 >
                                     Generate answers for selected subsections
@@ -582,8 +582,9 @@ const Chatbot = () => {
                    
                 </section>
                 <section id="response">
-                    <Row className="justify-content-md-center">
+                    <Row className="justify-content-md-center mt-3">
                         <Col md={12}>
+                            
                             <Form.Group className="mb-3 d-flex justify-content-between align-items-center">
                                 <Form.Label className="custom-label mb-0">Response:</Form.Label>
                                 <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
@@ -601,7 +602,7 @@ const Chatbot = () => {
                            
                         </Col>
                         <div>
-                        <Button variant="primary mt-2" onClick={handleAppendResponseToEditor}>
+                        <Button className="upload-button mt-2" onClick={handleAppendResponseToEditor}>
                                 Add to Proposal
                                 {/* down arrow */}
                             </Button>
@@ -632,7 +633,7 @@ const Chatbot = () => {
                 
                 <div className="proposal-header mb-3">
                    
-                    <h3 className="custom-label mt-4">Proposal Editor</h3>
+                    <h3 className="custom-label mt-5">Proposal Editor</h3>
                 </div>
                 <div className="proposal-container">
                         <Row className="justify-content-md-center">
@@ -659,7 +660,7 @@ const Chatbot = () => {
                             <Button
                                 variant={isSaved ? "success" : "primary"}
                                 onClick={saveProposal}
-                                className={`mt-1 chat-button ${isSaved && 'saved-button'}`}
+                                className={`mt-1 upload-button ${isSaved && 'saved-button'}`}
                                 disabled={isLoading || isSaved} // Consider disabling the button while saving or after saved
                             >
                                 {isSaved ? "Saved" : "Save Proposal"}
@@ -669,7 +670,7 @@ const Chatbot = () => {
                 </Row>
                 
                    
-                    <Row className="mt-3">
+                    <Row className="mt-5">
                         <Col md={12}>
                         <Form.Group className="mb-3">
                                 <Form.Label>
@@ -688,7 +689,7 @@ const Chatbot = () => {
                                 <Button
                                     variant="primary"
                                     onClick={submitFeedback}
-                                    className="chat-button mt-1"
+                                    className="upload-button mt-1"
                                     disabled={!questionAsked} // Disabled until a question is asked
                                 >
                                     Submit Feedback

@@ -5,6 +5,7 @@ import { useAuthUser, useSignOut } from "react-auth-kit";
 import { Link } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import "./Navbar.css";
+import ReactGA from 'react-ga4';
 
 const NavBar = () => {
   const getAuth = useAuthUser();
@@ -14,12 +15,22 @@ const NavBar = () => {
   const tokenRef = useRef(auth?.token || "default");
   const signOut = useSignOut();
 
+
   const toggle = () => setIsOpen(!isOpen);
-  const handleNavLinkClick = () => {
+
+    const handleGAEvent = (category, action, label) => {
+    ReactGA.event({
+      category: category,
+      action: action,
+      label: label,
+    });
+  };
+
+  const handleNavLinkClick = (label) => {
     if (window.innerWidth <= 768) {
-      // Bootstrap's breakpoint for small devices
       toggle();
     }
+    handleGAEvent('Navigation', 'Link Click', label);
   };
 
   useEffect(() => {
@@ -71,7 +82,7 @@ const NavBar = () => {
       </button>
       <a className="navbar-brand" href="/">
         mytender.io &nbsp;
-       
+
       </a>
 
       <div
@@ -81,9 +92,9 @@ const NavBar = () => {
         <ul className="navbar-nav ml-auto">
           {" "}
           {/* Apply ml-auto here */}
-          
-         
-       
+
+
+
           {auth ? (
             email === "adminuser" && (
               <>
@@ -117,13 +128,13 @@ const NavBar = () => {
           )}
        {auth ? (
   <li className="nav-item">
-    <Link to="/chatbot" className="btn btn-white nav-link" >
+        <Link to="/chatbot" className="btn btn-white nav-link" onClick={() => handleNavLinkClick('chatbot page')}>
       New Bid
     </Link>
   </li>
 ) : <></>}
-       
-          
+
+
        {auth ? (
         <li className="nav-item ">
           <Link to="/login">

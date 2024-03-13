@@ -2,10 +2,10 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 import { useEffect, useRef, useState } from "react";
 import { useAuthUser, useSignOut } from "react-auth-kit";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import "./Navbar.css";
-import ReactGA from 'react-ga4';
+import handleGAEvent from "../utilities/handleGAEvent";
 
 const NavBar = () => {
   const getAuth = useAuthUser();
@@ -14,23 +14,25 @@ const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const tokenRef = useRef(auth?.token || "default");
   const signOut = useSignOut();
-
+  const navigate = useNavigate();
 
   const toggle = () => setIsOpen(!isOpen);
 
-    const handleGAEvent = (category, action, label) => {
-    ReactGA.event({
-      category: category,
-      action: action,
-      label: label,
-    });
-  };
+
 
   const handleNavLinkClick = (label) => {
     if (window.innerWidth <= 768) {
       toggle();
     }
     handleGAEvent('Navigation', 'Link Click', label);
+    localStorage.removeItem('bidInfo');
+    localStorage.removeItem('backgroundInfo');
+    localStorage.removeItem('response');
+    localStorage.removeItem('inputText');
+    localStorage.removeItem('editorState');
+    window.location.reload();
+    
+
   };
 
   useEffect(() => {
@@ -128,7 +130,7 @@ const NavBar = () => {
           )}
        {auth ? (
   <li className="nav-item">
-        <Link to="/chatbot" className="btn btn-white nav-link" onClick={() => handleNavLinkClick('chatbot page')}>
+        <Link to="/" className="btn btn-white nav-link" onClick={() => handleNavLinkClick('chatbot page')}>
       New Bid
     </Link>
   </li>

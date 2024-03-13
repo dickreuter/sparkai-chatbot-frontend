@@ -9,6 +9,7 @@
     padding: 1rem;
     padding-top: 0rem;
     padding-right: 290px;
+    overflow-x: hidden;
     /* or whatever value you desire for the chatbot page */
 }
 
@@ -23,6 +24,7 @@
     padding: 1rem;
     padding-top: 0rem;
     padding-right: 55px;
+    overflow-x: hidden;
     /* or whatever value you desire for the chatbot page */
 }
 

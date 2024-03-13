@@ -12,7 +12,7 @@ const Bids = () => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
-    const navigate = useNavigate()
+    
 
     const navigateToChatbot = (bid) => {
       localStorage.setItem('navigatedFromBidsTable', 'true');

@@ -16,21 +16,14 @@ import { useLocation } from 'react-router-dom';
 import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-js';
 import ReactGA from 'react-ga4';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
-
-const handleGAEvent = (category, action, label) => {
-    ReactGA.event({
-      category: category,
-      action: action,
-      label: label,
-    });
-  };
+import handleGAEvent from "../utilities/handleGAEvent.tsx";
 
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
 
     const [choice, setChoice] = useState("3");
     const [broadness, setBroadness] = useState("1");
-    const [dataset, setDataset] = useState("default");
+    const [dataset, setDataset] = useState("Company Language Model");
 
     const [inputText, setInputText] = useState(
         localStorage.getItem('inputText') || ''
@@ -66,9 +59,34 @@ const Chatbot = () => {
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
 
+    const handleDatasetChange = (e) => {
+        const newDataset = e.target.value;
+        setDataset(newDataset); // Update the state with the new dataset value
+    
+        
+        handleGAEvent('Chatbot', 'Dataset Selection', 'Select Dataset Button');
+      };
+
+    const handleFunctionChange = (e) => {
+        const newChoice = e.target.value;
+        setChoice(newChoice); // Update the state with the new choice
+      
+       
+        handleGAEvent('Chatbot', 'Function Selection', 'Select Function Button');
+    };
+      
+      // Broadness dropdown onChange handler
+    const handleBroadnessChange = (e) => {
+        const newBroadness = e.target.value;
+        setBroadness(newBroadness); // Update the state with the new broadness level
+      
+        
+        handleGAEvent('Chatbot', 'Broadness Selection', 'Select Broadness Button');
+    };
+      
 
     const handleAppendResponseToEditor = () => {
-         handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
+        handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
         // Use a timestamp as a simple unique identifier
         // had to add to fix infinte append rsponse bug due to state being persisted
         const uniqueId = Date.now(); 
@@ -82,6 +100,8 @@ const Chatbot = () => {
 
     const handleSelect = (selectedKey) => {
         setResponse(selectedKey);
+        handleGAEvent('Chatbot', 'Select', 'Template Select Button');
+        
     };
     const countWords = (str) => {
         return str.split(/\s+/).filter(Boolean).length;
@@ -468,51 +488,48 @@ const Chatbot = () => {
                         <Col md={6}>
                             <div className="dropdowns">
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="custom-label">Select dataset:</Form.Label>
-                                        <Form.Select
-                                            aria-label="Dataset selection"
-                                            className="w-100 mx-auto chat-dropdown"
-                                            value={dataset}
-                                            onChange={(e) => setDataset(e.target.value)}
-                                        >
-                                            <option value="" disabled>
-                                                Select a dataset
-                                            </option>
-                                            {" "}
-                                            {/* This option is added */}
-                                            {availableCollections.map((collection) => (
-                                                <option key={collection} value={collection}>
-                                                    {collection}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
+                                    <Form.Label className="custom-label">Dataset:</Form.Label>
+                                    <Form.Select
+                                        aria-label="Dataset selection"
+                                        className="w-100 mx-auto chat-dropdown"
+                                        value={dataset}
+                                        onChange={handleDatasetChange} // Updated to use the new handler
+                                    >
+                                        <option value="" disabled>
+                                        Company Language Model
+                                        </option>
+                                        {/* This option is added */}
+                                        {availableCollections.map((collection) => (
+                                        <option key={collection} value={collection}>
+                                            {collection}
+                                        </option>
+                                        ))}
+                                    </Form.Select>
                                     </Form.Group>
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="custom-label">Select Function:</Form.Label>
-                                        <Form.Select
-                                            aria-label="Function selection"
-                                            className="w-100 mx-auto chat-dropdown"
-                                            value={choice}
-                                            onChange={(e) => setChoice(e.target.value)}
-                                        >
-                                            <option value="3">
-                                                Answer Question with multi-step Topic Selection
-                                            </option>
-                                            <option value="2">One Step Question answering</option>
-                                        </Form.Select>
+                                    <Form.Label className="custom-label">Function:</Form.Label>
+                                    <Form.Select
+                                        aria-label="Function selection"
+                                        className="w-100 mx-auto chat-dropdown"
+                                        value={choice}
+                                        onChange={handleFunctionChange}
+                                    >
+                                        <option value="3">Muti-topic Generator</option>
+                                        <option value="2">Auto Response</option>
+                                    </Form.Select>
                                     </Form.Group>
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="custom-label">Broadness of database search:</Form.Label>
-                                        <Form.Select
-                                            aria-label="Function selection"
-                                            className="w-100 mx-auto chat-dropdown"
-                                            value={broadness}
-                                            onChange={(e) => setBroadness(e.target.value)}
-                                        >
-                                            <option value="1">Narrow (single database entry)</option>
-                                            <option value="2">Extended (up to 2 entries)</option>
-                                            <option value="3">Broad (up to 3 entries)</option>
-                                        </Form.Select>
+                                    <Form.Label className="custom-label">Broadness of database search:</Form.Label>
+                                    <Form.Select
+                                        aria-label="Broadness selection"
+                                        className="w-100 mx-auto chat-dropdown"
+                                        value={broadness}
+                                        onChange={handleBroadnessChange}
+                                    >
+                                        <option value="1">Narrow (single database entry)</option>
+                                        <option value="2">Extended (up to 2 entries)</option>
+                                        <option value="3">Broad (up to 3 entries)</option>
+                                    </Form.Select>
                                     </Form.Group>
                                 </div>
                         </Col>

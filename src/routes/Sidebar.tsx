@@ -29,11 +29,27 @@ const Sidebar = () => {
   const [bids, setBids] = useState([]);
   // Adjust this useRef to obtain the token from your authentication context or state
   const tokenRef = useRef(auth?.token || "default");
+  const navigate = useNavigate()
+  const navigateToChatbot = (bid) => {
+    localStorage.setItem('navigatedFromBidsTable', 'true');
+    navigate('/chatbot', { state: { bid: bid, fromBidsTable: true } });
+  };
 
   useEffect(() => {
     fetchBids();
   }, []);
 
+  const handleSidebarLinkClick = (anchorId) => {
+    
+    handleGAEvent('Sidebar Navigation', 'Link Click', 'sidebar nav');
+  };
+
+  const handleOngoingSidebarLinkClick = (label) => {
+    
+    handleGAEvent('Sidebar Navigation' , 'Ongoing Link Click', 'ongoing link nav');
+  };
+
+  
   const fetchBids = async () => {
     try {
       const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
@@ -67,6 +83,12 @@ const Sidebar = () => {
     });
   };
 
+  const handleFirstLinkClick = (e, anchorId) => {
+    scrollToTop(e); // Pass the event to scrollToTop
+    handleSidebarLinkClick(anchorId); // Call handleSidebarLinkClick with the anchorId
+  };
+  
+
   return (
     <div className="sidebar">
       <div className="sidebar-top-title" onClick={toggleActive}>
@@ -78,10 +100,10 @@ const Sidebar = () => {
       {isActiveVisible && (
         <div className="sidebar-links">
           {/* You might want to adjust these links based on your app's routing */}
-          <Link onClick={scrollToTop} to="/chatbot#bidinfo" className='sidebar-link'>Bid Info</Link>
-          <Link to="/chatbot#inputquestion" className='sidebar-link'>Question</Link>
-          <Link to="/chatbot#response" className='sidebar-link'>Response</Link>
-          <Link to="/chatbot#proposal" className='sidebar-link'>Proposal</Link>
+          <Link onClick={(e) => handleFirstLinkClick(e, '#bidinfo')} to="/chatbot#bidinfo" className='sidebar-link'>Bid Info</Link>
+          <Link onClick={() => handleSidebarLinkClick('#inputquestion')} to="/chatbot#inputquestion" className='sidebar-link'>Question</Link>
+          <Link onClick={() => handleSidebarLinkClick('#response')} to="/chatbot#response" className='sidebar-link'>Response</Link>
+          <Link onClick={() => handleSidebarLinkClick('#proposal')} to="/chatbot#proposal" className='sidebar-link'>Proposal</Link>
         </div>
       )}
       <div className="sidebar-title" onClick={toggleOngoing}>
@@ -93,8 +115,8 @@ const Sidebar = () => {
       {isOngoingVisible && (
         <div className="sidebar-links">
           {recentOngoingBids.map((bid, index) => (
-            <Link key={index} to={`/chatbot#${bid.bid_title}`} onClick={scrollToTop} className='sidebar-link'>
-              {bid.bid_title}
+            <Link onClick={() => handleOngoingSidebarLinkClick('ongoing bid click')} to="/chatbot" state={{ bid: bid, fromBidsTable: true }} className='sidebar-link' onClick={() => navigateToChatbot(bid)}>
+                {bid.bid_title}
             </Link>
           ))}
         </div>

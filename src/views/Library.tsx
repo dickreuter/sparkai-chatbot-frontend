@@ -171,7 +171,7 @@ return (
                       <div className="header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h1 className="lib-custom-card-title">Resources</h1>
                         <Button className="upload-button" onClick={() => setShowUploadPdfModal(true)}>Upload PDF</Button>
-      <UploadPdfModal /> {/* This line includes the modal in your component */}
+                        <UploadPdfModal /> 
                       </div>
                       <table className="library-table">
                           <thead>

@@ -27,11 +27,15 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
     padding-right: 290px;
+<<<<<<< HEAD
 =======
 >>>>>>> b3c28fb (cleaner ui)
 =======
     padding-right: 290px;
 >>>>>>> 2f2dbbd (closing most frontend issues)
+=======
+    overflow-x: hidden;
+>>>>>>> 12248a7 (styling and GA)
     /* or whatever value you desire for the chatbot page */
 }
 
@@ -66,6 +70,7 @@
 =======
 >>>>>>> 2f2dbbd (closing most frontend issues)
     padding-right: 55px;
+    overflow-x: hidden;
     /* or whatever value you desire for the chatbot page */
 }
 

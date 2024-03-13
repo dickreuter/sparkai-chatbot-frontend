@@ -1,27 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD=======.library-container {
-    /* Align the tops of the two children */
-}
-
-.library-table {
-    flex: 1;
-    min-height: 50vh;
-    max-height: 50vh;
-    display: flex;
-    /* Prevents 
-    horizontal scrolling */
-}
-
-.cardbodytable {
-    overflow-y: auto;
-    /* Allows vertical scrolling if content overflows */
-    overflow-x: hidden;
-}
-
->>>>>>>4fc4254 (clearstorageonsignin) .upload-component {
-=======
 .upload-component {
->>>>>>> 2f2dbbd (closing most frontend issues)
     display: flex;
     min-height: 50vh;
     max-height: 50vh;

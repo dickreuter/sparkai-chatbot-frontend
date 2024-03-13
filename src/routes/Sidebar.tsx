@@ -6,21 +6,10 @@ import { Link } from 'react-router-dom';
 import "./Sidebar.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import ReactGA from "react-ga4";
 
+import { useNavigate } from 'react-router-dom';
+import handleGAEvent from '../utilities/handleGAEvent';
 
-<<<<<<< HEAD
-const handleGAEvent = (category, action, label) => {
-    ReactGA.event({
-      category: category,
-      action: action,
-      label: label,
-    });
-  };
-
-
-=======
->>>>>>> 2f2dbbd (closing most frontend issues)
 const Sidebar = () => {
   const [isActiveVisible, setIsActiveVisible] = useState(true);
   const [isOngoingVisible, setIsOngoingVisible] = useState(true);

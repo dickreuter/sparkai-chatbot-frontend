@@ -1,74 +1,28 @@
 .chatbot-container {
-<<<<<<< HEAD
-<<<<<<< HEAD
     width: 100%;
     height: 100%;
     margin-top: 40px;
     margin-bottom: 0;
     margin-left: 300px;
-=======
-    width: 79.5vw;
-=======
-    width: 100%;
->>>>>>> 2f2dbbd (closing most frontend issues)
-    height: 100%;
-    margin-top: 40px;
-    margin-bottom: 0;
-<<<<<<< HEAD
-    margin-left: 280px;
->>>>>>> b3c28fb (cleaner ui)
-=======
-    margin-left: 300px;
->>>>>>> 2f2dbbd (closing most frontend issues)
     background-color: white;
     justify-content: center;
     padding: 1rem;
     padding-top: 0rem;
-<<<<<<< HEAD
-<<<<<<< HEAD
     padding-right: 290px;
-<<<<<<< HEAD
-=======
->>>>>>> b3c28fb (cleaner ui)
-=======
-    padding-right: 290px;
->>>>>>> 2f2dbbd (closing most frontend issues)
-=======
     overflow-x: hidden;
->>>>>>> 12248a7 (styling and GA)
     /* or whatever value you desire for the chatbot page */
 }
 
 .lib-container {
-<<<<<<< HEAD
-<<<<<<< HEAD
     width: 100%;
     height: 100%;
     margin-top: 40px;
     margin-bottom: 0;
     margin-left: 65px;
-=======
-    width: 94.5vw;
-=======
-    width: 100%;
->>>>>>> 2f2dbbd (closing most frontend issues)
-    height: 100%;
-    margin-top: 40px;
-    margin-bottom: 0;
-<<<<<<< HEAD
-    margin-left: 60px;
->>>>>>> b3c28fb (cleaner ui)
-=======
-    margin-left: 65px;
->>>>>>> 2f2dbbd (closing most frontend issues)
     background-color: white;
     justify-content: center;
     padding: 1rem;
     padding-top: 0rem;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 2f2dbbd (closing most frontend issues)
     padding-right: 55px;
     overflow-x: hidden;
     /* or whatever value you desire for the chatbot page */
@@ -92,14 +46,6 @@
     animation: fadeInScaleUp 0.1s ease-out;
 }
 
-<<<<<<< HEAD
-=======
-    /* or whatever value you desire for the chatbot page */
-}
-
->>>>>>> b3c28fb (cleaner ui)
-=======
->>>>>>> 2f2dbbd (closing most frontend issues)
 .navbar-container {
     width: 94vw;
     height: 100%;
@@ -134,10 +80,6 @@
     /* This aligns the text to the left */
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 2f2dbbd (closing most frontend issues)
 .margin-container {
     margin-top: 15px;
     margin-left: 15px;
@@ -148,13 +90,6 @@
     padding: 20px;
 }
 
-<<<<<<< HEAD
-.bid-name-input {
-    text-align: left;
-    height: 10px;
-=======
-=======
->>>>>>> 2f2dbbd (closing most frontend issues)
 .bid-name-input {
     text-align: left;
     height: 10px;
@@ -164,18 +99,6 @@
     /* Ensures the text within the form starts at the left */
 }
 
-<<<<<<< HEAD
-.custom-card {
-    background-color: black;
->>>>>>> b3c28fb (cleaner ui)
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ced4da;
-    /* Ensures the text within the form starts at the left */
-}
-
-=======
->>>>>>> 2f2dbbd (closing most frontend issues)
 .white-card {
     background-color: white;
     border-radius: 4px;

@@ -7,6 +7,7 @@ import "./Upload.css";
 import { displayAlert } from "../helper/Alert";
 import CustomTextField from "../components/CustomTextField";
 import TextField from '@mui/material/TextField';
+import handleGAEvent from "../utilities/handleGAEvent";
 
 const UploadText = () => {
   const getAuth = useAuthUser();
@@ -60,6 +61,7 @@ const UploadText = () => {
       );
 
       displayAlert("Upload successful", "success");
+      handleGAEvent('Library', 'Text Upload', 'Upload Text Button');
     } catch (error) {
       console.error("Error saving strategy:", error);
       displayAlert("Failed to save", "danger");

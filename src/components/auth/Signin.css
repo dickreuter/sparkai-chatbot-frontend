@@ -4,9 +4,10 @@
     /* Vertically centers the child in the container */
     justify-content: center;
     /* Horizontally centers the child in the container */
-    height: 100vh;
+    height: 100%;
     /* Makes the container take up the full viewport height */
-    width: 100vw;
+    width: 100%;
+    margin-left: 300px;
     /* Optional: Makes the container take up the full viewport width */
 }
 

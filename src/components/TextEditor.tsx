@@ -117,7 +117,7 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
 
     useEffect(() => {
         // Save the editor state to localStorage whenever it changes
-        console.log("saved");
+        //console.log("saved");
         const contentState = editorState.getCurrentContent();
         localStorage.setItem('editorState', JSON.stringify(convertToRaw(contentState)));
     }, [editorState]);

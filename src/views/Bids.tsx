@@ -6,17 +6,19 @@ import { Link } from "react-router-dom";
 import "./Bids.css";
 import { useNavigate } from 'react-router-dom';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
+import handleGAEvent from '../utilities/handleGAEvent.tsx';
 
 const Bids = () => {
     const [bids, setBids] = useState([]);
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
-    
+    const navigate = useNavigate()
 
     const navigateToChatbot = (bid) => {
       localStorage.setItem('navigatedFromBidsTable', 'true');
       navigate('/chatbot', { state: { bid: bid, fromBidsTable: true } });
+      handleGAEvent('Bid Tracker', 'Navigate to Bid', 'Bid Table Link');
     };
 
     // Encapsulate the bid-fetching logic into its own function
@@ -30,7 +32,7 @@ const Bids = () => {
             });
             if (response.data && response.data.bids) {
                 setBids(response.data.bids);
-                console.log(response.data);
+               
             }   
         } catch (error) {
             console.error("Error fetching bids:", error);
@@ -56,8 +58,9 @@ const Bids = () => {
                     },
                 }
             );
-            console.log("Bid deleted successfully");
+          
             fetchBids(); // Refetch bids after successful deletion
+            handleGAEvent('Bid Tracker', 'Delete Bid', 'Delete Bid Button');
         } catch (error) {
             console.error("Error deleting bid:", error);
         }
@@ -76,9 +79,10 @@ const Bids = () => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-            console.log("Bid status updated successfully");
+       
     
             // Optimistically update the local state
+            handleGAEvent('Bid Tracker', 'Change Bid Status', 'Bid Status Dropdown');
             setTimeout(fetchBids, 500);
             
         } catch (error) {

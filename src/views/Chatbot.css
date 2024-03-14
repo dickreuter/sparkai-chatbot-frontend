@@ -323,6 +323,10 @@
     width: 100%;
 }
 
+.saved-button {
+    background-color: #029e1e !important;
+}
+
 .saved-button:disabled {
     opacity: 1;
     /* Override default opacity for disabled buttons */

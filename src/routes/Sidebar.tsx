@@ -19,10 +19,19 @@ const Sidebar = () => {
   // Adjust this useRef to obtain the token from your authentication context or state
   const tokenRef = useRef(auth?.token || "default");
   const navigate = useNavigate()
-  const navigateToChatbot = (bid) => {
-    localStorage.setItem('navigatedFromBidsTable', 'true');
-    navigate('/chatbot', { state: { bid: bid, fromBidsTable: true } });
-  };
+
+
+ const navigateToChatbot = (bid) => {
+  // Tracking the click before navigating
+  handleOngoingSidebarLinkClick('Ongoing bid click');
+
+  // Setting item in localStorage
+  localStorage.setItem('navigatedFromBidsTable', 'true');
+
+  // Navigating to the chatbot page with state
+  navigate('/chatbot', { state: { bid: bid, fromBidsTable: true } });
+  fetchBids();
+};
 
   useEffect(() => {
     fetchBids();
@@ -36,6 +45,7 @@ const Sidebar = () => {
   const handleOngoingSidebarLinkClick = (label) => {
     
     handleGAEvent('Sidebar Navigation' , 'Ongoing Link Click', 'ongoing link nav');
+    
   };
 
   
@@ -50,7 +60,7 @@ const Sidebar = () => {
         });
       if (response.data && response.data.bids) {
         setBids(response.data.bids);
-        console.log(response.data);
+       
       }
     } catch (error) {
       console.error("Error fetching bids:", error);
@@ -102,14 +112,17 @@ const Sidebar = () => {
         </span>
       </div>
       {isOngoingVisible && (
-        <div className="sidebar-links">
-          {recentOngoingBids.map((bid, index) => (
-            <Link onClick={() => handleOngoingSidebarLinkClick('ongoing bid click')} to="/chatbot" state={{ bid: bid, fromBidsTable: true }} className='sidebar-link' onClick={() => navigateToChatbot(bid)}>
-                {bid.bid_title}
-            </Link>
-          ))}
-        </div>
-      )}
+  <div className="sidebar-links">
+    {recentOngoingBids.map((bid, index) => (
+      // Using bid ID or another unique property from bid as the key, if available
+      // If bid ID isn't available, fall back to using index, but prefer a more stable identifier if possible
+      <Link key={bid.id || index} to="/chatbot" state={{ bid: bid, fromBidsTable: true }} className='sidebar-link' onClick={() => navigateToChatbot(bid)}>
+        {bid.bid_title}
+      </Link>
+    ))}
+  </div>
+)}
+
     </div>
   );
 };

@@ -7,6 +7,7 @@ import "../views/Upload.css";
 import {displayAlert} from "../helper/Alert.tsx";
 import TextField from '@mui/material/TextField';
 import CustomTextField from "./CustomTextField.tsx";
+import handleGAEvent from "../utilities/handleGAEvent.tsx";
 const UploadTemplateText = () => {
     const getAuth = useAuthUser();
     const auth = getAuth();
@@ -26,6 +27,8 @@ const UploadTemplateText = () => {
     
   
     const handleTextSubmit = async () => {
+
+
         const formData = new FormData();
         setIsUploading(true);
         formData.append("text", text);
@@ -54,6 +57,7 @@ const UploadTemplateText = () => {
             );
 
             displayAlert("Upload successful", "success");
+            handleGAEvent('Library', 'Template Upload', 'Upload Template Button');
         } catch (error) {
             console.error("Error saving:", error);
             displayAlert("Failed to save", "danger");

@@ -35,7 +35,7 @@ const UploadPDF = () => {
                     'Authorization': `Bearer ${tokenRef.current}` // Adding the token in the request headers
                 }
             });
-            console.log(response.data);
+            //console.log(response.data);
             displayAlert("Upload successful", "success");
         } catch (error) {
             console.error('Error uploading file:', error);

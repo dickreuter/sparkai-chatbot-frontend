@@ -14,6 +14,7 @@ import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import SideBar from '../routes/Sidebar.tsx'; 
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import NavBar from '../routes/NavBar';
+import handleGAEvent from "../utilities/handleGAEvent.tsx";
 
 const Library = () => {
   const getAuth = useAuthUser();
@@ -86,8 +87,8 @@ const FileContentModal = () => (
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
 
-      console.log("fetchfoldernames");
-      console.log(response.data);
+      //console.log("fetchfoldernames");
+      //console.log(response.data);
 
       // Ensure response.data structure is correctly handled here
       setFolderContents(prevContents => ({
@@ -105,8 +106,8 @@ const FileContentModal = () => (
     const formData = new FormData();
     formData.append('file_name', fileName);
     formData.append("profile_name", folderName);
-    console.log(folderName);
-    console.log(fileName);
+    //console.log(folderName);
+    //console.log(fileName);
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/show_file_content`,
@@ -119,9 +120,10 @@ const FileContentModal = () => (
         }
       );
       // Update modal content and show modal
-      console.log(response.data);
+      //console.log(response.data);
       setModalContent(response.data); // Assume response.data is the content you want to display
       setShowModal(true);
+      handleGAEvent('Library', 'View', 'View Button');
     } catch (error) {
       console.error('Error viewing file:', error);
     }
@@ -136,8 +138,8 @@ useEffect(() => {
         {},
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
-      console.log("response");
-      console.log(res.data);
+      //console.log("response");
+      //console.log(res.data);
       setAvailableCollections(res.data.collections || []);
       // Immediately fetch filenames for all collections
       for (const collection of res.data.collections || []) {
@@ -170,8 +172,17 @@ return (
                     <Card.Body>
                       <div className="header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h1 className="lib-custom-card-title">Resources</h1>
-                        <Button className="upload-button" onClick={() => setShowUploadPdfModal(true)}>Upload PDF</Button>
-                        <UploadPdfModal /> 
+                        <Button 
+                          className="upload-button" 
+                          onClick={() => {
+                            setShowUploadPdfModal(true);
+                            handleGAEvent('Library', 'Upload PDF', 'Upload PDF Button');
+                          }}
+                        >
+                          Upload PDF
+                        </Button>
+                        <UploadPdfModal />
+
                       </div>
                       <table className="library-table">
                           <thead>

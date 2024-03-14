@@ -9,12 +9,10 @@ import withAuth from "../routes/withAuth";
 import "./Chatbot.css";
 import FolderLogic from "../components/Folders";
 import CustomEditor from "../components/TextEditor.tsx";
-import VerticalAlignBottomIcon from '@mui/icons-material/VerticalAlignBottom';
 import TemplateLoader from "../components/TemplateLoader.tsx";
 import SideBar from '../routes/Sidebar.tsx' 
 import { useLocation } from 'react-router-dom';
 import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-js';
-import ReactGA from 'react-ga4';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
 
@@ -23,7 +21,7 @@ const Chatbot = () => {
 
     const [choice, setChoice] = useState("3");
     const [broadness, setBroadness] = useState("1");
-    const [dataset, setDataset] = useState("Company Language Model");
+    const [dataset, setDataset] = useState("default");
 
     const [inputText, setInputText] = useState(
         localStorage.getItem('inputText') || ''
@@ -52,7 +50,6 @@ const Chatbot = () => {
     const [questionAsked, setQuestionAsked] = useState(false);
     const [apiChoices, setApiChoices] = useState([]);
     const [selectedChoices, setSelectedChoices] = useState([]);
-    // Define a new state to trigger the append action
     const [appendResponse, setAppendResponse] = useState(false);
 
     const getAuth = useAuthUser();
@@ -87,8 +84,6 @@ const Chatbot = () => {
 
     const handleAppendResponseToEditor = () => {
         handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
-        // Use a timestamp as a simple unique identifier
-        // had to add to fix infinte append rsponse bug due to state being persisted
         const uniqueId = Date.now(); 
         setAppendResponse({ 
             id: uniqueId, // Unique identifier for each append action
@@ -129,7 +124,7 @@ const Chatbot = () => {
         formData.append('status', 'ongoing');
         formData.append('contract_information', backgroundInfo);
 
-        console.log(formData);
+
     
         try {
             const result = await axios.post(
@@ -138,12 +133,12 @@ const Chatbot = () => {
                 {
                     headers: {
                         'Authorization': `Bearer ${tokenRef.current}`,
-                        'Content-Type': 'multipart/form-data', // This might be needed depending on your backend setup
+                        'Content-Type': 'multipart/form-data', 
                     },
                 }
             );
     
-            console.log("Proposal saved successfully:", result.data);
+       
             setIsSaved(true);
             setTimeout(() => setIsSaved(false), 3000); // Reset after 3 seconds
         } catch (error) {
@@ -154,19 +149,16 @@ const Chatbot = () => {
     };
     
     const location = useLocation();
-    const bidData = location.state?.bid || ''; // Retrieve the passed bid data
+    const bidData = location.state?.bid || ''; 
 
     useEffect(() => {
 
-        console.log(bidData);
-        // Check if the component navigated from the bids table with bid data
-        
         
         const navigatedFromBidsTable = localStorage.getItem('navigatedFromBidsTable');
-        console.log(navigatedFromBidsTable)
+        //console.log(navigatedFromBidsTable)
   
         if (navigatedFromBidsTable === 'true' && location.state?.fromBidsTable && bidData) {
-            console.log("Navigated from bids table with bid data:", bidData);
+            //console.log("Navigated from bids table with bid data:", bidData);
         
             // Indicate that data has been loaded from navigation
          
@@ -201,8 +193,9 @@ const Chatbot = () => {
                 console.error("Error processing editor state:", error);
             }
         } else {
-            console.log("Loading data from local storage or post-edit");
+            //console.log("Loading data from local storage or post-edit");
             // Function to load data from local storage
+            
            
         }
     }, [location, bidData]);
@@ -256,6 +249,7 @@ const Chatbot = () => {
       
 
     const handleTextHighlight = async () => {
+        
         const selectedText = window.getSelection().toString();
         if (selectedText) {
             // Add a confirmation popup
@@ -266,8 +260,11 @@ const Chatbot = () => {
             );
             if (instructions) {
                 await new Promise((resolve) => setTimeout(resolve, 0));
+                console.log("instructions");
                 askCopilot(selectedText, instructions); // Call sendQuestion function to simulate submit
-            } else {
+                console.log(instructions);
+            }
+             else {
                 // User clicked 'Cancel' in the instructions prompt, exit the function
                 return;
             }
@@ -282,7 +279,7 @@ const Chatbot = () => {
         formData.append("text", `Question: ${inputText} \n Feedback: ${feedback}`);
         formData.append("profile_name", dataset); // Assuming email is the profile_name
         formData.append("mode", "feedback");
-        console.log(formData);
+        //console.log(formData);
 
         try {
             await axios.post(`http${HTTP_PREFIX}://${API_URL}/uploadtext`, formData, {
@@ -299,6 +296,7 @@ const Chatbot = () => {
     const askCopilot = async (copilotInput: string, instructions: string) => {
         setQuestionAsked(true);
         localStorage.setItem('questionAsked', 'true');
+        handleGAEvent('Chatbot', 'Copilot Input', copilotInput);
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
 
@@ -336,14 +334,14 @@ const Chatbot = () => {
     };
 
     const sendQuestion = async () => {
-        console.log("question asked");
+        //console.log("question asked");
         handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
         setQuestionAsked(true);
         localStorage.setItem('questionAsked', 'true');
         setResponse("");
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
-
+        console.log(dataset)
         try {
             const result = await axios.post(
                 `http${HTTP_PREFIX}://${API_URL}/question`,
@@ -370,9 +368,9 @@ const Chatbot = () => {
                 if (result.data && result.data.includes(",")) {
                     choicesArray = result.data.split(",").map((choice) => choice.trim());
                 }
-                console.log("API Response:", result);
+                //console.log("API Response:", result);
 
-                console.log("Choices Array: " + choicesArray);
+                //console.log("Choices Array: " + choicesArray);
 
                 setApiChoices(choicesArray);
             }
@@ -488,7 +486,7 @@ const Chatbot = () => {
                         <Col md={6}>
                             <div className="dropdowns">
                                     <Form.Group className="mb-3">
-                                    <Form.Label className="custom-label">Dataset:</Form.Label>
+                                    <Form.Label className="custom-label">Company Language Model:</Form.Label>
                                     <Form.Select
                                         aria-label="Dataset selection"
                                         className="w-100 mx-auto chat-dropdown"

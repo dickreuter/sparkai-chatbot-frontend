@@ -47,6 +47,7 @@ const FileUploader = ({ onFileSelect }) => {
   const handleUpload = () => {
     if (isFormFilled && selectedFile && profileName) {
       onFileSelect(selectedFile, profileName);
+      
       displayAlert("Upload successful", "success");
       // Optionally, reset the form here if needed
       setSelectedFile(null);

@@ -1,0 +1,550 @@
+/* VARIABLES */
+
+:root {
+    --c-dark: black;
+    /* Darker shade for text and elements */
+    --c-brand: #f58218;
+    /* Primary brand color, set to black */
+    --c-brand-light: #ffa654;
+    /* Light variant of the brand color for backgrounds or light elements */
+    --c-brand-rgb: 0, 0, 0;
+    /* RGB format of the brand color, useful for rgba() functions */
+    --c-body: black;
+    /* Body text color, set to a softer black for readability */
+    --font-base: "ClashDisplay", sans-serif;
+    /* Keeping the font same as before */
+    --box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+    /* Slightly stronger box shadow for depth */
+    --transition: all 0.5s ease;
+    /* Keeping transitions the same */
+}
+
+
+/* RESET & HELPERS */
+
+body {
+    font-family: var(--font-base);
+    line-height: 1.7;
+    color: var(--c-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+    font-weight: 600;
+    color: var(--c-dark);
+}
+
+a {
+    text-decoration: none;
+    color: var(--c-brand);
+    transition: var(--transition);
+}
+
+a:hover {
+    color: var(--c-brand-light);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.section-padding {
+    padding-top: 140px;
+    padding-bottom: 140px;
+}
+
+.theme-shadow {
+    box-shadow: var(--box-shadow);
+}
+
+
+/* IMAGE ZOOM */
+
+.image-zoom {
+    position: relative;
+    /* overflow: hidden; */
+}
+
+.image-zoom-wrapper {
+    overflow: hidden;
+    position: relative;
+}
+
+.image-zoom-wrapper img {
+    transition: var(--transition);
+}
+
+.image-zoom:hover .image-zoom-wrapper img {
+    transform: scale(1.1);
+}
+
+
+/* NAVBAR */
+
+.navbar {
+    box-shadow: var(--box-shadow);
+    height: 100px;
+}
+
+.navbar-brand:before {
+    content: '';
+    display: inline-block;
+    background: url(https://d23mvtytxhuzbg.cloudfront.net/static/images/mytender.io_badge_F-removebg-preview.png) no-repeat center center;
+    background-size: contain;
+    /* Adjust as needed */
+    width: 50px;
+    /* Adjust as needed */
+    height: 50px;
+    /* Adjust as needed */
+    padding: 0;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    color: var(--c-dark);
+}
+
+.navbar-nav .nav-link.active {
+    color: var(--c-brand);
+}
+
+
+/* BTN */
+
+.btn {
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    border-radius: 0;
+    padding: 10px 24px;
+}
+
+.btn-brand {
+    background-color: #f58218;
+    border-color: #f58218;
+    color: white;
+}
+
+.btn-light {
+    z-index: 1000;
+}
+
+.btn-brand:hover {
+    background-color: var(--c-brand-light);
+    border-color: var(--c-brand-light);
+    color: white;
+}
+
+
+/* HERO */
+
+#hero {
+    position: relative;
+    overflow: hidden;
+}
+
+#hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(rgba(var(--c-brand-rgb), 0.2), rgba(var(--c-brand-rgb), 0.1)), url('../images/6436987_3293275.jpg');
+    background-position: center;
+    background-size: cover;
+    transform: scaleX(-1);
+    z-index: -1;
+}
+
+.text-brand {
+    color: #f58218;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.hero-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-btn {
+    z-index: 100;
+}
+
+#particles-js {
+    pointer-events: none;
+}
+
+
+/* SECTION TITLE */
+
+.section-title {
+    margin-bottom: 60px;
+}
+
+.section-title .line {
+    width: 60px;
+    height: 4px;
+    background-color: var(--c-brand);
+    margin: 16px auto 24px auto;
+}
+
+.section-title p {
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* ICONBOX */
+
+.iconbox {
+    width: 70px;
+    height: 70px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-brand);
+    font-size: 34px;
+    flex: none;
+}
+
+
+/* SERVICE */
+
+.service {
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 350px;
+    /* Adjust this height as necessary */
+}
+
+.service::after {
+    content: "";
+    width: 40px;
+    height: 40px;
+    background: black;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transition: var(--transition);
+}
+
+.service:hover::after {
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: -1;
+}
+
+.service:hover h5,
+.service:hover p {
+    color: white;
+}
+
+.service:hover .iconbox {
+    color: var(--c-brand);
+}
+
+
+/* TRUST */
+
+.centered-image {
+    display: block;
+    /* Makes the image a block element */
+    max-width: 200px;
+    /* Maximum width, but can be less to maintain aspect ratio */
+    max-height: 200px;
+    /* Maximum height */
+    width: auto;
+    /* Allows the width to adjust to maintain aspect ratio */
+    height: auto;
+    /* Allows the height to adjust to maintain aspect ratio */
+    margin: 0 auto;
+    /* Centers the image horizontally */
+    object-fit: cover;
+    margin-bottom: 50px;
+    /* Adjusts the image size to cover the area, might crop */
+}
+
+
+/* COUNTER */
+
+#counter {
+    background: black;
+    background-size: cover;
+}
+
+
+/* PORTFOLIO */
+
+.portfolio-item .iconbox {
+    background-color: var(--c-brand);
+    color: white;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+}
+
+.portfolio-item:hover .iconbox {
+    opacity: 1;
+    top: 50%;
+}
+
+
+/* REVIEW */
+
+.review small {
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--c-brand);
+    white-space: nowrap;
+}
+
+.review-head {
+    position: relative;
+}
+
+.review-person {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.review-head::after {
+    content: "";
+    width: 28px;
+    height: 28px;
+    position: absolute;
+    bottom: -14px;
+    background-color: white;
+    transform: rotate(45deg);
+}
+
+
+/* TEAM */
+
+.team-member {
+    text-align: center;
+    /* Rounded corners for the boxes */
+    overflow: hidden;
+    /* Ensures the content respects the border-radius */
+}
+
+
+/* Responsive design for smaller screens like mobile devices */
+
+@media (max-width: 768px) {
+    .team-member .image,
+    .team-member .bigimage2,
+    .team-member .bigimage {
+        height: auto;
+        border-radius: 8px;
+        /* Adjust height for mobile */
+    }
+    .team-member .bigimage img,
+    .team-member .bigimage2 img {
+        transform: scale(1);
+        /* Less zoom for smaller screens */
+    }
+}
+
+.team-member .image,
+.team-member .bigimage2,
+.team-member .bigimage {
+    position: relative;
+    border-radius: 8px;
+    z-index: 2;
+    overflow: hidden;
+    height: 300px;
+    /* Setting a fixed height for image containers */
+}
+
+.team-member .image img,
+.team-member .bigimage2 img,
+.team-member .bigimage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.team-member .bigimage img {
+    transform: scale(1.5);
+    height: 300px;
+    /* Scale the image to zoom in */
+    transition: transform 0.3s ease;
+    /* Smooth transition for scaling */
+}
+
+.team-member .bigimage2 img {
+    transform: scale(1.5) translateX(-40%);
+    transform: scale(1.4);
+    height: 300px;
+    /* Scale the image to zoom in */
+    transition: transform 0.3s ease;
+    /* Smooth transition for scaling */
+}
+
+.social-links a {
+    width: 34px;
+    height: 34px;
+    background-color: rgba(0, 0, 0, 0);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border-radius: 100%;
+}
+
+.team-member .social-links {
+    display: flex;
+    align-items: center;
+    /* Center the items vertically */
+}
+
+.team-member .social-links .job-title {
+    margin-left: 8px;
+    /* Add some space between the icon and the text */
+}
+
+.team-member .social-links .job-title-link {
+    display: flex;
+    /* Allows vertical centering of icon */
+    align-items: center;
+}
+
+.team-member h5 {
+    margin-top: 16px;
+    margin-bottom: 4px;
+}
+
+.team-member a:hover h5 {
+    color: #3477eb;
+}
+
+
+/* blog post */
+
+.blog-post {
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-1);
+}
+
+.blog-post img {
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+    width: 100%;
+    height: 20vw;
+    object-fit: cover;
+}
+
+.blog-post .title {
+    line-height: 1.4;
+}
+
+.bg-image-2 {
+    background-image: url(https://d23mvtytxhuzbg.cloudfront.net/static/images/cover2.jpg);
+}
+
+
+/* CONTACT */
+
+#contact {
+    position: relative;
+    z-index: 2;
+}
+
+#contact::after {
+    content: "";
+    width: 100%;
+    height: 70%;
+    background: black;
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+#contact .form-control {
+    border-radius: 0;
+}
+
+#contact .form-control:focus {
+    box-shadow: none;
+    border-color: var(--c-brand);
+}
+
+
+/* FOOTER */
+
+footer {
+    padding-top: 120px;
+}
+
+.footer-top {
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-bottom {
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+footer li,
+footer p,
+footer a {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+footer .line {
+    width: 40px;
+    height: 4px;
+    background-color: var(--c-brand);
+    margin-top: 12px;
+    margin-bottom: 24px;
+}
+
+.social-icons a {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+}
+
+.social-icons a:hover {
+    background-color: var(--c-brand);
+    color: white;
+}

@@ -47,7 +47,7 @@ const FileUploader = ({ onFileSelect }) => {
   const handleUpload = () => {
     if (isFormFilled && selectedFile && profileName) {
       onFileSelect(selectedFile, profileName);
-      
+
       displayAlert("Upload successful", "success");
       // Optionally, reset the form here if needed
       setSelectedFile(null);
@@ -59,7 +59,7 @@ const FileUploader = ({ onFileSelect }) => {
     <div className={`file-uploader ${dragActive ? 'active' : ''}`}>
        <CustomTextField
                 fullWidth
-                label="Folder" 
+                label="Folder"
                 variant="outlined"
                 value={profileName}
                 onChange={(e) => setProfileName(e.target.value)}

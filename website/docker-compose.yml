@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '8000:8000'
+    environment:
+      CORESETTINGS_LOCAL_SETTINGS_PATH: 'local/settings.prod.py'

@@ -17,19 +17,19 @@ const UploadText = () => {
   const [text, setText] = useState(null);
 
 
-  
+
   const [profileName, setProfileName] = useState(null);
   const [fileName, setFileName] = useState(null);
   const [textFormat, setTextFormat] = useState("plain");
   const [isUploading, setIsUploading] = useState(false);
-  const [isFormFilled, setIsFormFilled] = useState(false); // 
+  const [isFormFilled, setIsFormFilled] = useState(false); //
 
   useEffect(() => {
     // Check if any field is either null or an empty string
     const checkFormFilled = profileName && fileName && text;
     setIsFormFilled(checkFormFilled);
   }, [profileName, fileName, text]); // React to changes in these states
-  
+
 
   const handleTextSubmit = async () => {
     const formData = new FormData();
@@ -72,7 +72,7 @@ const UploadText = () => {
 
   // ...
 
-  
+
   return (
     <div className="App" style={{ textAlign: 'left' }}>
       <div className="input-options-container mt-3">

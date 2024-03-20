@@ -113,7 +113,7 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
         }
     }, [appendResponse, editorState]);
 
-        
+
 
     useEffect(() => {
         // Save the editor state to localStorage whenever it changes
@@ -128,7 +128,7 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
 
 
 
-        
+
 
         return (
             <Editor
@@ -136,7 +136,7 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
                 onEditorStateChange={onEditorStateChange}
                 toolbarClassName="toolbarClassName"
                 wrapperClassName="wrapperClassName"
-                
+
             />
         );
         }

@@ -16,11 +16,10 @@ const withAuth = (WrappedComponent) => {
             }
         }, [isAuth, navigate]);  // Add dependencies to the useEffect hook
 
-        // Render the wrapped component if authenticated, 
+        // Render the wrapped component if authenticated,
         // or return null while waiting for useEffect to run
         return isAuth() ? <WrappedComponent {...props} /> : null;
     };
 };
 
 export default withAuth;
-

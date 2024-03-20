@@ -3,4 +3,3 @@ module.exports = {
       '@babel/preset-react',
     ],
   };
-  

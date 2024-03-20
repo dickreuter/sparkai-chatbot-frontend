@@ -61,7 +61,7 @@ const fetchFolderFilenames = async (folderName) => {
       { collection_name: folderName },
       { headers: { Authorization: `Bearer ${tokenRef.current}` } }
     );
-   
+
     setFolderContents({ ...folderContents, [folderName]: response.data });
   } catch (error) {
     console.error("Error fetching folder filenames:", error);

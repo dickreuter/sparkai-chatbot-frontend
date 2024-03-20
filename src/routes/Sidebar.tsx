@@ -38,17 +38,17 @@ const Sidebar = () => {
   }, []);
 
   const handleSidebarLinkClick = (anchorId) => {
-    
+
     handleGAEvent('Sidebar Navigation', 'Link Click', 'sidebar nav');
   };
 
   const handleOngoingSidebarLinkClick = (label) => {
-    
+
     handleGAEvent('Sidebar Navigation' , 'Ongoing Link Click', 'ongoing link nav');
-    
+
   };
 
-  
+
   const fetchBids = async () => {
     try {
       const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
@@ -60,7 +60,7 @@ const Sidebar = () => {
         });
       if (response.data && response.data.bids) {
         setBids(response.data.bids);
-       
+
       }
     } catch (error) {
       console.error("Error fetching bids:", error);
@@ -86,7 +86,7 @@ const Sidebar = () => {
     scrollToTop(e); // Pass the event to scrollToTop
     handleSidebarLinkClick(anchorId); // Call handleSidebarLinkClick with the anchorId
   };
-  
+
 
   return (
     <div className="sidebar">

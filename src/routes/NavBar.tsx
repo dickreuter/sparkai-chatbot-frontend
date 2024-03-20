@@ -31,7 +31,7 @@ const NavBar = () => {
     localStorage.removeItem('inputText');
     localStorage.removeItem('editorState');
     window.location.reload();
-    
+
 
   };
 

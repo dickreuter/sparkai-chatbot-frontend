@@ -3,8 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import "./SidebarSmall.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuthUser, useSignOut } from "react-auth-kit";
-import { 
-  faHome, 
+import {
+  faHome,
   faSignOutAlt ,
   faBookOpen,
   faLayerGroup,
@@ -14,8 +14,8 @@ import {
   faFileContract // Icon for proposals or contracts
 } from '@fortawesome/free-solid-svg-icons';
 
-const SideBarSmall = () => { 
- 
+const SideBarSmall = () => {
+
   const imageUrl = 'https://d23mvtytxhuzbg.cloudfront.net/static/images/mytender.io_badge_F-removebg-preview.png'; // Replace this URL with your image's direct link
 
   const location = useLocation(); // Hook to get the current location
@@ -26,7 +26,7 @@ const SideBarSmall = () => {
   return (
     <div className="sidebarsmall">
       {/* ...other links... */}
-      
+
       <Link to="/chatbot" className={`sidebarsmalllink ${isActive('/chatbot') ? 'sidebarsmalllink-active' : ''}`}>
         <FontAwesomeIcon icon={faFileContract} />
       </Link>
@@ -36,8 +36,8 @@ const SideBarSmall = () => {
       <Link to="/bids" className={`sidebarsmalllink ${isActive('/bids') ? 'sidebarsmalllink-active' : ''}`}>
         <FontAwesomeIcon icon={faLayerGroup} />
       </Link>
-      
-      
+
+
       <Link to="/login" onClick={signOut} className="sidebarsmalllink">
         <FontAwesomeIcon icon={faReply} />
       </Link>

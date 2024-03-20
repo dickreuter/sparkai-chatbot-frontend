@@ -9,14 +9,14 @@ import SideBar from '../routes/Sidebar.tsx' ;
 
 
 const Proposal = () => {
-  
+
     const [dataset, setDataset] = useState("default");
     const [inputText, setInputText] = useState("");
     const [response, setResponse] = useState("");
-  
+
     const [feedback, setFeedback] = useState("");
     const [questionAsked, setQuestionAsked] = useState(false);
-  
+
     const [appendResponse, setAppendResponse] = useState(false);
 
     const getAuth = useAuthUser();
@@ -44,17 +44,17 @@ const Proposal = () => {
         // Get the current content from localStorage
         const storedState = localStorage.getItem('editorContent');
         const contentState = storedState ? convertFromRaw(JSON.parse(storedState)) : EditorState.createEmpty().getCurrentContent();
-        
+
         // Create an updated editor state with the appended response
         const updatedContentState = Modifier.insertText(
             contentState,
             contentState.getSelectionAfter(),
             `\nQuestion: ${inputText}\nAnswer: ${response}\n`
         );
-        
+
         // Save the updated editor content to localStorage
         localStorage.setItem('editorContent', JSON.stringify(convertToRaw(updatedContentState)));
-        
+
         // Update the local state
         setEditorContent(JSON.stringify(convertToRaw(updatedContentState)));
     };
@@ -63,7 +63,7 @@ const Proposal = () => {
     return (
         <div id="proposal-page">
             <SideBar />
-            
+
             <div className="chat-container">
                 <h3 className="text-center mb-2 fw-bold">Text Editor</h3>
                 <div className="proposal-container">
@@ -72,7 +72,7 @@ const Proposal = () => {
                             <div className="d-flex justify-content-center mb-3">
                                 <CustomEditor response={response} appendResponse={appendResponse}/>
                             </div>
-                           
+
                         </Col>
                     </Row>
                 </div>

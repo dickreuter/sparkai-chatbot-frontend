@@ -10,10 +10,10 @@ ReactGA4.initialize("G-X8S1ZMRM3C");
 
 const Layout = () => {
   const location = useLocation();
-  
+
   // List of paths where the NavBar should be hidden
   const showNavBarPaths = ['/library', '/chatbot', '/bids', '/']; // Added '/login' to the array
- 
+
   // Check if the current path is in the list of paths to hide the NavBar
   const shouldShowNavBar = showNavBarPaths.includes(location.pathname);
 

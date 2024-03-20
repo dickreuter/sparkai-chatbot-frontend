@@ -25,7 +25,7 @@ const FullScreenTwoCards = () => {
 
     // Use custom hook for signing in
     const { success, message } = await submitSignIn(formData);
-    
+
     setSnackbarMessage(message);
     setSnackbarSeverity(success ? 'success' : 'error');
     setSnackbarOpen(true);
@@ -34,13 +34,13 @@ const FullScreenTwoCards = () => {
 
   return (
     <div className="cards-container text-center">
-     
-       
-         
+
+
+
             <div className="cardmini">
                 <div className="cardmini-text">
                   <h2>Login</h2>
-                
+
                 <div className="input-field">
                   <TextField
                     fullWidth
@@ -85,10 +85,10 @@ const FullScreenTwoCards = () => {
                 <AuthState />
 
 
-          
+
           </div>
         </div>
-   
+
   );
 };
 export default FullScreenTwoCards;

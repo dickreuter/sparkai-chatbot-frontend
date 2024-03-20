@@ -10,7 +10,7 @@ import "./Chatbot.css";
 import FolderLogic from "../components/Folders";
 import CustomEditor from "../components/TextEditor.tsx";
 import TemplateLoader from "../components/TemplateLoader.tsx";
-import SideBar from '../routes/Sidebar.tsx' 
+import SideBar from '../routes/Sidebar.tsx'
 import { useLocation } from 'react-router-dom';
 import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-js';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
@@ -59,56 +59,56 @@ const Chatbot = () => {
     const handleDatasetChange = (e) => {
         const newDataset = e.target.value;
         setDataset(newDataset); // Update the state with the new dataset value
-    
-        
+
+
         handleGAEvent('Chatbot', 'Dataset Selection', 'Select Dataset Button');
       };
 
     const handleFunctionChange = (e) => {
         const newChoice = e.target.value;
         setChoice(newChoice); // Update the state with the new choice
-      
-       
+
+
         handleGAEvent('Chatbot', 'Function Selection', 'Select Function Button');
     };
-      
+
       // Broadness dropdown onChange handler
     const handleBroadnessChange = (e) => {
         const newBroadness = e.target.value;
         setBroadness(newBroadness); // Update the state with the new broadness level
-      
-        
+
+
         handleGAEvent('Chatbot', 'Broadness Selection', 'Select Broadness Button');
     };
-      
+
 
     const handleAppendResponseToEditor = () => {
         handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
-        const uniqueId = Date.now(); 
-        setAppendResponse({ 
+        const uniqueId = Date.now();
+        setAppendResponse({
             id: uniqueId, // Unique identifier for each append action
-            question: inputText, 
-            answer: response 
+            question: inputText,
+            answer: response
         });
     };
-    
+
 
     const handleSelect = (selectedKey) => {
         setResponse(selectedKey);
         handleGAEvent('Chatbot', 'Select', 'Template Select Button');
-        
+
     };
     const countWords = (str) => {
         return str.split(/\s+/).filter(Boolean).length;
     };
 
-  
+
     const [isSaved, setIsSaved] = useState(false);
 
-    
+
     const saveProposal = async () => {
-       
-    
+
+
         // Retrieve the saved editor state from local storage
         handleGAEvent('Chatbot', 'Save Proposal', 'Save Proposal Button');
         const savedData = localStorage.getItem('editorState');
@@ -125,7 +125,7 @@ const Chatbot = () => {
         formData.append('contract_information', backgroundInfo);
 
 
-    
+
         try {
             const result = await axios.post(
                 `http${HTTP_PREFIX}://${API_URL}/upload_bids`,
@@ -133,41 +133,41 @@ const Chatbot = () => {
                 {
                     headers: {
                         'Authorization': `Bearer ${tokenRef.current}`,
-                        'Content-Type': 'multipart/form-data', 
+                        'Content-Type': 'multipart/form-data',
                     },
                 }
             );
-    
-       
+
+
             setIsSaved(true);
             setTimeout(() => setIsSaved(false), 3000); // Reset after 3 seconds
         } catch (error) {
             console.error("Error saving proposal:", error);
             setResponse(error.message);
         }
-    
+
     };
-    
+
     const location = useLocation();
-    const bidData = location.state?.bid || ''; 
+    const bidData = location.state?.bid || '';
 
     useEffect(() => {
 
-        
+
         const navigatedFromBidsTable = localStorage.getItem('navigatedFromBidsTable');
         //console.log(navigatedFromBidsTable)
-  
+
         if (navigatedFromBidsTable === 'true' && location.state?.fromBidsTable && bidData) {
             //console.log("Navigated from bids table with bid data:", bidData);
-        
+
             // Indicate that data has been loaded from navigation
-         
+
             // Update form states with data from navigation or provide default values
             setBidInfo(bidData?.bid_title || '');
             setBackgroundInfo(bidData?.contract_information || '');
             setInputText('');
             setResponse('');
-        
+
             // Update local storage to match the navigation data
             localStorage.setItem('bidInfo', bidData?.bid_title || '');
             localStorage.setItem('backgroundInfo', bidData?.contract_information || '');
@@ -175,19 +175,19 @@ const Chatbot = () => {
             localStorage.setItem('response', '');
 
             localStorage.setItem('navigatedFromBidsTable', 'false');
-            
+
             localStorage.getItem('bidInfo') || '';
             localStorage.getItem('backgroundInfo') || '';
             localStorage.getItem('inputText') || '';
             localStorage.getItem('response') || '';
-        
+
             // Handle editor state from bidData, if available
             try {
                 if (bidData?.text) {
                     const contentState = ContentState.createFromText(bidData.text);
                     const newEditorState = EditorState.createWithContent(contentState);
                     localStorage.setItem('editorState', JSON.stringify(convertToRaw(newEditorState.getCurrentContent())));
-                
+
                 }
             } catch (error) {
                 console.error("Error processing editor state:", error);
@@ -195,12 +195,12 @@ const Chatbot = () => {
         } else {
             //console.log("Loading data from local storage or post-edit");
             // Function to load data from local storage
-            
-           
+
+
         }
     }, [location, bidData]);
-    
-    
+
+
 
     // Update local storage and handle session flag on form changes
     useEffect(() => {
@@ -209,10 +209,10 @@ const Chatbot = () => {
         localStorage.setItem('inputText', inputText);
         localStorage.setItem('response', response);
       }, [bidInfo, backgroundInfo, inputText, response]);
-    
-  
-      
-  
+
+
+
+
 
     useEffect(() => {
         let interval = null;
@@ -232,7 +232,7 @@ const Chatbot = () => {
         setQuestionAsked(questionStatus);
     }, []);
 
-   
+
     useEffect(() => {
         // Check if there is a hash in the URL
         if (location.hash) {
@@ -241,15 +241,15 @@ const Chatbot = () => {
           if (element) {
             // Scroll to the element with options
             element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      
-            
+
+
           }
         }
       }, [location]); // Re-run the effect if the location changes
-      
+
 
     const handleTextHighlight = async () => {
-        
+
         const selectedText = window.getSelection().toString();
         if (selectedText) {
             // Add a confirmation popup
@@ -271,7 +271,7 @@ const Chatbot = () => {
         }
     };
 
-    
+
 
     const submitFeedback = async () => {
         handleGAEvent('Chatbot', 'Submit Feedback', 'Submit Feedback Button');
@@ -409,7 +409,7 @@ const Chatbot = () => {
         );
     };
 
- 
+
 
     const submitSelections = async () => {
         setIsLoading(true);
@@ -445,17 +445,17 @@ const Chatbot = () => {
         <div id="chatbot-page">
             <SideBarSmall />
             <SideBar/>
-        
-            
+
+
           <div className="chatbot-container">
-    
+
                 <h1 className='heavy'>New Bid</h1>
-                
+
                 <div className="library-container mt-4">
 
                 <section id="bidinfo">
-                        
-                        
+
+
                     <Row >
                         <Col md={6}>
                                     {/* Need to add Bid Name field*/}
@@ -466,12 +466,12 @@ const Chatbot = () => {
                                         className="bid-name-input"
                                         value={bidInfo}
                                         onChange={(e) => setBidInfo(e.target.value)}
-                                        
+
                                     />
                                 </Form.Group>
 
                                 {" "}
-                                {/* New column for background information 
+                                {/* New column for background information
                                 used to be Additional instructions (optional)*/}
                                 <Form.Group className="mb-3">
                                     <Form.Label className="custom-label" >Contract Information</Form.Label>
@@ -531,10 +531,10 @@ const Chatbot = () => {
                                     </Form.Group>
                                 </div>
                         </Col>
-                            
+
                     </Row>
                 </section>
-                  
+
                     <section id="inputquestion">
                     <Row
                         className="justify-content-md-center mt-4"
@@ -549,7 +549,7 @@ const Chatbot = () => {
                         />
                     </Row>
 
-                
+
                     <Row className="justify-content-md-center">
                         <Col md={12}>
                             {" "}
@@ -566,25 +566,25 @@ const Chatbot = () => {
                                     Word Count: {inputText.split(/\s+/).filter(Boolean).length}
                                 </Form.Text>
                             </Form.Group>
-                            <Button 
+                            <Button
                                 onClick={sendQuestion}
                                 className="upload-button mt-2"
                             >
                                 Submit
                             </Button>
-                            
-                           
-                           
+
+
+
                         </Col>
-                        
-                        
-                        
-                    
+
+
+
+
                     </Row>
                     <Row>
                     <div className="mb-3" style={{textAlign: "left"}}>
 
-                       
+
                         {isLoading && (
                             <div className="my-3">
                                 <Spinner animation="border"/>
@@ -606,12 +606,12 @@ const Chatbot = () => {
                         )}
                         </div>
                     </Row>
-                   
+
                 </section>
                 <section id="response">
                     <Row className="justify-content-md-center mt-3">
                         <Col md={12}>
-                            
+
                             <Form.Group className="mb-3 d-flex justify-content-between align-items-center">
                                 <Form.Label className="custom-label mb-0">Response:</Form.Label>
                                 <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
@@ -626,7 +626,7 @@ const Chatbot = () => {
                             <Form.Text className="text-muted">
                                 Word Count: {countWords(response)}
                             </Form.Text>
-                           
+
                         </Col>
                         <div>
                         <Button className="upload-button mt-2" onClick={handleAppendResponseToEditor}>
@@ -634,10 +634,10 @@ const Chatbot = () => {
                                 {/* down arrow */}
                             </Button>
                         </div>
-                        
-                                            
+
+
                    {/*
-                   
+
                         <Col md={4}>
                         <div className="container">
                         <button >Copilot button</button>
@@ -652,14 +652,14 @@ const Chatbot = () => {
                         </div>
 
                         </Col>
-                                            */} 
+                                            */}
                     </Row>
                 </section>
                 <section id="proposal">
-                
-                
+
+
                 <div className="proposal-header mb-3">
-                   
+
                     <h3 className="custom-label mt-5">Proposal Editor</h3>
                 </div>
                 <div className="proposal-container">
@@ -673,11 +673,11 @@ const Chatbot = () => {
                                     navigatedFromBidsTable={localStorage.getItem('navigatedFromBidsTable') === 'true'}
                                     toolbarClassName="toolbarClassName"
                                     wrapperClassName="wrapperClassName"
-                                
+
                                 />
                                 </div>
                             </Col>
-                            
+
                         </Row>
 
                 </div>
@@ -695,8 +695,8 @@ const Chatbot = () => {
 
                             </div>
                 </Row>
-                
-                   
+
+
                     <Row className="mt-5">
                         <Col md={12}>
                         <Form.Group className="mb-3">
@@ -723,16 +723,16 @@ const Chatbot = () => {
                                 </Button>
                             </div>
                             <div className="d-flex">
-                                
-                            </div>
-                            
-                        </Col>
-                        
-                    </Row>
-                 
 
-                 
-               
+                            </div>
+
+                        </Col>
+
+                    </Row>
+
+
+
+
             </div>
             </div>
         </div>

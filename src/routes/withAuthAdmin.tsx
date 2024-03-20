@@ -12,7 +12,7 @@ const withAuthAdmin = (WrappedComponent) => {
         const auth = getAuth();
         const tokenRef = useRef(auth?.token || 'default');
         const email = auth?.email || 'default';
-        
+
 
         useEffect(() => {
             // Check if user is authenticated
@@ -22,11 +22,10 @@ const withAuthAdmin = (WrappedComponent) => {
             }
         }, [isAuth, navigate]);  // Add dependencies to the useEffect hook
 
-        // Render the wrapped component if authenticated, 
+        // Render the wrapped component if authenticated,
         // or return null while waiting for useEffect to run
         return isAuth() ? <WrappedComponent {...props} /> : null;
     };
 };
 
 export default withAuthAdmin;
-

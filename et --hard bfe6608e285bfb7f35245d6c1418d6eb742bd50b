@@ -28,15 +28,15 @@ Author: okk0 <66914194+okk0@users.noreply.github.com>
 Date:   Sun Feb 11 20:41:09 2024 +0000
 
     Feedbacksection (#36)
-    
+
     * feedback started
-    
+
     * used local storage to maintain state
-    
+
     * made questionasked persist so users can give feedback
-    
+
     * more local storage persistence + made changes to nav based on samuel and jamie feeback
-    
+
     * minor visual changes
 
 [33mcommit 477dc18b1e14733d0987f6155d6071bb42a71bdb[m
@@ -74,49 +74,49 @@ Author: okk0 <66914194+okk0@users.noreply.github.com>
 Date:   Sat Feb 10 21:01:36 2024 +0000
 
     Layout changes
-    
+
     * initial commit
-    
+
     * login page done
-    
+
     * sidebar
-    
+
     * button
-    
+
     * added upload to library section
-    
+
     * initial commit
-    
+
     * login page done
-    
+
     * sidebar
-    
+
     * button
-    
+
     * added upload to library section
-    
+
     * login page done
-    
+
     * login page done
-    
+
     * nav
-    
+
     * login page done
-    
+
     * nav
-    
+
     * chatbot
-    
+
     * sidebar
-    
+
     * button
-    
+
     * added upload to library section
-    
+
     * chatbot
-    
+
     * styling chatbot page
-    
+
     * layout for bid creation section
 
 [33mcommit d70d798fe6094a5790dcbc214ffae473f0b944bd[m
@@ -136,45 +136,45 @@ Author: okk0 <66914194+okk0@users.noreply.github.com>
 Date:   Sat Feb 10 13:17:12 2024 +0000
 
     Newfeatures (#34)
-    
+
     * initial commit
-    
+
     * login page done
-    
+
     * sidebar
-    
+
     * button
-    
+
     * added upload to library section
-    
+
     * initial commit
-    
+
     * login page done
-    
+
     * sidebar
-    
+
     * button
-    
+
     * added upload to library section
-    
+
     * login page done
-    
+
     * login page done
-    
+
     * nav
-    
+
     * login page done
-    
+
     * nav
-    
+
     * chatbot
-    
+
     * sidebar
-    
+
     * button
-    
+
     * added upload to library section
-    
+
     * chatbot
 
 [33mcommit 5596f33c5041ec0d5cfe0bdec0e234d20fa472a9[m
@@ -182,37 +182,37 @@ Author: okk0 <66914194+okk0@users.noreply.github.com>
 Date:   Sat Feb 10 13:09:27 2024 +0000
 
     Newfeatures (#33)
-    
+
     * initial commit
-    
+
     * login page done
-    
+
     * sidebar
-    
+
     * button
-    
+
     * added upload to library section
-    
+
     * initial commit
-    
+
     * login page done
-    
+
     * sidebar
-    
+
     * button
-    
+
     * added upload to library section
-    
+
     * login page done
-    
+
     * login page done
-    
+
     * nav
-    
+
     * login page done
-    
+
     * nav
-    
+
     * chatbot
 
 [33mcommit d330b8bf3a76b290679c025b45ad0a7bb7804519[m
@@ -346,7 +346,7 @@ Author: okk0 <66914194+okk0@users.noreply.github.com>
 Date:   Sat Dec 23 23:05:26 2023 +0000
 
     Alex (#15)
-    
+
     * first comm
     * Alex login page and navbar
     * minor visual changes

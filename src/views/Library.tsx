@@ -11,7 +11,7 @@ import "./Library.css";
 import UploadTemplateText from '../components/UploadTemplateText';
 import Tooltip from "@mui/material/Tooltip";
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
-import SideBar from '../routes/Sidebar.tsx'; 
+import SideBar from '../routes/Sidebar.tsx';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import NavBar from '../routes/NavBar';
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
@@ -63,7 +63,7 @@ const UploadPdfModal = () => (
     <Modal.Body>
       <UploadPDF /> {/* Your UploadPDF component here */}
     </Modal.Body>
-    
+
   </Modal>
 );
 // Modal component to display file content
@@ -75,7 +75,7 @@ const FileContentModal = () => (
     <Modal.Body>
       <pre style={{ textAlign: 'center' }}>{modalContent}</pre> {/* Centered text */}
     </Modal.Body>
-    
+
   </Modal>
 );
 
@@ -156,14 +156,14 @@ useEffect(() => {
 return (
       <div id="chatbot-page">
         <SideBarSmall />
-        
-    
+
+
           <div className="lib-container">
-    
+
                 <h1  className='heavy'>Company Library</h1>
-                
+
                 <div className="library-container mt-4">
-                
+
 
 
                   <Row>
@@ -172,8 +172,8 @@ return (
                     <Card.Body>
                       <div className="header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h1 className="lib-custom-card-title">Resources</h1>
-                        <Button 
-                          className="upload-button" 
+                        <Button
+                          className="upload-button"
                           onClick={() => {
                             setShowUploadPdfModal(true);
                             handleGAEvent('Library', 'Upload PDF', 'Upload PDF Button');
@@ -220,7 +220,7 @@ return (
                     </Card>
                   </Col>
                   </Row>
-                   
+
                     <Row>
                       <Col md={12}>
                           <Card className="lib-custom-card mt-4">
@@ -229,7 +229,7 @@ return (
                               <UploadText />
                             </Card.Body>
                           </Card>
-                        
+
                       </Col>
                     </Row>
                     <Row>
@@ -244,18 +244,18 @@ return (
                         </div>
                       </Col>
                     </Row>
-                  
-                   
-                  
-                   
-                        
+
+
+
+
+
 
                 </div>
                 <FileContentModal />
-               
-               
+
+
           </div>
-        
+
       </div>
 
   );

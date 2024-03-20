@@ -17,15 +17,15 @@ const UploadTemplateText = () => {
     const [profileName, setProfileName] = useState(null);
     const [textFormat, setTextFormat] = useState("plain");
     const [isUploading, setIsUploading] = useState(false);
-    const [isFormFilled, setIsFormFilled] = useState(false); // 
+    const [isFormFilled, setIsFormFilled] = useState(false); //
 
     useEffect(() => {
       // Check if any field is either null or an empty string
       const checkFormFilled = profileName && text;
       setIsFormFilled(checkFormFilled);
     }, [profileName, text]); // React to changes in these states
-    
-  
+
+
     const handleTextSubmit = async () => {
 
 
@@ -68,7 +68,7 @@ const UploadTemplateText = () => {
 
     return (
         <div className="App" style={{ textAlign: "left" }}>
-    
+
           <div className="input-options-container mt-3">
             <CustomTextField
               fullWidth
@@ -77,10 +77,10 @@ const UploadTemplateText = () => {
               value={profileName}
               className="uploader-input"
               onChange={(e) => setProfileName(e.target.value)}
-              
+
             />
-          
-          
+
+
             <TextField
               fullWidth
               label="Paste Template Material Here..."
@@ -91,18 +91,18 @@ const UploadTemplateText = () => {
               onChange={(e) => setText(e.target.value)}
               sx={{
                 '& .MuiOutlinedInput-root': { // Target the root of the outlined input
-                
+
                   fontFamily: '"ClashDisplay", sans-serif', // Apply font family
-                
-      
+
+
                 },
                 '& .MuiInputLabel-root': { // Target the label of the TextField
                   fontFamily: '"ClashDisplay", sans-serif', // Apply font family to the label
                 }
               }}
             />
-            
-         
+
+
           <button
             onClick={handleTextSubmit}
             disabled={!isFormFilled}

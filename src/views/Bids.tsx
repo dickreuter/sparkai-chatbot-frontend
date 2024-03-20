@@ -24,16 +24,16 @@ const Bids = () => {
     // Encapsulate the bid-fetching logic into its own function
     const fetchBids = async () => {
         try {
-            const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_bids_list/`, 
-            {}, {  
+            const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
+            {}, {
                 headers: {
                     Authorization: `Bearer ${tokenRef.current}`,
                 },
             });
             if (response.data && response.data.bids) {
                 setBids(response.data.bids);
-               
-            }   
+
+            }
         } catch (error) {
             console.error("Error fetching bids:", error);
         }
@@ -58,7 +58,7 @@ const Bids = () => {
                     },
                 }
             );
-          
+
             fetchBids(); // Refetch bids after successful deletion
             handleGAEvent('Bid Tracker', 'Delete Bid', 'Delete Bid Button');
         } catch (error) {
@@ -71,7 +71,7 @@ const Bids = () => {
             const formData = new FormData();
             formData.append('bid_title', bidTitle);
             formData.append('status', newStatus);
-    
+
             await axios.post(`http${HTTP_PREFIX}://${API_URL}/update_bid_status/`,
                 formData, {
                     headers: {
@@ -79,27 +79,27 @@ const Bids = () => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-       
-    
+
+
             // Optimistically update the local state
             handleGAEvent('Bid Tracker', 'Change Bid Status', 'Bid Status Dropdown');
             setTimeout(fetchBids, 500);
-            
+
         } catch (error) {
             console.error("Error updating bid status:", error);
             // Optionally revert the optimistic update in case of error
             // fetchBids();
         }
     };
-    
-    
-    
+
+
+
 
     return (
         <div id="chatbot-page">
             <SideBarSmall />
-            
-        
+
+
             <div className="lib-container">
                 <h1 className='heavy'>Bid Tracker</h1>
                 <table className="bids-table mt-4">
@@ -108,7 +108,7 @@ const Bids = () => {
                             <th>Bid Title</th>
                             <th>Last edited</th>
                             <th>Status</th>
-                        
+
                             <th>Delete Bid</th>
                         </tr>
                     </thead>

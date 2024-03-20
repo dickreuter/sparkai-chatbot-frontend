@@ -16,8 +16,8 @@ const Log = () => {
     const fetchLogs = async () => {
       try {
         setIsLoading(true); // Start loading
-        const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_log/`, 
-        {}, {  
+        const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_log/`,
+        {}, {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`,
           },

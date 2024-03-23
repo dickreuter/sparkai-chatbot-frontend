@@ -1,0 +1,15 @@
+[flake8]
+ignore = C101,D403,F403,F405,I100,I201,W503,W504,W391, E302, W292, E265
+exclude =
+    .git,
+    __pycache__,
+    myenv
+filename = *.py
+accept-encodings = utf-8
+inline-quotes = single
+max-complexity = 12
+max-line-number = 500
+max-line-length = 119
+multiline-quotes = double
+per-file-ignores =
+    mytenderweb/project/settings/templates/settings.dev.py:F821

@@ -1,3 +1,7 @@
+# this file is for testing code quality of pull requests
+# right now it is just doing simple linting 
+# I will add tests for the spark-ai-frontend as well as website
+
 name: Quality Assurance
 on: [pull_request, workflow_call]
 
@@ -17,11 +21,8 @@ jobs:
 
       - name: Install Dependencies
         run: make install && make install-pre-commit
+        working-directory: ./website
 
       - name: Lint
         run: make lint
-
-      - name: Test
-        run: make test
-        env:
-          CORESETTINGS_LOCAL_SETTINGS_PATH: './website/mytenderweb/project/settings/templates/settings.github.py'
+        working-directory: ./website

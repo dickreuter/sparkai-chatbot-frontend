@@ -1,5 +1,5 @@
 # this file is for testing code quality of pull requests
-# right now it is just doing simple linting 
+# right now it is just doing simple linting
 # I will add tests for the spark-ai-frontend as well as website
 
 name: Quality Assurance

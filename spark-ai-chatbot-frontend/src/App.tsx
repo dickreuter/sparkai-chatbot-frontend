@@ -2,9 +2,11 @@ import React from 'react';
 import { AuthProvider } from 'react-auth-kit';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import './App.css';
+import './resources/clash-display.css';
 import NavBar from './routes/NavBar';
 import Routing from './routes/Routing';
 import ReactGA4 from "react-ga4";
+
 
 ReactGA4.initialize("G-X8S1ZMRM3C");
 

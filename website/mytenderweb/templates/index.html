@@ -5,7 +5,7 @@
 {% block content %}
 
 
-<section id="hero" class="d-flex align-items-center min-vh-100" style="background-image: url('{% static 'images/6436987_3293275.jpg' %}'); background-size: cover; background-position: center;">
+<section id="hero" class="d-flex align-items-center min-vh-100" style="background-image: url('{% static 'images/hero.jpg' %}'); background-size: cover; background-position: center;">
     <div class="container" style="margin-bottom: 35px; margin-top: -10%;">
         <div class="row">
             <div class="col-md-6">
@@ -93,9 +93,9 @@
                         <div class="iconbox">
                             <i class="ri-pen-nib-fill"></i>
                         </div>
-                        <h5 class="mt-4 mb-3">Data-Driven Market Research</h5>
+                        <h5 class="mt-4 mb-3">IT Services</h5>
                         <p>Utilising a 175 billion parameter model to build unparalleled market landscapes and projections.</p>
-                        <a href="{% url 'marketresearch' %}" class="btn btn-brand me-2">Learn More</a>
+                        <a href="{% url 'ITservices' %}" class="btn btn-brand me-2">Learn More</a>
 
                     </div>
                 </div>
@@ -106,10 +106,10 @@
                         <div class="iconbox">
                             <i class="ri-hand-coin-fill"></i> <!-- Icon Placeholder -->
                         </div>
-                        <h5 class="mt-4 mb-3">AI Procurement&nbsp;<br>Services</h5>
+                        <h5 class="mt-4 mb-3">Financial Services</h5>
                         <p class="mt-1">AI-Tender writer which will create bid-winning proposals in minutes.</p>
 
-                        <a href="{% url 'procurement' %}" class="btn btn-brand me-2">Learn More</a>
+                        <a href="{% url 'financialservices' %}" class="btn btn-brand me-2">Learn More</a>
                     </div>
                 </div>
 
@@ -119,10 +119,10 @@
                         <div class="iconbox">
                             <i class="ri-bar-chart-box-fill"></i> <!-- Icon Placeholder -->
                         </div>
-                        <h5 class="mt-4 mb-3">Business Intelligence</h5>
+                        <h5 class="mt-4 mb-3"> Facility Management and Construction </h5>
                         <p>Simplifying complex data sets. Maximise the insights of your collected data.</p>
 
-                        <a href="{% url 'businessintel' %}" class="btn btn-brand me-2">Learn More</a>
+                        <a href="{% url 'facilitymanagement' %}" class="btn btn-brand me-2">Learn More</a>
                     </div>
                 </div>
 
@@ -132,7 +132,7 @@
                         <div class="iconbox">
                             <i class="ri-brush-fill"></i> <!-- Icon Placeholder -->
                         </div>
-                        <h5 class="mt-4 mb-3">Language Engines</h5>
+                        <h5 class="mt-4 mb-3">Healthcare and Pharmaceuticals</h5>
                         <p>Creating custom Large Language Models designed to serve your business.</p>
                         <a href="{% url 'languageengines' %}" class="btn btn-brand me-2">Learn More</a>
 
@@ -262,7 +262,7 @@
                  <div class="row">
                     <div class="col-lg-4" data-aos="fade-up">
                         <div class="blog-post bg-light rounded">
-                            <img class= "rounded-top" src="https://d23mvtytxhuzbg.cloudfront.net/static/images/blog-post-1.jpg" alt="">
+                            <img class="rounded-top" src="{% static 'images/blog-post-1.jpg' %}" alt="">
                             <div class="blog-post-content p-4  d-flex flex-column">
                                 <h5 class="title">Artificial Intelligence (AI) in 2024: Transforming Businesses and Beyond
                                 </h5>
@@ -274,7 +274,7 @@
                     </div>
                     <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
                         <div class="blog-post bg-light rounded">
-                            <img class= "rounded-top" src="https://d23mvtytxhuzbg.cloudfront.net/static/images/blog-post-2.jpg" alt="">
+                            <img class= "rounded-top" src="{% static 'images/blog-post-2.jpg' %}" alt="">
                             <div class="blog-post-content p-4  d-flex flex-column">
                                 <h5 class="title">An Introduction to Corporate AI: How is AI Leveraged in Modern Businesses? </h5>
                                 <p class="my-3">AI in the corporate world, exemplified by Amazon's supply chain optimization and Netflix's personalization, has revolutionized business models by enhancing efficiency, customer experience, and operational strategies. </p> &nbsp;
@@ -284,7 +284,7 @@
                     </div>
                     <div class="col-lg-4" data-aos="fade-up" data-aos-delay="600">
                         <div class="blog-post bg-light rounded">
-                            <img class= "rounded-top" src="https://d23mvtytxhuzbg.cloudfront.net/static/images/blog-post-3.jpg" alt="">
+                            <img class= "rounded-top" src="{% static 'images/blog-post-3.jpg' %}" alt="">
                             <div class="blog-post-content p-4  d-flex flex-column">
                                 <h5 class="title">Story of Spark AI: Pioneering AI Innovations from Academia to Industry</h5>
                                 <p class="my-3">Originating from the University of Southampton, Spark AI has risen as a pivotal force in the AI industry, transforming business efficiency and success with its expertise and unwavering commitment to quality, integrity, and security.</p>

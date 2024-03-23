@@ -19,7 +19,7 @@ SECRET_KEY = NotImplemented
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['arbvantagefba.com', '127.0.0.1']
+ALLOWED_HOSTS = ['mytender.io', '127.0.0.1']
 import os.path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent

@@ -7,11 +7,10 @@ if IN_DOCKER or os.path.isfile('/.dockerenv'):  # type: ignore # noqa: F821
     ]
 
     MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')  # type: ignore # noqa: F821
-    #DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    #STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    
 
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'mytenderweb\static')
 
-print(STATIC_ROOT)
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'

@@ -19,17 +19,15 @@ SECRET_KEY = NotImplemented
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['arbvantagefba.com', '127.0.0.1']
+ALLOWED_HOSTS = ['mytender.io', '127.0.0.1']
+import os.path
 
-
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
-APPS_DIR = ROOT_DIR / "mytenderweb"
-
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes', 'django.contrib.sessions',
-    'django.contrib.messages', 'django.contrib.staticfiles', 'storages'
+    'django.contrib.messages', 'django.contrib.staticfiles', 'storages', 'mytenderweb',
 ]
 
 MIDDLEWARE = [
@@ -44,11 +42,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'mytenderweb.project.urls'
 
-print(APPS_DIR)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -60,9 +57,6 @@ TEMPLATES = [
         },
     },
 ]
-print(str(APPS_DIR / "templates"))
-
-TEMPLATES[0]["OPTIONS"]["debug"] = True
 
 WSGI_APPLICATION = 'mytenderweb.project.wsgi.application'
 

@@ -100,7 +100,7 @@ img {
 .navbar-brand:before {
     content: '';
     display: inline-block;
-    background: url(https://d23mvtytxhuzbg.cloudfront.net/static/images/mytender.io_badge_F-removebg-preview.png) no-repeat center center;
+    background: url('../images/mytender.io_badge.png') no-repeat center center;
     background-size: contain;
     /* Adjust as needed */
     width: 50px;
@@ -163,7 +163,7 @@ img {
     right: 0;
     bottom: 0;
     left: 0;
-    background: linear-gradient(rgba(var(--c-brand-rgb), 0.2), rgba(var(--c-brand-rgb), 0.1)), url('../images/6436987_3293275.jpg');
+    background: linear-gradient(rgba(var(--c-brand-rgb), 0.2), rgba(var(--c-brand-rgb), 0.1)), url('../images/hero.jpg');
     background-position: center;
     background-size: cover;
     transform: scaleX(-1);
@@ -463,10 +463,6 @@ img {
 
 .blog-post .title {
     line-height: 1.4;
-}
-
-.bg-image-2 {
-    background-image: url(https://d23mvtytxhuzbg.cloudfront.net/static/images/cover2.jpg);
 }
 
 

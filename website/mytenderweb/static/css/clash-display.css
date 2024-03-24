@@ -31,7 +31,7 @@
 
 @font-face {
     font-family: 'ClashDisplay';
-    src: url('https://d23mvtytxhuzbg.cloudfront.net/static/fonts/ClashDisplay-Variable.ttf') format('truetype');
+    src: url('../fonts/ClashDisplay-Variable.ttf') format('truetype');
     font-weight: 200 700;
     font-display: swap;
     font-style: normal;

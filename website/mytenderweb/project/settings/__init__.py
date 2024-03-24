@@ -4,9 +4,6 @@ from pathlib import Path
 from split_settings.tools import include, optional
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
-print("base")
-print(BASE_DIR)
-# Namespacing our own custom environment variables
 ENVVAR_SETTINGS_PREFIX = 'CORESETTINGS_'
 
 LOCAL_SETTINGS_PATH = os.getenv(f'{ENVVAR_SETTINGS_PREFIX}LOCAL_SETTINGS_PATH')

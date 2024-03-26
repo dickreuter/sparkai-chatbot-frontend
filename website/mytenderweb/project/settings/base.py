@@ -19,7 +19,7 @@ SECRET_KEY = NotImplemented
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['mytender.io', '127.0.0.1']
+ALLOWED_HOSTS = ['mytender.io', 'www.mytender.io', '127.0.0.1']
 import os.path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
@@ -108,3 +108,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-relay.gmail.com'  # Your email provider SMTP server
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587  # or another port that your email provider uses
+

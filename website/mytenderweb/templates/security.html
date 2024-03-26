@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}  {% endblock %}
+{% load static %}
+
+{% block content %}
+
+
+
+<section id="about" class="section-padding">
+    <div class="container">
+        <div class="row mb-0">
+            <div class="col-12 text-center"   >
+                <div class="section-title">
+                    <h1 class="display-4 fw-semibold">Software Security</h1>
+                    <div class="line" ></div>
+                    <p>We provide organisations with a secure environment to develop tenders and bids, without the risk of sensitive data exposure to third parties.</p>
+
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row justify-content-between align-items-center" style="font-size: 18px;">
+          
+
+            
+
+            <p><strong>Secure Infrastructure:</strong> mytender.io operates on Amazon's secure and reliable cloud infrastructure. AWS is trusted by governments and leading organisations worldwide for its robust security measures.</p>
+
+            <p><strong>Encryption at Rest and In Transit:</strong> Data is encrypted at rest using AES-256 encryption, both within EBS volumes and snapshots. In transit, data is encrypted using TLS 1.2 or higher protocols. </p>
+
+            <p><strong>Access Control:</strong> Granular access controls ensure only authorised users can access your bid data. You can define user permissions and roles to manage access levels within your team.</p>
+
+            <p><strong>Compliance:</strong> AWS adheres to a wide range of industry compliance standards, including HIPAA, PCI DSS, and GDPR. This ensures your data is handled according to the most stringent security regulations.</p>
+
+            <p><strong>Virtual Private Cloud (VPC):</strong> mytender.io utilises a unique Virtual Private Cloud (VPC) for each client. A VPC acts as a secure and isolated network environment for your bid data, further segregating it from other services and public traffic.</p>
+
+            <p><strong>Secure Data Transfer:</strong> Data transfer with open-source intelligence or the internet is strictly limited. mytender.io prioritises secure methods for data exchange. This can include:</p>
+
+            <p><strong>S3 Buckets with Private Access:</strong> Uploading and downloading data can occur through private S3 buckets, which restrict access only to authorised users and applications.</p>
+
+            <p><strong>Secure File Transfer Protocols:</strong> Protocols like SCP or FTPS can be used for secure file transfer, ensuring encryption during data movement.</p>
+
+            
+
+        </div>
+    </div>
+</section>
+
+
+
+
+
+{% endblock content %}

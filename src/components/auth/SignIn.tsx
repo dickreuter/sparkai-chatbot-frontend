@@ -33,42 +33,42 @@ const FullScreenTwoCards = () => {
 
 
   return (
-    <div className="cards-container text-center">
+    <div className="cards-container">
 
 
 
-            <div className="cardmini">
+          <div className="cardmini">
                 <div className="cardmini-text">
-                  <h2>Login</h2>
+                    <h2>Login</h2>
 
-                <div className="input-field">
-                  <TextField
-                    fullWidth
-                    label="Enter your account number"
-                    variant="outlined"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  />
-                </div>
-                <div className="input-field">
-                  <TextField
-                    fullWidth
-                    label="Password"
-                    variant="outlined"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  />
-                </div>
-                <Button
-                  className="login-button"
-                  variant="contained"
-                  onClick={onSubmit}
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Loading...' : 'Login'}
-                </Button>
-                <p>Forgot your password?</p>
+                    <div className="input-field">
+                      <TextField
+                        fullWidth
+                        label="Enter your account number"
+                        variant="outlined"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      />
+                    </div>
+                    <div className="input-field">
+                      <TextField
+                        fullWidth
+                        label="Password"
+                        variant="outlined"
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      />
+                    </div>
+                    <Button
+                      className="login-button"
+                      variant="contained"
+                      onClick={onSubmit}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Loading...' : 'Login'}
+                    </Button>
+                    <p>Forgot your password?</p>
                 </div>
 
 
@@ -87,7 +87,7 @@ const FullScreenTwoCards = () => {
 
 
           </div>
-        </div>
+      </div>
 
   );
 };

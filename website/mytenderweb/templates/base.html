@@ -41,7 +41,7 @@
         <div class="container">
 
             <a class="navbar-brand" href="{% url 'home' %}">
-                <span style="font-weight: bold; font-size: 30px; font-family: 'Montserrat', sans-serif;">mytender.io</span>
+                <span style="font-weight: bold; font-size: 30px; ">mytender.io</span>
             </a>
 
                 <button class="navbar-toggler" style="outline: none;" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -52,15 +52,39 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto" >
 
-                            {% if not request.user.is_authenticated%}
+                          
 
-                            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#about" > Home </a></li>
-                            <li class="nav-item"><a class="nav-link"  href="{% url 'home' %}#services">Services</a></li>
-                            <li class="nav-item"><a class="nav-link"  href="{% url 'home' %}#blog">Blog</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#hero" > Home </a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownServices" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Product
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownServices">
+                                    <!-- Add your dropdown items here -->
+                                    <li><a class="dropdown-item" href="{% url 'languageengine' %}">Language Engine</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'security' %}">Software Security</a></li>
+                                   
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownServices" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Services
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownServices">
+                                    <!-- Add your dropdown items here -->
+                                    <li><a class="dropdown-item" href="{% url 'ITservices' %}">IT</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'financialservices' %}">Financial</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'facilitymanagement' %}">Facility Management</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'healthcare' %}">Healthcare</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'telecoms' %}">Telecoms</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'publicsector' %}">Public Sector Vendors</a></li>
+                                </ul>
+                            </li>
+                            
+            
                             <li class="nav-item"><a class="nav-link"  href="{% url 'home' %}#team">Team</a></li>
                             <a href="{% url 'home' %}#contact" class="btn btn-brand ms-lg-3">Contact Us</a>
 
-                            {% endif%}
                         </li>
 
 
@@ -88,6 +112,7 @@
                 <div class="col-lg-3 col-sm-6">
                     <h5 class="mb-0 text-white">mytender.io</h5>
                     <div class="line"></div>
+                    <p>City Road 128 London EC1V 2NX UK</p>
                     <p>Built with quality, security and integrity.</p>
                     <div class="social-icons">
                         <a href="#"><i class="ri-twitter-fill"></i></a>
@@ -100,20 +125,22 @@
                     <h5 class="mb-0 text-white">SERVICES</h5>
                     <div class="line"></div>
                     <ul>
-                        <li><a href="#">Data-Driven Market Research</a></li>
-                        <li><a href="#">AI Procurement Services</a></li>
-                        <li><a href="#">Business Intelligence</a></li>
-                        <li><a href="#">Language Engines</a></li>
+                        <li><a href="#">IT Services</a></li>
+                        <li><a href="#">Financial Services</a></li>
+                        <li><a href="#">Facility Management</a></li>
+                        <li><a href="#">Healthcare</a></li>
+                       
                     </ul>
                 </div>
                 <div class="col-lg-3 col-sm-6">
                     <h5 class="mb-0 text-white">ABOUT</h5>
                     <div class="line"></div>
                     <ul>
-                        <li><a href="#">Blog</a></li>
                         <li><a href="#">Services</a></li>
                         <li><a href="#">Team</a></li>
                         <li><a href="#">Contact</a></li>
+                        <li><a href="#">Blog</a></li>
+                    
                     </ul>
                 </div>
                 <div class="col-lg-3 col-sm-6">
@@ -121,7 +148,7 @@
                     <div class="line"></div>
                     <ul>
 
-                        <li>support@spark-ai.co.uk</li>
+                        <li>info@mytender.io</li>
                         <li>www.mytender.io<li>
                     </ul>
                 </div>

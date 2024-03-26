@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}  {% endblock %}
+{% load static %}
+
+{% block content %}
+
+
+
+<section id="about" class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center"   >
+                <div class="section-title">
+                    <h1 class="display-4 fw-semibold">Language Engine</h1>
+                    <div class="line" ></div>
+                    <p>Efficient and effective contract writing, empower your team to win more bids with intelligent automation.</p>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-8 mx-auto text-center">
+                
+                <img id="myImage" src="{% static 'images/Screenshot.png' %}" alt="Descriptive Text Here" >
+
+        
+            </div>
+        </div>
+
+
+
+    </div>
+</section>
+
+
+<section class="section-padding" id="contact">
+    <div class="container">
+        <div class="row" style="margin-bottom: 160px;">
+            <div class="col-12 text-center" >
+                <div class="">
+                    <h1 class="display-4 text-white fw-semibold mb-4">Win more bids.</h1>
+                    <div class="line bg-white"></div>
+                </div>
+            </div>
+           
+            <div class="row">
+                <div class="col-6 mx-auto text-center">
+                    <p class="text-white bold" style="font-size: 18px;">Our product is a bid writing software that leverages the power of Generative AI to transform your tendering process. Committed to ensuring our clients secure more contracts, we offer a comprehensive suite of features designed to streamline workflows and enhance proposal quality.</p>
+                </div>
+            </div>
+          
+        </div>
+    </div>
+</section>
+
+
+<section class="section" style="margin-bottom: 140px;">
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col-md-8 mx-auto text-center">
+          <h1>What sets us apart?</h6>
+          
+          
+        </div>
+      </div>
+      <div class="row g-4 mb-5">
+        <div class="col-lg-4 col-sm-6">
+          <div class="card-effect">
+            <div class="round_iconbox">
+              <i class="bx bxs-terminal"></i>
+            </div>
+            <h5 class="mt-4 mb-2">Enterprise-Scale AI</h5>
+            <p>Seamless integration with your existing workflows, providing an effective foundation to tackle complex bids.</p>
+          </div>
+        </div>
+        <div class="col-lg-4 col-sm-6">
+            <div class="card-effect">
+              <div class="round_iconbox">
+                <i class="bx bxs-cloud"></i>
+              </div>
+              <h5 class="mt-4 mb-2">Centralised Data Management</h5>
+              <p>A secure and centralised repository for all your tender-related data, ensuring easy access and retrieval.</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-sm-6">
+            <div class="card-effect">
+              <div class="round_iconbox">
+                <i class="bx bxs-lock"></i>
+              </div>
+              <h5 class="mt-4 mb-2">Secure Data Infrastructure</h5>
+              <p>Our robust database architecture ensures the highest level of security and scalability which is paramount in today's data-driven environment.</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-sm-6">
+            <div class="card-effect">
+              <div class="round_iconbox">
+                <i class="bx bxs-data"></i>
+              </div>
+              <h5 class="mt-4 mb-2">Advanced Data Structuring</h5>
+              <p>Data uploaded to mytender.io is meticulously developed into a bespoke language engine, facilitating rapid searching and retrieval for efficient bid development.</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-sm-6">
+            <div class="card-effect">
+              <div class="round_iconbox">
+                <i class="bx bxs-search"></i>
+              </div>
+              <h5 class="mt-4 mb-2">Semantic Search</h5>
+              <p>To navigate nuances of tender requirements, a semantic search can be used to pinpoint the most relevant data within your own knowledge base.</p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-sm-6">
+            <div class="card-effect">
+              <div class="round_iconbox">
+                <i class="bx bxs-comment-detail"></i>
+              </div>
+              <h5 class="mt-4 mb-2">AI-Powered Response</h5>
+              <p>Intelligent editing tools that guide you in aligning your proposals with specific tender requirements, ensuring perfect language tone and technical compliance.</p>
+            </div>
+          </div>
+      </div>
+      
+    </div>
+  </section>
+  
+
+
+
+
+{% endblock content %}

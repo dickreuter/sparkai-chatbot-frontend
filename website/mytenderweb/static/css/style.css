@@ -7,7 +7,7 @@
     /* Primary brand color, set to black */
     --c-brand-light: #ffa654;
     /* Light variant of the brand color for backgrounds or light elements */
-    --c-brand-rgb: 0, 0, 0;
+    --c-brand-rgb: 245, 130, 24;
     /* RGB format of the brand color, useful for rgba() functions */
     --c-body: black;
     /* Body text color, set to a softer black for readability */
@@ -122,6 +122,35 @@ img {
 }
 
 
+/* Show dropdown on hover */
+
+.navbar .nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+
+/* Optional: change the appearance of the dropdown link on hover */
+
+.navbar .nav-item.dropdown:hover>.nav-link {
+    color: #0056b3;
+    /* Example color: Bootstrap's default link color */
+}
+
+
+/* Remove the down arrows from dropdown toggles */
+
+.navbar .dropdown-toggle::after {
+    content: none !important;
+}
+
+
+/* Keep dropdown open when hovering over the dropdown menu itself */
+
+.dropdown-menu:hover {
+    display: block;
+}
+
+
 /* BTN */
 
 .btn {
@@ -151,23 +180,22 @@ img {
 
 /* HERO */
 
-#hero {
-    position: relative;
-    overflow: hidden;
-}
-
-#hero::before {
-    content: '';
+#hero .bg-image {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    background: linear-gradient(rgba(var(--c-brand-rgb), 0.2), rgba(var(--c-brand-rgb), 0.1)), url('../images/hero.jpg');
+    background: url('../images/hero.jpg');
     background-position: center;
     background-size: cover;
     transform: scaleX(-1);
     z-index: -1;
+}
+
+#hero {
+    position: relative;
+    overflow: hidden;
 }
 
 .text-brand {
@@ -211,6 +239,35 @@ img {
     margin-right: auto;
 }
 
+.row strong {
+    font-weight: 500;
+    /* Adjust the font weight as needed */
+}
+
+.card-effect {
+    box-shadow: var(--box-shadow);
+    background-color: #fff;
+    padding: 25px;
+    transition: all 0.35s ease;
+}
+
+.card-effect:hover {
+    box-shadow: none;
+    transform: translateY(5px);
+}
+
+.round_iconbox {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--c-brand);
+    color: #fff;
+    font-size: 32px;
+    border-radius: 100px;
+}
+
 
 /* ICONBOX */
 
@@ -220,6 +277,7 @@ img {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    background: rgba(var(--c-brand-rgb), 0.1);
     color: var(--c-brand);
     font-size: 34px;
     flex: none;
@@ -347,102 +405,55 @@ img {
 
 /* TEAM */
 
-.team-member {
-    text-align: center;
-    /* Rounded corners for the boxes */
-    overflow: hidden;
-    /* Ensures the content respects the border-radius */
+
+/* TEAM */
+
+.team-member-content {
+    background-color: var(--c-brand);
+    position: absolute;
+    bottom: -24px;
+    left: 50%;
+    width: calc(100% - 50px);
+    transform: translateX(-50%);
+    padding: 24px;
+    transition: var(--transition);
+    opacity: 0;
 }
 
-
-/* Responsive design for smaller screens like mobile devices */
-
-@media (max-width: 768px) {
-    .team-member .image,
-    .team-member .bigimage2,
-    .team-member .bigimage {
-        height: auto;
-        border-radius: 8px;
-        /* Adjust height for mobile */
-    }
-    .team-member .bigimage img,
-    .team-member .bigimage2 img {
-        transform: scale(1);
-        /* Less zoom for smaller screens */
-    }
+.team-member:hover .team-member-content {
+    opacity: 1;
+    bottom: 24px;
 }
 
-.team-member .image,
-.team-member .bigimage2,
-.team-member .bigimage {
+.team-member-content a:hover {
+    text-decoration: underline;
+    text-decoration-color: black;
+    text-decoration-thickness: 2px;
+    /* Adjust the pixel value to make the underline thicker */
+}
+
+.image-zoom-wrapper {
+    width: 100%;
+    /* Adjust if you want a different size, but make sure all are the same */
+    height: 0;
+    /* This will be set based on the padding-bottom for aspect ratio */
+    padding-bottom: 100%;
+    /* Adjust the percentage for the desired aspect ratio */
     position: relative;
-    border-radius: 8px;
-    z-index: 2;
-    overflow: hidden;
-    height: 300px;
-    /* Setting a fixed height for image containers */
+    /* Needed for absolute positioning of the image */
 }
 
-.team-member .image img,
-.team-member .bigimage2 img,
-.team-member .bigimage img {
+
+/* Adjust image styling */
+
+.image-zoom-wrapper img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-.team-member .bigimage img {
-    transform: scale(1.5);
-    height: 300px;
-    /* Scale the image to zoom in */
-    transition: transform 0.3s ease;
-    /* Smooth transition for scaling */
-}
-
-.team-member .bigimage2 img {
-    transform: scale(1.5) translateX(-40%);
-    transform: scale(1.4);
-    height: 300px;
-    /* Scale the image to zoom in */
-    transition: transform 0.3s ease;
-    /* Smooth transition for scaling */
-}
-
-.social-links a {
-    width: 34px;
-    height: 34px;
-    background-color: rgba(0, 0, 0, 0);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    border-radius: 100%;
-}
-
-.team-member .social-links {
-    display: flex;
-    align-items: center;
-    /* Center the items vertically */
-}
-
-.team-member .social-links .job-title {
-    margin-left: 8px;
-    /* Add some space between the icon and the text */
-}
-
-.team-member .social-links .job-title-link {
-    display: flex;
-    /* Allows vertical centering of icon */
-    align-items: center;
-}
-
-.team-member h5 {
-    margin-top: 16px;
-    margin-bottom: 4px;
-}
-
-.team-member a:hover h5 {
-    color: #3477eb;
+    /* Cover the whole area, may crop the image */
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 
@@ -471,6 +482,7 @@ img {
 #contact {
     position: relative;
     z-index: 2;
+    background: white;
 }
 
 #contact::after {

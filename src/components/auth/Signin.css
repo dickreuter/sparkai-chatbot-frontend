@@ -1,24 +1,25 @@
 .cards-container {
-    display: flex;
-    align-items: center;
-    /* Vertically centers the child in the container */
+    width: 95vw;
+    height: 80vh;
     justify-content: center;
-    /* Horizontally centers the child in the container */
-    height: 100%;
-    /* Makes the container take up the full viewport height */
-    width: 100%;
-    margin-left: 300px;
+    display: flex;
+    justify-content: center !important;
+    /* Centers horizontally */
+    align-items: center;
+    /* Centers vertically */
+    /* Takes up the full viewport height */
+    margin: 0;
+    /* Removes any default margins */
     /* Optional: Makes the container take up the full viewport width */
 }
 
 .cardmini {
+    justify-content: center !important;
+    width: 40%;
+    height: 60%;
     background-color: white;
     padding: 120px;
     border-radius: 4px;
-    max-width: 600px;
-    width: 50vw;
-    height: 80vh;
-    margin: 40px auto;
 }
 
 .cardmini-text h2 {

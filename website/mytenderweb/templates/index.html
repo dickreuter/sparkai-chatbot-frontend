@@ -5,7 +5,8 @@
 {% block content %}
 
 
-<section id="hero" class="d-flex align-items-center min-vh-100" style="background-image: url('{% static 'images/hero.jpg' %}'); background-size: cover; background-position: center;">
+<section id="hero" class="d-flex align-items-center min-vh-100">
+    <div class="bg-image"></div> <!-- Added div for background image -->
     <div class="container" style="margin-bottom: 35px; margin-top: -10%;">
         <div class="row">
             <div class="col-md-6">
@@ -18,55 +19,66 @@
 </section>
 
 
+
 <section id="about" class="section-padding">
     <div class="container">
-
-        <div class="row justify-content-between align-items-center" data-aos="fade-down" data-aos-delay="50">
-
-            <div class="section-title text-center" style="margin-bottom: 20px;">
-                <h1 class="display-4 fw-semibold">Why us?</h1>
-                <div class="line"></div>
-
-            </div>
-
-            <div  class="col-lg-5">
-
-                <div class="d-flex mb-3">
-                    <div class="iconbox me-4 rounded">
-                        <i class="ri-pencil-fill"></i>
-                    </div>
-                    <div>
-                        <h5>Enhanced quality</h5>
-                        <p>Each client get's their own language model trained and tailored to their business, allowing continuous improvement in their responses.</p>
-                    </div>
-                </div>
-                <div class="d-flex mb-3">
-                    <div class="iconbox me-4 rounded">
-                        <i class="ri-lock-fill"></i>
-                    </div>
-                    <div>
-                        <h5>Data Security
-                        </h5>
-                        <p>Each client get's their own database inside of a AWS EC2 instance, meaning clients data is stored individually in their own secure environment.</p>
-                    </div>
-                </div>
-                <div class="d-flex">
-                    <div class="iconbox me-4 rounded">
-                        <i class="ri-time-fill"></i>
-                    </div>
-                    <div>
-                        <h5>Time saving</h5>
-                        <p>Bids go from weeks to minutes, allowing you to compete for more opportunities.</p>
-                    </div>
+        <div class="row">
+            <div class="col-12 text-center" data-aos="fade-down" data-aos-delay="150">
+                <div class="section-title">
+                    <h1 class="display-4 fw-semibold">About us</h1>
+                    <div class="line"></div>
+                    <p>Why choose us?</p>
                 </div>
             </div>
+        </div>
 
-            <div class="col-lg-7 mr-2" style="">
-                <figure>
-                    <img id="myImage" src="{% static 'images/Screenshot.png' %}" alt="Descriptive Text Here" style="margin-bottom: 10px; width: 2000px;">
+        <div class="row" data-aos="fade-down" data-aos-delay="50">
 
-                </figure>
+            
+            <div class="col-lg-5">
+
+                <div>
+
+                    <div class="d-flex mb-3">
+                        <div class="iconbox me-4 rounded">
+                            <i class="ri-pencil-fill"></i>
+                        </div>
+                        <div>
+                            <h5>Enhanced quality</h5>
+                            <p>Each client get's their own language model trained and tailored to their business, allowing continuous improvement in their responses.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="iconbox me-4 rounded">
+                            <i class="ri-lock-fill"></i>
+                        </div>
+                        <div>
+                            <h5>Data Security
+                            </h5>
+                            <p>Each client get's their own database inside of a AWS EC2 instance, meaning clients data is stored individually in their own secure environment.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="iconbox me-4 rounded">
+                            <i class="ri-time-fill"></i>
+                        </div>
+                        <div>
+                            <h5>Time saving</h5>
+                            <p>Bids go from weeks to minutes, allowing you to compete for more opportunities.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <div class="col-lg-7" > 
+               
+                <img id="myImage" src="{% static 'images/Screenshot.png' %}" alt="Descriptive Text Here" >
+
+           
+             </div>
+
+
+           
 
         </div>
     </div>
@@ -91,10 +103,10 @@
                 <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="150">
                     <div class="service theme-shadow p-lg-5 p-4 rounded">
                         <div class="iconbox">
-                            <i class="ri-pen-nib-fill"></i>
+                            <i class="ri-cloud-fill"></i>
                         </div>
                         <h5 class="mt-4 mb-3">IT Services</h5>
-                        <p>Utilising a 175 billion parameter model to build unparalleled market landscapes and projections.</p>
+                        <p>Leverage advanced AI and centralised data management to streamline the IT services bidding process.</p>
                         <a href="{% url 'ITservices' %}" class="btn btn-brand me-2">Learn More</a>
 
                     </div>
@@ -104,10 +116,10 @@
                 <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="250">
                     <div class="service theme-shadow p-lg-5 p-4 rounded">
                         <div class="iconbox">
-                            <i class="ri-hand-coin-fill"></i> <!-- Icon Placeholder -->
+                            <i class="ri-bank-fill"></i> <!-- Icon Placeholder -->
                         </div>
                         <h5 class="mt-4 mb-3">Financial Services</h5>
-                        <p class="mt-1">AI-Tender writer which will create bid-winning proposals in minutes.</p>
+                        <p>Enhance the financial services bidding process with secure cloud technologies and data processing.</p>
 
                         <a href="{% url 'financialservices' %}" class="btn btn-brand me-2">Learn More</a>
                     </div>
@@ -117,10 +129,10 @@
                 <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="350">
                     <div class="service theme-shadow p-lg-5 p-4 rounded">
                         <div class="iconbox">
-                            <i class="ri-bar-chart-box-fill"></i> <!-- Icon Placeholder -->
+                            <i class="ri-building-2-fill"></i> <!-- Icon Placeholder -->
                         </div>
-                        <h5 class="mt-4 mb-3"> Facility Management and Construction </h5>
-                        <p>Simplifying complex data sets. Maximise the insights of your collected data.</p>
+                        <h5 class="mt-4 mb-3"> Construction </h5>
+                        <p>Empower facility management and construction bidding with AI-driven insights and tailored responses.</p>
 
                         <a href="{% url 'facilitymanagement' %}" class="btn btn-brand me-2">Learn More</a>
                     </div>
@@ -130,11 +142,11 @@
                 <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="450">
                     <div class="service theme-shadow p-lg-5 p-4 rounded">
                         <div class="iconbox">
-                            <i class="ri-brush-fill"></i> <!-- Icon Placeholder -->
+                            <i class="ri-dossier-fill"></i> <!-- Icon Placeholder -->
                         </div>
-                        <h5 class="mt-4 mb-3">Healthcare and Pharmaceuticals</h5>
-                        <p>Creating custom Large Language Models designed to serve your business.</p>
-                        <a href="{% url 'languageengines' %}" class="btn btn-brand me-2">Learn More</a>
+                        <h5 class="mt-4 mb-3">Healthcare</h5>
+                        <p>Optimise healthcare and pharmaceutical bid processes with AI powered contextual data inputs.</p>
+                        <a href="{% url 'healthcare' %}" class="btn btn-brand me-2">Learn More</a>
 
                     </div>
                 </div>
@@ -143,11 +155,11 @@
                 <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="550">
                     <div class="service theme-shadow p-lg-5 p-4 rounded">
                         <div class="iconbox">
-                            <i class="ri-team-fill"></i> <!-- Icon Placeholder -->
+                            <i class="ri-router-fill"></i> <!-- Icon Placeholder -->
                         </div>
-                        <h5 class="mt-4 mb-3">AI Recruitment Agency</h5>
-                        <p>Exclusive network of AI Engineers from the University of Southampton, if you have a specific problem you want solving.</p>
-                        <a href="{% url 'recruitmentagency' %}" class="btn btn-brand me-2">Learn More</a>
+                        <h5 class="mt-4 mb-3">Data Centres and Telecoms</h5>
+                        <p>Streamline the bid process for data centre and telecom sectors with tailored proposals. </p>
+                        <a href="{% url 'telecoms' %}" class="btn btn-brand me-2">Learn More</a>
                     </div>
                 </div>
 
@@ -155,22 +167,142 @@
                 <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="650">
                     <div class="service theme-shadow p-lg-5 p-4 rounded">
                         <div class="iconbox">
-                            <i class="ri-lightbulb-flash-fill"></i> <!-- Icon Placeholder -->
+                            <i class="ri-building-fill"></i> <!-- Icon Placeholder -->
                         </div>
-                        <h5 class="mt-4 mb-3">AI Consulting</h5>
-                        <p>If you are unsure on what AI looks like in your business, we will identify for you.</p>
-                        <a href="{% url 'aiconsulting' %}" class="btn btn-brand me-2">Learn More</a>
+                        <h5 class="mt-4 mb-3">Public Sector Vendors</h5>
+                        <p>Enhance public sector bidding processes with AI powered proposals and large-scale information retrieval.</p>
+                        <a href="{% url 'publicsector' %}" class="btn btn-brand me-2">Learn More</a>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-<!-- TRUST -->
-<section id="trust" class="section-padding border-top">
+    <section id="team" class="section-padding border-top" data-aos="fade-down" data-aos-delay="50">
+        <div class="container">
+          <div class="row">
+            <div class="col-12 text-center">
+              <div class="section-title">
+                <h1 class="display-4 fw-semibold">Team Members</h1>
+                <div class="line"></div>
+                <p>Meet our dedicated team who combine expertise and passion to drive our success. Each member brings a wealth of experience and a unique perspective, contributing to our innovative approaches and solutions.</p>
+              </div>
+            </div>
+          </div>
+            <div class="row">
+                <div class="col-md-3">
+                <div class="team-member image-zoom">
+                    <div class="image-zoom-wrapper">
+                    <img src="{% static 'images/team1.png' %}" alt="">
+                    </div>
+                    <div class="team-member-content">
+                        <a href="https://www.linkedin.com/in/samuel-aaron-9877561a9/">
+                            <h5>Samuel Aaron</h5>
+                        </a>
+                    <p class="mb-0">Chief Executive Officer</p>
+                    </div>
+                </div>
+                </div>
+            
+           
+                <div class="col-md-3">
+                <div class="team-member image-zoom">
+                    <div class="image-zoom-wrapper">
+                    <img src="{% static 'images/team4.png' %}" alt="">
+                    </div>
+                    <div class="team-member-content">
+                        <a href="https://www.linkedin.com/in/dickreuter/">
+                            <h5>Nicolas Dickreuter</h5>
+                        </a>
+                    <p class="mb-0">Lead AI Engineer</p>
+                    </div>
+                </div>
+                </div>
+            
+            
+                <div class="col-md-3">
+                <div class="team-member image-zoom">
+                    <div class="image-zoom-wrapper">
+                    <img src="{% static 'images/team3.png' %}" alt="">
+                    </div>
+                    <div class="team-member-content">
+                        <a href="https://www.linkedin.com/in/jamie-horsnell-47347725b/">
+                            <h5>Jamie Horsnell</h5>
+                        </a>
+                        
+                    <p class="mb-0">Chief Technology Officer</p>
+                    </div>
+                </div>
+                </div>
+          
+        
+                <div class="col-md-3">
+                <div class="team-member image-zoom">
+                    <div class="image-zoom-wrapper">
+                    <img src="{% static 'images/team2.png' %}" alt="">
+                    </div>
+                    <div class="team-member-content">
+                     <a href="https://www.linkedin.com/in/joshua-aaron/">
+                        <h5>Joshua Aaron</h5>
+                    </a>
+                    <p class="mb-0">Data Protection Officer</p>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </section>
+      
+
+
+
+    <!-- CONTACT -->
+
+<section class="section-padding" id="contact">
     <div class="container">
         <div class="row">
             <div class="col-12 text-center" data-aos="fade-down" data-aos-delay="150">
+                <div class="section-title">
+                    <h1 class="display-4 text-white fw-semibold">Get in touch</h1>
+                    <div class="line bg-white"></div>
+                    <p class="text-white bold">We'd love to hear from you if you have any questions!</p>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8" data-aos="fade-down" data-aos-delay="250">
+                <form action="#" method="post" class="row g-3 p-lg-5 p-4 bg-white theme-shadow rounded">
+                    {% csrf_token %}
+                    <div class="form-group col-lg-6">
+                        <input type="text" name="first_name" class="form-control" placeholder="Enter First Name" required>
+                    </div>
+                    <div class="form-group col-lg-6">
+                        <input type="text" name="last_name" class="form-control" placeholder="Enter Last Name" required>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <input type="email" name="email" class="form-control" placeholder="Enter Email Address" required>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <input type="text" name="subject" class="form-control" placeholder="Enter Subject" required>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <textarea name="message" rows="5" class="form-control" placeholder="Enter Message" required></textarea>
+                    </div>
+                    <div class="form-group col-lg-12 d-grid">
+                        <button type="submit" class="btn btn-brand" style="background: var(--c-brand); border: none;">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    <!-- TRUST -->
+<section id="trust" class="section-padding border-top" data-aos="fade-down" data-aos-delay="50">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center" >
                 <div class="section-title">
                     <h1 class="display-4 fw-semibold">Working to build your trust</h1>
                     <div class="line"></div>
@@ -179,21 +311,21 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="col-lg-4 col-md-6" >
                 <div class="feature-block text-center">
                     <img src="{% static 'images/cpd.png' %}" alt="Compliance" class="img-fluid centered-image">
                     <h4 class="mt-3">Compliance</h4>
                     <p>At mytender.io, we operate in 100% accordance with GDPR, SOC 2, and ISO27001 standards, demonstrating our unwavering commitment to data privacy and security.</p>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="250">
+            <div class="col-lg-4 col-md-6" >
                 <div class="feature-block text-center">
                     <img src="{% static 'images/irsm.jpg' %}" alt="Accreditations" class="img-fluid centered-image">
                     <h4 class="mt-3">Accreditations</h4>
                     <p>We are proud to hold IIRSM and CPD accreditations, underscoring our dedication to the continuous enhancement of our data security and operational excellence.</p>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-12" data-aos="fade-up" data-aos-delay="300">
+            <div class="col-lg-4 col-md-12" >
                 <div class="feature-block text-center">
                     <img src="{% static 'images/gdpr.jpg' %}" alt="Cloud Security" class="img-fluid centered-image ">
                     <h4 class="mt-3">Cloud Security</h4>
@@ -204,52 +336,11 @@
     </div>
 </section>
 
-
-
-
-    <!-- CONTACT -->
-    <section class="section-padding bg-light" id="contact">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 text-center"data-aos="fade-down" data-aos-delay="150" >
-                    <div class="section-title">
-                        <h1 class="display-4 text-white fw-semibold">Get in touch</h1>
-                        <div class="line bg-white"></div>
-                        <p class="text-white bold">We'd love to hear from you if you have any questions!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-8 "data-aos="fade-down" data-aos-delay="250">
-                    <form action="#" class="row g-3 p-lg-5 p-4 bg-white theme-shadow rounded">
-                        <div class="form-group col-lg-6">
-                            <input type="text" class="form-control" placeholder="Enter first name">
-                        </div>
-                        <div class="form-group col-lg-6">
-                            <input type="text" class="form-control" placeholder="Enter last name">
-                        </div>
-                        <div class="form-group col-lg-12">
-                            <input type="email" class="form-control" placeholder="Enter Email address">
-                        </div>
-                        <div class="form-group col-lg-12">
-                            <input type="text" class="form-control" placeholder="Enter subject">
-                        </div>
-                        <div class="form-group col-lg-12">
-                            <textarea name="message" rows="5" class="form-control" placeholder="Enter Message"></textarea>
-                        </div>
-                        <div class="form-group col-lg-12 d-grid">
-                            <button class="btn btn-brand">Send Message</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
     <!-- BLOG -->
-    <section id="blog" class="section-padding">
+    <section id="blog" class="section-padding border top" data-aos="fade-down" data-aos-delay="50">
         <div class="container">
             <div class="row">
-                <div class="col-12 text-center "ata-aos="fade-down" data-aos-delay="150" >
+                <div class="col-12 text-center " >
                     <div class="section-title">
                         <h1 class="display-4 fw-semibold">Recent News & Articles</h1>
                         <div class="line"></div>
@@ -260,7 +351,7 @@
             </div>
             <div class="row">
                  <div class="row">
-                    <div class="col-lg-4" data-aos="fade-up">
+                    <div class="col-lg-4" >
                         <div class="blog-post bg-light rounded">
                             <img class="rounded-top" src="{% static 'images/blog-post-1.jpg' %}" alt="">
                             <div class="blog-post-content p-4  d-flex flex-column">
@@ -272,7 +363,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="col-lg-4" >
                         <div class="blog-post bg-light rounded">
                             <img class= "rounded-top" src="{% static 'images/blog-post-2.jpg' %}" alt="">
                             <div class="blog-post-content p-4  d-flex flex-column">
@@ -282,7 +373,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="600">
+                    <div class="col-lg-4" >
                         <div class="blog-post bg-light rounded">
                             <img class= "rounded-top" src="{% static 'images/blog-post-3.jpg' %}" alt="">
                             <div class="blog-post-content p-4  d-flex flex-column">

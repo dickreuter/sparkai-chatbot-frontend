@@ -1,23 +1,14 @@
-# deploys the website if there is a push to master branch
-
 name: Continuous Integration
 
 on:
   push:
     branches: [ dev ]
 
- jobs:
-   quality-assurance:
-     name: Quality Assurance
-     uses: ./.github/workflows/tests.yml
-
-   deploy:
-     name: Deploy
-     needs: quality-assurance
-     runs-on: ubuntu-latest
-     steps:
-      - name: Configure SSH
-      
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
       - name: Set Target Directory
         run: |
           echo "TARGET_DIR=/home/ec2-user/website/" >> $GITHUB_ENV

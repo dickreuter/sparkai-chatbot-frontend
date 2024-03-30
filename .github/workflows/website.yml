@@ -1,15 +1,10 @@
 # deploys the website if there is a push to master branch
 
- name: Continuous Integration
+name: Continuous Integration
 
- on:
-   push:
-     branches:
-       - master
-
- concurrency:
-   group: master
-   cancel-in-progress: true
+on:
+  push:
+    branches: [ dev ]
 
  jobs:
    quality-assurance:
@@ -21,23 +16,17 @@
      needs: quality-assurance
      runs-on: ubuntu-latest
      steps:
-       - name: Configure SSH
-         env:
-           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-           SSH_HOST: ${{ secrets.SSH_HOST }}
-           SSH_USER: ${{ secrets.SSH_USER }}
-         run: |
-           mkdir -p ~/.ssh/
-           echo "$SSH_PRIVATE_KEY" > ~/.ssh/github
-           chmod 600 ~/.ssh/github
-           cat >>~/.ssh/config <<END
-           Host target
-             HostName $SSH_HOST
-             User $SSH_USER
-             IdentityFile ~/.ssh/github
-             LogLevel ERROR
-             StrictHostKeyChecking no
-           END
-       - name: Run deploy
-         run: |
-           ssh target "cd website/ && docker-compose down && git pull && docker-compose build && docker-compose up -d --force-recreate"
+      - name: Configure SSH
+      
+      - name: Set Target Directory
+        run: |
+          echo "TARGET_DIR=/home/ec2-user/website/" >> $GITHUB_ENV
+
+      - name: Run deploy
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOYMENT_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan 44.208.84.199 >> ~/.ssh/known_hosts
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa" --exclude '.git' --exclude 'node_modules' . ec2-user@44.208.84.199:$TARGET_DIR
+          ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 "cd $TARGET_DIR/sparkai-chatbot-frontend/website && docker-compose down && docker-compose build && docker-compose up -d --force-recreate"

@@ -38,16 +38,19 @@
 <body data-bs-spy="scroll" data-bs-target=".navbar">
 
     <nav class="navbar navbar-expand-lg bg-white sticky-top">
-        <div class="container">
+        <div class="container-fluid d-flex justify-content-between">
 
+    
             <a class="navbar-brand" href="{% url 'home' %}">
-                <span style="font-weight: bold; font-size: 30px; ">mytender.io</span>
+                <span style="font-weight: bold; font-size: 30px;">mytender.io</span>
             </a>
-
-                <button class="navbar-toggler" style="outline: none;" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" >
-                    <span class="fas fa-bars"></span>
-                </button>
+    
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="fas fa-bars"></span>
+            </button>
+    
+        
 
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto" >

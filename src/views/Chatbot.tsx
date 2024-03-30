@@ -51,6 +51,10 @@ const Chatbot = () => {
     const [apiChoices, setApiChoices] = useState([]);
     const [selectedChoices, setSelectedChoices] = useState([]);
     const [appendResponse, setAppendResponse] = useState(false);
+    
+    const [isCopilotVisible, setIsCopilotVisible] = useState(false);
+    const toggleCopilotVisibility = () => setIsCopilotVisible(!isCopilotVisible);
+
 
     const getAuth = useAuthUser();
     const auth = getAuth();
@@ -251,23 +255,27 @@ const Chatbot = () => {
     const handleTextHighlight = async () => {
 
         const selectedText = window.getSelection().toString();
+        console.log("h");
         if (selectedText) {
             // Add a confirmation popup
 
             // User clicked 'OK', ask for further instructions
-            const instructions = window.prompt(
-                "Please enter instructions how to enhance the selected text:"
-            );
-            if (instructions) {
-                await new Promise((resolve) => setTimeout(resolve, 0));
-                console.log("instructions");
-                askCopilot(selectedText, instructions); // Call sendQuestion function to simulate submit
-                console.log(instructions);
-            }
-             else {
+            //const instructions = window.prompt(
+            //    "Please enter instructions how to enhance the selected text:"
+            //);
+
+            setIsCopilotVisible(true);
+            
+            //if (instructions) {
+            //    await new Promise((resolve) => setTimeout(resolve, 0));
+            //    console.log("instructions");
+            //    askCopilot(selectedText, instructions); // Call sendQuestion function to simulate submit
+            //    console.log(instructions);
+            //}
+            // else {
                 // User clicked 'Cancel' in the instructions prompt, exit the function
-                return;
-            }
+            //    return;
+            //}
         }
     };
 
@@ -444,7 +452,7 @@ const Chatbot = () => {
     return (
         <div id="chatbot-page">
             <SideBarSmall />
-            <SideBar/>
+            <SideBar isCopilotVisible={isCopilotVisible} setIsCopilotVisible={setIsCopilotVisible} />
 
 
           <div className="chatbot-container">
@@ -636,23 +644,7 @@ const Chatbot = () => {
                         </div>
 
 
-                   {/*
-
-                        <Col md={4}>
-                        <div className="container">
-                        <button >Copilot button</button>
-                        <div className="co-pilot-task mt-2">Copilot task...</div>
-                        <ul className="options-list">
-                            <li>Option 1</li>
-                            <li>Option 2</li>
-                            <li>Option 3</li>
-                            <li>Option 4</li>
-                            <li>Option 5</li>
-                        </ul>
-                        </div>
-
-                        </Col>
-                                            */}
+        
                     </Row>
                 </section>
                 <section id="proposal">

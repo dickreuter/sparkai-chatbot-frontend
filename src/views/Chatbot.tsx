@@ -236,6 +236,7 @@ const Chatbot = () => {
         setQuestionAsked(questionStatus);
     }, []);
 
+    
 
     useEffect(() => {
         // Check if there is a hash in the URL
@@ -252,11 +253,48 @@ const Chatbot = () => {
       }, [location]); // Re-run the effect if the location changes
 
 
+      useEffect(() => {
+        let intervalId = null;
+    
+        const checkTextSelection = () => {
+            const selectedText = window.getSelection().toString();
+            setIsCopilotVisible(!!selectedText);
+            
+            // If there's no selected text, clear the interval if it exists
+            if (!selectedText && intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        };
+    
+        const startIntervalCheck = () => {
+            // Only start a new interval if one isn't already running
+            if (!intervalId) {
+                intervalId = setInterval(() => {
+                    checkTextSelection();
+                }, 100); // Check every 100 milliseconds
+            }
+        };
+    
+        // Add event listeners for mouse up and key up to handle different ways of text selection
+        document.addEventListener('mouseup', startIntervalCheck);
+        document.addEventListener('keyup', startIntervalCheck);
+    
+        // Cleanup the event listeners and interval on component unmount
+        return () => {
+            document.removeEventListener('mouseup', startIntervalCheck);
+            document.removeEventListener('keyup', startIntervalCheck);
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, []); 
+    
     const handleTextHighlight = async () => {
 
         const selectedText = window.getSelection().toString();
-        console.log("h");
-        if (selectedText) {
+        console.log("Selected text:", selectedText);
+        //if (selectedText) {
             // Add a confirmation popup
 
             // User clicked 'OK', ask for further instructions
@@ -264,7 +302,7 @@ const Chatbot = () => {
             //    "Please enter instructions how to enhance the selected text:"
             //);
 
-            setIsCopilotVisible(true);
+            //setIsCopilotVisible(true);
             
             //if (instructions) {
             //    await new Promise((resolve) => setTimeout(resolve, 0));
@@ -276,7 +314,7 @@ const Chatbot = () => {
                 // User clicked 'Cancel' in the instructions prompt, exit the function
             //    return;
             //}
-        }
+        //}
     };
 
 

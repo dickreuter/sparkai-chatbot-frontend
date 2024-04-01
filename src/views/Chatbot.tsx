@@ -272,7 +272,7 @@ const Chatbot = () => {
             if (!intervalId) {
                 intervalId = setInterval(() => {
                     checkTextSelection();
-                }, 100); // Check every 100 milliseconds
+                }, 100); // Check every 100 milli
             }
         };
     
@@ -289,7 +289,7 @@ const Chatbot = () => {
             }
         };
     }, []); 
-    
+
     const handleTextHighlight = async () => {
 
         const selectedText = window.getSelection().toString();

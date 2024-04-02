@@ -14,6 +14,26 @@ interface IAttributesConfig {
     prompt2: string;
     prompt3a: string;
     prompt3b: string;
+
+    prompt1expand: string;
+    prompt1summarise: string;
+    prompt1improve_grammar: string;
+    prompt1translate_to_english: string;
+    prompt1change_tense: string;
+    prompt1rephrase: string;
+    prompt1incorporate: string;
+    prompt1we_will_active_voice: string;
+    prompt1list_creator: string;
+    prompt1reduce_word_character_count: string;
+    prompt1word_cutting_adverbs: string;
+    prompt1word_cutting_adjectives: string;
+    prompt1word_cutting_commas_with_dashes: string;
+    prompt1explain_how: string;
+    prompt1add_statistics: string;
+    prompt1for_example: string;
+    prompt1adding_case_study: string;
+    prompt1company_library: string;
+
     forbidden: string;
     numbers_allowed_prefixes: string;
     selectedModelType: string;
@@ -244,13 +264,7 @@ const AdminPannel = () => {
                 />
             </div>
 
-            <div className="prompt">
-                <label>Prompt1: (Copilot)</label>
-                <textarea
-                    value={data.prompt1}
-                    onChange={(e) => handleChange("prompt1", e.target.value)}
-                />
-            </div>
+
             <div className="prompt">
                 <label>Prompt2 (Q/A pairs) </label>
                 <textarea
@@ -273,6 +287,136 @@ const AdminPannel = () => {
                     onChange={(e) => handleChange("prompt3b", e.target.value)}
                 />
             </div>
+
+
+            <div className="prompt">
+                <label>Copilot: Expand</label>
+                <textarea
+                    value={data.prompt1expand}
+                    onChange={(e) => handleChange("prompt1expand", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Summarise</label>
+                <textarea
+                    value={data.prompt1summarise}
+                    onChange={(e) => handleChange("prompt1summarise", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Improve grammar</label>
+                <textarea
+                    value={data.prompt1improve_grammar}
+                    onChange={(e) => handleChange("prompt1improve_grammar", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Translate to English</label>
+                <textarea
+                    value={data.prompt1translate_to_english}
+                    onChange={(e) => handleChange("prompt1translate_to_english", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Change tense</label>
+                <textarea
+                    value={data.prompt1change_tense}
+                    onChange={(e) => handleChange("prompt1change_tense", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Rephrase</label>
+                <textarea
+                    value={data.prompt1rephrase}
+                    onChange={(e) => handleChange("prompt1rephrase", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Incorporate</label>
+                <textarea
+                    value={data.prompt1incorporate}
+                    onChange={(e) => handleChange("prompt1incorporate", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: We will active voice</label>
+                <textarea
+                    value={data.prompt1we_will_active_voice}
+                    onChange={(e) => handleChange("prompt1we_will_active_voice", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: List creator</label>
+                <textarea
+                    value={data.prompt1list_creator}
+                    onChange={(e) => handleChange("prompt1list_creator", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Reduce word character count</label>
+                <textarea
+                    value={data.prompt1reduce_word_character_count}
+                    onChange={(e) => handleChange("prompt1reduce_word_character_count", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Word cutting adverbs</label>
+                <textarea
+                    value={data.prompt1word_cutting_adverbs}
+                    onChange={(e) => handleChange("prompt1word_cutting_adverbs", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Word cutting adjectives</label>
+                <textarea
+                    value={data.prompt1word_cutting_adjectives}
+                    onChange={(e) => handleChange("prompt1word_cutting_adjectives", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Word cutting commas with dashes</label>
+                <textarea
+                    value={data.prompt1word_cutting_commas_with_dashes}
+                    onChange={(e) => handleChange("prompt1word_cutting_commas_with_dashes", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Explain how</label>
+                <textarea
+                    value={data.prompt1explain_how}
+                    onChange={(e) => handleChange("prompt1explain_how", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Add statistics</label>
+                <textarea
+                    value={data.prompt1add_statistics}
+                    onChange={(e) => handleChange("prompt1add_statistics", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: For example</label>
+                <textarea
+                    value={data.prompt1for_example}
+                    onChange={(e) => handleChange("prompt1for_example", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Adding case study</label>
+                <textarea
+                    value={data.prompt1adding_case_study}
+                    onChange={(e) => handleChange("prompt1adding_case_study", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Copilot: Company library</label>
+                <textarea
+                    value={data.prompt1company_library}
+                    onChange={(e) => handleChange("prompt1company_library", e.target.value)}
+                />
+            </div>
+
+
 
             <div className="prompt">
                 <label>Comma separated words that are replaced with [ ] </label>

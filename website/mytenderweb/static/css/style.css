@@ -219,10 +219,34 @@ img {
 
 /* Media query for small screens */
 
-@media (max-width: 768px) {
+@media (max-width: 450px) {
     h1.display-2 {
-        font-size: 2rem;
+        font-size: 1.6rem !important;
         /* Reduced font size for small screens */
+    }
+    #hero h4 {
+        font-size: 1.2rem !important;
+        /* You can also use a specific size like 16px */
+    }
+}
+
+@media (max-width: 991.5px) {
+    #myImage {
+        margin-top: 5%;
+    }
+}
+
+@media (max-width: 600.5px) {
+    #myImage {
+        margin-top: 5%;
+    }
+    h1.display-2 {
+        font-size: 1.9rem;
+        /* Reduced font size for small screens */
+    }
+    #hero h4 {
+        font-size: 1.6rem;
+        /* You can also use a specific size like 16px */
     }
 }
 
@@ -269,6 +293,72 @@ img {
     z-index: -1;
 }
 
+#heroservices .services-bg-image-it {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../images/itservices.jpg') center / cover no-repeat;
+    z-index: -1;
+}
+
+#heroservices .services-bg-image-finance {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../images/finance.jpg') center / cover no-repeat;
+    z-index: -1;
+}
+
+#heroservices .services-bg-image-facility {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../images/construction.jpg') center / cover no-repeat;
+    z-index: -1;
+}
+
+#heroservices .services-bg-image-healthcare {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../images/healthcare.jpg') center / cover no-repeat;
+    z-index: -1;
+}
+
+#heroservices .services-bg-image-telecoms {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../images/telecoms.jpg') center / cover no-repeat;
+    z-index: -1;
+}
+
+#heroservices .services-bg-image-publicsector {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('../images/publicsector.jpg') center / cover no-repeat;
+    z-index: -1;
+}
+
+#heroservices {
+    position: relative;
+    height: 250px;
+    /* Adjust based on your needs */
+}
+
 #hero {
     position: relative;
     overflow: hidden;
@@ -293,14 +383,6 @@ img {
 
 #particles-js {
     pointer-events: none;
-}
-
-@media (max-width: 767.98px) {
-    .team-member-img {
-        width: 75%;
-        /* Reduce the image size on smaller screens */
-        height: auto;
-    }
 }
 
 
@@ -543,6 +625,12 @@ img {
 
 /* blog post */
 
+@media (max-width: 768px) {
+    .blog-post {
+        margin-bottom: 20px;
+    }
+}
+
 .blog-post {
     border-radius: var(--border-radius);
     background-color: var(--color-bg-1);
@@ -554,6 +642,7 @@ img {
     width: 100%;
     height: 20vw;
     object-fit: cover;
+    min-height: 200px !important;
 }
 
 .blog-post .title {

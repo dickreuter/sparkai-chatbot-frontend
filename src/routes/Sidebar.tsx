@@ -10,7 +10,7 @@ import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons
 import { useNavigate } from 'react-router-dom';
 import handleGAEvent from '../utilities/handleGAEvent';
 
-const SideBar = ({ isCopilotVisible, setIsCopilotVisible }) => {
+const SideBar = ({ isCopilotVisible, setIsCopilotVisible, selectedText, askCopilot }) => {
 
   const [isActiveVisible, setIsActiveVisible] = useState(true);
   const [isOngoingVisible, setIsOngoingVisible] = useState(true);
@@ -92,9 +92,17 @@ const SideBar = ({ isCopilotVisible, setIsCopilotVisible }) => {
     handleSidebarLinkClick(anchorId); // Call handleSidebarLinkClick with the anchorId
   };
 
+
+  
   const handleLinkClick = (linkName) => (e) => {
     e.preventDefault(); // Prevent the default link behavior
     console.log(`${linkName} clicked`);
+    const copilot_mode = linkName.toLowerCase().replace(/\s+/g, '_');
+    console.log(`${copilot_mode}`);
+    const instructions = '';
+    console.log(selectedText);
+    askCopilot(selectedText, instructions, copilot_mode ); 
+
     // Here you can add any logic you need to handle the click
   };
 
@@ -155,17 +163,17 @@ const SideBar = ({ isCopilotVisible, setIsCopilotVisible }) => {
                 <a href="#" onClick={handleLinkClick('Change Tense')} className='sidebar-link'>Change Tense</a>
                 <a href="#" onClick={handleLinkClick('Rephrase')} className='sidebar-link'>Rephrase</a>
                 <a href="#" onClick={handleLinkClick('Incorporate')} className='sidebar-link'>Incorporate</a>
-                <a href="#" onClick={handleLinkClick('We Will - Active Voice')} className='sidebar-link'>We Will - Active Voice</a>
+                <a href="#" onClick={handleLinkClick('We Will Active Voice')} className='sidebar-link'>We Will Active Voice</a>
                 <a href="#" onClick={handleLinkClick('List Creator')} className='sidebar-link'>List Creator</a>
                 <a href="#" onClick={handleLinkClick('Reduce Word Character Count')} className='sidebar-link'>Reduce Word Character Count</a>
-                <a href="#" onClick={handleLinkClick('Word Cutting - Adverbs')} className='sidebar-link'>Word Cutting - Adverbs</a>
-                <a href="#" onClick={handleLinkClick('Word Cutting - Adjectives')} className='sidebar-link'>Word Cutting - Adjectives</a>
-                <a href="#" onClick={handleLinkClick('Word Cutting - Commas with Dashes')} className='sidebar-link'>Word Cutting - Commas with Dashes</a>
+                <a href="#" onClick={handleLinkClick('Word Cutting Adverbs')} className='sidebar-link'>Word Cutting Adverbs</a>
+                <a href="#" onClick={handleLinkClick('Word Cutting Adjectives')} className='sidebar-link'>Word Cutting Adjectives</a>
+                <a href="#" onClick={handleLinkClick('Word Cutting Commas with Dashes')} className='sidebar-link'>Word Cutting Commas with Dashes</a>
                 <a href="#" onClick={handleLinkClick('Explain How')} className='sidebar-link'>Explain How</a>
                 <a href="#" onClick={handleLinkClick('Add Statistics')} className='sidebar-link'>Add Statistics</a>
                 <a href="#" onClick={handleLinkClick('For Example')} className='sidebar-link'>For Example</a>
                 <a href="#" onClick={handleLinkClick('Adding Case Study')} className='sidebar-link'>Adding Case Study</a>
-                <a href="#" onClick={handleLinkClick('Search - Company Library')} className='sidebar-link'>Search - Company Library</a>
+                <a href="#" onClick={handleLinkClick('Search Company Library')} className='sidebar-link'>Search Company Library</a>
                 </div>
                 
             )}

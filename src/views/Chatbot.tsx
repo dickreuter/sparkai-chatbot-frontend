@@ -53,6 +53,7 @@ const Chatbot = () => {
     const [appendResponse, setAppendResponse] = useState(false);
     
     const [isCopilotVisible, setIsCopilotVisible] = useState(false);
+    const [selectedText, setSelectedText] = useState('');
     const toggleCopilotVisibility = () => setIsCopilotVisible(!isCopilotVisible);
 
 
@@ -253,72 +254,6 @@ const Chatbot = () => {
       }, [location]); // Re-run the effect if the location changes
 
 
-      useEffect(() => {
-        let intervalId = null;
-    
-        const checkTextSelection = () => {
-            const selectedText = window.getSelection().toString();
-            setIsCopilotVisible(!!selectedText);
-            
-            // If there's no selected text, clear the interval if it exists
-            if (!selectedText && intervalId) {
-                clearInterval(intervalId);
-                intervalId = null;
-            }
-        };
-    
-        const startIntervalCheck = () => {
-            // Only start a new interval if one isn't already running
-            if (!intervalId) {
-                intervalId = setInterval(() => {
-                    checkTextSelection();
-                }, 100); // Check every 100 milli
-            }
-        };
-    
-        // Add event listeners for mouse up and key up to handle different ways of text selection
-        document.addEventListener('mouseup', startIntervalCheck);
-        document.addEventListener('keyup', startIntervalCheck);
-    
-        // Cleanup the event listeners and interval on component unmount
-        return () => {
-            document.removeEventListener('mouseup', startIntervalCheck);
-            document.removeEventListener('keyup', startIntervalCheck);
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-        };
-    }, []); 
-
-    const handleTextHighlight = async () => {
-
-        const selectedText = window.getSelection().toString();
-        console.log("Selected text:", selectedText);
-        //if (selectedText) {
-            // Add a confirmation popup
-
-            // User clicked 'OK', ask for further instructions
-            //const instructions = window.prompt(
-            //    "Please enter instructions how to enhance the selected text:"
-            //);
-
-            //setIsCopilotVisible(true);
-            
-            //if (instructions) {
-            //    await new Promise((resolve) => setTimeout(resolve, 0));
-            //    console.log("instructions");
-            //    askCopilot(selectedText, instructions); // Call sendQuestion function to simulate submit
-            //    console.log(instructions);
-            //}
-            // else {
-                // User clicked 'Cancel' in the instructions prompt, exit the function
-            //    return;
-            //}
-        //}
-    };
-
-
-
     const submitFeedback = async () => {
         handleGAEvent('Chatbot', 'Submit Feedback', 'Submit Feedback Button');
         const formData = new FormData();
@@ -339,45 +274,7 @@ const Chatbot = () => {
         }
     };
 
-    const askCopilot = async (copilotInput: string, instructions: string) => {
-        setQuestionAsked(true);
-        localStorage.setItem('questionAsked', 'true');
-        handleGAEvent('Chatbot', 'Copilot Input', copilotInput);
-        setIsLoading(true);
-        setStartTime(Date.now()); // Set start time for the timer
-
-        try {
-            const result = await axios.post(
-                `http${HTTP_PREFIX}://${API_URL}/copilot`,
-                {
-                    input_text: copilotInput,
-                    extra_instructions: instructions,
-                    dataset,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${tokenRef.current}`,
-                    },
-                }
-            );
-
-            // Assuming the original 'response' state contains the text you're working with
-            // and 'copilotInput' is the text selected by the user that was sent for processing
-            // Replace the 'copilotInput' in the 'response' with 'result.data'
-            if (response.includes(copilotInput)) {
-                const updatedResponse = response.replace(copilotInput, result.data);
-                setResponse(updatedResponse);
-            } else {
-                console.error("Selected text not found in the response.");
-                // Optionally handle the case where the selected text isn't found
-                // For example, you might want to append the result or alert the user
-            }
-        } catch (error) {
-            console.error("Error sending question:", error);
-            setResponse(error.message); // Consider how you want to handle errors, e.g., appending them or alerting the user
-        }
-        setIsLoading(false);
-    };
+  
 
     const sendQuestion = async () => {
         //console.log("question asked");
@@ -487,12 +384,96 @@ const Chatbot = () => {
         setIsLoading(false);
     };
 
+    const askCopilot = async (copilotInput: string, instructions: string, copilot_mode: string) => {
+        setQuestionAsked(true);
+        localStorage.setItem('questionAsked', 'true');
+        handleGAEvent('Chatbot', 'Copilot Input', copilotInput);
+        setIsLoading(true);
+        setStartTime(Date.now()); // Set start time for the timer
+
+        console.log({
+            input_text: copilotInput,
+            extra_instructions: instructions,
+            copilot_mode: copilot_mode,
+            dataset,
+          });
+          
+
+        try {
+            const result = await axios.post(
+                `http${HTTP_PREFIX}://${API_URL}/copilot`,
+                {
+                    input_text: copilotInput,
+                    extra_instructions: instructions,
+                    copilot_mode: copilot_mode,
+                    dataset,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${tokenRef.current}`,
+                    },
+                }
+            );
+
+            // Assuming the original 'response' state contains the text you're working with
+            // and 'copilotInput' is the text selected by the user that was sent for processing
+            // Replace the 'copilotInput' in the 'response' with 'result.data'
+            if (response.includes(copilotInput)) {
+                const updatedResponse = response.replace(copilotInput, result.data);
+                setResponse(updatedResponse);
+            } else {
+                console.error("Selected text not found in the response.");
+                // Optionally handle the case where the selected text isn't found
+                // For example, you might want to append the result or alert the user
+            }
+        } catch (error) {
+            console.error("Error sending question:", error);
+            setResponse(error.message); // Consider how you want to handle errors, e.g., appending them or alerting the user
+        }
+        setIsLoading(false);
+    };
+
+    useEffect(() => {
+        let intervalId = null;
+
+        const checkTextSelection = () => {
+            const currentSelectedText = window.getSelection().toString();
+            setIsCopilotVisible(!!currentSelectedText);
+            setSelectedText(currentSelectedText);
+            
+            if (!currentSelectedText && intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        };
+
+        const startIntervalCheck = () => {
+            if (!intervalId) {
+                intervalId = setInterval(checkTextSelection, 100);
+            }
+        };
+
+        document.addEventListener('mouseup', startIntervalCheck);
+        document.addEventListener('keyup', startIntervalCheck);
+
+        return () => {
+            document.removeEventListener('mouseup', startIntervalCheck);
+            document.removeEventListener('keyup', startIntervalCheck);
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, []);
+
     return (
         <div id="chatbot-page">
             <SideBarSmall />
-            <SideBar isCopilotVisible={isCopilotVisible} setIsCopilotVisible={setIsCopilotVisible} />
-
-
+            <SideBar
+                isCopilotVisible={isCopilotVisible}
+                setIsCopilotVisible={setIsCopilotVisible}
+                selectedText={selectedText} // Pass the selected text to the Sidebar component
+                askCopilot={askCopilot}
+            />
           <div className="chatbot-container">
 
                 <h1 className='heavy'>New Bid</h1>
@@ -667,7 +648,7 @@ const Chatbot = () => {
                                 className="chat-output mt-3 mb-2"
                                 value={response}
                                 onChange={(e) => setResponse(e.target.value)}
-                                onMouseUp={handleTextHighlight}
+                               
                             />
                             <Form.Text className="text-muted">
                                 Word Count: {countWords(response)}

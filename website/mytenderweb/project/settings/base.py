@@ -22,6 +22,8 @@ DEBUG = False
 ALLOWED_HOSTS = ['mytender.io', 'www.mytender.io', '127.0.0.1', '44.208.84.199']
 import os.path
 
+CRSF_TRUSTED_ORIGINS = ['https://mytender.io', 'https://www.mytender.io']
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 # Application definition
 

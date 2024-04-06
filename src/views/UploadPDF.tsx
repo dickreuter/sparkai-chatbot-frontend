@@ -7,7 +7,7 @@ import { useAuthUser } from 'react-auth-kit';
 import {displayAlert} from "../helper/Alert";
 
 
-const UploadPDF = () => {
+const UploadPDF = ({get_collections}) => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || 'default');
@@ -37,6 +37,8 @@ const UploadPDF = () => {
             });
             //console.log(response.data);
             displayAlert("Upload successful", "success");
+            get_collections();
+
         } catch (error) {
             console.error('Error uploading file:', error);
             displayAlert("Failed to save", "danger");

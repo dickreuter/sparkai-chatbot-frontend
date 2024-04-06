@@ -49,13 +49,18 @@
     color: black;
 }
 
+.library-table th,
+.library-table td {
+    width: 50%;
+}
+
+.library-table td:last-child,
+.library-table th:last-child {
+    text-align: right;
+}
+
 
 /* Specifically target the Action column to make it narrower */
-
-.library-table th:last-child,
-.library-table td:last-child {
-    width: 6.5%;
-}
 
 .library-table tr:last-child td {
     border-bottom: none;
@@ -94,4 +99,9 @@
 .lib-custom-card .card-body {
     padding: 0px;
     /* Adjust padding as needed */
+}
+
+.fa-icon {
+    margin-right: 8px;
+    /* Adjust the spacing as needed */
 }

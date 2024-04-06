@@ -9,7 +9,7 @@ import CustomTextField from "../components/CustomTextField";
 import TextField from '@mui/material/TextField';
 import handleGAEvent from "../utilities/handleGAEvent";
 
-const UploadText = () => {
+const UploadText = ({get_collections}) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -34,7 +34,7 @@ const UploadText = () => {
   const handleTextSubmit = async () => {
     const formData = new FormData();
     setIsUploading(true);
-    formData.append("text", "plain");
+    formData.append("text", text);
     formData.append("filename", fileName);
     formData.append("profile_name", profileName);
     formData.append("mode", textFormat);
@@ -61,6 +61,7 @@ const UploadText = () => {
       );
 
       displayAlert("Upload successful", "success");
+      get_collections();
       handleGAEvent('Library', 'Text Upload', 'Upload Text Button');
     } catch (error) {
       console.error("Error saving strategy:", error);

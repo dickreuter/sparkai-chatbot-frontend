@@ -115,7 +115,7 @@ const Chatbot = () => {
 
 
         // Retrieve the saved editor state from local storage
-        handleGAEvent('Chatbot', 'Save Proposal', 'Save Proposal Button');
+       
         const savedData = localStorage.getItem('editorState');
         let editorText = '';
         if (savedData) {
@@ -150,6 +150,7 @@ const Chatbot = () => {
             console.error("Error saving proposal:", error);
             setResponse(error.message);
         }
+        handleGAEvent('Chatbot', 'Save Proposal', 'Save Proposal Button');
 
     };
 

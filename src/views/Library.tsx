@@ -23,7 +23,7 @@ const Library = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
-  const [profileName, setProfileName] = useState("default");
+
 
   const [availableCollections, setAvailableCollections] = useState([]);
   const [folderContents, setFolderContents] = useState({});
@@ -31,34 +31,16 @@ const Library = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState('');
 
-  //pagination
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
-
-  // Function to change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-    // Calculate the rows to display
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = Object.entries(folderContents).slice(indexOfFirstRow, indexOfLastRow);
 
-// This creates a flat list of { fileName, folderName } objects for all files
-const flatFiles = Object.entries(folderContents).reduce((acc, [folderName, files]) => {
-  const folderFiles = files.map(fileName => ({ folderName, fileName }));
-  return [...acc, ...folderFiles];
-}, []);
 
-// Now apply pagination to flatFiles
-const totalRows = flatFiles.length;
 
 const [totalPages, setTotalPages] = useState(0);
 
-
-const currentFiles = flatFiles.slice(indexOfFirstRow, indexOfLastRow);
-
 const [showUploadPdfModal, setShowUploadPdfModal] = useState(false);
-// Rest of your component logic
 
 const [activeFolder, setActiveFolder] = useState(null);
 
@@ -80,39 +62,61 @@ const UploadPdfModal = () => (
 );
 // Modal component to display file content
 const FileContentModal = () => (
-  <Modal  show={showModal} onHide={() => setShowModal(false)} size="lg">
-    <Modal.Header closeButton>
-      <Modal.Title>File Content</Modal.Title>
-    </Modal.Header>
+  <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+  <Modal.Header closeButton style={{ display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
+    {/* Wrapping the Modal.Title in a div that takes up full width */}
+    <div style={{ flex: '1 1 auto' }}>
+      <Modal.Title style={{ textAlign: 'center' }}>
+        File Content
+      </Modal.Title>
+    </div>
+  </Modal.Header>
     <Modal.Body>
-      <pre style={{ textAlign: 'center' }}>{modalContent}</pre> {/* Centered text */}
+      <pre style={{
+        textAlign: 'center',
+        padding: '20px', // Add padding around the text
+        whiteSpace: 'pre-wrap', // Ensures that text wraps and does not cause horizontal scrolling
+        wordWrap: 'break-word', // Break words to prevent overflow
+        overflowX: 'hidden' // Hide horizontal scrollbar
+      }}>
+        {modalContent}
+      </pre>
     </Modal.Body>
-
   </Modal>
 );
 
 
 
-  const fetchFolderFilenames = async (folderName) => {
-    try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
-        { collection_name: folderName },
-        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
-      );
+const fetchFolderFilenames = async (folderName) => {
+  try {
+    const response = await axios.post(
+      `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
+      { collection_name: folderName },
+      { headers: { Authorization: `Bearer ${tokenRef.current}` } }
+    );
 
-      //console.log("fetchfoldernames");
-      //console.log(response.data);
+    // Assuming response.data is an array of objects with 'meta' and 'unique_id' properties
+    console.log(response.data);
 
-      // Ensure response.data structure is correctly handled here
-      setFolderContents(prevContents => ({
-        ...prevContents,
-        [folderName]: response.data // Adjust according to actual response structure
-      }));
-    } catch (error) {
-      console.error("Error fetching folder filenames:", error);
-    }
-  };
+    // Create an array of objects, each containing both the filename and unique_id
+    const filesWithIds = response.data.map(item => ({
+      filename: item.meta,
+      unique_id: item.unique_id
+    }));
+
+    console.log(filesWithIds);
+
+    // Update folderContents with the new array of objects
+    setFolderContents(prevContents => ({
+      ...prevContents,
+      [folderName]: filesWithIds
+    }));
+    
+  } catch (error) {
+    console.error("Error fetching folder filenames:", error);
+  }
+};
+
 
 
   const viewFile = async (fileName, folderName) => {
@@ -169,13 +173,13 @@ useEffect(() => {
 
 
 
-const deleteDocument = async (documentTitle) => {
+const deleteDocument = async (uniqueId) => {
   const formData = new FormData();
-  formData.append('profile_name', documentTitle);
+  formData.append('unique_id', uniqueId);
 
   try {
       await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/delete_template/`,
+          `http${HTTP_PREFIX}://${API_URL}/delete_template_entry/`,
           formData,
           {
               headers: {
@@ -185,8 +189,9 @@ const deleteDocument = async (documentTitle) => {
           }
       );
 
-      //get_collections(); // Refetch bids after successful deletion
       handleGAEvent('Library', 'Delete Document', 'Delete Document Button');
+      console.log("deleted")
+      get_collections();
   } catch (error) {
       console.error("Error deleting document:", error);
   }
@@ -212,6 +217,7 @@ const deleteFolder = async (folderTitle) => {
 
       //get_collections(); // Refetch bids after successful deletion
       handleGAEvent('Library', 'Delete Folder', 'Delete Folder Button');
+      get_collections();
   } catch (error) {
       console.error("Error deleting document:", error);
   }
@@ -269,22 +275,23 @@ const renderFolderContents = () => {
   const end = start + rowsPerPage;
   const currentFiles = folderContents[activeFolder]?.slice(start, end) || [];
   
-  return currentFiles.map((fileName, index) => (
+  return currentFiles.map(({ filename, unique_id }, index) => ( // Destructure filename and unique_id here
     <tr key={index}>
-       <td><FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {fileName}</td>
+      
+       <td><FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {filename}</td>
       <td colSpan={3}>
-      <FontAwesomeIcon
-      icon={faEye}
-      className="action-icon view-icon"
-      onClick={() => viewFile(fileName, activeFolder)}
-      style={{ cursor: 'pointer', marginRight: '15px' }} // Inline styles for cursor and spacing
-    />
-    <FontAwesomeIcon
-      icon={faTrash}
-      className="action-icon delete-icon"
-      onClick={() => deleteDocument(fileName)}
-      style={{ cursor: 'pointer', marginRight: '15px'}} // Inline style for cursor
-    />
+        <FontAwesomeIcon
+          icon={faEye}
+          className="action-icon view-icon"
+          onClick={() => viewFile(filename, activeFolder)} 
+          style={{ cursor: 'pointer', marginRight: '15px' }} 
+        />
+        <FontAwesomeIcon
+          icon={faTrash}
+          className="action-icon delete-icon"
+          onClick={() => deleteDocument(unique_id)} 
+          style={{ cursor: 'pointer', marginRight: '15px'}} 
+        />
       </td>
     </tr>
   ));
@@ -333,7 +340,7 @@ return (
                 </table>
 
               </Card.Body>
-              <div className="pagination-controls mt-2">
+              <div className="pagination-controls mt-4">
                   {[...Array(totalPages)].map((_, i) => (
                     <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
                       {i + 1}

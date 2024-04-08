@@ -20,7 +20,7 @@ const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
 
     const [choice, setChoice] = useState("3");
-    const [broadness, setBroadness] = useState("1");
+    const [broadness, setBroadness] = useState("2");
     const [dataset, setDataset] = useState("default");
 
     const [inputText, setInputText] = useState(
@@ -552,9 +552,9 @@ const Chatbot = () => {
                                         value={broadness}
                                         onChange={handleBroadnessChange}
                                     >
-                                        <option value="1">Narrow (single database entry)</option>
-                                        <option value="2">Extended (up to 2 entries)</option>
-                                        <option value="3">Broad (up to 3 entries)</option>
+                                        <option value="1">Narrow (2 entries)</option>
+                                        <option value="2">Extended (up to 4 entries)</option>
+                                        <option value="3">Broad (up to 6 entries)</option>
                                     </Form.Select>
                                     </Form.Group>
                                 </div>

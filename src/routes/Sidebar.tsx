@@ -146,7 +146,7 @@ const SideBar = ({ isCopilotVisible, setIsCopilotVisible, selectedText, askCopil
         )}
 
       <div>
-          <div className="sidebar-title" onClick={() => setIsCopilotVisible(false)}>
+          <div className="sidebar-title" >
             Copilot
             <span className="toggle-icon">
               <FontAwesomeIcon icon={isCopilotVisible ? faChevronDown : faChevronRight} />

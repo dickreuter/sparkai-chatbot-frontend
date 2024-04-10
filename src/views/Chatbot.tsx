@@ -54,8 +54,7 @@ const Chatbot = () => {
     
     const [isCopilotVisible, setIsCopilotVisible] = useState(false);
     const [selectedText, setSelectedText] = useState('');
-    const toggleCopilotVisibility = () => setIsCopilotVisible(!isCopilotVisible);
-
+    
 
     const getAuth = useAuthUser();
     const auth = getAuth();
@@ -540,7 +539,7 @@ const Chatbot = () => {
                                         value={choice}
                                         onChange={handleFunctionChange}
                                     >
-                                        <option value="3">Muti-topic Generator</option>
+                                        <option value="3">Multi-topic Generator</option>
                                         <option value="2">Auto Response</option>
                                     </Form.Select>
                                     </Form.Group>

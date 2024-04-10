@@ -79,13 +79,13 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
                 anchorKey: blockKey,
                 anchorOffset: lengthOfLastBlock + 1, // start of the word "Question"
                 focusKey: blockKey,
-                focusOffset: lengthOfLastBlock + 9, // end of the word "Question"
+                focusOffset: lengthOfLastBlock + 10, // end of the word "Question"
             });
 
             // Create selection range for the word "Answer"
             const answerRange = new SelectionState({
                 anchorKey: blockKey,
-                anchorOffset: lengthOfLastBlock + 14 + appendResponse.question.length, // start of the word "Answer"
+                anchorOffset: lengthOfLastBlock + 13 + appendResponse.question.length, // start of the word "Answer"
                 focusKey: blockKey,
                 focusOffset: lengthOfLastBlock + 20 + appendResponse.question.length, // end of the word "Answer"
             });

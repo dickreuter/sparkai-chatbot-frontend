@@ -128,10 +128,10 @@
                     <h5 class="mb-0 text-white">SERVICES</h5>
                     <div class="line"></div>
                     <ul>
-                        <li><a href="#">IT Services</a></li>
-                        <li><a href="#">Financial Services</a></li>
-                        <li><a href="#">Facility Management</a></li>
-                        <li><a href="#">Healthcare</a></li>
+                        <li><a  href="{% url 'ITservices' %}">IT Services</a></li>
+                        <li><a href="{% url 'financialservices' %}">Financial Services</a></li>
+                        <li><a  href="{% url 'facilitymanagement' %}">Facility Management</a></li>
+                        <li><a  href="{% url 'healthcare' %}">Healthcare</a></li>
                        
                     </ul>
                 </div>
@@ -139,10 +139,10 @@
                     <h5 class="mb-0 text-white">ABOUT</h5>
                     <div class="line"></div>
                     <ul>
-                        <li><a href="#">Services</a></li>
-                        <li><a href="#">Team</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Blog</a></li>
+                        <li><a href="{% url 'home' %}#services">Services</a></li>
+                        <li><a href="{% url 'home' %}#team">Team</a></li>
+                        <li><a href="{% url 'home' %}#contact">Contact</a></li>
+                        <li><a href="{% url 'home' %}#blog">Blog</a></li>
                     
                     </ul>
                 </div>

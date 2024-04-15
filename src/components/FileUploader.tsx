@@ -46,14 +46,27 @@ const FileUploader = ({ onFileSelect }) => {
 
   const handleUpload = () => {
     if (isFormFilled && selectedFile && profileName) {
+      // Check for spaces in the profileName first
+      if (/\s/.test(profileName)) {
+        displayAlert('Profile name should not contain spaces', 'warning');
+        return;
+      }
+  
+      // Then check for the validity of the profileName using regex
+      if (!/^[a-zA-Z0-9_-]{3,}$/.test(profileName)) {
+        displayAlert('Profile name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
+        return;
+      }
+  
       onFileSelect(selectedFile, profileName);
-
+  
       displayAlert("Upload successful", "success");
       // Optionally, reset the form here if needed
       setSelectedFile(null);
       setProfileName(null);
     }
   };
+  
 
   return (
     <div className={`file-uploader ${dragActive ? 'active' : ''}`}>

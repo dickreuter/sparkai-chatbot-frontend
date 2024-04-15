@@ -3,17 +3,11 @@ import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
-import {Button, Col, Container, Form, Row, Spinner, Card, Modal} from "react-bootstrap";
-import { Link } from 'react-router-dom';
+import {Button, Col,  Row, Card, Modal} from "react-bootstrap";
 import UploadPDF from './UploadPDF';
 import UploadText from './UploadText';
 import "./Library.css";
-import UploadTemplateText from '../components/UploadTemplateText';
-import Tooltip from "@mui/material/Tooltip";
-import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
-import SideBar from '../routes/Sidebar.tsx';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
-import NavBar from '../routes/NavBar';
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
 import { faEye, faTrash, faFolder, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 
@@ -32,7 +26,7 @@ const Library = () => {
   const [modalContent, setModalContent] = useState('');
 
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -42,36 +36,65 @@ const [totalPages, setTotalPages] = useState(0);
 
 const [showUploadPdfModal, setShowUploadPdfModal] = useState(false);
 
+const [showUploadTextModal, setShowUploadTextModal] = useState(false);
+
 const [activeFolder, setActiveFolder] = useState(null);
 
 
 
 // Modal Component for UploadPDF
 const UploadPdfModal = () => (
-  <Modal  show={showUploadPdfModal} onHide={() => setShowUploadPdfModal(false)} size="lg">
-    <Modal.Header closeButton>
-      <Modal.Title>PDF Uploader</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <UploadPDF
-      get_collections = {get_collections}
-      /> {/* Your UploadPDF component here */}
-    </Modal.Body>
-
-  </Modal>
-);
-// Modal component to display file content
-const FileContentModal = () => (
-  <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
-  <Modal.Header closeButton style={{ display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
-    {/* Wrapping the Modal.Title in a div that takes up full width */}
-    <div style={{ flex: '1 1 auto' }}>
-      <Modal.Title style={{ textAlign: 'center' }}>
-        File Content
+  <Modal show={showUploadPdfModal} onHide={() => setShowUploadPdfModal(false)} size="lg">
+       <Modal.Header closeButton >
+    <div >
+      <Modal.Title >
+        PDF Uploader
       </Modal.Title>
     </div>
   </Modal.Header>
     <Modal.Body>
+      <div >
+        <UploadPDF get_collections={get_collections} />
+      </div>
+    </Modal.Body>
+  </Modal>
+);
+
+const UploadTextModal = () => (
+  <Modal show={showUploadTextModal} onHide={() => setShowUploadTextModal(false)} size="lg">
+     <Modal.Header closeButton >
+    <div >
+      <Modal.Title >
+        Text Uploader
+      </Modal.Title>
+    </div>
+  </Modal.Header>
+    <Modal.Body>
+      <div >
+      <UploadText 
+                get_collections = {get_collections}
+                />
+      </div>
+    </Modal.Body>
+  </Modal>
+);
+
+
+// Modal component to display file content
+const FileContentModal = () => (
+  <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+    <Modal.Header closeButton style={{ display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
+      {/* Wrapping the Modal.Title in a div that takes up full width */}
+      <div style={{ flex: '1 1 auto' }}>
+        <Modal.Title style={{ textAlign: 'center' }}>
+          File Content
+        </Modal.Title>
+      </div>
+    </Modal.Header>
+    <Modal.Body style={{
+      height: '600px', // Set a fixed height for the modal body
+      overflowY: 'auto' // Add vertical scrollbar when content overflows
+    }}>
       <pre style={{
         textAlign: 'center',
         padding: '20px', // Add padding around the text
@@ -309,76 +332,59 @@ return (
       <div className="library-container mt-4">
         <Row>
           <Col md={12}>
-            <Card className="lib-custom-card">
-            <Card.Body style={{ height: '330px' }}>
-                <div className="header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h1 className="lib-custom-card-title">Resources</h1>
-                  <Button
-                    className="upload-button"
-                    onClick={() => setShowUploadPdfModal(true)}
-                  >
-                    Upload PDF
-                  </Button>
-                  <UploadPdfModal />
-                </div>
-                
-                {/* Table Structure */}
-                <table  className="library-table">
-                  <thead>
-                    <tr>
-                      <th>{activeFolder ? `Documents in ${activeFolder}` : 'Folders'}</th>
-                      <th colSpan={3}>
-                        {activeFolder && (
-                          <Button className="upload-button"  style={{backgroundColor: 'black'}} onClick={() => setActiveFolder(null)}>Back to Folders</Button>
-                        )}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activeFolder ? renderFolderContents() : renderFolders()}
-                  </tbody>
-                </table>
-
-              </Card.Body>
-              <div className="pagination-controls mt-4">
-                  {[...Array(totalPages)].map((_, i) => (
-                    <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-            </Card>
-          </Col>
-        </Row>
-         
-
-        {/* Upload Text and Template Uploader Sections remain unchanged */}
-        <Row>
-          {/* Text Uploader */}
-          <Col md={12}>
-            <Card className="lib-custom-card mt-4">
-              <Card.Body>
-                <h1 className="lib-custom-card-title">Text Uploader</h1>
-                <UploadText 
-                get_collections = {get_collections}
-                />
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-        <Row>
-          {/* Template Uploader */}
-          <Col md={12}>
-            <div className="mt-4">
-              <Card className="lib-custom-card mt-4">
-                <Card.Body>
-                  <h1 className="lib-custom-card-title">Template Uploader</h1>
-                  <UploadTemplateText />
-                </Card.Body>
-              </Card>
+          <Card className="lib-custom-card">
+          <Card.Body style={{ height: '530px' }}>
+            <div className="header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h1 className="lib-custom-card-title">Resources</h1>
+              <div style={{ display: 'flex' }}>
+                <Button
+                  className="upload-button"
+                  onClick={() => setShowUploadPdfModal(true)}
+                  style={{ marginRight: '10px' }} // Add some space between the buttons
+                >
+                  Upload PDF
+                </Button>
+                <UploadPdfModal />
+                <Button 
+                  className="upload-button"
+                  onClick={() => setShowUploadTextModal(true)}
+                  style={{ backgroundColor: 'black' }}
+                >
+                  Upload Text
+                </Button>
+                <UploadTextModal />
+              </div>
             </div>
+            
+            {/* Table Structure */}
+            <table className="library-table">
+              <thead>
+                <tr>
+                  <th>{activeFolder ? `Documents in ${activeFolder}` : 'Folders'}</th>
+                  <th colSpan={3}>
+                    {activeFolder && (
+                      <Button className="upload-button" style={{backgroundColor: 'black'}} onClick={() => setActiveFolder(null)}>Back to Folders</Button>
+                    )}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {activeFolder ? renderFolderContents() : renderFolders()}
+              </tbody>
+            </table>
+          </Card.Body>
+          <div className="pagination-controls mt-4">
+            {[...Array(totalPages)].map((_, i) => (
+              <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        </Card>
+
           </Col>
         </Row>
+       
       </div>
       <FileContentModal />
     </div>

@@ -67,7 +67,7 @@ const UploadTemplateText = () => {
     };
 
     return (
-        <div className="App" style={{ textAlign: "left" }}>
+        <div className="App" style={{ textAlign: "center" }}>
 
           <div className="input-options-container mt-3">
             <CustomTextField

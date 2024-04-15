@@ -39,11 +39,16 @@ const UploadText = ({get_collections}) => {
     formData.append("profile_name", profileName);
     formData.append("mode", textFormat);
 
+    if (/\s/.test(profileName)) {
+      displayAlert('Profile name should not contain spaces', 'warning');
+      setIsUploading(false);
+      return;
+    
+    }
+
     if (!/^[a-zA-Z0-9_-]{3,}$/.test(profileName)) {
-      displayAlert(
-        "Profile name should only contain alphanumeric characters and be at least 3 characters long",
-        "warning"
-      );
+        displayAlert('Profile name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
+      
       setIsUploading(false);
       return;
     }
@@ -76,7 +81,7 @@ const UploadText = ({get_collections}) => {
 
   return (
     <div className="App" style={{ textAlign: 'left' }}>
-      <div className="input-options-container mt-3">
+      <div className="input-options-container">
         <CustomTextField
           fullWidth
           label="Folder"

@@ -1,6 +1,14 @@
 .file-uploader {
     padding-top: 15px;
     padding-bottom: 15px;
+    text-align: left;
+    display: flex;
+    /* This makes it a flex container */
+    flex-direction: column;
+    /* Align children vertically */
+    justify-content: center;
+    /* Center children vertically */
+    /* Center text */
 }
 
 .drop-zone {

@@ -20,18 +20,14 @@ const NavBar = () => {
 
 
 
-  const handleNavLinkClick = (path) => {
-    if (window.innerWidth <= 768) {
-      toggle();
-    }
+  const handleNavLinkClick = () => {
     handleGAEvent('Navigation', 'Link Click', 'newbid');
     localStorage.removeItem('bidInfo');
     localStorage.removeItem('backgroundInfo');
     localStorage.removeItem('response');
     localStorage.removeItem('inputText');
     localStorage.removeItem('editorState');
-    //window.location.reload();
-    window.location.href = `/${path}`;
+    window.location.href = `/chatbot`;
 
 
   };
@@ -131,7 +127,7 @@ const NavBar = () => {
           )}
        {auth ? (
         <li className="nav-item">
-  <button className="btn btn-white nav-link" onClick={() => handleNavLinkClick('chatbot')}>
+  <button className="btn btn-white nav-link" onClick={() => handleNavLinkClick()}>
     New Bid
   </button>
 </li>

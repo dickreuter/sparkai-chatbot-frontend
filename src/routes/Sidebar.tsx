@@ -14,43 +14,19 @@ const SideBar = ({ isCopilotVisible, setIsCopilotVisible, selectedText, askCopil
 
   const [isActiveVisible, setIsActiveVisible] = useState(true);
   const [isOngoingVisible, setIsOngoingVisible] = useState(true);
-
-
+  const [selectedBid, setSelectedBid] = useState(null);
 
   const getAuth = useAuthUser();
   const auth = getAuth();
   const [bids, setBids] = useState([]);
-  // Adjust this useRef to obtain the token from your authentication context or state
   const tokenRef = useRef(auth?.token || "default");
   const navigate = useNavigate()
-
-
- const navigateToChatbot = (bid) => {
-  // Tracking the click before navigating
-  handleOngoingSidebarLinkClick('Ongoing bid click');
-
-  // Setting item in localStorage
-  localStorage.setItem('navigatedFromBidsTable', 'true');
-
-  // Navigating to the chatbot page with state
-  navigate('/chatbot', { state: { bid: bid, fromBidsTable: true } });
-  fetchBids();
-};
 
   useEffect(() => {
     fetchBids();
   }, []);
 
-  const handleSidebarLinkClick = (anchorId) => {
 
-    handleGAEvent('Sidebar Navigation', 'Link Click', 'sidebar nav');
-  };
-
-  const handleOngoingSidebarLinkClick = (label) => {
-
-    handleGAEvent('Sidebar Navigation' , 'Ongoing Link Click', 'ongoing link nav');
-
-  };
 
 
   const fetchBids = async () => {
@@ -92,15 +68,35 @@ const SideBar = ({ isCopilotVisible, setIsCopilotVisible, selectedText, askCopil
     handleSidebarLinkClick(anchorId); // Call handleSidebarLinkClick with the anchorId
   };
 
+  const handleSidebarLinkClick = (anchorId) => {
+    localStorage.setItem('navigatedFromBidsTable', 'true');
+    
+    navigate('/chatbot', { state: { bid: selectedBid, fromBidsTable: true } });
+    handleGAEvent('Sidebar Navigation', 'Link Click', 'sidebar nav');
+  };
 
+  const handleOngoingSidebarLinkClick = (label) => {
+
+    handleGAEvent('Sidebar Navigation' , 'Ongoing Link Click', 'ongoing link nav');
+
+  };
+
+  const navigateToChatbot = (bid) => {
+    setSelectedBid(bid);  // Update the selected bid
+    handleOngoingSidebarLinkClick('Ongoing bid click');
+    localStorage.setItem('navigatedFromBidsTable', 'true');
+    navigate('/chatbot', { state: { bid: bid, fromBidsTable: true } });
+    fetchBids();
+  };
+  
   
   const handleLinkClick = (linkName) => (e) => {
     e.preventDefault(); // Prevent the default link behavior
-    console.log(`${linkName} clicked`);
+    //console.log(`${linkName} clicked`);
     const copilot_mode = linkName.toLowerCase().replace(/\s+/g, '_');
-    console.log(`${copilot_mode}`);
+    //console.log(`${copilot_mode}`);
     const instructions = '';
-    console.log(selectedText);
+    //console.log(selectedText);
     askCopilot(selectedText, instructions, copilot_mode ); 
 
     // Here you can add any logic you need to handle the click
@@ -118,10 +114,10 @@ const SideBar = ({ isCopilotVisible, setIsCopilotVisible, selectedText, askCopil
       {isActiveVisible && (
         <div className="sidebar-links">
           {/* You might want to adjust these links based on your app's routing */}
-          <Link onClick={(e) => handleFirstLinkClick(e, '#bidinfo')} to="/chatbot#bidinfo" className='sidebar-link'>Bid Info</Link>
-          <Link onClick={() => handleSidebarLinkClick('#inputquestion')} to="/chatbot#inputquestion" className='sidebar-link'>Question</Link>
-          <Link onClick={() => handleSidebarLinkClick('#response')} to="/chatbot#response" className='sidebar-link'>Response</Link>
-          <Link onClick={() => handleSidebarLinkClick('#proposal')} to="/chatbot#proposal" className='sidebar-link'>Proposal</Link>
+          <Link state={{ bid: selectedBid, fromBidsTable: true }}  onClick={(e) => handleFirstLinkClick(e, '#bidinfo')} to="/chatbot#bidinfo" className='sidebar-link'>Bid Info</Link>
+          <Link state={{ bid: selectedBid, fromBidsTable: true }}  onClick={() => handleSidebarLinkClick('#inputquestion')} to="/chatbot#inputquestion" className='sidebar-link'>Question</Link>
+          <Link state={{ bid: selectedBid, fromBidsTable: true }}  onClick={() => handleSidebarLinkClick('#response')} to="/chatbot#response" className='sidebar-link'>Response</Link>
+          <Link state={{ bid: selectedBid, fromBidsTable: true }}  onClick={() => handleSidebarLinkClick('#proposal')} to="/chatbot#proposal" className='sidebar-link'>Proposal</Link>
         </div>
       )}
 
@@ -137,7 +133,7 @@ const SideBar = ({ isCopilotVisible, setIsCopilotVisible, selectedText, askCopil
               {recentOngoingBids.map((bid, index) => (
                 // Using bid ID or another unique property from bid as the key, if available
                 // If bid ID isn't available, fall back to using index, but prefer a more stable identifier if possible
-                <Link key={bid.id || index} to="/chatbot" state={{ bid: bid, fromBidsTable: true }} className='sidebar-link' onClick={() => navigateToChatbot(bid)}>
+                <Link key={bid.id || index} state={{ bid: bid, fromBidsTable: true }}  className='sidebar-link' onClick={() => navigateToChatbot(bid)}>
                   {bid.bid_title}
                 </Link>
           ))}

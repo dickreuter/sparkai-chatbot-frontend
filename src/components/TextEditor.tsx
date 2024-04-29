@@ -4,7 +4,7 @@ import { EditorState, convertToRaw, convertFromRaw, Modifier, SelectionState, Co
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 
-function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTable, toolbarClassName,  wrapperClassName}) {
+function CustomEditor({ bidText, appendResponse, navigatedFromBidsTable}) {
 
     const appendedIds = useRef(new Set()); // Track IDs of appended responses
 
@@ -19,13 +19,6 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
                 console.error("Error loading editor state from localStorage:", error);
             }
         }
-
-        // If navigated from bids table and bidText is provided, initialize with bidText
-        if (navigatedFromBidsTable && bidText) {
-            const contentState = ContentState.createFromText(bidText);
-            return EditorState.createWithContent(contentState);
-        }
-
         // Default to an empty editor if no saved state or bidText is available
         return EditorState.createEmpty();
     };
@@ -39,14 +32,12 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
             const currentContentText = editorState.getCurrentContent().getPlainText();
             if (bidText !== currentContentText) {
                 const contentState = ContentState.createFromText(bidText);
-                setEditorState(EditorState.createWithContent(contentState));
+                let newEditorState = EditorState.createWithContent(contentState);
+                newEditorState = applyBoldToHeadings(newEditorState);
+                setEditorState(newEditorState);
             }
         }
     }, [navigatedFromBidsTable, bidText, editorState]);
-
-
-    // Continue with your appendResponse logic as before
-
 
     useEffect(() => {
         if (appendResponse && !appendedIds.current.has(appendResponse.id)) {
@@ -122,13 +113,44 @@ function CustomEditor({ bidText, response, appendResponse, navigatedFromBidsTabl
         localStorage.setItem('editorState', JSON.stringify(convertToRaw(contentState)));
     }, [editorState]);
 
+
+    function applyBoldToHeadings(editorState) {
+        const contentState = editorState.getCurrentContent();
+        const blocks = contentState.getBlockMap();
+
+        let newContentState = contentState;
+        blocks.forEach((block) => {
+            const blockText = block.getText();
+            const questionMatch = /Question:/.exec(blockText);
+            const answerMatch = /Answer:/.exec(blockText);
+
+            if (questionMatch) {
+                const questionRange = new SelectionState({
+                    anchorKey: block.getKey(),
+                    anchorOffset: questionMatch.index,
+                    focusKey: block.getKey(),
+                    focusOffset: questionMatch.index + "Question:".length,
+                });
+                newContentState = Modifier.applyInlineStyle(newContentState, questionRange, 'BOLD');
+            }
+
+            if (answerMatch) {
+                const answerRange = new SelectionState({
+                    anchorKey: block.getKey(),
+                    anchorOffset: answerMatch.index,
+                    focusKey: block.getKey(),
+                    focusOffset: answerMatch.index + "Answer:".length,
+                });
+                newContentState = Modifier.applyInlineStyle(newContentState, answerRange, 'BOLD');
+            }
+        });
+
+        return EditorState.push(editorState, newContentState, 'change-inline-style');
+    }
+
     const onEditorStateChange = (newEditorState) => {
         setEditorState(newEditorState);
     };
-
-
-
-
 
         return (
             <Editor

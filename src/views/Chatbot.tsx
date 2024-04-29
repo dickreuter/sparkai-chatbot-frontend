@@ -15,6 +15,7 @@ import { useLocation } from 'react-router-dom';
 import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-js';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
+import ProposalEditor from "./ProposalEditor.tsx";
 
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
@@ -27,9 +28,7 @@ const Chatbot = () => {
         localStorage.getItem('inputText') || ''
       );
 
-    const [response, setResponse] = useState(
-        localStorage.getItem('response') || ''
-      );
+    
 
     const [isLoading, setIsLoading] = useState(false);
     const [startTime, setStartTime] = useState(null);
@@ -50,15 +49,27 @@ const Chatbot = () => {
     const [questionAsked, setQuestionAsked] = useState(false);
     const [apiChoices, setApiChoices] = useState([]);
     const [selectedChoices, setSelectedChoices] = useState([]);
+
+
     const [appendResponse, setAppendResponse] = useState(false);
+    const [response, setResponse] = useState(
+        localStorage.getItem('response') || ''
+      );
     
     const [isCopilotVisible, setIsCopilotVisible] = useState(false);
     const [selectedText, setSelectedText] = useState('');
+    const textAreaRef = useRef(null);  // Reference to the textarea
+
     
 
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
+
+    const [selectedQuestionId, setSelectedQuestionId] = useState("-1"); // Default to "Full Proposal"
+    const location = useLocation();
+    const bidData = location.state?.bid || ' ';
+    //console.log(bidData);
 
     const handleDatasetChange = (e) => {
         const newDataset = e.target.value;
@@ -88,13 +99,22 @@ const Chatbot = () => {
 
     const handleAppendResponseToEditor = () => {
         handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
-        const uniqueId = Date.now();
-        setAppendResponse({
-            id: uniqueId, // Unique identifier for each append action
-            question: inputText,
-            answer: response
-        });
+        setSelectedQuestionId("-1"); // Reset dropdown to "Full Proposal"
+    
+        // Delay the next operation to ensure UI updates smoothly
+        setTimeout(() => {
+            const uniqueId = Date.now();
+            setAppendResponse({
+                id: uniqueId, // Unique identifier for each append action
+                question: inputText,
+                answer: response
+            });
+    
+            setIsAppended(true);
+            setTimeout(() => setIsAppended(false), 3000);
+        }, 100); // Adjust the delay here based on your needs
     };
+    
 
 
     const handleSelect = (selectedKey) => {
@@ -108,7 +128,7 @@ const Chatbot = () => {
 
 
     const [isSaved, setIsSaved] = useState(false);
-
+    const [isAppended, setIsAppended] = useState(false);
 
     const saveProposal = async () => {
 
@@ -153,8 +173,8 @@ const Chatbot = () => {
 
     };
 
-    const location = useLocation();
-    const bidData = location.state?.bid || '';
+  
+    //console.log(bidData);
 
     useEffect(() => {
 
@@ -434,37 +454,38 @@ const Chatbot = () => {
     };
 
     useEffect(() => {
-        let intervalId = null;
-
         const checkTextSelection = () => {
-            const currentSelectedText = window.getSelection().toString();
-            setIsCopilotVisible(!!currentSelectedText);
-            setSelectedText(currentSelectedText);
+            if (textAreaRef.current && document.activeElement === textAreaRef.current) {
+                const selection = window.getSelection();
+                const selectedText = selection.toString();
+                setIsCopilotVisible(!!selectedText);
+                setSelectedText(selectedText);
             
-            if (!currentSelectedText && intervalId) {
-                clearInterval(intervalId);
-                intervalId = null;
+                if (!selectedText) {
+                    // Delay clearing the selection state to allow for link clicks to be processed
+                    setTimeout(() => {
+                        setIsCopilotVisible(false);
+                    }, 100); // 100 ms delay
+                }
+                setSelectedText(selectedText);
+            } else {
+                setTimeout(() => {
+                    setIsCopilotVisible(false);
+                    setSelectedText('');
+                }, 100); // 100 ms delay
+              
             }
         };
 
-        const startIntervalCheck = () => {
-            if (!intervalId) {
-                intervalId = setInterval(checkTextSelection, 100);
-            }
-        };
-
-        document.addEventListener('mouseup', startIntervalCheck);
-        document.addEventListener('keyup', startIntervalCheck);
+        // Listen for mouse up and key up events to capture text selections
+        document.addEventListener('mouseup', checkTextSelection);
+        document.addEventListener('keyup', checkTextSelection);
 
         return () => {
-            document.removeEventListener('mouseup', startIntervalCheck);
-            document.removeEventListener('keyup', startIntervalCheck);
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
+            document.removeEventListener('mouseup', checkTextSelection);
+            document.removeEventListener('keyup', checkTextSelection);
         };
     }, []);
-
     return (
         <div id="chatbot-page">
             <SideBarSmall />
@@ -644,6 +665,7 @@ const Chatbot = () => {
                                 <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
                             </Form.Group>
                             <Form.Control
+                                ref={textAreaRef}
                                 as="textarea"
                                 className="chat-output mt-3 mb-2"
                                 value={response}
@@ -656,43 +678,37 @@ const Chatbot = () => {
 
                         </Col>
                         <div>
-                        <Button className="upload-button mt-2" onClick={handleAppendResponseToEditor}>
-                                Add to Proposal
-                                {/* down arrow */}
+                        <Button
+                        variant={isAppended ? "success" : "primary"}
+                        className="upload-button mt-2" 
+                        onClick={handleAppendResponseToEditor}
+                        disabled={isLoading || isAppended} 
+                        >   
+                                {isAppended ? "Added" : "Add to Proposal"}
                             </Button>
                         </div>
 
 
         
                     </Row>
+
+
+
+
                 </section>
-                <section id="proposal">
+                
+                {bidData ? (
+                    <ProposalEditor
+                        bidData={bidData}
+                        appendResponse={appendResponse}
+                        selectedQuestionId={selectedQuestionId}
+                        setSelectedQuestionId={setSelectedQuestionId}
+                    />
+                ) : (
+                    <div>Loading or no bid data available...</div>
+                )}
 
 
-                <div className="proposal-header mb-3">
-
-                    <h3 className="custom-label mt-5">Proposal Editor</h3>
-                </div>
-                <div className="proposal-container">
-                        <Row className="justify-content-md-center">
-                            <Col md={12}>
-                                <div className="d-flex justify-content-center mb-3">
-                                <CustomEditor
-                                    bidText={bidData.text}
-                                    response={response}
-                                    appendResponse={appendResponse}
-                                    navigatedFromBidsTable={localStorage.getItem('navigatedFromBidsTable') === 'true'}
-                                    toolbarClassName="toolbarClassName"
-                                    wrapperClassName="wrapperClassName"
-
-                                />
-                                </div>
-                            </Col>
-
-                        </Row>
-
-                </div>
-                </section>
                 <Row className="mt-3">
                             <div >
                             <Button

@@ -28,9 +28,16 @@ const useAuthSignIn = () => {
         }
       })) {
 
+        localStorage.removeItem('bidInfo');
+        localStorage.removeItem('backgroundInfo');
+        localStorage.removeItem('response');
+        localStorage.removeItem('inputText');
+        localStorage.removeItem('editorState');
         navigate('/chatbot');
 
-        localStorage.clear();
+        //localStorage.clear();
+       
+
         return { success: true, message: 'Log in successful!' };
       } else {
         setError('Log in unsuccessful');

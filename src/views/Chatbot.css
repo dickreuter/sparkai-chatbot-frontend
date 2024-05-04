@@ -73,7 +73,7 @@
 }
 
 .custom-label {
-    font-size: 1rem;
+    font-size: 1.05rem;
     /* This sets the font size to be larger */
     text-align: left !important;
     font-weight: 500;

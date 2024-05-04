@@ -9,9 +9,11 @@ import UploadText from './UploadText';
 import "./Library.css";
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
-import { faEye, faTrash, faFolder, faFileAlt } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTrash, faFolder, faFileAlt,  faArrowUpFromBracket, faEllipsisVertical} from '@fortawesome/free-solid-svg-icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { UploadPDFModal, UploadTextModal, UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
+
 
 const Library = () => {
   const getAuth = useAuthUser();
@@ -26,58 +28,138 @@ const Library = () => {
   const [modalContent, setModalContent] = useState('');
 
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+  const rowsPerPage = 9;
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const [totalPages, setTotalPages] = useState(0);
+
+  const [activeFolder, setActiveFolder] = useState(null);
+
+  const [showPDFModal, setShowPDFModal] = useState(false);
+  const [showTextModal, setShowTextModal] = useState(false);
+
+  const [showDeleteFolderModal, setShowDeleteFolderModal] = useState(false);
+  const [folderToDelete, setFolderToDelete] = useState('');
+
+  const [showDeleteFileModal, setShowDeleteFileModal] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState(null);
+
+  const [uploadFolder, setUploadFolder] = useState(null);
+
+  const handleDelete = async (folderTitle) => {
+    // Your delete folder logic here
+    console.log('Deleting folder:', folderTitle);
+    setFolderToDelete(''); // Reset folderToDelete after deletion
+    deleteFolder(folderTitle);
+    setShowDeleteFolderModal(false); // Close modal after deletion
+  };
+
+  const handleDeleteFileClick = (event, unique_id, filename) => {
+    event.stopPropagation(); // Prevents the row click event
+    setFileToDelete({ unique_id, filename });
+    setShowDeleteFileModal(true);
+  };
+  
+
+  const handleShowPDFModal = (event, folder) => {
+    event.stopPropagation();  // Stop the event from propagating further
+    setUploadFolder(folder);  // Set the folder state
+    setShowPDFModal(true);    // Show the PDF upload modal
+};
+
+const handleShowTextModal = (event, folder) => {
+    event.stopPropagation();  // Stop the event from propagating further
+    setUploadFolder(folder);  // Set the folder state
+    setShowTextModal(true);   // Show the Text upload modal
+};
+
+const handleOpenPDFModal = () => {
+  setUploadFolder(null);  // Reset the upload folder to null
+  setShowPDFModal(true);  // Open the PDF upload modal
+};
+
+const handleOpenTextModal = () => {
+  setUploadFolder(null);  // Reset the upload folder to null
+  setShowTextModal(true);  // Open the Text upload modal
+};
 
 
-const [totalPages, setTotalPages] = useState(0);
-
-const [showUploadPdfModal, setShowUploadPdfModal] = useState(false);
-
-const [showUploadTextModal, setShowUploadTextModal] = useState(false);
-
-const [activeFolder, setActiveFolder] = useState(null);
-
-
-
-// Modal Component for UploadPDF
-const UploadPdfModal = () => (
-  <Modal show={showUploadPdfModal} onHide={() => setShowUploadPdfModal(false)} size="lg">
-       <Modal.Header closeButton >
-    <div >
-      <Modal.Title >
-        PDF Uploader
-      </Modal.Title>
-    </div>
-  </Modal.Header>
-    <Modal.Body>
-      <div >
-        <UploadPDF get_collections={get_collections} />
-      </div>
-    </Modal.Body>
-  </Modal>
+  const UploadPDFModal = ({ show, onHide, folder, get_collections }) => (
+    <Modal 
+        show={show} 
+        onHide={() => { onHide(); }}  // Removed e.stopPropagation() here, may not be necessary
+        onClick={(e) => e.stopPropagation()}  // Correct usage
+        size="lg"
+    >
+        <Modal.Header closeButton onClick={(e) => e.stopPropagation()}>
+            <Modal.Title>PDF Uploader</Modal.Title>
+        </Modal.Header>
+        <Modal.Body onClick={(e) => e.stopPropagation()}>
+            <UploadPDF folder={folder} get_collections={get_collections} onClose={onHide} />
+        </Modal.Body>
+    </Modal>
 );
 
-const UploadTextModal = () => (
-  <Modal show={showUploadTextModal} onHide={() => setShowUploadTextModal(false)} size="lg">
-     <Modal.Header closeButton >
-    <div >
-      <Modal.Title >
-        Text Uploader
-      </Modal.Title>
-    </div>
-  </Modal.Header>
-    <Modal.Body>
-      <div >
-      <UploadText 
-                get_collections = {get_collections}
-                />
-      </div>
-    </Modal.Body>
-  </Modal>
+const UploadTextModal = ({ show, onHide, folder, get_collections }) => (
+    <Modal 
+        show={show} 
+        onHide={() => { onHide(); }}  // Removed e.stopPropagation() here, may not be necessary
+        onClick={(e) => e.stopPropagation()}  // Correct usage
+        size="lg"
+    >
+        <Modal.Header closeButton onClick={(e) => e.stopPropagation()}>
+            <Modal.Title>Text Uploader</Modal.Title>
+        </Modal.Header>
+        <Modal.Body onClick={(e) => e.stopPropagation()}>
+            <UploadText folder={folder} get_collections={get_collections} onClose={onHide} />
+        </Modal.Body>
+    </Modal>
 );
+
+
+const DeleteFolderModal = ({ show, onHide, onDelete, folderTitle }) => {
+  return (
+      <Modal show={show} onHide={onHide} size="lg">
+          <Modal.Header closeButton>
+              <Modal.Title>Delete Folder</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+              Are you sure you want to delete the folder "{folderTitle}"?
+          </Modal.Body>
+          <Modal.Footer>
+              <Button variant="secondary" onClick={onHide}>
+                  Cancel
+              </Button>
+              <Button variant="danger" onClick={() => onDelete(folderTitle)}>
+                  Delete
+              </Button>
+          </Modal.Footer>
+      </Modal>
+  );
+};
+
+const DeleteFileModal = ({ show, onHide, onDelete, fileName }) => {
+  return (
+    <Modal show={show} onHide={onHide} size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>Delete File</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        Are you sure you want to delete the file "{fileName}"?
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={onHide}>
+          Cancel
+        </Button>
+        <Button variant="danger" onClick={() => onDelete()}>
+          Delete
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
 
 
 // Modal component to display file content
@@ -119,7 +201,7 @@ const fetchFolderFilenames = async (folderName) => {
     );
 
     // Assuming response.data is an array of objects with 'meta' and 'unique_id' properties
-    console.log(response.data);
+    //console.log(response.data);
 
     // Create an array of objects, each containing both the filename and unique_id
     const filesWithIds = response.data.map(item => ({
@@ -127,7 +209,7 @@ const fetchFolderFilenames = async (folderName) => {
       unique_id: item.unique_id
     }));
 
-    console.log(filesWithIds);
+    //console.log(filesWithIds);
 
     // Update folderContents with the new array of objects
     setFolderContents(prevContents => ({
@@ -140,6 +222,25 @@ const fetchFolderFilenames = async (folderName) => {
   }
 };
 
+
+const get_collections = async () => {
+  try {
+    const res = await axios.post(
+      `http${HTTP_PREFIX}://${API_URL}/get_collections`,
+      {},
+      { headers: { Authorization: `Bearer ${tokenRef.current}` } }
+    );
+    //console.log("response");
+    //console.log(res.data);
+    setAvailableCollections(res.data.collections || []);
+    // Immediately fetch filenames for all collections
+    for (const collection of res.data.collections || []) {
+      await fetchFolderFilenames(collection);
+    }
+  } catch (error) {
+    console.error("Error fetching collections:", error);
+  }
+};
 
 
   const viewFile = async (fileName, folderName) => {
@@ -170,29 +271,6 @@ const fetchFolderFilenames = async (folderName) => {
     }
   };
 
-  const get_collections = async () => {
-    try {
-      const res = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_collections`,
-        {},
-        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
-      );
-      //console.log("response");
-      //console.log(res.data);
-      setAvailableCollections(res.data.collections || []);
-      // Immediately fetch filenames for all collections
-      for (const collection of res.data.collections || []) {
-        await fetchFolderFilenames(collection);
-      }
-    } catch (error) {
-      console.error("Error fetching collections:", error);
-    }
-  };
-
-useEffect(() => {
-  
-  get_collections();
-}, []); // Removed tokenRef from dependencies to avoid refetching on token change
 
 
 
@@ -213,7 +291,7 @@ const deleteDocument = async (uniqueId) => {
       );
 
       handleGAEvent('Library', 'Delete Document', 'Delete Document Button');
-      console.log("deleted")
+      //console.log("deleted")
       get_collections();
   } catch (error) {
       console.error("Error deleting document:", error);
@@ -221,8 +299,8 @@ const deleteDocument = async (uniqueId) => {
 };
 
 const deleteFolder = async (folderTitle) => {
-  console.log("delete folder")
-  console.log(folderTitle);
+  //console.log("delete folder")
+  //console.log(folderTitle);
   const formData = new FormData();
   formData.append('profile_name', folderTitle);
 
@@ -253,72 +331,70 @@ const handleFolderClick = (folderName) => {
 };
 
 useEffect(() => {
-  // Calculate total pages based on whether a folder is selected or not
+  get_collections();
+}, []); // Empty dependency array means this effect runs only on mount
+
+
+useEffect(() => {
+  if (activeFolder === null) {
+    setCurrentPage(1); // Reset to page 1 only when the active folder is deselected
+  }
   const itemsCount = activeFolder ? (folderContents[activeFolder]?.length || 0) : availableCollections.length;
   const pages = Math.ceil(itemsCount / rowsPerPage);
   setTotalPages(pages);
-  setCurrentPage(1); // Optionally reset to page 1 when switching context
 }, [activeFolder, folderContents, availableCollections.length, rowsPerPage]);
 
 
-// Function to render folders
+
 const renderFolders = () => {
-  // Calculate the slice of folders to display based on current page
   const startIdx = (currentPage - 1) * rowsPerPage;
   const endIdx = startIdx + rowsPerPage;
   const foldersToDisplay = availableCollections.slice(startIdx, endIdx);
 
   return foldersToDisplay.map((folder, index) => (
     <tr key={index} onClick={() => handleFolderClick(folder)} style={{ cursor: 'pointer' }}>
-      <td><FontAwesomeIcon icon={faFolder} className="fa-icon" /> {folder}</td>
+      <td><FontAwesomeIcon icon={faFolder} className="fa-icon"  onClick={(event) => {
+            event.stopPropagation(); 
+          }} 
+          
+          style={{ cursor: 'pointer', marginRight: '10px' }} // Inline style for cursor
+          /> {folder}</td>
       <td colSpan={3}>
-          <FontAwesomeIcon
-          icon={faEye}
-          className="action-icon view-icon"
-          style={{ cursor: 'pointer', marginRight: '15px' }} // Inline styles for cursor and spacing
+      <UploadButtonWithDropdown
+            folder={folder}
+            get_collections={get_collections}
+            handleShowPDFModal={handleShowPDFModal}
+            handleShowTextModal={handleShowTextModal}
+            setShowDeleteFolderModal={setShowDeleteFolderModal}
+            setFolderToDelete={setFolderToDelete}
         />
-        <FontAwesomeIcon
-          icon={faTrash}
-          className="action-icon delete-icon"
-          onClick={(event) => {
-            event.stopPropagation(); // Prevents the row click event
-            deleteFolder(folder);
-          }}
-          style={{ cursor: 'pointer', marginRight: '15px'}} // Inline style for cursor
-        />
-        </td> 
+      </td> 
     </tr>
   ));
 };
-
-
 
 const renderFolderContents = () => {
   const start = (currentPage - 1) * rowsPerPage;
   const end = start + rowsPerPage;
   const currentFiles = folderContents[activeFolder]?.slice(start, end) || [];
   
-  return currentFiles.map(({ filename, unique_id }, index) => ( // Destructure filename and unique_id here
-    <tr key={index}>
-      
-       <td><FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {filename}</td>
+  return currentFiles.map(({ filename, unique_id }, index) => (
+    <tr key={index} onClick={() => viewFile(filename, activeFolder)} style={{ cursor: 'pointer' }}>
+      <td><FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {filename}</td>
       <td colSpan={3}>
-        <FontAwesomeIcon
-          icon={faEye}
-          className="action-icon view-icon"
-          onClick={() => viewFile(filename, activeFolder)} 
-          style={{ cursor: 'pointer', marginRight: '15px' }} 
-        />
         <FontAwesomeIcon
           icon={faTrash}
           className="action-icon delete-icon"
-          onClick={() => deleteDocument(unique_id)} 
-          style={{ cursor: 'pointer', marginRight: '15px'}} 
+          onClick={(event) => handleDeleteFileClick(event, unique_id, filename)}
+          style={{ cursor: 'pointer', marginRight: '15px'}}
         />
       </td>
     </tr>
   ));
 };
+
+
+
 
 
 
@@ -333,26 +409,26 @@ return (
         <Row>
           <Col md={12}>
           <Card className="lib-custom-card">
-          <Card.Body style={{ height: '530px' }}>
+          <Card.Body style={{ height: '560px' }}>
             <div className="header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h1 className="lib-custom-card-title">Resources</h1>
               <div style={{ display: 'flex' }}>
                 <Button
-                  className="upload-button"
-                  onClick={() => setShowUploadPdfModal(true)}
-                  style={{ marginRight: '10px' }} // Add some space between the buttons
-                >
-                  Upload PDF
-                </Button>
-                <UploadPdfModal />
-                <Button 
-                  className="upload-button"
-                  onClick={() => setShowUploadTextModal(true)}
-                  style={{ backgroundColor: 'black' }}
-                >
-                  Upload Text
-                </Button>
-                <UploadTextModal />
+            className="upload-button"
+            onClick={handleOpenPDFModal}
+            style={{ marginRight: '10px' }} // Add some space between the buttons
+        >
+            Upload PDF
+        </Button>
+       
+        <Button 
+            className="upload-button"
+            onClick={handleOpenTextModal}
+            style={{ backgroundColor: 'black' }}
+        >
+            Upload Text
+        </Button>
+            
               </div>
             </div>
             
@@ -387,6 +463,41 @@ return (
        
       </div>
       <FileContentModal />
+      
+     
+      <DeleteFolderModal
+          show={showDeleteFolderModal}
+          onHide={() => setShowDeleteFolderModal(false)}
+          onDelete={() => handleDelete(folderToDelete)}
+          folderTitle={folderToDelete}
+      />
+
+        <DeleteFileModal
+          show={showDeleteFileModal}
+          onHide={() => setShowDeleteFileModal(false)}
+          onDelete={() => {
+            deleteDocument(fileToDelete.unique_id);
+            setShowDeleteFileModal(false); // Close the modal after deletion
+          }}
+          fileName={fileToDelete ? fileToDelete.filename : ''}
+        />
+
+
+      <UploadPDFModal
+        show={showPDFModal}
+        onHide={() => setShowPDFModal(false)}
+        folder={uploadFolder}
+         get_collections={get_collections}
+      />
+      <UploadTextModal
+        show={showTextModal}
+        onHide={() => setShowTextModal(false)}
+        folder={uploadFolder}
+        get_collections={get_collections}
+      />
+        
+
+       
     </div>
   </div>
 );

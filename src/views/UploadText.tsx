@@ -9,7 +9,7 @@ import CustomTextField from "../components/CustomTextField";
 import TextField from '@mui/material/TextField';
 import handleGAEvent from "../utilities/handleGAEvent";
 
-const UploadText = ({get_collections}) => {
+const UploadText = ({folder, get_collections, onClose}) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -18,7 +18,7 @@ const UploadText = ({get_collections}) => {
 
 
 
-  const [profileName, setProfileName] = useState(null);
+  const [profileName, setProfileName] = useState(folder || '');
   const [fileName, setFileName] = useState(null);
   const [textFormat, setTextFormat] = useState("plain");
   const [isUploading, setIsUploading] = useState(false);
@@ -66,8 +66,10 @@ const UploadText = ({get_collections}) => {
       );
 
       displayAlert("Upload successful", "success");
+      onClose();
       get_collections();
       handleGAEvent('Library', 'Text Upload', 'Upload Text Button');
+
     } catch (error) {
       console.error("Error saving strategy:", error);
       displayAlert("Failed to save", "danger");
@@ -82,13 +84,15 @@ const UploadText = ({get_collections}) => {
   return (
     <div className="App" style={{ textAlign: 'left' }}>
       <div className="input-options-container">
-        <CustomTextField
-          fullWidth
-          label="Folder"
-          variant="outlined"
-          value={profileName}
-          onChange={(e) => setProfileName(e.target.value)}
-        />
+      <CustomTextField
+        fullWidth
+        label="Folder"
+        variant="outlined"
+        value={profileName}
+        onChange={(e) => setProfileName(e.target.value)}
+        disabled={!!folder} // Disable if folder prop is provided
+      />
+
         <CustomTextField
           fullWidth
           label="File name"

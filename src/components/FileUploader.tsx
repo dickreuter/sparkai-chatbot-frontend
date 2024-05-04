@@ -3,13 +3,14 @@ import './FileUploader.css';
 import CustomTextField from './CustomTextField';
 import { displayAlert } from '../helper/Alert';
 
-const FileUploader = ({ onFileSelect }) => {
+const FileUploader = ({ onFileSelect, folder, onClose }) => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [profileName, setProfileName] = useState(null);
+  const [profileName, setProfileName] = useState(folder || '');
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [fileToUpload, setfileToUpload] = useState(null);
 
+  //console.log(folder);
   useEffect(() => {
     // Check if any field is either null or an empty string
     const checkFormFilled = profileName && selectedFile;
@@ -64,20 +65,22 @@ const FileUploader = ({ onFileSelect }) => {
       // Optionally, reset the form here if needed
       setSelectedFile(null);
       setProfileName(null);
+      onClose(); 
     }
   };
   
 
   return (
     <div className={`file-uploader ${dragActive ? 'active' : ''}`}>
-       <CustomTextField
-                fullWidth
-                label="Folder"
-                variant="outlined"
-                value={profileName}
-                onChange={(e) => setProfileName(e.target.value)}
-                className="uploader-input mb-3" // Margin bottom for spacing
-            />
+          <CustomTextField
+            fullWidth
+            label="Folder"
+            variant="outlined"
+            value={profileName}
+            onChange={(e) => setProfileName(e.target.value)}
+            disabled={!!folder} // Disable input if folder name is provided
+            className="uploader-input mb-3" // Margin bottom for spacing
+          />
       <div
         className="drop-zone"
         onDragEnter={handleDrag}

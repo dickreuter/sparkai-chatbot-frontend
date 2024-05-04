@@ -105,3 +105,39 @@
     margin-right: 8px;
     /* Adjust the spacing as needed */
 }
+
+
+/* Button with ellipsis icon */
+
+.ellipsis-icon {
+    color: black;
+}
+
+.ellipsis-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+    outline: none;
+}
+
+.ellipsis-button:hover {
+    background-color: #f2f2f2;
+    /* Slightly darker for better visibility on hover */
+}
+
+.ellipsis-button:focus,
+.ellipsis-button:active {
+    outline: none;
+    /* Remove outline on focus */
+    background-color: #f2f2f2;
+    /* Keeps the background color consistent */
+    box-shadow: none;
+    /* Removes any box shadow if applied by the browser */
+}

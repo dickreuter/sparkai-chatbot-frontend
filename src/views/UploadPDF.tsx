@@ -7,7 +7,7 @@ import { useAuthUser } from 'react-auth-kit';
 import {displayAlert} from "../helper/Alert";
 
 
-const UploadPDF = ({get_collections}) => {
+const UploadPDF = ({folder, get_collections, onClose}) => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || 'default');
@@ -49,7 +49,7 @@ const UploadPDF = ({get_collections}) => {
     return (
         <div className="App">
 
-            <FileUploader onFileSelect={handleFileSelect} />
+            <FileUploader onFileSelect={handleFileSelect} folder={folder} onClose={onClose}/>
         </div>
     );
 }

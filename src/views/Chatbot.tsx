@@ -16,6 +16,9 @@ import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-j
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
 import ProposalEditor from "./ProposalEditor.tsx";
+import { saveAs } from 'file-saver';
+import { Document, Packer, Paragraph, TextRun } from 'docx';
+import { stateToHTML } from 'draft-js-export-html';
 
 const Chatbot = () => {
     const [folderContents, setFolderContents] = useState({});
@@ -172,6 +175,47 @@ const Chatbot = () => {
         handleGAEvent('Chatbot', 'Save Proposal', 'Save Proposal Button');
 
     };
+
+    
+    const retrieveEditorState = () => {
+        const savedData = localStorage.getItem('editorState');
+        if (savedData) {
+            const rawContent = JSON.parse(savedData);
+            const contentState = convertFromRaw(rawContent);
+            return EditorState.createWithContent(contentState);
+        }
+        return EditorState.createEmpty();
+    };
+
+    const exportToDocx = (editorState) => {
+        if (!editorState) {
+            console.error("No editor state available");
+            return;
+        }
+    
+        // Convert editor state to plain text or implement your HTML to DOCX logic here
+        const contentState = editorState.getCurrentContent();
+        const contentText = contentState.getPlainText('\n');
+    
+        // Create a new document
+        const doc = new Document({
+            sections: [{
+                properties: {},
+                children: contentText.split('\n').map(line => new Paragraph({
+                    children: [new TextRun(line)]
+                }))
+            }]
+        });
+    
+        // Used Packer to create a Blob
+        Packer.toBlob(doc).then(blob => {
+            // Save the Blob as a DOCX file
+            saveAs(blob, 'proposal.docx');
+        }).catch(err => {
+            console.error('Error creating DOCX:', err);
+        });
+    };
+    
 
   
     //console.log(bidData);
@@ -719,6 +763,16 @@ const Chatbot = () => {
                             >
                                 {isSaved ? "Saved" : "Save Proposal"}
                             </Button>
+                            <Button
+                                variant={"primary"}
+                                onClick={() => exportToDocx(retrieveEditorState())} // Use an arrow function to delay execution
+                                className="mt-1 ml-2 upload-button"
+                                disabled={isLoading}
+                                style={{marginLeft: "5px", backgroundColor: "black"}}
+                            >
+                                Export to Word
+                            </Button>
+
 
                             </div>
                 </Row>

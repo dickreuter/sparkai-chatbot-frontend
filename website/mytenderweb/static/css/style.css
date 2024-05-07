@@ -232,10 +232,7 @@ img {
 
 .small-video {
     width: 100% !important;
-    /* This makes the video responsive */
     height: auto !important;
-    /* Maintain aspect ratio */
-    /* This maintains the aspect ratio */
 }
 
 @media (max-width: 991.5px) {

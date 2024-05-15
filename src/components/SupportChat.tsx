@@ -1,5 +1,4 @@
-// src/components/ChatBot.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Widget, addResponseMessage, addUserMessage } from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
 import axios from 'axios';
@@ -7,21 +6,19 @@ import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
 
 const SupportChat = ({ auth }) => {
   const [messages, setMessages] = useState([]);
-  const [messageCount, setMessageCount] = useState(0);
+  const messagesRef = useRef(messages);
 
   useEffect(() => {
-    if (auth?.token) {
-      fetchMessages();
-      const intervalId = setInterval(fetchMessages, 10000); // Poll every 10 seconds
-      return () => clearInterval(intervalId); // Cleanup interval on unmount
-    }
-  }, [auth?.token]);
+    messagesRef.current = messages;
+  }, [messages]);
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
+    if (!auth?.token) return;
+
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/slack_get_messages`,
-        {}, // Keeping it consistent with the example pattern
+        {},
         {
           headers: {
             Authorization: `Bearer ${auth?.token}`,
@@ -30,33 +27,50 @@ const SupportChat = ({ auth }) => {
       );
       const { messages: fetchedMessages } = response.data;
 
-      if (fetchedMessages.length > messageCount) {
+      console.log('Fetched Messages:', fetchedMessages);
 
-        // Find new messages that are not already in the current state
+      if (Array.isArray(fetchedMessages)) {
         const newMessages = fetchedMessages.filter(
-          (msg) => !messages.includes(msg)
+          (fMsg) => !messagesRef.current.some((msg) => msg.id === fMsg.id)
         );
 
-        // Add only new messages
-        newMessages.forEach((msg) => addResponseMessage(msg));
+        console.log('New Messages:', newMessages);
 
-        // Update the state with the new messages and message count
+        newMessages.forEach((msg) => {
+          if (typeof msg.text === 'string') {
+            if (msg.text.startsWith('!')) {
+              addUserMessage(msg.text.slice(1)); // Strip the "!" before adding
+            } else {
+              addResponseMessage(msg.text);
+            }
+          } else {
+            console.error('Invalid message format:', msg);
+          }
+        });
+
         setMessages((prevMessages) => [...prevMessages, ...newMessages]);
-        setMessageCount(fetchedMessages.length);
-        console.log(newMessages)
-        console.log(messages)
-        console.log(messageCount)
+      } else {
+        console.error('Fetched messages is not an array:', fetchedMessages);
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
-  };
+  }, [auth?.token]);
+
+  useEffect(() => {
+    if (auth?.token) {
+      fetchMessages();
+      const intervalId = setInterval(fetchMessages, 10000);
+      return () => clearInterval(intervalId);
+    }
+  }, [auth?.token, fetchMessages]);
 
   const handleNewUserMessage = async (newMessage) => {
     if (newMessage.startsWith('!')) {
       const cleanMessage = newMessage.slice(1);
-      const newMessages = [cleanMessage];
-      newMessages.forEach((msg) => addResponseMessage(msg));
+      if (typeof cleanMessage === 'string') {
+        addResponseMessage(cleanMessage);
+      }
     } else {
       try {
         const formData = new FormData();
@@ -76,7 +90,9 @@ const SupportChat = ({ auth }) => {
         if (error) {
           console.error("Error sending message:", error);
         } else {
-          addUserMessage(message);
+          if (typeof message === 'string') {
+            addUserMessage(message);
+          }
         }
       } catch (error) {
         console.error("Error sending message:", error);

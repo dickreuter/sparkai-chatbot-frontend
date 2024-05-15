@@ -1,16 +1,15 @@
-import React, { useRef } from 'react';
-import { AuthProvider, useAuthUser } from 'react-auth-kit';
+import React, {useEffect} from 'react';
 import { BrowserRouter, useLocation } from 'react-router-dom';
+import { AuthProvider, useAuthUser } from 'react-auth-kit';
 import './App.css';
 import './resources/clash-display.css';
 import NavBar from './routes/NavBar';
 import Routing from './routes/Routing';
 import ReactGA4 from "react-ga4";
-import { useEffect } from 'react';
-import { Widget, addResponseMessage } from 'react-chat-widget';
-import 'react-chat-widget/lib/styles.css';
 import sidebarIcon from './resources/images/mytender.io_badge.png';
 import './Widget.css';
+import SupportChat from "./components/SupportChat.tsx";
+
 ReactGA4.initialize("G-X8S1ZMRM3C");
 
 const Layout = () => {
@@ -19,12 +18,8 @@ const Layout = () => {
   const auth = getAuth();
 
   useEffect(() => {
-    
     if (auth?.token) {
-     
-      addResponseMessage('Welcome to this awesome chat!');
-    } else {
-      console.log("");
+      console.log("User authenticated");
     }
   }, [auth?.token]);
 
@@ -38,28 +33,14 @@ const Layout = () => {
       <div className="main-content">
         <Routing />
       </div>
-      {isAuthenticated && (
-        <Widget
-          handleNewUserMessage={handleNewUserMessage}
-          title="Support"
-          subtitle="Ask us anything"
-        />
-      )}
+      {isAuthenticated && <SupportChat auth={auth} />} {/* Use the ChatBot component */}
     </>
   );
 };
 
-
-function handleNewUserMessage(newMessage) {
-  const response = "Your response logic here";
-  addResponseMessage(response);
-}
-
 const App = () => {
   useEffect(() => {
-
     const token = localStorage.getItem('sparkaichatbot'); // Adjust based on your actual token key
-  
   }, []);
 
   return (
@@ -70,6 +51,5 @@ const App = () => {
     </AuthProvider>
   );
 }
-
 
 export default App;

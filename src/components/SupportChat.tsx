@@ -6,7 +6,9 @@ import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
 
 const SupportChat = ({ auth }) => {
   const [messages, setMessages] = useState([]);
+  const [isFirstFetch, setIsFirstFetch] = useState(true);
   const messagesRef = useRef(messages);
+  const lastUserMessageRef = useRef(null);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -31,7 +33,7 @@ const SupportChat = ({ auth }) => {
 
       if (Array.isArray(fetchedMessages)) {
         const newMessages = fetchedMessages.filter(
-          (fMsg) => !messagesRef.current.some((msg) => msg.id === fMsg.id)
+          (fMsg) => !messagesRef.current.some((msg) => msg.id === fMsg.id || msg.text === fMsg.text)
         );
 
         console.log('New Messages:', newMessages);
@@ -39,7 +41,9 @@ const SupportChat = ({ auth }) => {
         newMessages.forEach((msg) => {
           if (typeof msg.text === 'string') {
             if (msg.text.startsWith('!')) {
-              addUserMessage(msg.text.slice(1)); // Strip the "!" before adding
+              if (isFirstFetch) {
+                addUserMessage(msg.text.slice(1)); // Strip the "!" before adding
+              }
             } else {
               addResponseMessage(msg.text);
             }
@@ -49,13 +53,14 @@ const SupportChat = ({ auth }) => {
         });
 
         setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+        setIsFirstFetch(false); // Mark as no longer the first fetch
       } else {
         console.error('Fetched messages is not an array:', fetchedMessages);
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
-  }, [auth?.token]);
+  }, [auth?.token, isFirstFetch]);
 
   useEffect(() => {
     if (auth?.token) {
@@ -66,37 +71,45 @@ const SupportChat = ({ auth }) => {
   }, [auth?.token, fetchMessages]);
 
   const handleNewUserMessage = async (newMessage) => {
-    if (newMessage.startsWith('!')) {
-      const cleanMessage = newMessage.slice(1);
-      if (typeof cleanMessage === 'string') {
-        addResponseMessage(cleanMessage);
-      }
-    } else {
-      try {
-        const formData = new FormData();
-        formData.append('message', newMessage);
+    // Check if the new message is the same as the last user message
+    if (lastUserMessageRef.current === newMessage) {
+      return; // Don't add the message if it's the same as the last one
+    }
 
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/slack_send_message`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${auth?.token}`,
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        );
-        const { message, error } = response.data;
-        if (error) {
-          console.error("Error sending message:", error);
-        } else {
-          if (typeof message === 'string') {
-            addUserMessage(message);
-          }
+    try {
+      const formData = new FormData();
+      formData.append('message', newMessage);
+
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/slack_send_message`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${auth?.token}`,
+            'Content-Type': 'multipart/form-data',
+          },
         }
-      } catch (error) {
+      );
+      const { message, error } = response.data;
+      if (error) {
         console.error("Error sending message:", error);
+      } else {
+        if (typeof message === 'string') {
+          addUserMessage(message);
+          const newMessageObject = {
+            id: new Date().getTime().toString(), // Use current timestamp as unique id
+            text: message // Add the message text to the object
+          };
+          setMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages, newMessageObject];
+            messagesRef.current = updatedMessages; // Update the ref
+            return updatedMessages;
+          });
+          lastUserMessageRef.current = message; // Update the last user message ref
+        }
       }
+    } catch (error) {
+      console.error("Error sending message:", error);
     }
   };
 

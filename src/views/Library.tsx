@@ -353,25 +353,29 @@ const renderFolders = () => {
 
   return foldersToDisplay.map((folder, index) => (
     <tr key={index} onClick={() => handleFolderClick(folder)} style={{ cursor: 'pointer' }}>
-      <td><FontAwesomeIcon icon={faFolder} className="fa-icon"  onClick={(event) => {
-            event.stopPropagation(); 
-          }} 
-          
-          style={{ cursor: 'pointer', marginRight: '10px' }} // Inline style for cursor
-          /> {folder}</td>
+      <td>
+        <FontAwesomeIcon 
+          icon={faFolder} 
+          className="fa-icon"  
+          onClick={(event) => event.stopPropagation()} 
+          style={{ cursor: 'pointer', marginRight: '10px' }} 
+        /> 
+        {folder}
+      </td>
       <td colSpan={3}>
-      <UploadButtonWithDropdown
-            folder={folder}
-            get_collections={get_collections}
-            handleShowPDFModal={handleShowPDFModal}
-            handleShowTextModal={handleShowTextModal}
-            setShowDeleteFolderModal={setShowDeleteFolderModal}
-            setFolderToDelete={setFolderToDelete}
+        <UploadButtonWithDropdown
+          folder={folder}
+          get_collections={get_collections}
+          handleShowPDFModal={handleShowPDFModal}
+          handleShowTextModal={handleShowTextModal}
+          setShowDeleteFolderModal={setShowDeleteFolderModal}
+          setFolderToDelete={setFolderToDelete}
         />
       </td> 
     </tr>
   ));
 };
+
 
 const renderFolderContents = () => {
   const start = (currentPage - 1) * rowsPerPage;

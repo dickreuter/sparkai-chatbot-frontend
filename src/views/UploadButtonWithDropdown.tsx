@@ -1,28 +1,23 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Modal } from "react-bootstrap";
-import { MenuItem, Menu } from "@mui/material";
-import { faArrowUpFromBracket, faEllipsisVertical} from '@fortawesome/free-solid-svg-icons';
-import UploadPDF from './UploadPDF';
-import UploadText from './UploadText';
-
-
-
-// Modals for PDF and Text Upload
-
+import { Button, MenuItem, Menu } from "@mui/material";
+import { faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 
 const UploadButtonWithDropdown = ({
     folder, get_collections, handleShowPDFModal, handleShowTextModal,
     setShowDeleteFolderModal, setFolderToDelete
 }) => {
+
     const [anchorEl, setAnchorEl] = useState(null);
+    const dropdownRef = useRef(null);
 
     const handleClick = (event) => {
-        event.stopPropagation();  // This prevents the event from bubbling up to the table row
+        event.stopPropagation(); // This prevents the event from bubbling up to the table row
         setAnchorEl(event.currentTarget);
     };
-    
-    const handleClose = () => {
+
+    const handleClose = (event) => {
+        if (event) event.stopPropagation();
         setAnchorEl(null);
     };
 
@@ -30,29 +25,53 @@ const UploadButtonWithDropdown = ({
     const handlePDFClick = (event) => {
         event.stopPropagation();
         handleShowPDFModal(event, folder);
-        handleClose();
+        handleClose(event);
     };
 
     const handleTextClick = (event) => {
         event.stopPropagation();
         handleShowTextModal(event, folder);
-        handleClose();
+        handleClose(event);
     };
 
     const handleDeleteClick = (event) => {
         event.stopPropagation();
         setFolderToDelete(folder);
         setShowDeleteFolderModal(true);
-        handleClose();
+        handleClose(event);
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                handleClose(event);
+            }
+        };
+
+        document.addEventListener("click", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, [dropdownRef]);
+
     return (
-        <>
-           <Button
+        <div ref={dropdownRef}>
+             <Button
                 aria-controls="simple-menu"
                 aria-haspopup="true"
                 onClick={handleClick}
-                className="ellipsis-button"  // Apply the new class for styling
+                sx={{
+                    borderRadius: '50%',
+                    minWidth: 0,
+                    padding: '10px',
+                    backgroundColor: 'transparent',
+                    
+                    '&.MuiButton-root:active': {
+                        boxShadow: 'none',
+                    },
+                }}
+                className="ellipsis-button" // Apply the new class for styling
             >
                 <FontAwesomeIcon icon={faEllipsisVertical} className="ellipsis-icon" />
             </Button>
@@ -64,11 +83,11 @@ const UploadButtonWithDropdown = ({
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                 <MenuItem onClick={handlePDFClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Upload PDF</MenuItem>
-                    <MenuItem onClick={handleTextClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Upload Text</MenuItem>
-                    <MenuItem onClick={handleDeleteClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Delete Folder</MenuItem>
+                <MenuItem onClick={handlePDFClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Upload PDF</MenuItem>
+                <MenuItem onClick={handleTextClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Upload Text</MenuItem>
+                <MenuItem onClick={handleDeleteClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Delete Folder</MenuItem>
             </Menu>
-        </>
+        </div>
     );
 };
 

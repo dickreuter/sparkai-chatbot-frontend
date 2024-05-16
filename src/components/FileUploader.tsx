@@ -6,7 +6,7 @@ import { displayAlert } from '../helper/Alert';
 const FileUploader = ({ onFileSelect, folder, onClose }) => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [profileName, setProfileName] = useState(folder || '');
+  const [profileName, setProfileName] = useState(folder || 'default');
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [fileToUpload, setfileToUpload] = useState(null);
 
@@ -49,13 +49,13 @@ const FileUploader = ({ onFileSelect, folder, onClose }) => {
     if (isFormFilled && selectedFile && profileName) {
       // Check for spaces in the profileName first
       if (/\s/.test(profileName)) {
-        displayAlert('Profile name should not contain spaces', 'warning');
+        displayAlert('Folder name should not contain spaces', 'warning');
         return;
       }
   
       // Then check for the validity of the profileName using regex
       if (!/^[a-zA-Z0-9_-]{3,}$/.test(profileName)) {
-        displayAlert('Profile name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
+        displayAlert('Folder name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
         return;
       }
   

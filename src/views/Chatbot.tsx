@@ -500,24 +500,23 @@ const Chatbot = () => {
     useEffect(() => {
         const checkTextSelection = () => {
             if (textAreaRef.current && document.activeElement === textAreaRef.current) {
-                const selection = window.getSelection();
-                const selectedText = selection.toString();
+                const textArea = textAreaRef.current;
+                const selectedText = textArea.value.substring(textArea.selectionStart, textArea.selectionEnd);
                 setIsCopilotVisible(!!selectedText);
                 setSelectedText(selectedText);
-            
+                console.log(selectedText);
+                
                 if (!selectedText) {
                     // Delay clearing the selection state to allow for link clicks to be processed
                     setTimeout(() => {
                         setIsCopilotVisible(false);
                     }, 100); // 100 ms delay
                 }
-                setSelectedText(selectedText);
             } else {
                 setTimeout(() => {
                     setIsCopilotVisible(false);
                     setSelectedText('');
                 }, 100); // 100 ms delay
-              
             }
         };
 
@@ -566,7 +565,7 @@ const Chatbot = () => {
                                 {/* New column for background information
                                 used to be Additional instructions (optional)*/}
                                 <Form.Group className="mb-3">
-                                    <Form.Label className="custom-label" >Contract Information</Form.Label>
+                                    <Form.Label className="custom-label" >Win Themes</Form.Label>
                                     <Form.Control
                                         as="textarea"
                                         className="background-info-input"
@@ -585,9 +584,7 @@ const Chatbot = () => {
                                         value={dataset}
                                         onChange={handleDatasetChange} // Updated to use the new handler
                                     >
-                                        <option value="" disabled>
-                                        Company Language Model
-                                        </option>
+                                      
                                         {/* This option is added */}
                                         {availableCollections.map((collection) => (
                                         <option key={collection} value={collection}>

@@ -61,24 +61,36 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
         }
     };
 
+    const truncateText = (text, maxLength) => {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...';
+        }
+        return text;
+    };
+
     return (
         <section id="proposal">
             <div className="proposal-header mb-2">
                 <h3 className="custom-label mt-5">Proposal Editor</h3>
                 <Dropdown onSelect={handleSelect}>
-                <Dropdown.Toggle className="upload-button" style={{backgroundColor: 'black'}} id="dropdown-basic">
-                    Navigate to Question
-                </Dropdown.Toggle>
+                    <Dropdown.Toggle className="upload-button" style={{backgroundColor: 'black'}} id="dropdown-basic">
+                        Navigate to Question
+                    </Dropdown.Toggle>
 
-                <Dropdown.Menu>
-                    
-                    {responses.map((response, index) => (
-                        <Dropdown.Item key={index} eventKey={response.id.toString()}>
-                            {response.question}
-                        </Dropdown.Item>
-                    ))}
-                </Dropdown.Menu>
-            </Dropdown>
+                    <Dropdown.Menu>
+                        {responses.length > 0 ? (
+                            responses.map((response, index) => (
+                                <Dropdown.Item key={index} eventKey={response.id.toString()}>
+                                    {truncateText(response.question, 50)} {/* Limit to 50 characters */}
+                                </Dropdown.Item>
+                            ))
+                        ) : (
+                            <Dropdown.Item eventKey="navigate" disabled>
+                                Add some Question/Answer blocks to navigate!
+                            </Dropdown.Item>
+                        )}
+                    </Dropdown.Menu>
+                </Dropdown>
             </div>
             
             <div className="proposal-container" ref={proposalContainerRef} style={{overflowY: 'scroll', maxHeight: '400px', scrollBehavior: 'smooth'}}>

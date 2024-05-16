@@ -131,13 +131,3 @@
     background-color: #f2f2f2;
     /* Slightly darker for better visibility on hover */
 }
-
-.ellipsis-button:focus,
-.ellipsis-button:active {
-    outline: none;
-    /* Remove outline on focus */
-    background-color: #f2f2f2;
-    /* Keeps the background color consistent */
-    box-shadow: none;
-    /* Removes any box shadow if applied by the browser */
-}

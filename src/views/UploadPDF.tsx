@@ -23,7 +23,7 @@ const UploadPDF = ({folder, get_collections, onClose}) => {
 
         // Check if profile name is valid
         if (!/^[a-zA-Z0-9_-]{3,}$/.test(profileName)) {
-            displayAlert('Profile name should only contain alphanumeric characters and be at least 3 characters long', 'warning');
+            displayAlert('Folder name should only contain alphanumeric characters and be at least 3 characters long', 'warning');
             setIsUploading(false)
             return;
         }

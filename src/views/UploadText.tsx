@@ -18,7 +18,7 @@ const UploadText = ({folder, get_collections, onClose}) => {
 
 
 
-  const [profileName, setProfileName] = useState(folder || '');
+  const [profileName, setProfileName] = useState(folder || 'default');
   const [fileName, setFileName] = useState(null);
   const [textFormat, setTextFormat] = useState("plain");
   const [isUploading, setIsUploading] = useState(false);
@@ -40,14 +40,14 @@ const UploadText = ({folder, get_collections, onClose}) => {
     formData.append("mode", textFormat);
 
     if (/\s/.test(profileName)) {
-      displayAlert('Profile name should not contain spaces', 'warning');
+      displayAlert('Folder name should not contain spaces', 'warning');
       setIsUploading(false);
       return;
     
     }
 
     if (!/^[a-zA-Z0-9_-]{3,}$/.test(profileName)) {
-        displayAlert('Profile name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
+        displayAlert('Folder name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
       
       setIsUploading(false);
       return;

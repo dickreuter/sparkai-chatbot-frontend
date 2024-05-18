@@ -613,9 +613,9 @@ const Chatbot = () => {
                                         value={broadness}
                                         onChange={handleBroadnessChange}
                                     >
-                                        <option value="1">Narrow (2 entries)</option>
-                                        <option value="2">Extended (up to 4 entries)</option>
-                                        <option value="3">Broad (up to 6 entries)</option>
+                                        <option value="1">Narrow (3 entries)</option>
+                                        <option value="2">Extended (up to 6 entries)</option>
+                                        <option value="3">Broad (up to 9 entries)</option>
                                     </Form.Select>
                                     </Form.Group>
                                 </div>

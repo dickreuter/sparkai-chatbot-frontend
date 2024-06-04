@@ -76,29 +76,31 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
 
     return (
         <>
-            <div className="proposal-header">
-                <h3 className="custom-label"></h3>
-                <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
-                <Dropdown onSelect={handleSelect}>
-                    <Dropdown.Toggle className="upload-button" style={{backgroundColor: 'black'}} id="dropdown-basic">
+             <div className="proposal-header">
+                <h1 className='heavy'>Proposal</h1>
+                <div className="dropdown-container">
+                    <TemplateLoader token={tokenRef.current} handleSelect={handleSelect} />
+                    <Dropdown onSelect={handleSelect}>
+                    <Dropdown.Toggle className="upload-button" style={{ backgroundColor: 'black' }} id="dropdown-basic">
                         Navigate to Question
                     </Dropdown.Toggle>
 
                     <Dropdown.Menu>
                         {responses.length > 0 ? (
-                            responses.map((response, index) => (
-                                <Dropdown.Item key={index} eventKey={response.id.toString()}>
-                                    {truncateText(response.question, 50)} {/* Limit to 50 characters */}
-                                </Dropdown.Item>
-                            ))
-                        ) : (
-                            <Dropdown.Item eventKey="navigate" disabled>
-                                Add some Question/Answer blocks to navigate!
+                        responses.map((response, index) => (
+                            <Dropdown.Item key={index} eventKey={response.id.toString()}>
+                            {truncateText(response.question, 50)} {/* Limit to 50 characters */}
                             </Dropdown.Item>
+                        ))
+                        ) : (
+                        <Dropdown.Item eventKey="navigate" disabled>
+                            Add some Question/Answer blocks to navigate!
+                        </Dropdown.Item>
                         )}
                     </Dropdown.Menu>
-                </Dropdown>
-            </div>
+                    </Dropdown>
+                </div>
+                </div>
             
             <div className="proposal-container" ref={proposalContainerRef}>
                 <Row className="justify-content-md-center">

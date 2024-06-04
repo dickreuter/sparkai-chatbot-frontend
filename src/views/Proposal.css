@@ -1,9 +1,19 @@
+/* Proposal.css */
+
 .proposal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    /* Center align items vertically */
     margin-right: 180px;
-    margin-bottom: 45px;
+    width: 100%;
+    /* Add margin to the left if necessary */
+}
+
+.dropdown-container {
+    display: flex;
+    align-items: center;
+    /* Center align items vertically */
 }
 
 .proposal-title {
@@ -12,8 +22,8 @@
 }
 
 .proposal-header button {
-    position: absolute;
-    left: 0;
+    margin-left: 10px;
+    /* Add margin between buttons */
 }
 
 .proposal-container {

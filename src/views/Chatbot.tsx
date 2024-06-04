@@ -722,7 +722,7 @@ const Chatbot = () => {
                         <div>
                         <Button
                         variant={isAppended ? "success" : "primary"}
-                        className="upload-button mt-2" 
+                        className="upload-button mt-2 mb-4" 
                         onClick={handleAppendResponseToEditor}
                         disabled={isLoading || isAppended} 
                         >   

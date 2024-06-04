@@ -34,9 +34,7 @@ return (
 
             <div className="lib-container">
                 <BidNavbar/>
-                <div>
-                <h1 className='heavy'>Proposal</h1>
-                </div>
+                
                 {bidData ? (
                     <ProposalEditor
                         bidData={bidData}

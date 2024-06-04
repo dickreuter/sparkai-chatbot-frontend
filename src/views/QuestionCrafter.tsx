@@ -25,38 +25,42 @@ const QuestionCrafter = () => {
   
 
 return (
-    <div className="chatpage">
+    <div className="chatpage ">
             <SideBarSmall />
 
-            <div className="lib-container">
+            <div className="lib-container ">
                 <BidNavbar/>
                 <div className="mb-4">
                 <h1 className='heavy'>Question Crafter</h1>
                 </div>
                 <div className="library-container">
             
-            <Row >
-                <Col md={8}>
-                <div className="card-title-container">
-                  <div className="tooltip-container">
-                      <i className="fas fa-info-circle tooltip-icon"></i>
-                      <span className="tooltip-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+                <Row >
+                    <Col md={8}>
+                  
+                      
+                    <h1 className="lib-title">Question</h1>
+                  
+                    <div className="question-extractor">
+                    <input type="text" className="card-input" placeholder="Enter bid proposition here..." />
                   </div>
-                  <h1 className="lib-title">Bid Pilot</h1>
+
+                  <h1 className="lib-title mt-4 mb-4">Response</h1>
+                  
+                  <div className="question-extractor">
+                  <input type="text" className="card-input" placeholder="Enter bid proposition here..." />
                 </div>
-                <div className="question-extractor">
-                <input type="text" className="card-input" placeholder="Enter bid proposition here..." />
-              </div>
-              </Col>
-              <Col md={4}>
-             
-                  <h1 className="lib-title">Bid Pilot</h1>
+
+                  </Col>
+                  <Col md={4}>
                 
-                <div className="question-extractor">
-                <input type="text" className="card-input" placeholder="Enter bid proposition here..." />
-              </div>
-              </Col>
-            </Row>
+                      <h1 className="lib-title">Bid Pilot</h1>
+                    
+                    <div className="bid-pilot-container">
+                    <input type="text" className="card-input" placeholder="Enter bid proposition here..." />
+                  </div>
+                  </Col>
+                </Row>
         </div>
                
 

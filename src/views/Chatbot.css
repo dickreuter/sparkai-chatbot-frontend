@@ -13,6 +13,10 @@
     /* or whatever value you desire for the chatbot page */
 }
 
+.heavy {
+    font-weight: 600;
+}
+
 @keyframes fadeInScaleUp {
     from {
         opacity: 0;

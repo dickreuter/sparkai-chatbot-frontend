@@ -143,8 +143,8 @@ const BidExtractor = () => {
                   <h1 className="lib-title">Client Details</h1>
                 </div>
                 <div className="question-extractor">
-                <input type="text" className="card-input" placeholder="Enter bid proposition here..." />
-              </div>
+                  <textarea className="card-textarea" placeholder="Enter client details here..."></textarea>
+                </div>
               </Col>
               <Col md={6}>
                 <div className="card-title-container mb-2">
@@ -164,7 +164,7 @@ const BidExtractor = () => {
                   <h1 className="lib-title">Bid Proposition</h1>
                 </div>
                 <div className="question-extractor">
-                  <input type="text" className="card-input" placeholder="Enter bid proposition here..." />
+                  <textarea className="card-textarea" placeholder="Enter bid proposition here..."></textarea>
                 </div>
               </Col>
             </Row>

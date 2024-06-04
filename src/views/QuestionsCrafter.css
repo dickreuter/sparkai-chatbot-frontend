@@ -1,15 +1,193 @@
 .bid-pilot-container {
     flex: 1;
     box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
-    background-color: #fff;
-    padding: 25px;
-    transition: all 0.35s ease;
     margin: 0;
     word-wrap: break-word;
-    height: 770px;
+    height: 730px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     margin-bottom: 40px;
+    /* Lightened border color */
+    border-bottom-left-radius: 8px;
+    /* Rounded bottom left corner */
+    border-bottom-right-radius: 8px;
+    /* Rounded bottom right corner */
     /* Ensure children start at the top */
+}
+
+.input-header {
+    flex: 1;
+    padding: 14px;
+    border-top-left-radius: 8px;
+    /* Only the top left corner rounded */
+    border-top-right-radius: 8px;
+    /* Only the top right corner rounded */
+    display: flex;
+    flex-direction: column;
+    height: 80px;
+    background-color: black;
+}
+
+.input-console {
+    flex: 1;
+    padding: 14px;
+    border-bottom-left-radius: 8px;
+    /* Only the top left corner rounded */
+    border-bottom-right-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    max-height: 140px;
+    background-color: black;
+}
+
+.mini-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    background-color: #e0e0e0;
+}
+
+.message-bubble {
+    display: flex;
+    /* Inline block to fit content */
+    max-width: 70%;
+    min-width: 150px;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+}
+
+.message-bubble.user {
+    background-color: #ff9900;
+    align-self: flex-end;
+    border-top-right-radius: 0;
+    color: white;
+}
+
+.message-bubble.bot {
+    background-color: #f0f0f0;
+    align-self: flex-start;
+    border-top-left-radius: 0;
+    color: black;
+}
+
+.chatResponse-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    background-color: white;
+    justify-content: flex-start;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0;
+    margin-top: 0;
+}
+
+.bid-input-bar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #383838;
+    box-sizing: border-box;
+    z-index: 1000;
+    border-radius: 25px;
+    height: 50px;
+}
+
+.bid-input-bar input {
+    flex: 1;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    margin-right: 10px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #383838;
+    color: #ffffff;
+    width: 100%
+}
+
+.bid-input-bar button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background-color: #ffa500;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bid-input-bar button:hover {
+    background-color: #ed9a02;
+}
+
+.bid-input-bar button svg {
+    width: 16px;
+    /* Adjust the size of the icon */
+    height: 16px;
+    /* Adjust the size of the icon */
+}
+
+.arrow-button {
+    background-color: #383838;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.7rem;
+    border-radius: 8px;
+}
+
+.dropdown-container {
+    display: flex;
+    align-items: center;
+    /* Center align items vertically */
+}
+
+.dropdown-container .arrow-button+.arrow-button {
+    margin-left: 4px;
+    /* Adjust this value to reduce the distance */
+}
+
+.dropdown-container .option-button+.option-button {
+    margin-left: 6px;
+    /* Adjust this value to reduce the distance */
+}
+
+.checkbox-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.checkbox-label {
+    margin-bottom: 4px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.checkbox {
+    margin-right: 8px;
+}
+
+.option-button {
+    background-color: #383838;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.7rem;
+    border-radius: 8px;
 }

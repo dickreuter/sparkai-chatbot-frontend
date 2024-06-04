@@ -85,10 +85,23 @@
     margin: 0;
     word-wrap: break-word;
     height: 350px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
     /* Ensure children start at the top */
+}
+
+.card-textarea {
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    background-color: white;
+    color: black;
+    resize: none;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+}
+
+.card-textarea:focus {
+    outline: none;
 }
 
 .card-input {

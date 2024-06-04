@@ -1,0 +1,69 @@
+.bidCardsContainer {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    /* Allows this container to scroll independently if needed */
+}
+
+.bid-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    cursor: pointer;
+    color: black;
+}
+
+.card-effect-long {
+    flex: 1;
+    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    padding: 25px;
+    transition: all 0.35s ease;
+    margin: 0;
+}
+
+.card-effect-long:hover {
+    transform: translateY(5px);
+}
+
+.bid-card-content {
+    flex-grow: 1;
+}
+
+.bid-card-content h5 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.bid-card-content .last-updated {
+    margin: 5px 0 0;
+    font-size: 12px;
+    color: #777;
+}
+
+.completion-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.progress-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.completion-text {
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 400px;
+}
+
+.progress-bar {
+    width: 200px;
+    /* Adjust width as needed */
+}

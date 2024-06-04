@@ -1,0 +1,114 @@
+.chatpage {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+.chatResponse-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    margin-top: 40px;
+    margin-bottom: 0;
+    background-color: white;
+    justify-content: flex-start;
+    padding-left: 200px;
+    padding-right: 15px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-bubble {
+    display: flex;
+    /* Inline block to fit content */
+    max-width: 70%;
+    min-width: 150px;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+}
+
+.message-bubble.user {
+    background-color: #ff9900;
+    align-self: flex-end;
+    border-top-right-radius: 0;
+    color: white;
+}
+
+.message-bubble.bot {
+    background-color: #f0f0f0;
+    align-self: flex-start;
+    border-top-left-radius: 0;
+    color: black;
+}
+
+.input-bar {
+    position: fixed;
+    bottom: 0;
+    left: 200px;
+    width: calc(100% - 215px);
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #333333;
+    /* Light shade of black */
+    box-sizing: border-box;
+    z-index: 1000;
+    border-radius: 25px;
+    margin-bottom: 10px;
+    background-color: #383838;
+    /* Light shade of black gradient */
+}
+
+.input-bar input {
+    flex: 1;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    margin-right: 10px;
+    box-sizing: border-box;
+    outline: none;
+    background-color: #383838;
+    /* Light shade of black for input */
+    color: #ffffff;
+    /* White text for better contrast */
+}
+
+.input-bar button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background-color: #ffa500;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-bar button:hover {
+    background-color: #ed9a02;
+}
+
+.input-bar button svg {
+    width: 16px;
+    /* Adjust the size of the icon */
+    height: 16px;
+    /* Adjust the size of the icon */
+}

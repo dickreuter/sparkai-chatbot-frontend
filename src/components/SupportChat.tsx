@@ -2,13 +2,20 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Widget, addResponseMessage, addUserMessage } from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
+import './SupportChat.css'; // Import custom styles
+import sidebarIcon from '../resources/images/mytender.io_badge.png';
+
+import { faComment, faComments } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const SupportChat = ({ auth }) => {
   const [messages, setMessages] = useState([]);
   const [isFirstFetch, setIsFirstFetch] = useState(true);
   const messagesRef = useRef(messages);
   const lastUserMessageRef = useRef(null);
+  const location = useLocation(); // Get the current location
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -113,11 +120,18 @@ const SupportChat = ({ auth }) => {
     }
   };
 
+  // Conditionally render the SupportChat based on the current route
+  if (location.pathname === '/chatResponse') {
+    return null;
+  }
+
   return (
     <Widget
       handleNewUserMessage={handleNewUserMessage}
       title="Support"
       subtitle="Ask us anything"
+      fullScreenMode={false}
+      
     />
   );
 };

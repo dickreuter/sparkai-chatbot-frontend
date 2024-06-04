@@ -11,7 +11,7 @@
     /* Adjust height as needed or consider using min-height for dynamic content */
     min-height: 100%;
     width: 240px;
-    height: 100vh;
+    height: 90vh;
     /* Adjust width as needed */
     position: fixed;
     z-index: 1;

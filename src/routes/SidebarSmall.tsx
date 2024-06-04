@@ -5,13 +5,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuthUser, useSignOut } from "react-auth-kit";
 import {
   faHome,
+  faShieldAlt,
+  faQuestionCircle,
   faSignOutAlt,
   faBookOpen,
   faLayerGroup,
   faFileAlt,  // Icon representing documents or information
   faFileCircleQuestion, // Icon for questions
   faReply, // Icon for comments or responses
-  faFileContract // Icon for proposals or contracts
+  faTachometerAlt,
+  faFileContract, // Icon for proposals or contracts
+  faComments
 } from '@fortawesome/free-solid-svg-icons';
 // Import the image
 import sidebarIcon from '../resources/images/mytender.io_badge.png';
@@ -25,23 +29,44 @@ const SideBarSmall = () => {
 
   return (
     <div className="sidebarsmall">
-      {/* ...other links... */}
-
-      <Link to="/chatbot" className={`sidebarsmalllink ${isActive('/chatbot') ? 'sidebarsmalllink-active' : ''}`}>
-        <FontAwesomeIcon icon={faFileContract} />
-      </Link>
-      <Link to="/library" className={`sidebarsmalllink ${isActive('/library') ? 'sidebarsmalllink-active' : ''}`}>
-        <FontAwesomeIcon icon={faBookOpen} />
-      </Link>
-      <Link to="/bids" className={`sidebarsmalllink ${isActive('/bids') ? 'sidebarsmalllink-active' : ''}`}>
-        <FontAwesomeIcon icon={faLayerGroup} />
-      </Link>
-
-      <Link to="/login" onClick={signOut} className="sidebarsmalllink">
-        <FontAwesomeIcon icon={faReply} />
-      </Link>
-      {/* ... */}
-      <img src={sidebarIcon} alt="Sidebar Icon" className="sidebarsmall-image" />
+      <div>
+        <Link to="/dashboard" className={`sidebarsmalllink ${isActive('/dashboard') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faTachometerAlt} />
+          <span>Dashboard</span>
+        </Link>
+        <Link to="/chatbot" className={`sidebarsmalllink ${isActive('/chatbot') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faFileContract} />
+          <span>Bid Editor</span>
+        </Link>
+        <Link to="/chatResponse" className={`sidebarsmalllink ${isActive('/chatResponse') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faComments} />
+          <span>Q/A Chat</span>
+        </Link>
+        <Link to="/library" className={`sidebarsmalllink ${isActive('/library') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faBookOpen} />
+          <span>Library</span>
+        </Link>
+        <Link to="/bids" className={`sidebarsmalllink ${isActive('/bids') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faLayerGroup} />
+          <span>Bids</span>
+        </Link>
+        <Link to="/security" className={`sidebarsmalllink ${isActive('/security') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faShieldAlt} />
+          <span>Security</span>
+        </Link>
+        
+    
+      </div>
+      <div className="signout-container">
+      <Link to="https://mytender.io/" className="sidebarsmall-image-link">
+          <img src={sidebarIcon} alt="Sidebar Icon" />
+          <span>Site</span>
+        </Link>
+        <Link to="/login" onClick={signOut} className="sidebarsmalllink signout-link">
+          <FontAwesomeIcon icon={faReply} />
+          <span>Sign Out</span>
+        </Link>
+      </div>
     </div>
   );
 };

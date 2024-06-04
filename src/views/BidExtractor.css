@@ -1,0 +1,177 @@
+/* BidExtractor.css */
+
+.editable:focus {
+    outline: none;
+}
+
+.edit-tag {
+    margin-left: -5px;
+    font-size: 14px;
+    background: none;
+    border: none;
+    color: blue;
+    cursor: pointer;
+}
+
+.edit-tag:hover {
+    text-decoration: underline;
+}
+
+.title-container {
+    display: flex;
+    align-items: center;
+}
+
+.info-icon {
+    margin-right: 10px;
+    color: white;
+    background-color: black;
+    border-radius: 50%;
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.info-icon::after {
+    content: attr(title);
+    position: absolute;
+    width: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 125%;
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.info-icon:hover::after {
+    opacity: 1;
+}
+
+.upload-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 350px;
+    width: 350px;
+    border: 2px solid orange;
+    background-color: #f2f2f2;
+    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+}
+
+.upload-cross {
+    font-size: 36px;
+    color: gray;
+}
+
+.question-extractor {
+    flex: 1;
+    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    padding: 25px;
+    transition: all 0.35s ease;
+    margin: 0;
+    word-wrap: break-word;
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Ensure children start at the top */
+}
+
+.card-input {
+    width: 100%;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    background-color: white;
+    color: black;
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    /* Align text to start at the top */
+}
+
+.question-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.question-item {
+    padding: 12px;
+    border-bottom: 1px solid #ccc;
+}
+
+.card-title-container {
+    display: flex;
+    align-items: baseline;
+}
+
+.tooltip-container {
+    position: relative;
+    /* This sets the positioning context for the absolute children */
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 30px;
+    margin-left: 1%;
+    color: black;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: 700px;
+    background-color: black;
+    color: #fff;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 999000;
+    font-size: 12px;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 5px;
+    padding-top: 20px;
+}
+
+.tooltip-text-cd {
+    visibility: hidden;
+    width: 550px;
+    background-color: black;
+    color: #fff;
+    border-radius: 6px;
+    padding: 8px;
+    position: absolute;
+    z-index: 999000;
+    font-size: 12px;
+    bottom: 120%;
+    margin-bottom: 5px;
+    padding-top: 20px;
+}
+
+.tooltip-container:hover .tooltip-text-cd {
+    visibility: visible;
+}
+
+.tooltip-container:hover .tooltip-text {
+    visibility: visible;
+}
+
+.tooltip-icon {
+    font-size: 17px;
+    /* Adjusted font size for a smaller icon */
+    margin-right: 7px;
+}

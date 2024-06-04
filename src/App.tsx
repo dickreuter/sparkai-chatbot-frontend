@@ -24,7 +24,7 @@ const Layout = () => {
   }, [auth?.token]);
 
   const isAuthenticated = auth?.token !== undefined;
-  const showNavBarPaths = ['/library', '/chatbot', '/bids', '/'];
+  const showNavBarPaths = ['/library', '/chatbot', '/bids', '/', '/dashboard', '/chatResponse', "/bid-extractor", "/question-crafter", "/proposal"  ];
   const shouldShowNavBar = showNavBarPaths.includes(location.pathname);
 
   return (
@@ -39,9 +39,7 @@ const Layout = () => {
 };
 
 const App = () => {
-  useEffect(() => {
-    const token = localStorage.getItem('sparkaichatbot'); // Adjust based on your actual token key
-  }, []);
+
 
   return (
     <AuthProvider authType={"localstorage"} authName={"sparkaichatbot"}>

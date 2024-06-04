@@ -13,21 +13,6 @@
     /* or whatever value you desire for the chatbot page */
 }
 
-.lib-container {
-    width: 100%;
-    height: 100%;
-    margin-top: 40px;
-    margin-bottom: 0;
-    margin-left: 65px;
-    background-color: white;
-    justify-content: center;
-    padding: 1rem;
-    padding-top: 0rem;
-    padding-right: 55px;
-    overflow-x: hidden;
-    /* or whatever value you desire for the chatbot page */
-}
-
 @keyframes fadeInScaleUp {
     from {
         opacity: 0;
@@ -268,9 +253,10 @@
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     /* Adds a subtle shadow */
-    margin: 1rem;
+    margin-top: 20px;
     padding: 1rem;
     height: 40vh;
+    width: 100%;
 }
 
 .co-pilot-task {
@@ -287,37 +273,6 @@
 
 .options-list li {
     margin-bottom: 5px;
-}
-
-.proposal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-right: 180px;
-}
-
-.proposal-title {
-    margin: 0;
-    font-size: 22px;
-}
-
-.proposal-header button {
-    position: absolute;
-    left: 0;
-}
-
-.proposal-container {
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ced4da;
-    margin-top: 0;
-    height: 100%;
-    padding: 0rem;
-    justify-content: center;
-    overflow-y: scroll;
-    padding: 1%;
-    min-height: 800px;
-    max-height: 800px;
 }
 
 .wrapperClassName {

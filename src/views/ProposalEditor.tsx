@@ -4,10 +4,12 @@ import CustomEditor from "../components/TextEditor.tsx";
 import withAuth from '../routes/withAuth.tsx';
 import TemplateLoader from '../components/TemplateLoader.tsx';
 import { useAuthUser } from 'react-auth-kit';
+import handleGAEvent from '../utilities/handleGAEvent.tsx';
 
 function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelectedQuestionId }) {
     const [responses, setResponses] = useState([]);
     const proposalContainerRef = useRef(null); // Ref for the proposal container
+    const [response, setResponse] = useState('');
 
     const getAuth = useAuthUser();
     const auth = getAuth();
@@ -67,6 +69,12 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
         }
     };
 
+    const handleSelectTemplate = (selectedKey) => {
+        setResponse(selectedKey);
+        handleGAEvent('Chatbot', 'Select', 'Template Select Button');
+
+    };
+
     const truncateText = (text, maxLength) => {
         if (text.length > maxLength) {
             return text.substring(0, maxLength) + '...';
@@ -79,7 +87,7 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
              <div className="proposal-header">
                 <h1 className='heavy'>Proposal</h1>
                 <div className="dropdown-container">
-                    <TemplateLoader token={tokenRef.current} handleSelect={handleSelect} />
+                    <TemplateLoader token={tokenRef.current} handleSelect={handleSelectTemplate} />
                     <Dropdown onSelect={handleSelect}>
                     <Dropdown.Toggle className="upload-button" style={{ backgroundColor: 'black' }} id="dropdown-basic">
                         Navigate to Question
@@ -100,7 +108,7 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
                     </Dropdown.Menu>
                     </Dropdown>
                 </div>
-                </div>
+            </div>
             
             <div className="proposal-container" ref={proposalContainerRef}>
                 <Row className="justify-content-md-center">

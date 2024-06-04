@@ -27,7 +27,7 @@ const TemplateLoader = ({token, handleSelect}) => {
 
     return (
         <Dropdown onSelect={handleSelect}>
-            <Dropdown.Toggle className="upload-button" style={{backgroundColor: 'black'}} id="dropdown-basic">
+            <Dropdown.Toggle className="upload-button" style={{backgroundColor: 'orange', color: 'black'}} id="dropdown-basic">
                 Select Template
             </Dropdown.Toggle>
 

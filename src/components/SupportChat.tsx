@@ -121,7 +121,10 @@ const SupportChat = ({ auth }) => {
   };
 
   // Conditionally render the SupportChat based on the current route
-  if (location.pathname === '/chatResponse') {
+
+  const notRenderedUrls = ['/chatResponse', '/question-crafter']
+
+  if (notRenderedUrls.includes(location.pathname)) {
     return null;
   }
 

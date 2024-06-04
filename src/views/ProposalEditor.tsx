@@ -2,10 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Row, Col, Dropdown } from 'react-bootstrap';
 import CustomEditor from "../components/TextEditor.tsx";
 import withAuth from '../routes/withAuth.tsx';
+import TemplateLoader from '../components/TemplateLoader.tsx';
+import { useAuthUser } from 'react-auth-kit';
 
 function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelectedQuestionId }) {
     const [responses, setResponses] = useState([]);
     const proposalContainerRef = useRef(null); // Ref for the proposal container
+
+    const getAuth = useAuthUser();
+    const auth = getAuth();
+    const tokenRef = useRef(auth?.token || "default");
 
     useEffect(() => {
         if (bidData && bidData.text) {
@@ -69,9 +75,10 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
     };
 
     return (
-        <section id="proposal">
-            <div className="proposal-header mb-2">
-                <h3 className="custom-label mt-5">Proposal Editor</h3>
+        <>
+            <div className="proposal-header">
+                <h3 className="custom-label"></h3>
+                <TemplateLoader token={tokenRef.current} handleSelect={handleSelect}/>
                 <Dropdown onSelect={handleSelect}>
                     <Dropdown.Toggle className="upload-button" style={{backgroundColor: 'black'}} id="dropdown-basic">
                         Navigate to Question
@@ -93,7 +100,7 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
                 </Dropdown>
             </div>
             
-            <div className="proposal-container" ref={proposalContainerRef} style={{overflowY: 'scroll', maxHeight: '400px', scrollBehavior: 'smooth'}}>
+            <div className="proposal-container" ref={proposalContainerRef}>
                 <Row className="justify-content-md-center">
                     <Col md={12}>
                         <CustomEditor
@@ -104,7 +111,7 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
                     </Col>
                 </Row>
             </div>
-        </section>
+        </>
     );
 }
 

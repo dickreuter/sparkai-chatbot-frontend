@@ -532,13 +532,14 @@ const Chatbot = () => {
     return (
         <div id="chatbot-page">
             <SideBarSmall />
-            <SideBar
-                isCopilotVisible={isCopilotVisible}
-                setIsCopilotVisible={setIsCopilotVisible}
-                selectedText={selectedText} // Pass the selected text to the Sidebar component
-                askCopilot={askCopilot}
-            />
-          <div className="chatbot-container">
+            {/* <SideBar
+    isCopilotVisible={isCopilotVisible}
+    setIsCopilotVisible={setIsCopilotVisible}
+    selectedText={selectedText} // Pass the selected text to the Sidebar component
+    askCopilot={askCopilot}
+/> */}
+
+          <div className="lib-container">
 
                 <h1 className='heavy'>New Bid</h1>
 
@@ -794,7 +795,7 @@ const Chatbot = () => {
                                 <Button
                                     variant="primary"
                                     onClick={submitFeedback}
-                                    className="upload-button mt-1"
+                                    className="upload-button mt-1 mb-2"
                                     disabled={!questionAsked} // Disabled until a question is asked
                                 >
                                     Submit Feedback

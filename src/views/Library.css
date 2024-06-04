@@ -1,3 +1,17 @@
+.lib-container {
+    width: 100%;
+    height: 100%;
+    margin-top: 40px;
+    margin-bottom: 0;
+    background-color: white;
+    justify-content: center;
+    padding-top: 30px;
+    padding-left: 205px;
+    padding-right: 20px;
+    overflow-x: hidden;
+    /* or whatever value you desire for the chatbot page */
+}
+
 .upload-component {
     display: flex;
     min-height: 50vh;
@@ -94,6 +108,11 @@
     font-weight: 600;
     margin-left: 15px;
     margin-top: 20px;
+}
+
+.lib-title {
+    font-size: 22px;
+    font-weight: 600;
 }
 
 .lib-custom-card .card-body {

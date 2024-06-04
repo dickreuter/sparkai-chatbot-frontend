@@ -15,6 +15,7 @@ urlpatterns = [
     path("futureai", TemplateView.as_view(template_name="aiblog.html"), name='futureai'),
     path("story", TemplateView.as_view(template_name="story.html"), name='story'),
     path("intro", TemplateView.as_view(template_name="intro.html"), name='intro'),
-     path("", home, name='home'),
+    path("book", TemplateView.as_view(template_name="bookcall.html"), name='book'),
+    path("", home, name='home'),
 
 ]

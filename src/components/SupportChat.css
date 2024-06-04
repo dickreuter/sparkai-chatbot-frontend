@@ -1,0 +1,16 @@
+/* SupportChat.css */
+
+
+/* Change the support chat button color to black */
+
+.rcw-launcher {
+    background-color: #000 !important;
+    background-size: cover !important;
+    background-position: center !important;
+    border-radius: 50% !important;
+}
+
+.rcw-header {
+    background-color: #000 !important;
+    color: #fff !important;
+}

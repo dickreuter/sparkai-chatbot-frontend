@@ -95,7 +95,7 @@ const BidExtractor = () => {
             </button>
           </h1>
         </div>
-        <div className="library-container">
+        <div >
             <Row>
               <Col md={3}>
                <h1 className="lib-title mb-3">Upload RFP</h1>

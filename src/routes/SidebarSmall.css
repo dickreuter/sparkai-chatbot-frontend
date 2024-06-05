@@ -1,5 +1,5 @@
 .sidebarsmall {
-    height: 93%;
+    height: 95%;
     margin-top: 55px;
     width: 185px;
     /* Adjust width as needed */
@@ -7,7 +7,7 @@
     z-index: 200;
     top: 0;
     left: 0;
-    background: linear-gradient(90deg, rgb(28, 27, 27) 0%, rgb(26, 23, 23) 100%);
+    background-color: #262626;
     overflow-x: hidden;
     padding-top: 10px;
     padding-left: 10px;

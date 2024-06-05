@@ -3,7 +3,7 @@
     box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
     margin: 0;
     word-wrap: break-word;
-    height: 730px;
+    height: 700px;
     display: flex;
     flex-direction: column;
     margin-bottom: 40px;
@@ -25,7 +25,7 @@
     display: flex;
     flex-direction: column;
     height: 80px;
-    background-color: black;
+    background-color: #262626;
 }
 
 .input-console {
@@ -37,7 +37,7 @@
     display: flex;
     flex-direction: column;
     max-height: 140px;
-    background-color: black;
+    background-color: #262626;
 }
 
 .mini-messages {
@@ -49,25 +49,26 @@
     background-color: #e0e0e0;
 }
 
-.message-bubble {
+.message-bubble-small {
     display: flex;
     /* Inline block to fit content */
-    max-width: 70%;
-    min-width: 150px;
+    max-width: 80%;
+    min-width: 60px;
     padding: 10px;
     border-radius: 15px;
     margin-bottom: 10px;
     word-wrap: break-word;
+    font-size: 14px;
 }
 
-.message-bubble.user {
+.message-bubble-small.user {
     background-color: #ff9900;
     align-self: flex-end;
     border-top-right-radius: 0;
     color: white;
 }
 
-.message-bubble.bot {
+.message-bubble-small.bot {
     background-color: #f0f0f0;
     align-self: flex-start;
     border-top-left-radius: 0;
@@ -190,4 +191,50 @@
     font-weight: 600;
     font-size: 0.7rem;
     border-radius: 8px;
+}
+
+.question-answer-box {
+    flex: 1;
+    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    padding: 10px;
+    transition: all 0.35s ease;
+    margin: 0;
+    word-wrap: break-word;
+    height: 335px;
+    /* Ensure children start at the top */
+}
+
+.loading-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 24px;
+    color: #000;
+    font-weight: 600;
+}
+
+.loading-dots span {
+    animation: blink 1.4s infinite both;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0.2;
+    }
+    20% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.2;
+    }
 }

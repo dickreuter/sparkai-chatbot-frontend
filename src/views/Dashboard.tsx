@@ -139,7 +139,7 @@ return (
                 </div>
       
 
-                <div className="library-container mt-4">
+                <div className="mt-4">
                     <Row>
                         <Col md={12}>
                         <Card className="lib-custom-card mb-4">

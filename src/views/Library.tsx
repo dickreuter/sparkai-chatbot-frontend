@@ -437,7 +437,7 @@ return (
             </div>
             
             {/* Table Structure */}
-            <table className="library-table">
+            <table className="library-table ">
               <thead>
                 <tr>
                   <th>{activeFolder ? `Documents in ${activeFolder}` : 'Folders'}</th>

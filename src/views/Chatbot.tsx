@@ -530,20 +530,20 @@ const Chatbot = () => {
         };
     }, []);
     return (
-        <div id="chatbot-page">
+        <div className="chatpage">
             <SideBarSmall />
-            {/* <SideBar
-    isCopilotVisible={isCopilotVisible}
-    setIsCopilotVisible={setIsCopilotVisible}
-    selectedText={selectedText} // Pass the selected text to the Sidebar component
-    askCopilot={askCopilot}
-/> */}
+                            {/* <SideBar
+                    isCopilotVisible={isCopilotVisible}
+                    setIsCopilotVisible={setIsCopilotVisible}
+                    selectedText={selectedText} // Pass the selected text to the Sidebar component
+                    askCopilot={askCopilot}
+                /> */}
 
           <div className="lib-container">
 
                 <h1 className='heavy'>New Bid</h1>
 
-                <div className="library-container mt-4">
+                <div className="mt-4">
 
                 <section id="bidinfo">
 

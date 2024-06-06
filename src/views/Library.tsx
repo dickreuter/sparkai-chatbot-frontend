@@ -403,7 +403,7 @@ const renderFolderContents = () => {
 
 
 return (
-  <div id="chatbot-page">
+  <div className="chatpage">
     <SideBarSmall />
 
     <div className="lib-container">

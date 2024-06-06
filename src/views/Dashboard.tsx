@@ -107,7 +107,7 @@ return (
                   icon={faEye}
                   title="AI Bid/No Bid"
                   description="Let AI help you quickly assess opportunities to help you decide whether to bid or not."
-                  path="/bids" // Update path prop
+                  path="/calculator" // Update path prop
                 />
                 <DashboardCard
                   style={{ margin: '0px !important' }}

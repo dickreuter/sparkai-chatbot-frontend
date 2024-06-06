@@ -96,21 +96,21 @@ const BidExtractor = () => {
           </h1>
         </div>
         <div >
-            <Row>
-              <Col md={3}>
-               <h1 className="lib-title mb-3">Upload RFP</h1>
+        <Row>
+            <Col className="col-3-5">
+              <div>
+                <h1 className="lib-title mb-3">Upload RFP</h1>
                 <div className="upload-rfp">
                   <div className="upload-placeholder">
                     <span className="upload-cross">+</span>
                   </div>
-                 
                 </div>
-              </Col>
-              <Col md={9}>
-              <div style={{marginLeft: "30px"}}>
-              <h1 className="lib-title mb-3">Question Extractor</h1>
-                <div className="question-extractor">
-                
+              </div>
+            </Col>
+            <Col className="col-8-5">
+              <div>
+                <h1 className="lib-title mb-3">Question Extractor</h1>
+                <div className="question-extractor-flex">
                   <div className="question-list">
                     <div className="question-item">Question 1</div>
                     <div className="question-item">Question 2</div>
@@ -121,9 +121,8 @@ const BidExtractor = () => {
                   </div>
                 </div>
               </div>
-              
-              </Col>
-            </Row>
+            </Col>
+          </Row>
             <Row className="mt-5 mb-5">
                 <Col md={6}>
                 <div className="card-title-container mb-2">

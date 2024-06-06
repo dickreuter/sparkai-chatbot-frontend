@@ -16,11 +16,14 @@ import Dashboard from "../views/Dashboard.tsx"
 import ChatbotResponse from "../views/ChatbotResponse.tsx"
 import BidExtractor from "../views/BidExtractor.tsx"
 import QuestionCrafter from "../views/QuestionCrafter.tsx"
+import Calculator from "../views/Calculator.tsx"
+
 function Routing() {
     return (
         <div>
             <Routes>
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/calculator" element={<Calculator />} />
                 <Route path="/" element={<BidExtractor />} />
                 <Route path="/chatbot" element={<Chatbot />} />
                 <Route path="/chatResponse" element={<ChatbotResponse />} />

@@ -43,5 +43,6 @@
 .main-content {
     padding: 0px;
     overflow-x: hidden;
-    /* Adjust this value based on your navbar's height */
+    width: 100vw;
+    height: 100vh;
 }

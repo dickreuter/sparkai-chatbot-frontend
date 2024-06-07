@@ -31,11 +31,10 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border: 1px solid #ced4da;
     margin-top: 0;
-    height: 100%;
     padding: 0rem;
     justify-content: center;
     overflow-y: scroll;
     padding: 1%;
-    min-height: 600px;
-    margin-bottom: 40px;
+    height: 600px;
+    margin-bottom: 20px;
 }

@@ -10,6 +10,7 @@ import BidNavbar from "../routes/BidNavbar.tsx";
 import "./QuestionsCrafter.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import FolderLogic from "../components/Folders.tsx";
 
 const QuestionCrafter = () => {
   const getAuth = useAuthUser();
@@ -18,18 +19,43 @@ const QuestionCrafter = () => {
 
   const [bids, setBids] = useState([]);
   const [selectedBid, setSelectedBid] = useState(null);
-
+  
   const [dataset, setDataset] = useState("default");
   const [availableCollections, setAvailableCollections] = useState<string[]>([]);
+  const [folderContents, setFolderContents] = useState({});
+  const [isAppended, setIsAppended] = useState(false);
+  const [appendResponse, setAppendResponse] = useState(false);
+  const [selectedQuestionId, setSelectedQuestionId] = useState("-1"); // Default to "Full Proposal"
 
+  
   const handleDatasetChange = (e) => {
     const newDataset = e.target.value;
     setDataset(newDataset); // Update the state with the new dataset value
     handleGAEvent('Chatbot', 'Dataset Selection', 'Select Dataset Button');
   };
+
   const handleSelect = (eventKey) => {
     handleDatasetChange({ target: { value: eventKey } });
   };
+
+  const handleAppendResponseToEditor = () => {
+    handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
+    setSelectedQuestionId("-1"); // Reset dropdown to "Full Proposal"
+
+    // Delay the next operation to ensure UI updates smoothly
+    setTimeout(() => {
+        const uniqueId = Date.now();
+        setAppendResponse({
+            id: uniqueId, // Unique identifier for each append action
+            question: inputText,
+            answer: response
+        });
+
+        setIsAppended(true);
+        setTimeout(() => setIsAppended(false), 3000);
+    }, 100); // Adjust the delay here based on your needs
+};
+
 
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -50,6 +76,8 @@ const QuestionCrafter = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [apiChoices, setApiChoices] = useState([]);
+  const [wordAmounts, setWordAmounts] = useState({});
+
 
 
   const [inputText, setInputText] = useState(
@@ -146,22 +174,120 @@ const QuestionCrafter = () => {
 
 
   const sendQuestionToChatbot = async () => {
-    handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
-    setQuestionAsked(true);
-    localStorage.setItem('questionAsked', 'true');
-    setResponse("");
+      //console.log("question asked");
+      handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
+      setQuestionAsked(true);
+      localStorage.setItem('questionAsked', 'true');
+      setResponse("");
+      setIsLoading(true);
+      setStartTime(Date.now()); // Set start time for the timer
+      console.log(dataset)
+      try {
+          const result = await axios.post(
+              `http${HTTP_PREFIX}://${API_URL}/question`,
+              {
+                  choice: choice === "3" ? "3a" : choice,
+                  broadness: broadness,
+                  input_text: inputText,
+                  extra_instructions: backgroundInfo,
+                  dataset,
+              },
+              {
+                  headers: {
+                      Authorization: `Bearer ${tokenRef.current}`,
+                  },
+              }
+          );
+          if (choice != "3") {
+              setResponse(result.data);
+          }
+          if (choice === "3") {
+              let choicesArray = [];
+
+              // Check if result.data contains comma-separated values
+              if (result.data && result.data.includes(",")) {
+                  choicesArray = result.data.split(",").map((choice) => choice.trim());
+              }
+              //console.log("API Response:", result);
+
+              //console.log("Choices Array: " + choicesArray);
+
+              setApiChoices(choicesArray);
+          }
+      } catch (error) {
+          console.error("Error sending question:", error);
+          setResponse(error.message);
+      }
+      setIsLoading(false);
+  };
+
+
+  const handleChoiceSelection = (selectedChoice) => {
+    if (selectedChoices.includes(selectedChoice)) {
+        setSelectedChoices(
+            selectedChoices.filter((choice) => choice !== selectedChoice)
+        );
+        setWordAmounts((prevWordAmounts) => {
+            const newWordAmounts = { ...prevWordAmounts };
+            delete newWordAmounts[selectedChoice];
+            return newWordAmounts;
+        });
+    } else {
+        setSelectedChoices([...selectedChoices, selectedChoice]);
+        setWordAmounts((prevWordAmounts) => ({
+            ...prevWordAmounts,
+            [selectedChoice]: 500 // Default word amount
+        }));
+    }
+};
+
+const renderChoices = () => {
+    return (
+        <div className="choices-container">
+            {apiChoices.map((choice, index) => (
+                <div key={index} className="choice-item d-flex align-items-center">
+                    <Form.Check
+                        type="checkbox"
+                        label={choice}
+                        checked={selectedChoices.includes(choice)}
+                        onChange={() => handleChoiceSelection(choice)}
+                    />
+                    {selectedChoices.includes(choice) && (
+                        <Form.Control
+                            type="number"
+                            value={wordAmounts[choice] || 500}
+                            onChange={(e) => setWordAmounts({
+                                ...wordAmounts,
+                                [choice]: parseInt(e.target.value, 10)
+                            })}
+                            min={1}
+                            className="ml-2"
+                            placeholder="500"
+                            style={{ width: '120px', marginLeft: '10px' }}
+                        />
+                    )}
+                </div>
+            ))}
+        </div>
+    );
+};
+
+
+const submitSelections = async () => {
     setIsLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
-    console.log(dataset)
     try {
+        const word_amounts = selectedChoices.map((choice) => wordAmounts[choice] || 100);
         const result = await axios.post(
-            `http${HTTP_PREFIX}://${API_URL}/question`,
+            `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
             {
-                choice: choice === "3" ? "3a" : choice,
+                choice: "3b",
                 broadness: broadness,
                 input_text: inputText,
                 extra_instructions: backgroundInfo,
+                selected_choices: selectedChoices,
                 dataset,
+                word_amounts
             },
             {
                 headers: {
@@ -169,86 +295,18 @@ const QuestionCrafter = () => {
                 },
             }
         );
-        if (choice != "3") {
-            setResponse(result.data);
-        }
-        if (choice === "3") {
-            let choicesArray = [];
-
-            // Check if result.data contains comma-separated values
-            if (result.data && result.data.includes(",")) {
-                choicesArray = result.data.split(",").map((choice) => choice.trim());
-            }
-            //console.log("API Response:", result);
-
-            //console.log("Choices Array: " + choicesArray);
-
-            setApiChoices(choicesArray);
-        }
+        setResponse(result.data); // Assuming this is the final answer
+        setApiChoices([]); // Clear choices
+        setSelectedChoices([]); // Clear selected choices
+        setWordAmounts({}); // Clear word amounts
     } catch (error) {
-        console.error("Error sending question:", error);
+        console.error("Error submitting selections:", error);
         setResponse(error.message);
     }
     setIsLoading(false);
 };
 
-const handleChoiceSelection = (selectedChoice) => {
-  // Toggle selection logic
-  if (selectedChoices.includes(selectedChoice)) {
-      setSelectedChoices(
-          selectedChoices.filter((choice) => choice !== selectedChoice)
-      );
-  } else {
-      setSelectedChoices([...selectedChoices, selectedChoice]);
-  }
-};
 
-const renderChoices = () => {
-  return (
-      <div className="choices-container">
-          {apiChoices.map((choice, index) => (
-              <Form.Check
-                  className="choice-item"
-                  type="checkbox"
-                  label={choice}
-                  key={index}
-                  checked={selectedChoices.includes(choice)}
-                  onChange={() => handleChoiceSelection(choice)}
-              />
-          ))}
-      </div>
-  );
-};
-
-const submitSelections = async () => {
-  setIsLoading(true);
-  setStartTime(Date.now()); // Set start time for the timer
-  try {
-      const result = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
-          {
-              choice: "3b",
-              broadness: broadness,
-              input_text: inputText,
-              extra_instructions: backgroundInfo,
-              selected_choices: selectedChoices,
-              dataset,
-          },
-          {
-              headers: {
-                  Authorization: `Bearer ${tokenRef.current}`,
-              },
-          }
-      );
-      setResponse(result.data); // Assuming this is the final answer
-      setApiChoices([]); // Clear choices
-      setSelectedChoices([]); // Clear selected choices
-  } catch (error) {
-      console.error("Error submitting selections:", error);
-      setResponse(error.message);
-  }
-  setIsLoading(false);
-};
   return (
     <div className="chatpage">
       <SideBarSmall />
@@ -264,6 +322,17 @@ const submitSelections = async () => {
           </div>
         </div>
         <div>
+
+        <Row className="justify-content-md-center mt-4" style={{ visibility: 'hidden', height: 0, overflow: 'hidden' }}>
+                        <FolderLogic
+                            tokenRef={tokenRef}
+                            setAvailableCollections={setAvailableCollections}
+                            setFolderContents={setFolderContents}
+                            availableCollections={availableCollections}
+                            folderContents={folderContents}
+                        />
+        </Row>
+
 
           <Row>
             <Col md={8}>
@@ -331,7 +400,7 @@ const submitSelections = async () => {
 
               <h1 className="lib-title mt-4 mb-3">Response</h1>
 
-              <div className="question-answer-box">
+              <div className="response-box">
                 <textarea
                   className="card-textarea"
                   placeholder="Enter response here..."
@@ -339,6 +408,15 @@ const submitSelections = async () => {
                   onChange={(e) => setResponse(e.target.value)}
                 ></textarea>
               </div>
+
+              <Button
+                        variant={isAppended ? "success" : "primary"}
+                        className="upload-button mt-2 mb-4" 
+                        onClick={handleAppendResponseToEditor}
+                        disabled={isLoading || isAppended} 
+              >   
+                    {isAppended ? "Added" : "Add to Proposal"}
+              </Button>
 
             </Col>
             <Col md={4}>

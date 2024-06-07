@@ -13,7 +13,8 @@ import BidCard from "../components/BidCard.tsx";
 import { Card, Col, Row } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css'; // Assuming you put your styles here
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-js';
+import { useLocation } from 'react-router-dom';
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
@@ -22,7 +23,7 @@ const BidExtractor = () => {
   const [bids, setBids] = useState([]);
   const [selectedBid, setSelectedBid] = useState(null);
 
-  const [bidName, setBidName] = useState('Bid Name');
+  const [bidName, setBidName] = useState(localStorage.getItem('bidInfo') || 'Bid Name');
   const [isEditing, setIsEditing] = useState(false);
 
   const navigate = useNavigate();
@@ -30,6 +31,23 @@ const BidExtractor = () => {
   const bidNameTempRef = useRef(bidName);
 
   const CHARACTER_LIMIT = 20;
+
+  /////////////  COOKIES   //////////////////////////////////////////////////////////////////////////////////////////
+  const location = useLocation();
+  const bidData = location.state?.bid || ' ';
+
+  const [bidInfo, setBidInfo] = useState(
+    localStorage.getItem('bidInfo') || ''
+  );
+
+  const [backgroundInfo, setBackgroundInfo] = useState(
+    localStorage.getItem('backgroundInfo') || ''
+  );
+
+  const [questions, setQuestions] = useState([]);
+
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   const handleBidNameChange = (e) => {
     const newText = e.target.innerText.replace(/\n/g, ''); // Remove new lines
@@ -63,6 +81,8 @@ const BidExtractor = () => {
 
   const handleBlur = () => {
     setBidName(bidNameTempRef.current);
+    setBidInfo(bidNameTempRef.current);
+    localStorage.setItem('bidInfo', bidNameTempRef.current);
     setIsEditing(false);
   };
 
@@ -72,12 +92,86 @@ const BidExtractor = () => {
     }
   }, [isEditing, bidName]);
 
+  //////////////////////////// LOAD BID ///////////////////////////////////////////////////////////////////////
+  useEffect(() => {
+    const navigatedFromBidsTable = localStorage.getItem('navigatedFromBidsTable');
+
+    if (navigatedFromBidsTable === 'true' && location.state?.fromBidsTable && bidData) {
+
+
+      // Update form states with data from navigation or provide default values
+      setBidInfo(bidData?.bid_title || '');
+      setBackgroundInfo(bidData?.contract_information || '');
+
+
+      // Update local storage to match the navigation data
+      localStorage.setItem('bidInfo', bidData?.bid_title || '');
+      localStorage.setItem('backgroundInfo', bidData?.contract_information || '');
+
+
+      localStorage.setItem('navigatedFromBidsTable', 'false');
+
+      localStorage.getItem('bidInfo') || '';
+      localStorage.getItem('backgroundInfo') || '';
+
+
+    } 
+  }, [location, bidData]);
+
+  // Update local storage and handle session flag on form changes
+  useEffect(() => {
+    localStorage.setItem('bidInfo', bidInfo);
+    localStorage.setItem('backgroundInfo', backgroundInfo);
+  }, [bidInfo, backgroundInfo]);
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+  
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    try {
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/extract_questions_from_pdf`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
+  
+      console.log(result);
+  
+      const extractedQuestions = result.data.filter(question => question.trim() !== '');
+      console.log("extracted questions:");
+      console.log(extractedQuestions);
+      setQuestions(extractedQuestions);
+      
+    } catch (error) {
+      console.error("Error extracting questions:", error);
+    }
+  };
+  
+
+  useEffect(() => {
+    // Perform side-effect to update the questions
+    if (questions.length > 0) {
+      console.log("Questions updated:", questions);
+    }
+  }, [questions]);
+
+
   return (
     <div className="chatpage">
       <SideBarSmall />
       <div className="lib-container">
         <BidNavbar />
-        <div className="mb-4">
+        <div className="mb-3">
           <h1 className='heavy'>
             <span
               contentEditable={isEditing}
@@ -95,56 +189,78 @@ const BidExtractor = () => {
             </button>
           </h1>
         </div>
-        <div >
-        <Row>
+        <div>
+          <Row>
             <Col className="col-3-5">
               <div>
                 <h1 className="lib-title mb-3">Upload RFP</h1>
-                <div className="upload-rfp">
-                  <div className="upload-placeholder">
-                    <span className="upload-cross">+</span>
-                  </div>
+                <div className="upload-rfp" onClick={() => document.getElementById('fileInput').click()}>
+                <input 
+                  type="file" 
+                  id="fileInput" 
+                  style={{ display: 'none' }} 
+                  onChange={handleFileUpload} 
+                />
+                <div className="upload-placeholder">
+                  <span className="upload-cross">+</span>
                 </div>
+              </div>
+
               </div>
             </Col>
             <Col className="col-8-5">
-              <div>
-                <h1 className="lib-title mb-3">Question Extractor</h1>
-                <div className="question-extractor-flex">
-                  <div className="question-list">
-                    <div className="question-item">Question 1</div>
-                    <div className="question-item">Question 2</div>
-                    <div className="question-item">Question 3</div>
-                    <div className="question-item">Question 4</div>
-                    <div className="question-item">Question 5</div>
-                    <div className="question-item">Question 6</div>
-                  </div>
+            <div>
+              <h1 className="lib-title mb-3">Question Extractor</h1>
+              <div className="question-extractor-flex">
+                <div className="question-list">
+                  {questions.length === 0 ? (
+                    <>
+                      <div className="question-item">Question 1</div>
+                      <div className="question-item">Question 2</div>
+                      <div className="question-item">Question 3</div>
+                      <div className="question-item">Question 4</div>
+                      <div className="question-item">Question 5</div>
+                      <div className="question-item">Question 6</div>
+
+                    </>
+                  ) : (
+                    questions.map((question, index) => (
+                      <div key={index} className="question-item">
+                        {question}
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
-            </Col>
+            </div>
+          </Col>
           </Row>
-            <Row className="mt-5 mb-5">
-                <Col md={6}>
-                <div className="card-title-container mb-2">
-                  <div className="tooltip-container">
-                      <i className="fas fa-info-circle tooltip-icon"></i>
-                      <span className="tooltip-text-cd">
-                        <strong style={{marginLeft: "15px"}}>What are the client’s business issues that have led them to release this tender?</strong>
-                        <ul>
-                          <li>What will happen if they don’t address these issues?</li>
-                          <li>What value results from addressing these issues?</li>
-                          <li>What business objectives do they want to achieve?</li>
-                          <li>Which objective is the most important to the client?</li>
-                        
-                        </ul>
-                      </span>
-                  </div>
-                  <h1 className="lib-title">Client Details</h1>
+          <Row className="mt-5 mb-5">
+            <Col md={6}>
+              <div className="card-title-container mb-2">
+                <div className="tooltip-container">
+                  <i className="fas fa-info-circle tooltip-icon"></i>
+                  <span className="tooltip-text-cd">
+                    <strong style={{ marginLeft: "15px" }}>What are the client’s business issues that have led them to release this tender?</strong>
+                    <ul>
+                      <li>What will happen if they don’t address these issues?</li>
+                      <li>What value results from addressing these issues?</li>
+                      <li>What business objectives do they want to achieve?</li>
+                      <li>Which objective is the most important to the client?</li>
+                    </ul>
+                  </span>
                 </div>
-                <div className="question-extractor">
-                  <textarea className="card-textarea" placeholder="Enter client details here..."></textarea>
-                </div>
-              </Col>
+                <h1 className="lib-title">Client Details</h1>
+              </div>
+              <div className="question-extractor">
+                <textarea
+                  className="card-textarea"
+                  placeholder="Enter client details here..."
+                  value={backgroundInfo}
+                  onChange={(e) => setBackgroundInfo(e.target.value)}
+                ></textarea>
+              </div>
+            </Col>
               <Col md={6}>
                 <div className="card-title-container mb-2">
                   <div className="tooltip-container">

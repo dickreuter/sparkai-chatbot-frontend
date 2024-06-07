@@ -6,19 +6,16 @@
     font-weight: 600;
     font-size: 0.9rem;
     border: none;
-    /* Remove default border */
     cursor: pointer;
-    /* Indicate it's selectable */
+    position: relative;
 }
 
 .status-dropdown.ongoing {
-    background-color: #F7AE36;
-    /* Yellow for ongoing */
+    background-color: orange;
 }
 
 .status-dropdown.complete {
     background-color: black;
-    /* Green for complete */
 }
 
 .bids-table {
@@ -27,11 +24,11 @@
     margin: 0;
     padding: 0;
     border-collapse: collapse;
-    /* Updated for border application */
     border-spacing: 0;
     margin: 20px auto;
     overflow: hidden;
-    margin-bottom: 0;
+    margin-bottom: 40px;
+    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
 }
 
 .bids-table th,
@@ -39,10 +36,9 @@
     text-align: left;
     white-space: nowrap;
     overflow: hidden;
-    padding: 8px;
+    padding: 12px;
     text-overflow: ellipsis;
     border-bottom: 1px solid #ddd;
-    /* Add horizontal line between rows */
 }
 
 
@@ -51,7 +47,6 @@
 .bids-table td:first-child,
 .bids-table th:first-child {
     padding-left: 16px;
-    /* Increase left padding for the first column */
 }
 
 .bids-table th {
@@ -70,4 +65,10 @@
 
 .bids-table tr:last-child td {
     border-bottom: none;
+}
+
+.dropdown-menu-f {
+    z-index: 1050;
+    position: absolute;
+    will-change: transform;
 }

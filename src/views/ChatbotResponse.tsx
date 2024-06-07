@@ -18,7 +18,7 @@ const ChatbotResponse = () => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState("");
 
-    const [choice, setChoice] = useState("3");
+    const [choice, setChoice] = useState("2");
     const [broadness, setBroadness] = useState("2");
     const [dataset, setDataset] = useState("default");
     const [inputText, setInputText] = useState('');
@@ -51,52 +51,46 @@ const ChatbotResponse = () => {
         setResponse("");
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
-
+    
+        // Add a temporary bot message with loading dots
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { type: 'bot', text: 'loading' }
+        ]);
+    
         try {
-            const result = await axios.post(
-                `http${HTTP_PREFIX}://${API_URL}/question`,
-                {
-                    choice: choice === "3" ? "3a" : choice,
-                    broadness: broadness,
-                    input_text: question,
-                    extra_instructions: backgroundInfo,
-                    dataset,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${tokenRef.current}`,
-                    },
-                }
-            );
-
-            if (choice != "3") {
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    { type: 'bot', text: result.data }
-                ]);
-            } else if (choice === "3") {
-                let choicesArray = [];
-
-                if (result.data && result.data.includes(",")) {
-                    choicesArray = result.data.split(",").map((choice) => choice.trim());
-                }
-
-                setApiChoices(choicesArray);
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    { type: 'bot', text: choicesArray.join(", ") }
-                ]);
+          const result = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/question`,
+            {
+              choice: choice,
+              broadness: broadness,
+              input_text: question,
+              extra_instructions: backgroundInfo,
+              dataset,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${tokenRef.current}`,
+              },
             }
+          );
+    
+          // Replace the temporary loading message with the actual response
+          setMessages((prevMessages) => [
+            ...prevMessages.slice(0, -1),
+            { type: 'bot', text: result.data }
+          ]);
         } catch (error) {
-            console.error("Error sending question:", error);
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                { type: 'bot', text: error.message }
-            ]);
+          console.error("Error sending question:", error);
+          // Replace the temporary loading message with the error message
+          setMessages((prevMessages) => [
+            ...prevMessages.slice(0, -1),
+            { type: 'bot', text: error.response?.status === 400 ? 'Message failed, please contact support...' : error.message }
+          ]);
         }
         setIsLoading(false);
-    };
-
+      };
+    
     return (
         <div className="chatpage">
             <SideBarSmall />
@@ -104,7 +98,15 @@ const ChatbotResponse = () => {
                 <div className="messages">
                     {messages.map((message, index) => (
                         <div key={index} className={`message-bubble ${message.type}`}>
-                            {message.text}
+                             {message.text === 'loading' ? (
+                          <div className="loading-dots">
+                            <span>. </span>
+                            <span>. </span>
+                            <span>. </span>
+                          </div>
+                        ) : (
+                          message.text
+                        )}
                         </div>
                     ))}
                 </div>

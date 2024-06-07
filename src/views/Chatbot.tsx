@@ -52,6 +52,8 @@ const Chatbot = () => {
     const [questionAsked, setQuestionAsked] = useState(false);
     const [apiChoices, setApiChoices] = useState([]);
     const [selectedChoices, setSelectedChoices] = useState([]);
+    const [wordAmounts, setWordAmounts] = useState({});
+
 
 
     const [appendResponse, setAppendResponse] = useState(false);
@@ -388,69 +390,94 @@ const Chatbot = () => {
         setIsLoading(false);
     };
 
-    const handleChoiceSelection = (selectedChoice) => {
-        // Toggle selection logic
-        if (selectedChoices.includes(selectedChoice)) {
-            setSelectedChoices(
-                selectedChoices.filter((choice) => choice !== selectedChoice)
-            );
-        } else {
-            setSelectedChoices([...selectedChoices, selectedChoice]);
-        }
-    };
+const handleChoiceSelection = (selectedChoice) => {
+    if (selectedChoices.includes(selectedChoice)) {
+        setSelectedChoices(
+            selectedChoices.filter((choice) => choice !== selectedChoice)
+        );
+        setWordAmounts((prevWordAmounts) => {
+            const newWordAmounts = { ...prevWordAmounts };
+            delete newWordAmounts[selectedChoice];
+            return newWordAmounts;
+        });
+    } else {
+        setSelectedChoices([...selectedChoices, selectedChoice]);
+        setWordAmounts((prevWordAmounts) => ({
+            ...prevWordAmounts,
+            [selectedChoice]: 500 // Default word amount
+        }));
+    }
+};
 
-    const renderChoices = () => {
-        return (
-            <div className="choices-container">
-                {apiChoices.map((choice, index) => (
+
+const renderChoices = () => {
+    return (
+        <div className="choices-container">
+            {apiChoices.map((choice, index) => (
+                <div key={index} className="choice-item d-flex align-items-center">
                     <Form.Check
-                        className="choice-item"
                         type="checkbox"
                         label={choice}
-                        key={index}
                         checked={selectedChoices.includes(choice)}
                         onChange={() => handleChoiceSelection(choice)}
                     />
-                ))}
-            </div>
-        );
-    };
+                    {selectedChoices.includes(choice) && (
+                        <Form.Control
+                            type="number"
+                            value={wordAmounts[choice] || 500}
+                            onChange={(e) => setWordAmounts({
+                                ...wordAmounts,
+                                [choice]: parseInt(e.target.value, 10)
+                            })}
+                            min={1}
+                            className="ml-2"
+                            placeholder="500"
+                            style={{ width: '120px', marginLeft: '10px' }}
+                        />
+                    )}
+                </div>
+            ))}
+        </div>
+    );
+};
 
 
 
-    const submitSelections = async () => {
-        setIsLoading(true);
-        setStartTime(Date.now()); // Set start time for the timer
-        try {
-            // word_amounts needs to be an array with the same length as selectedChoices and contains 100 each time
-            const word_amounts = selectedChoices.map(() => 100);
-            const result = await axios.post(
-                `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
-                {
-                    choice: "3b",
-                    broadness: broadness,
-                    input_text: inputText,
-                    extra_instructions: backgroundInfo,
-                    selected_choices: selectedChoices,
-                    dataset,
-                    word_amounts
 
+
+const submitSelections = async () => {
+    setIsLoading(true);
+    setStartTime(Date.now()); // Set start time for the timer
+    try {
+        const word_amounts = selectedChoices.map((choice) => wordAmounts[choice] || 100);
+        const result = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
+            {
+                choice: "3b",
+                broadness: broadness,
+                input_text: inputText,
+                extra_instructions: backgroundInfo,
+                selected_choices: selectedChoices,
+                dataset,
+                word_amounts
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${tokenRef.current}`,
                 },
-                {
-                    headers: {
-                        Authorization: `Bearer ${tokenRef.current}`,
-                    },
-                }
-            );
-            setResponse(result.data); // Assuming this is the final answer
-            setApiChoices([]); // Clear choices
-            setSelectedChoices([]); // Clear selected choices
-        } catch (error) {
-            console.error("Error submitting selections:", error);
-            setResponse(error.message);
-        }
-        setIsLoading(false);
-    };
+            }
+        );
+        setResponse(result.data); // Assuming this is the final answer
+        setApiChoices([]); // Clear choices
+        setSelectedChoices([]); // Clear selected choices
+        setWordAmounts({}); // Clear word amounts
+    } catch (error) {
+        console.error("Error submitting selections:", error);
+        setResponse(error.message);
+    }
+    setIsLoading(false);
+};
+
 
     const askCopilot = async (copilotInput: string, instructions: string, copilot_mode: string) => {
         setQuestionAsked(true);

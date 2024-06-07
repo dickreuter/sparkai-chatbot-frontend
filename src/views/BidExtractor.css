@@ -64,15 +64,32 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 350px;
-    width: 350px;
+    height: 100%;
+    width: 100%;
+    max-width: 410px;
+    /* Maximum size */
+    max-height: 350px;
+    /* Maximum size */
     border: 2px solid orange;
     background-color: #f2f2f2;
     box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+    margin: 0;
+    margin-left: 0;
+    /* Center the component */
+    box-sizing: border-box;
+}
+
+.upload-rfp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 350px;
+    width: 100%;
+    padding: 0;
 }
 
 .upload-cross {
-    font-size: 36px;
+    font-size: 40px;
     color: gray;
 }
 

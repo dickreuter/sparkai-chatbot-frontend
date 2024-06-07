@@ -191,25 +191,25 @@ const BidExtractor = () => {
         </div>
         <div>
           <Row>
-            <Col className="col-3-5">
-              <div>
-                <h1 className="lib-title mb-3">Upload RFP</h1>
-                <div className="upload-rfp" onClick={() => document.getElementById('fileInput').click()}>
-                <input 
-                  type="file" 
-                  id="fileInput" 
-                  style={{ display: 'none' }} 
-                  onChange={handleFileUpload} 
-                />
-                <div className="upload-placeholder">
-                  <span className="upload-cross">+</span>
-                </div>
-              </div>
+          <Col md={4}>
+  <div>
+    <h1 className="lib-title mb-3">Upload RFP</h1>
+    <div className="upload-rfp" onClick={() => document.getElementById('fileInput').click()}>
+      <input 
+        type="file" 
+        id="fileInput" 
+        style={{ display: 'none' }} 
+        onChange={handleFileUpload} 
+      />
+      <div className="upload-placeholder">
+        <span className="upload-cross">+</span>
+      </div>
+    </div>
+  </div>
+</Col>
 
-              </div>
-            </Col>
-            <Col className="col-8-5">
-            <div>
+            <Col md={8}>
+            <div >
               <h1 className="lib-title mb-3">Question Extractor</h1>
               <div className="question-extractor-flex">
                 <div className="question-list">

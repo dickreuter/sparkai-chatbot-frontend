@@ -33,6 +33,7 @@ interface IAttributesConfig {
     prompt1for_example: string;
     prompt1adding_case_study: string;
     prompt1company_library: string;
+    question_extractor: string;
 
     forbidden: string;
     numbers_allowed_prefixes: string;
@@ -413,6 +414,13 @@ const AdminPannel = () => {
                 <textarea
                     value={data.prompt1company_library}
                     onChange={(e) => handleChange("prompt1company_library", e.target.value)}
+                />
+            </div>
+            <div className="prompt">
+                <label>Question extractor from PDF</label>
+                <textarea
+                    value={data.question_extractor}
+                    onChange={(e) => handleChange("question_extractor", e.target.value)}
                 />
             </div>
 

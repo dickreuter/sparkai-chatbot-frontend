@@ -204,6 +204,18 @@
     /* Ensure children start at the top */
 }
 
+.response-box {
+    flex: 1;
+    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    padding: 10px;
+    transition: all 0.35s ease;
+    margin: 0;
+    word-wrap: break-word;
+    height: 375px;
+    /* Ensure children start at the top */
+}
+
 .loading-dots {
     display: flex;
     justify-content: center;

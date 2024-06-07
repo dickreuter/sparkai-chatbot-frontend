@@ -422,6 +422,8 @@ const Chatbot = () => {
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
         try {
+            // word_amounts needs to be an array with the same length as selectedChoices and contains 100 each time
+            const word_amounts = selectedChoices.map(() => 100);
             const result = await axios.post(
                 `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
                 {
@@ -431,6 +433,8 @@ const Chatbot = () => {
                     extra_instructions: backgroundInfo,
                     selected_choices: selectedChoices,
                     dataset,
+                    word_amounts
+
                 },
                 {
                     headers: {

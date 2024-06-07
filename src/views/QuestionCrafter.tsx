@@ -5,7 +5,7 @@ import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import handleGAEvent from '../utilities/handleGAEvent';
-import { Button, Card, Col, Dropdown, Row } from "react-bootstrap";
+import { Button, Card, Col, Dropdown, Form, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./QuestionsCrafter.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,6 +21,7 @@ const QuestionCrafter = () => {
 
   const [dataset, setDataset] = useState("default");
   const [availableCollections, setAvailableCollections] = useState<string[]>([]);
+
   const handleDatasetChange = (e) => {
     const newDataset = e.target.value;
     setDataset(newDataset); // Update the state with the new dataset value
@@ -33,25 +34,55 @@ const QuestionCrafter = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
-  const [choice, setChoice] = useState("2");
-  const [broadness, setBroadness] = useState("2");
-  const [inputText, setInputText] = useState('');
+  const [bidPilotchoice, setBidPilotChoice] = useState("2");
+  const [bidPilotbroadness, setBidPilotBroadness] = useState("2");
+  const [isBidPilotLoading, setIsBidPilotLoading] = useState(false);
+
+  const [choice, setChoice] = useState("3");
+    const [broadness, setBroadness] = useState("2");
+
+
   const [backgroundInfo, setBackgroundInfo] = useState('');
-  const [response, setResponse] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [selectedChoices, setSelectedChoices] = useState([]);
   const [apiChoices, setApiChoices] = useState([]);
 
+
+  const [inputText, setInputText] = useState(
+    localStorage.getItem('inputText') || ''
+  );
+
+  const [response, setResponse] = useState(
+    localStorage.getItem('response') || ''
+  );
+
+  const [messageResponse, setMessageResponse] = useState(
+    localStorage.getItem('response') || ''
+  );
+
+
   useEffect(() => {
-    if (isLoading) {
-      console.log("Loading...");
-    } else {
-      console.log("Finished loading");
+    localStorage.setItem('inputText', inputText);
+    localStorage.setItem('response', response);
+  }, [inputText, response]);
+
+  useEffect(() => {
+    let interval = null;
+    if (isLoading && startTime) {
+        interval = setInterval(() => {
+            setElapsedTime((Date.now() - startTime) / 1000); // Update elapsed time in seconds
+        }, 100);
+    } else if (!isLoading) {
+        clearInterval(interval);
     }
-  }, [isLoading]);
+    return () => clearInterval(interval);
+}, [isLoading, startTime]);
+
+
 
   const handleSendMessage = () => {
     if (inputValue.trim() !== "") {
@@ -70,8 +101,8 @@ const QuestionCrafter = () => {
   const sendQuestion = async (question) => {
     handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
     setQuestionAsked(true);
-    setResponse("");
-    setIsLoading(true);
+    setMessageResponse("");
+    setIsBidPilotLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
 
     // Add a temporary bot message with loading dots
@@ -84,8 +115,8 @@ const QuestionCrafter = () => {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question`,
         {
-          choice: choice,
-          broadness: broadness,
+          choice: bidPilotchoice,
+          broadness: bidPilotbroadness,
           input_text: question,
           extra_instructions: backgroundInfo,
           dataset,
@@ -107,19 +138,124 @@ const QuestionCrafter = () => {
       // Replace the temporary loading message with the error message
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
-        { type: 'bot', text: error.message }
+        { type: 'bot', text: error.response?.status === 400 ? 'Message failed, please contact support...' : error.message }
       ]);
     }
-    setIsLoading(false);
+    setIsBidPilotLoading(false);
   };
 
+
+  const sendQuestionToChatbot = async () => {
+    handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
+    setQuestionAsked(true);
+    localStorage.setItem('questionAsked', 'true');
+    setResponse("");
+    setIsLoading(true);
+    setStartTime(Date.now()); // Set start time for the timer
+    console.log(dataset)
+    try {
+        const result = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/question`,
+            {
+                choice: choice === "3" ? "3a" : choice,
+                broadness: broadness,
+                input_text: inputText,
+                extra_instructions: backgroundInfo,
+                dataset,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${tokenRef.current}`,
+                },
+            }
+        );
+        if (choice != "3") {
+            setResponse(result.data);
+        }
+        if (choice === "3") {
+            let choicesArray = [];
+
+            // Check if result.data contains comma-separated values
+            if (result.data && result.data.includes(",")) {
+                choicesArray = result.data.split(",").map((choice) => choice.trim());
+            }
+            //console.log("API Response:", result);
+
+            //console.log("Choices Array: " + choicesArray);
+
+            setApiChoices(choicesArray);
+        }
+    } catch (error) {
+        console.error("Error sending question:", error);
+        setResponse(error.message);
+    }
+    setIsLoading(false);
+};
+
+const handleChoiceSelection = (selectedChoice) => {
+  // Toggle selection logic
+  if (selectedChoices.includes(selectedChoice)) {
+      setSelectedChoices(
+          selectedChoices.filter((choice) => choice !== selectedChoice)
+      );
+  } else {
+      setSelectedChoices([...selectedChoices, selectedChoice]);
+  }
+};
+
+const renderChoices = () => {
+  return (
+      <div className="choices-container">
+          {apiChoices.map((choice, index) => (
+              <Form.Check
+                  className="choice-item"
+                  type="checkbox"
+                  label={choice}
+                  key={index}
+                  checked={selectedChoices.includes(choice)}
+                  onChange={() => handleChoiceSelection(choice)}
+              />
+          ))}
+      </div>
+  );
+};
+
+const submitSelections = async () => {
+  setIsLoading(true);
+  setStartTime(Date.now()); // Set start time for the timer
+  try {
+      const result = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
+          {
+              choice: "3b",
+              broadness: broadness,
+              input_text: inputText,
+              extra_instructions: backgroundInfo,
+              selected_choices: selectedChoices,
+              dataset,
+          },
+          {
+              headers: {
+                  Authorization: `Bearer ${tokenRef.current}`,
+              },
+          }
+      );
+      setResponse(result.data); // Assuming this is the final answer
+      setApiChoices([]); // Clear choices
+      setSelectedChoices([]); // Clear selected choices
+  } catch (error) {
+      console.error("Error submitting selections:", error);
+      setResponse(error.message);
+  }
+  setIsLoading(false);
+};
   return (
     <div className="chatpage">
       <SideBarSmall />
 
       <div className="lib-container">
         <BidNavbar />
-        <div className="proposal-header">
+        <div className="proposal-header mb-2">
           <h1 className='heavy'>Question Crafter</h1>
           <div className="dropdown-container">
             <Button className={`upload-button`}>
@@ -135,7 +271,6 @@ const QuestionCrafter = () => {
               <div className="proposal-header mb-2">
                 <h1 className="lib-title">Question</h1>
                 <div className="dropdown-container">
-
 
                   <Dropdown onSelect={handleSelect} className="w-100 mx-auto chat-dropdown">
                     <Dropdown.Toggle className="upload-button" style={{ backgroundColor: 'black' }} id="dropdown-basic">
@@ -154,13 +289,55 @@ const QuestionCrafter = () => {
               </div>
 
               <div className="question-answer-box">
-                <textarea className="card-textarea" placeholder="Enter bid proposition here..."></textarea>
+                <textarea
+                  className="card-textarea"
+                  placeholder="Enter question here..."
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                ></textarea>
               </div>
+              <div className="text-muted mt-2">
+                  Word Count: {inputText.split(/\s+/).filter(Boolean).length}
+              </div>
+              <Button  className="upload-button mt-2" onClick={sendQuestionToChatbot}>
+                Submit
+              </Button>
+
+              <Row>
+                    <div className="mb-3" style={{textAlign: "left"}}>
+
+
+                        {isLoading && (
+                            <div className="my-3">
+                                <Spinner animation="border"/>
+                                <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
+                            </div>
+                        )}
+                        {choice === "3" && apiChoices.length > 0 && (
+                            <div>
+                                {renderChoices()}
+                                <Button
+                                    variant="primary"
+                                    onClick={submitSelections}
+                                    className="upload-button mt-3"
+                                    disabled={selectedChoices.length === 0}
+                                >
+                                    Generate answers for selected subsections
+                                </Button>
+                            </div>
+                        )}
+                        </div>
+              </Row>
 
               <h1 className="lib-title mt-4 mb-3">Response</h1>
 
               <div className="question-answer-box">
-                <textarea className="card-textarea" placeholder="Enter bid proposition here..."></textarea>
+                <textarea
+                  className="card-textarea"
+                  placeholder="Enter response here..."
+                  value={response}
+                  onChange={(e) => setResponse(e.target.value)}
+                ></textarea>
               </div>
 
             </Col>
@@ -240,5 +417,6 @@ const QuestionCrafter = () => {
     </div>
   );
 }
+
 
 export default withAuth(QuestionCrafter);

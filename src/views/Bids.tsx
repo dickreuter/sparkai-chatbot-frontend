@@ -7,6 +7,7 @@ import "./Bids.css";
 import { useNavigate } from 'react-router-dom';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import handleGAEvent from '../utilities/handleGAEvent.tsx';
+import { Dropdown } from 'react-bootstrap';
 
 const Bids = () => {
     const [bids, setBids] = useState([]);

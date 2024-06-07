@@ -36,14 +36,14 @@ const SupportChat = ({ auth }) => {
       );
       const { messages: fetchedMessages } = response.data;
 
-      console.log('Fetched Messages:', fetchedMessages);
+      //console.log('Fetched Messages:', fetchedMessages);
 
       if (Array.isArray(fetchedMessages)) {
         const newMessages = fetchedMessages.filter(
           (fMsg) => !messagesRef.current.some((msg) => msg.id === fMsg.id || msg.text === fMsg.text)
         );
 
-        console.log('New Messages:', newMessages);
+        //console.log('New Messages:', newMessages);
 
         newMessages.forEach((msg) => {
           if (typeof msg.text === 'string') {

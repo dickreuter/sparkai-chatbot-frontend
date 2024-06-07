@@ -125,7 +125,7 @@ return (
                         key={bid.id || index}
                         state={{ bid: bid, fromBidsTable: true }}
                         onClick={() => navigateToChatbot(bid)}
-                        to={`/chatbot`} // Ensure you replace this with the correct path
+                        to={`/bid-extractor`} // Ensure you replace this with the correct path
                         style={{ textDecoration: 'none' }} // Remove default link styling
                         >
                         <BidCard

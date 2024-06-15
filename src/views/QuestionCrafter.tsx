@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import withAuth from '../routes/withAuth';
@@ -11,12 +11,17 @@ import "./QuestionsCrafter.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import FolderLogic from "../components/Folders.tsx";
+import { EditorState, convertToRaw, convertFromRaw, Modifier, SelectionState } from 'draft-js';
+import { BidContext } from "./BidWritingStateManagerView.tsx";
 
 const QuestionCrafter = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
+  const { sharedState, setSharedState } = useContext(BidContext);
+  const { editorState } = sharedState;
+  
   const [bids, setBids] = useState([]);
   const [selectedBid, setSelectedBid] = useState(null);
   
@@ -38,23 +43,46 @@ const QuestionCrafter = () => {
     handleDatasetChange({ target: { value: eventKey } });
   };
 
+  const handleSelectQuestion = (eventKey) => {
+    const selectedQuestion = sharedState.questions[eventKey];
+    if (selectedQuestion) {
+      setInputText(selectedQuestion);
+    }
+  };
+
   const handleAppendResponseToEditor = () => {
     handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
     setSelectedQuestionId("-1"); // Reset dropdown to "Full Proposal"
 
     // Delay the next operation to ensure UI updates smoothly
     setTimeout(() => {
-        const uniqueId = Date.now();
-        setAppendResponse({
-            id: uniqueId, // Unique identifier for each append action
-            question: inputText,
-            answer: response
-        });
+      const uniqueId = Date.now();
+      const currentContent = convertFromRaw(JSON.parse(editorState));
+      const currentContentBlock = currentContent.getBlockMap().last();
+      const lengthOfLastBlock = currentContentBlock.getLength();
 
-        setIsAppended(true);
-        setTimeout(() => setIsAppended(false), 3000);
+      const selectionState = SelectionState.createEmpty(currentContentBlock.getKey()).merge({
+        anchorOffset: lengthOfLastBlock,
+        focusOffset: lengthOfLastBlock,
+      });
+
+      const contentStateWithNewText = Modifier.insertText(
+        currentContent,
+        selectionState,
+        `\nQuestion:\n${inputText}\n\nAnswer:\n${response}\n\n`
+      );
+
+      const newEditorState = EditorState.push(EditorState.createWithContent(currentContent), contentStateWithNewText, 'insert-characters');
+
+      setSharedState((prevState) => ({
+        ...prevState,
+        editorState: JSON.stringify(convertToRaw(newEditorState.getCurrentContent())),
+      }));
+
+      setIsAppended(true);
+      setTimeout(() => setIsAppended(false), 3000);
     }, 100); // Adjust the delay here based on your needs
-};
+  };
 
 
   const [messages, setMessages] = useState([]);
@@ -89,7 +117,7 @@ const QuestionCrafter = () => {
   );
 
   const [messageResponse, setMessageResponse] = useState(
-    localStorage.getItem('response') || ''
+    localStorage.getItem('messageResponse') || ''
   );
 
 
@@ -354,8 +382,33 @@ const submitSelections = async () => {
                       ))}
                     </Dropdown.Menu>
                   </Dropdown>
+              
+
+
+                  <Dropdown onSelect={handleSelectQuestion} className="w-100 mx-auto chat-dropdown">
+                    <Dropdown.Toggle className="upload-button" style={{ backgroundColor: 'black' }} id="dropdown-basic">
+                      Select a Question
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu className="w-100">
+                      {sharedState.questions.length > 0 ? (
+                        sharedState.questions.map((question, index) => (
+                          <Dropdown.Item key={index} eventKey={index.toString()}>
+                            {question}
+                          </Dropdown.Item>
+                        ))
+                      ) : (
+                        <Dropdown.Item eventKey="none" disabled>
+                          No questions available
+                        </Dropdown.Item>
+                      )}
+                    </Dropdown.Menu>
+                  </Dropdown>
+
+                  </div>
                 </div>
-              </div>
+
+              
 
               <div className="question-answer-box">
                 <textarea

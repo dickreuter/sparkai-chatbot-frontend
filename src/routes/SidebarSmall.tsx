@@ -34,7 +34,7 @@ const SideBarSmall = () => {
           <FontAwesomeIcon icon={faTachometerAlt} />
           <span>Dashboard</span>
         </Link>
-        <Link to="/chatbot" className={`sidebarsmalllink ${isActive('/chatbot') ? 'sidebarsmalllink-active' : ''}`}>
+        <Link to="/bid-extractor" className={`sidebarsmalllink ${isActive('/bid-extractor') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faFileContract} />
           <span>Bid Editor</span>
         </Link>

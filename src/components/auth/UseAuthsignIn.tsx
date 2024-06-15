@@ -33,7 +33,7 @@ const useAuthSignIn = () => {
         localStorage.removeItem('response');
         localStorage.removeItem('inputText');
         localStorage.removeItem('editorState');
-        navigate('/chatbot');
+        navigate('/dashboard');
 
         //localStorage.clear();
        

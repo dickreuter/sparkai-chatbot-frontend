@@ -17,6 +17,7 @@ import ChatbotResponse from "../views/ChatbotResponse.tsx"
 import BidExtractor from "../views/BidExtractor.tsx"
 import QuestionCrafter from "../views/QuestionCrafter.tsx"
 import Calculator from "../views/Calculator.tsx"
+import BidManagement from "../views/BidWritingStateManagerView.tsx"
 
 function Routing() {
     return (
@@ -24,25 +25,26 @@ function Routing() {
             <Routes>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/calculator" element={<Calculator />} />
-                <Route path="/" element={<BidExtractor />} />
-                <Route path="/chatbot" element={<Chatbot />} />
+                <Route path="/" element={<Dashboard />} />
                 <Route path="/chatResponse" element={<ChatbotResponse />} />
                 <Route path="/login" element={<SignInComponent />} />
                 <Route path="/logout" element={<SignOut />} />
-                <Route path="/bid-extractor" element={<BidExtractor />} />
-                <Route path="/question-crafter" element={<QuestionCrafter />} />
-                <Route path="/proposal" element={<Proposal />} />
                 <Route path="/adminpannel" element={<Pannels />} />
                 <Route path="/uploadtemplatetext" element={<UploadTemplateText />} />
                 <Route path="/qlog" element={<Log />} />
                 <Route path="/flog" element={<FLog />} />
                 <Route path="/bids" element={<Bids />} />
                 <Route path="/library" element={<Library />} />
-               
-
+                
+                {/* Wrap related routes inside a single parent Route with BidManagement */}
+                <Route element={<BidManagement />}>
+                    <Route path="/bid-extractor" element={<BidExtractor />} />
+                    <Route path="/question-crafter" element={<QuestionCrafter />} />
+                    <Route path="/proposal" element={<Proposal />} />
+                </Route>
             </Routes>
         </div>
-    )
+    );
 }
 
-export default Routing
+export default Routing;

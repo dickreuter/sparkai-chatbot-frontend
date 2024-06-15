@@ -249,3 +249,18 @@
         opacity: 0.2;
     }
 }
+
+.chat-dropdown .dropdown-menu {
+    min-width: 200px;
+    /* Adjust as necessary */
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-dropdown .dropdown-menu .dropdown-item {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

@@ -1,43 +1,39 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useContext, useState, useCallback } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
-import { EditorState, convertToRaw, convertFromRaw, Modifier, SelectionState, ContentState } from 'draft-js';
+import { EditorState, convertToRaw, convertFromRaw, Modifier, SelectionState } from 'draft-js';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import { BidContext } from '../views/BidWritingStateManagerView.tsx';
+import { useDebouncedCallback } from './useDebouncedCallback.tsx';
+// Import debounce hook
 
-
-function CustomEditor({ bidText, appendResponse, navigatedFromBidsTable}) {
-
+function CustomEditor({ bidText, appendResponse }) {
+    const { setSharedState } = useContext(BidContext);
     const appendedIds = useRef(new Set()); // Track IDs of appended responses
 
     const initializeEditorState = () => {
-        // First, attempt to load from localStorage if available
-        const savedData = localStorage.getItem('editorState');
-        if (savedData) {
+        if (bidText) {
             try {
-                const contentState = convertFromRaw(JSON.parse(savedData));
+                const contentState = convertFromRaw(JSON.parse(bidText));
                 return EditorState.createWithContent(contentState);
             } catch (error) {
-                console.error("Error loading editor state from localStorage:", error);
+                console.error("Error loading editor state from bidText:", error);
             }
         }
-        // Default to an empty editor if no saved state or bidText is available
         return EditorState.createEmpty();
     };
 
     const [editorState, setEditorState] = useState(initializeEditorState);
 
     useEffect(() => {
-        // Only update editor from bidText if specifically navigated from bids table
-        // and bidText is different from current content (to avoid unnecessary reinitializations)
-        if (navigatedFromBidsTable && bidText) {
-            const currentContentText = editorState.getCurrentContent().getPlainText();
-            if (bidText !== currentContentText) {
-                const contentState = ContentState.createFromText(bidText);
-                let newEditorState = EditorState.createWithContent(contentState);
-                newEditorState = applyBoldToHeadings(newEditorState);
-                setEditorState(newEditorState);
+        if (bidText) {
+            try {
+                const contentState = convertFromRaw(JSON.parse(bidText));
+                setEditorState(EditorState.createWithContent(contentState));
+            } catch (error) {
+                console.error("Error updating editor state from bidText:", error);
             }
         }
-    }, [navigatedFromBidsTable, bidText, editorState]);
+    }, [bidText]);
 
     useEffect(() => {
         if (appendResponse && !appendedIds.current.has(appendResponse.id)) {
@@ -61,27 +57,23 @@ function CustomEditor({ bidText, appendResponse, navigatedFromBidsTable}) {
             let newEditorState = EditorState.push(editorState, newContentState, 'insert-characters');
             setEditorState(newEditorState);
 
-            // Apply 'BOLD' style to the words "Question" and "Answer"
             const blockKey = newEditorState.getSelection().getStartKey();
             const blockLength = newEditorState.getCurrentContent().getBlockForKey(blockKey).getLength();
 
-            // Create selection range for the word "Question"
             const questionRange = new SelectionState({
                 anchorKey: blockKey,
-                anchorOffset: lengthOfLastBlock + 1, // start of the word "Question"
+                anchorOffset: lengthOfLastBlock + 1,
                 focusKey: blockKey,
-                focusOffset: lengthOfLastBlock + 10, // end of the word "Question"
+                focusOffset: lengthOfLastBlock + 10,
             });
 
-            // Create selection range for the word "Answer"
             const answerRange = new SelectionState({
                 anchorKey: blockKey,
-                anchorOffset: lengthOfLastBlock + 13 + appendResponse.question.length, // start of the word "Answer"
+                anchorOffset: lengthOfLastBlock + 13 + appendResponse.question.length,
                 focusKey: blockKey,
-                focusOffset: lengthOfLastBlock + 20 + appendResponse.question.length, // end of the word "Answer"
+                focusOffset: lengthOfLastBlock + 20 + appendResponse.question.length,
             });
 
-            // Apply 'BOLD' style to the word "Question"
             newContentState = Modifier.applyInlineStyle(
                 newEditorState.getCurrentContent(),
                 questionRange,
@@ -90,7 +82,6 @@ function CustomEditor({ bidText, appendResponse, navigatedFromBidsTable}) {
 
             newEditorState = EditorState.push(newEditorState, newContentState, 'change-inline-style');
 
-            // Apply 'BOLD' style to the word "Answer"
             newContentState = Modifier.applyInlineStyle(
                 newEditorState.getCurrentContent(),
                 answerRange,
@@ -100,67 +91,34 @@ function CustomEditor({ bidText, appendResponse, navigatedFromBidsTable}) {
             newEditorState = EditorState.push(newEditorState, newContentState, 'change-inline-style');
 
             setEditorState(newEditorState);
+            setSharedState(prevState => ({
+                ...prevState,
+                editorState: JSON.stringify(convertToRaw(newEditorState.getCurrentContent()))
+            }));
             appendedIds.current.add(appendResponse.id);
         }
-    }, [appendResponse, editorState]);
+    }, [appendResponse, editorState, setSharedState]);
 
-
-
-    useEffect(() => {
-        // Save the editor state to localStorage whenever it changes
-        //console.log("saved");
-        const contentState = editorState.getCurrentContent();
-        localStorage.setItem('editorState', JSON.stringify(convertToRaw(contentState)));
-    }, [editorState]);
-
-
-    function applyBoldToHeadings(editorState) {
-        const contentState = editorState.getCurrentContent();
-        const blocks = contentState.getBlockMap();
-
-        let newContentState = contentState;
-        blocks.forEach((block) => {
-            const blockText = block.getText();
-            const questionMatch = /Question:/.exec(blockText);
-            const answerMatch = /Answer:/.exec(blockText);
-
-            if (questionMatch) {
-                const questionRange = new SelectionState({
-                    anchorKey: block.getKey(),
-                    anchorOffset: questionMatch.index,
-                    focusKey: block.getKey(),
-                    focusOffset: questionMatch.index + "Question:".length,
-                });
-                newContentState = Modifier.applyInlineStyle(newContentState, questionRange, 'BOLD');
-            }
-
-            if (answerMatch) {
-                const answerRange = new SelectionState({
-                    anchorKey: block.getKey(),
-                    anchorOffset: answerMatch.index,
-                    focusKey: block.getKey(),
-                    focusOffset: answerMatch.index + "Answer:".length,
-                });
-                newContentState = Modifier.applyInlineStyle(newContentState, answerRange, 'BOLD');
-            }
-        });
-
-        return EditorState.push(editorState, newContentState, 'change-inline-style');
-    }
+    const debouncedEditorStateChange = useDebouncedCallback((newEditorState) => {
+        setSharedState(prevState => ({
+            ...prevState,
+            editorState: JSON.stringify(convertToRaw(newEditorState.getCurrentContent()))
+        }));
+    }, 500); // Adjust delay as needed
 
     const onEditorStateChange = (newEditorState) => {
         setEditorState(newEditorState);
+        debouncedEditorStateChange(newEditorState);
     };
 
-        return (
-            <Editor
-                editorState={editorState}
-                onEditorStateChange={onEditorStateChange}
-                toolbarClassName="toolbarClassName"
-                wrapperClassName="wrapperClassName"
+    return (
+        <Editor
+            editorState={editorState}
+            onEditorStateChange={onEditorStateChange}
+            toolbarClassName="toolbarClassName"
+            wrapperClassName="wrapperClassName"
+        />
+    );
+}
 
-            />
-        );
-        }
-
-    export default CustomEditor;
+export default CustomEditor;

@@ -10,7 +10,7 @@ import "./Library.css";
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
 import { faEye, faTrash, faFolder, faFileAlt,  faArrowUpFromBracket, faEllipsisVertical} from '@fortawesome/free-solid-svg-icons';
-
+import "./Chatbot.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UploadPDFModal, UploadTextModal, UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
 

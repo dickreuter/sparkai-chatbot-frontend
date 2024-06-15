@@ -18,7 +18,7 @@ const Bids = () => {
 
     const navigateToChatbot = (bid) => {
       localStorage.setItem('navigatedFromBidsTable', 'true');
-      navigate('/chatbot', { state: { bid: bid, fromBidsTable: true } });
+      navigate('/bid-extractor', { state: { bid: bid, fromBidsTable: true } });
       handleGAEvent('Bid Tracker', 'Navigate to Bid', 'Bid Table Link');
     };
 
@@ -117,7 +117,7 @@ const Bids = () => {
                     {bids.map((bid, index) => (
                         <tr key={index}>
                         <td>
-                        <Link to="/chatbot" state={{ bid: bid, fromBidsTable: true }} onClick={() => navigateToChatbot(bid)}>
+                        <Link to="/bid-extractor" state={{ bid: bid, fromBidsTable: true }} onClick={() => navigateToChatbot(bid)}>
                             {bid.bid_title}
                         </Link>
                         </td>

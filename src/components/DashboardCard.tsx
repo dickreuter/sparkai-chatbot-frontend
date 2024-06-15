@@ -16,6 +16,16 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ icon, title, description,
   const navigate = useNavigate();
 
   const handleClick = () => {
+    if (path === '/bid-extractor') {
+      // Add your custom logic here
+      localStorage.removeItem('bidInfo');
+      localStorage.removeItem('backgroundInfo');
+      localStorage.removeItem('response');
+      localStorage.removeItem('inputText');
+      localStorage.removeItem('editorState');
+      console.log('Bid Extractor path clicked!');
+      // You can add any additional logic here before navigating
+    }
     navigate(path);
   };
 

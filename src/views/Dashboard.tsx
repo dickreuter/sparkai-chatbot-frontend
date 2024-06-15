@@ -75,7 +75,7 @@ const Dashboard = () => {
     setSelectedBid(bid);  // Update the selected bid
     handleOngoingSidebarLinkClick('Ongoing bid click');
     localStorage.setItem('navigatedFromBidsTable', 'true');
-    navigate('/chatbot', { state: { bid: bid, fromBidsTable: true } });
+    navigate('/bid-extractor', { state: { bid: bid, fromBidsTable: true } });
     fetchBids();
   };
 

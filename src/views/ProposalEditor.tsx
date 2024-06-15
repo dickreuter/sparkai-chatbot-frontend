@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Row, Col, Dropdown } from 'react-bootstrap';
 import CustomEditor from "../components/TextEditor.tsx";
 import withAuth from '../routes/withAuth.tsx';
 import TemplateLoader from '../components/TemplateLoader.tsx';
 import { useAuthUser } from 'react-auth-kit';
 import handleGAEvent from '../utilities/handleGAEvent.tsx';
+import { BidContext } from '../views/BidWritingStateManagerView.tsx';
 
 function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelectedQuestionId }) {
+
     const [responses, setResponses] = useState([]);
     const proposalContainerRef = useRef(null); // Ref for the proposal container
     const [response, setResponse] = useState('');
@@ -16,14 +18,27 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
     const tokenRef = useRef(auth?.token || "default");
 
     useEffect(() => {
-        if (bidData && bidData.text) {
-            const parsedResponses = parseResponses(bidData.text);
+        if (bidData) {
+            const contentState = JSON.parse(bidData);
+            const text = contentState.blocks.map(block => block.text).join('\n');
+            const parsedResponses = parseResponses(text);
             setResponses(parsedResponses);
             if (selectedQuestionId && selectedQuestionId !== "navigate") {
                 updateSelection(selectedQuestionId, parsedResponses);
             }
         }
     }, [bidData, selectedQuestionId]);
+
+    useEffect(() => {
+        // Scroll to the bottom when the component is loaded
+        const container = proposalContainerRef.current;
+        if (container) {
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    }, []);
 
     function updateSelection(questionId, parsedResponses) {
         const foundResponse = parsedResponses.find(res => res.id.toString() === questionId);
@@ -58,7 +73,10 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
             const index = container.textContent.search(regex);
             if (index >= 0) {
                 const proportion = index / container.textContent.length;
-                container.scrollTop = proportion * container.scrollHeight;
+                container.scrollTo({
+                    top: proportion * container.scrollHeight,
+                    behavior: 'smooth'
+                });
             }
         }
     }
@@ -72,7 +90,6 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
     const handleSelectTemplate = (selectedKey) => {
         setResponse(selectedKey);
         handleGAEvent('Chatbot', 'Select', 'Template Select Button');
-
     };
 
     const truncateText = (text, maxLength) => {
@@ -114,9 +131,8 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
                 <Row className="justify-content-md-center">
                     <Col md={12}>
                         <CustomEditor
-                            bidText={bidData.text}
+                            bidText={bidData}
                             appendResponse={appendResponse}
-                            navigatedFromBidsTable={localStorage.getItem('navigatedFromBidsTable') === 'true'}
                         />
                     </Col>
                 </Row>

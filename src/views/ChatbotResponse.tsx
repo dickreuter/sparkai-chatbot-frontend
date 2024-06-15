@@ -15,7 +15,17 @@ const ChatbotResponse = () => {
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
 
-    const [messages, setMessages] = useState([]);
+     const [messages, setMessages] = useState(() => {
+    const savedMessages = localStorage.getItem('chatResponseMessages');
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
+
+  useEffect(() => {
+    // Save messages to localStorage whenever they change
+    localStorage.setItem('chatResponseMessages', JSON.stringify(messages));
+  }, [messages]);
+  
+  
     const [inputValue, setInputValue] = useState("");
 
     const [choice, setChoice] = useState("2");

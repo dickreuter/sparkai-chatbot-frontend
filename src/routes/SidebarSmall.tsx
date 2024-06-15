@@ -15,7 +15,8 @@ import {
   faReply, // Icon for comments or responses
   faTachometerAlt,
   faFileContract, // Icon for proposals or contracts
-  faComments
+  faComments,
+  faCircleQuestion
 } from '@fortawesome/free-solid-svg-icons';
 // Import the image
 import sidebarIcon from '../resources/images/mytender.io_badge.png';
@@ -38,34 +39,29 @@ const SideBarSmall = () => {
           <FontAwesomeIcon icon={faFileContract} />
           <span>Bid Editor</span>
         </Link>
-        <Link to="/chatResponse" className={`sidebarsmalllink ${isActive('/chatResponse') ? 'sidebarsmalllink-active' : ''}`}>
-          <FontAwesomeIcon icon={faComments} />
-          <span>Q/A Chat</span>
+        <Link to="/bids" className={`sidebarsmalllink ${isActive('/bids') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faLayerGroup} />
+          <span>Bid Register</span>
         </Link>
         <Link to="/library" className={`sidebarsmalllink ${isActive('/library') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faBookOpen} />
           <span>Library</span>
         </Link>
-        <Link to="/bids" className={`sidebarsmalllink ${isActive('/bids') ? 'sidebarsmalllink-active' : ''}`}>
-          <FontAwesomeIcon icon={faLayerGroup} />
-          <span>Bids</span>
+        <Link to="/chatResponse" className={`sidebarsmalllink ${isActive('/chatResponse') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faComments} />
+          <span>Q/A Chat</span>
         </Link>
-        <Link to="/security" className={`sidebarsmalllink ${isActive('/security') ? 'sidebarsmalllink-active' : ''}`}>
-          <FontAwesomeIcon icon={faShieldAlt} />
-          <span>Security</span>
-        </Link>
-        
-    
       </div>
       <div className="signout-container">
+      <Link to="/howto" className={`sidebarsmalllink ${isActive('/howto') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faCircleQuestion} />
+          <span>How To</span>
+        </Link>
       <Link to="https://mytender.io/" className="sidebarsmall-image-link">
           <img src={sidebarIcon} alt="Sidebar Icon" />
           <span>Site</span>
         </Link>
-        <Link to="/login" onClick={signOut} className="sidebarsmalllink signout-link">
-          <FontAwesomeIcon icon={faReply} />
-          <span>Sign Out</span>
-        </Link>
+      
       </div>
     </div>
   );

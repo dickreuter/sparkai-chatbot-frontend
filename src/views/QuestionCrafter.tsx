@@ -85,7 +85,17 @@ const QuestionCrafter = () => {
   };
 
 
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => {
+    const savedMessages = localStorage.getItem('messages');
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
+
+  useEffect(() => {
+    // Save messages to localStorage whenever they change
+    localStorage.setItem('messages', JSON.stringify(messages));
+  }, [messages]);
+  
+  
   const [inputValue, setInputValue] = useState("");
 
   const [bidPilotchoice, setBidPilotChoice] = useState("2");
@@ -116,10 +126,7 @@ const QuestionCrafter = () => {
     localStorage.getItem('response') || ''
   );
 
-  const [messageResponse, setMessageResponse] = useState(
-    localStorage.getItem('messageResponse') || ''
-  );
-
+ 
 
   useEffect(() => {
     localStorage.setItem('inputText', inputText);
@@ -157,7 +164,6 @@ const QuestionCrafter = () => {
   const sendQuestion = async (question) => {
     handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
     setQuestionAsked(true);
-    setMessageResponse("");
     setIsBidPilotLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
 
@@ -342,7 +348,7 @@ const submitSelections = async () => {
       <div className="lib-container">
         <BidNavbar />
         <div className="proposal-header mb-2">
-          <h1 className='heavy'>Question Crafter</h1>
+          <h1 className='heavy'>Bid Response</h1>
           <div className="dropdown-container">
             <Button className={`upload-button`}>
               Next Question

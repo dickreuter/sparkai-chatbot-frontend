@@ -5,7 +5,7 @@ import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
@@ -32,6 +32,8 @@ const BidExtractor = () => {
 
   const location = useLocation();
   const bidData = location.state?.bid || '';
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const navigatedFromBidsTable = localStorage.getItem('navigatedFromBidsTable');
@@ -111,6 +113,7 @@ const BidExtractor = () => {
     formData.append("file", file);
 
     try {
+      setLoading(true);
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/extract_questions_from_pdf`,
         formData,
@@ -129,8 +132,11 @@ const BidExtractor = () => {
       }));
     } catch (error) {
       console.error("Error extracting questions:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   useEffect(() => {
     if (questions.length > 0) {
@@ -278,48 +284,58 @@ const BidExtractor = () => {
             </Col>
           </Row>
           <Row>
-            <Col md={4}>
-              <div>
-                <h1 className="lib-title mb-3">Upload RFP</h1>
-                <div className="upload-rfp" onClick={() => document.getElementById('fileInput').click()}>
-                  <input 
-                    type="file" 
-                    id="fileInput" 
-                    style={{ display: 'none' }} 
-                    onChange={handleFileUpload} 
-                  />
-                  <div className="upload-placeholder">
-                    <span className="upload-cross">+</span>
-                  </div>
-                </div>
-              </div>
-            </Col>
-            <Col md={8}>
-              <div>
-                <h1 className="lib-title mb-3">Question Extractor</h1>
-                <div className="question-extractor-flex">
-                  <div className="question-list">
-                    {questions.length === 0 ? (
-                      <>
-                        <div className="question-item">Question 1</div>
-                        <div className="question-item">Question 2</div>
-                        <div className="question-item">Question 3</div>
-                        <div className="question-item">Question 4</div>
-                        <div className="question-item">Question 5</div>
-                        <div className="question-item">Question 6</div>
-                      </>
-                    ) : (
-                      questions.map((question, index) => (
-                        <div key={index} className="question-item">
-                          {question}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Col>
-          </Row>
+         
+          <Col md={12}>
+  <div>
+    <div className="proposal-header mb-2">
+      <h1 className="lib-title mb-3">
+        Question Extractor{" "}
+        <span className="beta-label">beta</span>
+      </h1>
+      {loading ? (
+    <div className="loading-spinner">
+      <Spinner animation="border" variant="primary" style={{ width: '1.5rem', height: '1.5rem' }} />
+    </div>
+  ) : (
+        <>
+          <Button
+            className={`upload-button`}
+            onClick={() => document.getElementById("fileInput").click()}
+          >
+            Retrieve Questions
+          </Button>
+          <input
+            type="file"
+            id="fileInput"
+            style={{ display: "none" }}
+            onChange={handleFileUpload}
+          />
+        </>
+      )}
+    </div>
+    <div className="question-extractor-flex mb-5">
+      <div className="question-list">
+        {questions.length === 0 ? (
+          <>
+            <div className="question-item">Question 1</div>
+            <div className="question-item">Question 2</div>
+            <div className="question-item">Question 3</div>
+            <div className="question-item">Question 4</div>
+            <div className="question-item">Question 5</div>
+            <div className="question-item">Question 6</div>
+          </>
+        ) : (
+          questions.map((question, index) => (
+            <div key={index} className="question-item">
+              {question}
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+</Col>
+    </Row>
        
         </div>
       </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './FileUploader.css';
 import CustomTextField from './CustomTextField';
 import { displayAlert } from '../helper/Alert';
+import { Spinner } from 'react-bootstrap'; // Import Spinner component
 
 const FileUploader = ({ onFileSelect, folder, onClose }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -9,13 +10,12 @@ const FileUploader = ({ onFileSelect, folder, onClose }) => {
   const [profileName, setProfileName] = useState(folder || 'default');
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [fileToUpload, setfileToUpload] = useState(null);
+  const [isUploading, setIsUploading] = useState(false); // New state for loading
 
-  //console.log(folder);
   useEffect(() => {
-    // Check if any field is either null or an empty string
     const checkFormFilled = profileName && selectedFile;
     setIsFormFilled(checkFormFilled);
-  }, [profileName, selectedFile]); // Also depend on selectedFile for real-time UI update
+  }, [profileName, selectedFile]);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -34,7 +34,6 @@ const FileUploader = ({ onFileSelect, folder, onClose }) => {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       setSelectedFile(file);
-
     }
   };
 
@@ -47,40 +46,42 @@ const FileUploader = ({ onFileSelect, folder, onClose }) => {
 
   const handleUpload = () => {
     if (isFormFilled && selectedFile && profileName) {
-      // Check for spaces in the profileName first
       if (/\s/.test(profileName)) {
         displayAlert('Folder name should not contain spaces', 'warning');
         return;
       }
-  
-      // Then check for the validity of the profileName using regex
+
       if (!/^[a-zA-Z0-9_-]{3,}$/.test(profileName)) {
         displayAlert('Folder name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
         return;
       }
-  
-      onFileSelect(selectedFile, profileName);
-  
-      displayAlert("Upload successful", "success");
-      // Optionally, reset the form here if needed
-      setSelectedFile(null);
-      setProfileName(null);
-      onClose(); 
+
+      setIsUploading(true); // Set loading state to true
+
+      onFileSelect(selectedFile, profileName).then(() => {
+        setIsUploading(false); // Set loading state to false after upload
+        displayAlert("Upload successful", "success");
+        setSelectedFile(null);
+        setProfileName(folder || 'default');
+        onClose();
+      }).catch(() => {
+        setIsUploading(false); // Set loading state to false in case of an error
+        displayAlert("Upload failed", "danger");
+      });
     }
   };
-  
 
   return (
     <div className={`file-uploader ${dragActive ? 'active' : ''}`}>
-          <CustomTextField
-            fullWidth
-            label="Folder"
-            variant="outlined"
-            value={profileName}
-            onChange={(e) => setProfileName(e.target.value)}
-            disabled={!!folder} // Disable input if folder name is provided
-            className="uploader-input mb-3" // Margin bottom for spacing
-          />
+      <CustomTextField
+        fullWidth
+        label="Folder"
+        variant="outlined"
+        value={profileName}
+        onChange={(e) => setProfileName(e.target.value)}
+        disabled={!!folder}
+        className="uploader-input mb-3"
+      />
       <div
         className="drop-zone"
         onDragEnter={handleDrag}
@@ -102,8 +103,12 @@ const FileUploader = ({ onFileSelect, folder, onClose }) => {
         <div>
           <h4 className='mt-3'>Selected File</h4>
           <p>{selectedFile.name}</p>
-          <button onClick={handleUpload} disabled={!isFormFilled} className="upload-button">
-            Upload Data
+          <button onClick={handleUpload} disabled={!isFormFilled || isUploading} className="upload-button">
+            {isUploading ? (
+              <Spinner animation="border" size="sm" /> // Display spinner while uploading
+            ) : (
+              "Upload Data"
+            )}
           </button>
         </div>
       )}

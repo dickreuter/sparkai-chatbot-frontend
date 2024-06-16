@@ -101,18 +101,19 @@ const UploadText = ({folder, get_collections, onClose}) => {
           onChange={(e) => setFileName(e.target.value)}
         />
         <TextField
-          fullWidth
-          label="Paste Bid Material Here.."
-          variant="outlined"
-          multiline
-          rows={4}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          sx={{
-            '& .MuiOutlinedInput-root': { fontFamily: '"ClashDisplay", sans-serif' },
-            '& .MuiInputLabel-root': { fontFamily: '"ClashDisplay", sans-serif' },
-          }}
-        />
+  fullWidth
+  label="Paste Bid Material Here.."
+  variant="outlined"
+  multiline
+  rows={10} // Adjust the number of rows to increase the height
+  value={text}
+  onChange={(e) => setText(e.target.value)}
+  sx={{
+    '& .MuiOutlinedInput-root': { fontFamily: '"ClashDisplay", sans-serif' },
+    '& .MuiInputLabel-root': { fontFamily: '"ClashDisplay", sans-serif' },
+  }}
+/>
+
         <button
           onClick={handleTextSubmit}
           disabled={!isFormFilled} // Button is disabled if not all fields are filled

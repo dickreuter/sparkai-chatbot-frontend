@@ -5,7 +5,7 @@ import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Row } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
@@ -151,7 +151,7 @@ const BidExtractor = () => {
       <SideBarSmall />
       <div className="lib-container">
         <BidNavbar />
-        <div className="mb-3">
+        <div className="proposal-header mt-3 mb-2">
           <h1 className='heavy'>
             <span
               contentEditable={isEditing}
@@ -168,8 +168,115 @@ const BidExtractor = () => {
               edit
             </button>
           </h1>
+          <div >
+            <Button className={`upload-button`}>
+              Bid no/bid calculator
+            </Button>
+          </div>
         </div>
         <div>
+        <div className="input-container">
+          <Row className="no-gutters mx-n2">
+            <Col md={4} className="px-2">
+              <div className="card-effect-input-box">
+                <div className="input-box">
+                  <h1 className="inputbox-title">Client name</h1>
+                  <textarea className="inputbox-textarea" placeholder="Enter client name here..."></textarea>
+                </div>
+              </div>
+            </Col>
+            <Col md={4} className="px-2">
+              <div className="card-effect-input-box">
+                <div className="input-box">
+                  <h1 className="inputbox-title">Bid Qualification Result</h1>
+                  <textarea className="inputbox-textarea" placeholder="Enter bid qualification result here..."></textarea>
+                </div>
+              </div>
+            </Col>
+            <Col md={4} className="px-2">
+              <div className="card-effect-input-box">
+                <div className="input-box">
+                  <h1 className="inputbox-title">Opportunity Owner</h1>
+                  <textarea className="inputbox-textarea" placeholder="Enter opportunity owner here..."></textarea>
+                </div>
+              </div>
+            </Col>
+          </Row>
+          <Row className="no-gutters mt-3 mx-n2">
+            <Col md={4} className="px-2">
+              <div className="card-effect-input-box">
+                <div className="input-box">
+                  <h1 className="inputbox-title">Submission Deadline</h1>
+                  <textarea className="inputbox-textarea" placeholder="Enter submission deadline here..."></textarea>
+                </div>
+              </div>
+            </Col>
+            <Col md={4} className="px-2">
+              <div className="card-effect-input-box">
+                <div className="input-box">
+                  <h1 className="inputbox-title">Bid Manager</h1>
+                  <textarea className="inputbox-textarea" placeholder="Enter bid manager here..."></textarea>
+                </div>
+              </div>
+            </Col>
+            <Col md={4} className="px-2">
+              <div className="card-effect-input-box">
+                <div className="input-box">
+                  <h1 className="inputbox-title">Contributors</h1>
+                  <textarea className="inputbox-textarea" placeholder="Enter contributors here..."></textarea>
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </div>
+        <Row className="mt-5 mb-5">
+            <Col md={6}>
+              <div className="card-title-container mb-2">
+                <div className="tooltip-container">
+                  <i className="fas fa-info-circle tooltip-icon"></i>
+                  <span className="tooltip-text-cd">
+                    <strong style={{ marginLeft: "15px" }}>What are the client’s business issues that have led them to release this tender?</strong>
+                    <ul>
+                      <li>What will happen if they don’t address these issues?</li>
+                      <li>What value results from addressing these issues?</li>
+                      <li>What business objectives do they want to achieve?</li>
+                      <li>Which objective is the most important to the client?</li>
+                    </ul>
+                  </span>
+                </div>
+                <h1 className="lib-title">Opportunity Information</h1>
+              </div>
+              <div className="question-extractor">
+                <textarea
+                  className="card-textarea"
+                  placeholder="Enter client details here..."
+                  value={backgroundInfo}
+                  onChange={handleBackgroundInfoChange}
+                ></textarea>
+              </div>
+            </Col>
+            <Col md={6}>
+              <div className="card-title-container mb-2">
+                <div className="tooltip-container">
+                    <i className="fas fa-info-circle tooltip-icon"></i>
+                    <span className="tooltip-text">
+                      <strong style={{marginLeft: "15px"}}>What are the client’s business issues that have led them to release this tender?</strong>
+                      <ul>
+                        <li>What products/services/applications can you provide to address the issue?</li>
+                        <li>What outcomes would result from each of your suggestions?</li>
+                        <li>When comparing the impact of your solution with the issues the client seeks to mitigate, which recommendation stands out as the most advantageous?</li>
+                        <li>What makes you confident that your recommendation will be the right fit for the client?</li>
+                        <li>Why should the client select your solution and not your competitors’?</li>
+                      </ul>
+                    </span>
+                </div>
+                <h1 className="lib-title">Compliance Requirements</h1>
+              </div>
+              <div className="question-extractor">
+                <textarea className="card-textarea" placeholder="Enter bid proposition here..."></textarea>
+              </div>
+            </Col>
+          </Row>
           <Row>
             <Col md={4}>
               <div>
@@ -213,54 +320,7 @@ const BidExtractor = () => {
               </div>
             </Col>
           </Row>
-          <Row className="mt-5 mb-5">
-            <Col md={6}>
-              <div className="card-title-container mb-2">
-                <div className="tooltip-container">
-                  <i className="fas fa-info-circle tooltip-icon"></i>
-                  <span className="tooltip-text-cd">
-                    <strong style={{ marginLeft: "15px" }}>What are the client’s business issues that have led them to release this tender?</strong>
-                    <ul>
-                      <li>What will happen if they don’t address these issues?</li>
-                      <li>What value results from addressing these issues?</li>
-                      <li>What business objectives do they want to achieve?</li>
-                      <li>Which objective is the most important to the client?</li>
-                    </ul>
-                  </span>
-                </div>
-                <h1 className="lib-title">Client Details</h1>
-              </div>
-              <div className="question-extractor">
-                <textarea
-                  className="card-textarea"
-                  placeholder="Enter client details here..."
-                  value={backgroundInfo}
-                  onChange={handleBackgroundInfoChange}
-                ></textarea>
-              </div>
-            </Col>
-            <Col md={6}>
-              <div className="card-title-container mb-2">
-                <div className="tooltip-container">
-                    <i className="fas fa-info-circle tooltip-icon"></i>
-                    <span className="tooltip-text">
-                      <strong style={{marginLeft: "15px"}}>What are the client’s business issues that have led them to release this tender?</strong>
-                      <ul>
-                        <li>What products/services/applications can you provide to address the issue?</li>
-                        <li>What outcomes would result from each of your suggestions?</li>
-                        <li>When comparing the impact of your solution with the issues the client seeks to mitigate, which recommendation stands out as the most advantageous?</li>
-                        <li>What makes you confident that your recommendation will be the right fit for the client?</li>
-                        <li>Why should the client select your solution and not your competitors’?</li>
-                      </ul>
-                    </span>
-                </div>
-                <h1 className="lib-title">Bid Proposition</h1>
-              </div>
-              <div className="question-extractor">
-                <textarea className="card-textarea" placeholder="Enter bid proposition here..."></textarea>
-              </div>
-            </Col>
-          </Row>
+       
         </div>
       </div>
     </div>

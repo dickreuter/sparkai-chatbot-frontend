@@ -22,5 +22,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan 44.208.84.199 >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 "cd $TARGET_DIR/sparkai-chatbot-frontend/website && docker-compose down"
+          ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 "docker system prune -af"
           rsync -avz -e "ssh -i ~/.ssh/id_rsa" --exclude '.git' --exclude 'node_modules' . ec2-user@44.208.84.199:$TARGET_DIR/sparkai-chatbot-frontend
           ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 "cd $TARGET_DIR/sparkai-chatbot-frontend/website && docker-compose build --no-cache && docker-compose up -d --force-recreate"

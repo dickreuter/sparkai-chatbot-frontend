@@ -349,7 +349,7 @@ const submitSelections = async () => {
         <BidNavbar />
         <div className="proposal-header mb-2">
           <h1 className='heavy'>Bid Response</h1>
-          <div className="dropdown-container">
+          <div >
             <Button className={`upload-button`}>
               Next Question
             </Button>

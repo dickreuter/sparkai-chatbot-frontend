@@ -32,7 +32,10 @@ const QuestionCrafter = () => {
   const [appendResponse, setAppendResponse] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState("-1"); // Default to "Full Proposal"
 
-  
+  const [isCopilotVisible, setIsCopilotVisible] = useState(false);
+  const [selectedText, setSelectedText] = useState('');
+  const textAreaRef = useRef(null);  // Reference to the textarea
+
   const handleDatasetChange = (e) => {
     const newDataset = e.target.value;
     setDataset(newDataset); // Update the state with the new dataset value
@@ -82,6 +85,68 @@ const QuestionCrafter = () => {
       setIsAppended(true);
       setTimeout(() => setIsAppended(false), 3000);
     }, 100); // Adjust the delay here based on your needs
+  };
+
+  const askCopilot = async (copilotInput: string, instructions: string, copilot_mode: string) => {
+    setQuestionAsked(true);
+    localStorage.setItem('questionAsked', 'true');
+    handleGAEvent('Chatbot', 'Copilot Input', copilotInput);
+    setIsLoading(true);
+    setStartTime(Date.now()); // Set start time for the timer
+
+    console.log({
+        input_text: copilotInput,
+        extra_instructions: instructions,
+        copilot_mode: copilot_mode,
+        dataset,
+      });
+      
+
+    try {
+        const result = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/copilot`,
+            {
+                input_text: copilotInput,
+                extra_instructions: instructions,
+                copilot_mode: copilot_mode,
+                dataset,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${tokenRef.current}`,
+                },
+            }
+        );
+
+        // Assuming the original 'response' state contains the text you're working with
+        // and 'copilotInput' is the text selected by the user that was sent for processing
+        // Replace the 'copilotInput' in the 'response' with 'result.data'
+        if (response.includes(copilotInput)) {
+            const updatedResponse = response.replace(copilotInput, result.data);
+            setResponse(updatedResponse);
+        } else {
+            console.error("Selected text not found in the response.");
+            // Optionally handle the case where the selected text isn't found
+            // For example, you might want to append the result or alert the user
+        }
+    } catch (error) {
+        console.error("Error sending question:", error);
+        setResponse(error.message); // Consider how you want to handle errors, e.g., appending them or alerting the user
+    }
+    setIsLoading(false);
+};
+
+
+  const handleLinkClick = (linkName) => (e) => {
+    e.preventDefault(); // Prevent the default link behavior
+    //console.log(`${linkName} clicked`);
+    const copilot_mode = linkName.toLowerCase().replace(/\s+/g, '_');
+    //console.log(`${copilot_mode}`);
+    const instructions = '';
+    //console.log(selectedText);
+    askCopilot(selectedText, instructions, copilot_mode ); 
+
+    // Here you can add any logic you need to handle the click
   };
 
 
@@ -340,6 +405,39 @@ const submitSelections = async () => {
     setIsLoading(false);
 };
 
+useEffect(() => {
+  const checkTextSelection = () => {
+      if (textAreaRef.current && document.activeElement === textAreaRef.current) {
+          const textArea = textAreaRef.current;
+          const selectedText = textArea.value.substring(textArea.selectionStart, textArea.selectionEnd);
+          setIsCopilotVisible(!!selectedText);
+          setSelectedText(selectedText);
+          console.log(selectedText);
+          
+          if (!selectedText) {
+              // Delay clearing the selection state to allow for link clicks to be processed
+              setTimeout(() => {
+                  setIsCopilotVisible(false);
+              }, 100); // 100 ms delay
+          }
+      } else {
+          setTimeout(() => {
+              setIsCopilotVisible(false);
+              setSelectedText('');
+          }, 100); // 100 ms delay
+      }
+  };
+
+  // Listen for mouse up and key up events to capture text selections
+  document.addEventListener('mouseup', checkTextSelection);
+  document.addEventListener('keyup', checkTextSelection);
+
+  return () => {
+      document.removeEventListener('mouseup', checkTextSelection);
+      document.removeEventListener('keyup', checkTextSelection);
+  };
+}, []);
+
 
   return (
     <div className="chatpage">
@@ -461,6 +559,8 @@ const submitSelections = async () => {
 
               <div className="response-box">
                 <textarea
+                  ref={textAreaRef}
+                  as="textarea"
                   className="card-textarea"
                   placeholder="Enter response here..."
                   value={response}
@@ -470,7 +570,7 @@ const submitSelections = async () => {
 
               <Button
                         variant={isAppended ? "success" : "primary"}
-                        className="upload-button mt-2 mb-4" 
+                        className="upload-button mt-3 mb-4" 
                         onClick={handleAppendResponseToEditor}
                         disabled={isLoading || isAppended} 
               >   
@@ -495,21 +595,32 @@ const submitSelections = async () => {
 
               <div className="bid-pilot-container">
                 <div className="chatResponse-container">
-                  <div className="mini-messages">
-                    {messages.map((message, index) => (
-                      <div key={index} className={`message-bubble-small ${message.type}`}>
-                        {message.text === 'loading' ? (
-                          <div className="loading-dots">
-                            <span>. </span>
-                            <span>. </span>
-                            <span>. </span>
-                          </div>
-                        ) : (
-                          message.text
-                        )}
-                      </div>
-                    ))}
+                {isCopilotVisible ? (
+                  <div className={`prompts-container ${!isCopilotVisible ? 'fade-out' : ''}`}>
+                    <div className="prompts">
+                      <Button className="prompt-button" onClick={handleLinkClick('Summarise')}>Summarise</Button>
+                      <Button className="prompt-button" onClick={handleLinkClick('Expand')}>Expand</Button>
+                      <Button className="prompt-button" onClick={handleLinkClick('Rephrase')}>Rephrase</Button>
+                      <Button className="prompt-button" onClick={handleLinkClick('Incorporate')}>Incorporate</Button>
+                    </div>
                   </div>
+                ) : (
+                                  <div className="mini-messages">
+                      {messages.map((message, index) => (
+                        <div key={index} className={`message-bubble-small ${message.type}`}>
+                          {message.text === 'loading' ? (
+                            <div className="loading-dots">
+                              <span>. </span>
+                              <span>. </span>
+                              <span>. </span>
+                            </div>
+                          ) : (
+                            message.text
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <div className="input-console">
                     <div className="proposal-header mb-2">
                       <div className="checkbox-container">
@@ -523,12 +634,8 @@ const submitSelections = async () => {
                         </label>
                       </div>
                       <div className="dropdown-container mb-2">
-                        <Button className={`option-button`}>
-                          Prompts
-                        </Button>
-                        <Button className={`option-button `}>
-                          Clear
-                        </Button>
+                        <Button className="option-button">Prompts</Button>
+                        <Button className="option-button">Clear</Button>
                       </div>
                     </div>
                     <div className="bid-input-bar">
@@ -543,10 +650,10 @@ const submitSelections = async () => {
                         <FontAwesomeIcon icon={faPaperPlane} />
                       </button>
                     </div>
-
                   </div>
                 </div>
               </div>
+
             </Col>
           </Row>
         </div>

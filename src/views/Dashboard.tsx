@@ -72,6 +72,13 @@ const Dashboard = () => {
   };
 
   const navigateToChatbot = (bid) => {
+    localStorage.removeItem('bidInfo');
+    localStorage.removeItem('backgroundInfo');
+    localStorage.removeItem('response');
+    localStorage.removeItem('inputText');
+    localStorage.removeItem('editorState');
+    localStorage.removeItem('messages');
+    localStorage.removeItem('bidState');
     setSelectedBid(bid);  // Update the selected bid
     handleOngoingSidebarLinkClick('Ongoing bid click');
     localStorage.setItem('navigatedFromBidsTable', 'true');

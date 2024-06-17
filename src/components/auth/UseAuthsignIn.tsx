@@ -33,6 +33,9 @@ const useAuthSignIn = () => {
         localStorage.removeItem('response');
         localStorage.removeItem('inputText');
         localStorage.removeItem('editorState');
+        localStorage.removeItem('messages');
+        localStorage.removeItem('chatResponseMessages');
+        localStorage.removeItem('bidState');
         navigate('/dashboard');
 
         //localStorage.clear();

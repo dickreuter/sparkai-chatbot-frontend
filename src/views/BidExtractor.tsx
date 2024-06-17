@@ -38,27 +38,30 @@ const BidExtractor = () => {
   useEffect(() => {
     const navigatedFromBidsTable = localStorage.getItem('navigatedFromBidsTable');
     if (navigatedFromBidsTable === 'true' && location.state?.fromBidsTable && bidData) {
-      console.log("from bids table")
+      console.log("from bids table");
       setSharedState(prevState => ({
         ...prevState,
         bidInfo: bidData?.bid_title || '',
         backgroundInfo: bidData?.contract_information || ''
       }));
-
+  
       if (bidData?.text) {
-        console.log(bidData.text)
+        console.log(bidData.text);
         const contentState = ContentState.createFromText(bidData.text);
         const newEditorState = EditorState.createWithContent(contentState);
         setSharedState(prevState => ({
           ...prevState,
-          editorState: JSON.stringify(convertToRaw(newEditorState.getCurrentContent()))
+          editorState: newEditorState
         }));
       }
-
+  
       localStorage.setItem('navigatedFromBidsTable', 'false');
     }
   }, [location, bidData, setSharedState]);
+  
 
+
+  
   useEffect(() => {
     // Set the initial bid name from the context state
     bidNameTempRef.current = bidInfo;

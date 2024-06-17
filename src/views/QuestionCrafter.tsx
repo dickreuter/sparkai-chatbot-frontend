@@ -56,37 +56,34 @@ const QuestionCrafter = () => {
   const handleAppendResponseToEditor = () => {
     handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
     setSelectedQuestionId("-1"); // Reset dropdown to "Full Proposal"
-
-    // Delay the next operation to ensure UI updates smoothly
+  
     setTimeout(() => {
-      const uniqueId = Date.now();
-      const currentContent = convertFromRaw(JSON.parse(editorState));
-      const currentContentBlock = currentContent.getBlockMap().last();
-      const lengthOfLastBlock = currentContentBlock.getLength();
-
-      const selectionState = SelectionState.createEmpty(currentContentBlock.getKey()).merge({
+      const currentContent = editorState.getCurrentContent();
+      const lastBlock = currentContent.getBlockMap().last();
+      const lengthOfLastBlock = lastBlock.getLength();
+      const selectionState = SelectionState.createEmpty(lastBlock.getKey()).merge({
         anchorOffset: lengthOfLastBlock,
         focusOffset: lengthOfLastBlock,
       });
-
+  
       const contentStateWithNewText = Modifier.insertText(
         currentContent,
         selectionState,
         `\nQuestion:\n${inputText}\n\nAnswer:\n${response}\n\n`
       );
-
-      const newEditorState = EditorState.push(EditorState.createWithContent(currentContent), contentStateWithNewText, 'insert-characters');
-
+  
+      const newEditorState = EditorState.push(editorState, contentStateWithNewText, 'insert-characters');
+  
       setSharedState((prevState) => ({
         ...prevState,
-        editorState: JSON.stringify(convertToRaw(newEditorState.getCurrentContent())),
+        editorState: newEditorState
       }));
-
+  
       setIsAppended(true);
       setTimeout(() => setIsAppended(false), 3000);
-    }, 100); // Adjust the delay here based on your needs
+    }, 100);
   };
-
+  
   const askCopilot = async (copilotInput: string, instructions: string, copilot_mode: string) => {
     setQuestionAsked(true);
     localStorage.setItem('questionAsked', 'true');

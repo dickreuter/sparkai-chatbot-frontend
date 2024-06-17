@@ -3,12 +3,13 @@ import { Routes, Route, Outlet } from 'react-router-dom';
 import BidExtractor from './BidExtractor';
 import QuestionCrafter from './QuestionCrafter';
 import Proposal from './Proposal';
+import { EditorState, convertFromRaw, convertToRaw } from 'draft-js';
 
 interface SharedState {
   bidInfo: string;
   backgroundInfo: string;
   questions: string[];
-  editorState: string;
+  editorState: EditorState;
 }
 
 interface BidContextType {
@@ -21,7 +22,7 @@ const defaultState: BidContextType = {
     bidInfo: '',
     backgroundInfo: '',
     questions: [],
-    editorState: '',
+    editorState: EditorState.createEmpty(),
   },
   setSharedState: () => {},
 };
@@ -33,17 +34,32 @@ const BidManagement: React.FC = () => {
   const [sharedState, setSharedState] = useState<SharedState>(() => {
     // Retrieve the initial state from localStorage
     const savedState = localStorage.getItem('bidState');
-    return savedState ? JSON.parse(savedState) : {
+    if (savedState) {
+      const parsedState = JSON.parse(savedState);
+      return {
+        ...parsedState,
+        editorState: parsedState.editorState ? 
+                     EditorState.createWithContent(convertFromRaw(JSON.parse(parsedState.editorState))) :
+                     EditorState.createEmpty(),
+      };
+    }
+    return {
       bidInfo: '',
       backgroundInfo: '',
       questions: [],
-      editorState: '',
+      editorState: EditorState.createEmpty(),
     };
   });
 
   useEffect(() => {
     // Persist the state to localStorage whenever it changes
-    localStorage.setItem('bidState', JSON.stringify(sharedState));
+    const stateToSave = {
+      ...sharedState,
+      editorState: sharedState.editorState ? 
+                   JSON.stringify(convertToRaw(sharedState.editorState.getCurrentContent())) : 
+                   ''
+    };
+    localStorage.setItem('bidState', JSON.stringify(stateToSave));
   }, [sharedState]);
 
   return (

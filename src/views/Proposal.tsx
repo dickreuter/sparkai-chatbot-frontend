@@ -26,30 +26,16 @@ const Proposal = () => {
   const [selectedQuestionId, setSelectedQuestionId] = useState("-1");
   const [isSaved, setIsSaved] = useState(false);
 
-  const editorRef = useRef(null);
-
-  const retrieveEditorState = () => {
-    if (editorState) {
-      try {
-        const rawContent = JSON.parse(editorState);
-        const contentState = convertFromRaw(rawContent);
-        return EditorState.createWithContent(contentState);
-      } catch (error) {
-        console.error("Failed to parse editorState:", error);
-      }
-    }
-    return EditorState.createEmpty();
-  };
 
   const exportToDocx = (editorState) => {
     if (!editorState) {
       console.error("No editor state available");
       return;
     }
-
+  
     const contentState = editorState.getCurrentContent();
     const contentText = contentState.getPlainText('\n');
-
+  
     const doc = new Document({
       sections: [{
         properties: {},
@@ -58,24 +44,25 @@ const Proposal = () => {
         }))
       }]
     });
-
+  
     Packer.toBlob(doc).then(blob => {
       saveAs(blob, 'proposal.docx');
     }).catch(err => {
       console.error('Error creating DOCX:', err);
     });
   };
+  
 
   const saveProposal = async () => {
-    const editorContentState = retrieveEditorState().getCurrentContent();
+    const editorContentState = editorState.getCurrentContent();
     const editorText = editorContentState.getPlainText('\n');
-
+  
     const formData = new FormData();
     formData.append('bid_title', bidInfo);
     formData.append('text', editorText);
     formData.append('status', 'ongoing');
     formData.append('contract_information', backgroundInfo);
-
+  
     try {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/upload_bids`,
@@ -87,13 +74,14 @@ const Proposal = () => {
           },
         }
       );
-
+  
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 3000); // Reset after 3 seconds
     } catch (error) {
       console.error("Error saving proposal:", error);
     }
   };
+  
 
   return (
     <div className="chatpage">
@@ -118,13 +106,14 @@ const Proposal = () => {
             </Button>
             <Button
               variant={"primary"}
-              onClick={() => exportToDocx(retrieveEditorState())}
+              onClick={() => exportToDocx(editorState)}
               className="mt-1 ml-2 upload-button"
               disabled={isLoading}
               style={{ marginLeft: "5px", backgroundColor: "black" }}
             >
               Export to Word
             </Button>
+
           </div>
         </Row>
       </div>

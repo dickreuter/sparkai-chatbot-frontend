@@ -7,7 +7,7 @@ import { useAuthUser } from 'react-auth-kit';
 import handleGAEvent from '../utilities/handleGAEvent.tsx';
 import { BidContext } from '../views/BidWritingStateManagerView.tsx';
 
-function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelectedQuestionId }) {
+function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestionId, setSelectedQuestionId }) {
 
     const [responses, setResponses] = useState([]);
     const proposalContainerRef = useRef(null); // Ref for the proposal container
@@ -18,27 +18,25 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
     const tokenRef = useRef(auth?.token || "default");
 
     useEffect(() => {
-        if (bidData) {
-            const contentState = JSON.parse(bidData);
-            const text = contentState.blocks.map(block => block.text).join('\n');
+        if (editorState) {
+            const contentState = editorState.getCurrentContent();
+            const text = contentState.getPlainText('\n');
             const parsedResponses = parseResponses(text);
             setResponses(parsedResponses);
             if (selectedQuestionId && selectedQuestionId !== "navigate") {
                 updateSelection(selectedQuestionId, parsedResponses);
             }
         }
-    }, [bidData, selectedQuestionId]);
+    }, [editorState, selectedQuestionId]);
 
     useEffect(() => {
         // Scroll to the bottom when the component is loaded
         const container = proposalContainerRef.current;
         if (container) {
-            container.scrollTo({
-                top: container.scrollHeight,
-                behavior: 'smooth'
-            });
+            container.scrollTo({ top: container.scrollHeight });
         }
     }, []);
+
 
     function updateSelection(questionId, parsedResponses) {
         const foundResponse = parsedResponses.find(res => res.id.toString() === questionId);
@@ -74,7 +72,7 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
             if (index >= 0) {
                 const proportion = index / container.textContent.length;
                 container.scrollTo({
-                    top: proportion * container.scrollHeight,
+                    top: (proportion * container.scrollHeight) - 200,
                     behavior: 'smooth'
                 });
             }
@@ -131,7 +129,7 @@ function ProposalEditor({ bidData, appendResponse, selectedQuestionId, setSelect
                 <Row className="justify-content-md-center">
                     <Col md={12}>
                         <CustomEditor
-                            bidText={bidData}
+                            
                             appendResponse={appendResponse}
                         />
                     </Col>

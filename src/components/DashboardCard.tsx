@@ -23,6 +23,8 @@ const DashboardCard: React.FC<DashboardCardProps> = ({ icon, title, description,
       localStorage.removeItem('response');
       localStorage.removeItem('inputText');
       localStorage.removeItem('editorState');
+      localStorage.removeItem('messages');
+      localStorage.removeItem('bidState');
       console.log('Bid Extractor path clicked!');
       // You can add any additional logic here before navigating
     }

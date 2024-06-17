@@ -26,6 +26,8 @@ const NavBar = () => {
     localStorage.removeItem('backgroundInfo');
     localStorage.removeItem('response');
     localStorage.removeItem('inputText');
+    localStorage.removeItem('editorState');
+    localStorage.removeItem('messages');
     localStorage.removeItem('bidState');
     window.location.href = `/bid-extractor`;
 

@@ -7,6 +7,7 @@ import { BidContext } from '../views/BidWritingStateManagerView.tsx';
 function CustomEditor({ appendResponse }) {
     const { sharedState, setSharedState } = useContext(BidContext);
     
+    // Function to apply bold to "Question:" and "Answer:" headings
     const applyBoldToHeadings = useCallback((editorState) => {
         const blocks = editorState.getCurrentContent().getBlocksAsArray();
         let newContentState = editorState.getCurrentContent();
@@ -14,10 +15,8 @@ function CustomEditor({ appendResponse }) {
             const text = block.getText();
             if (text.startsWith('Question:') || text.startsWith('Answer:')) {
                 const blockKey = block.getKey();
-                const range = new SelectionState({
-                    anchorKey: blockKey,
+                const range = SelectionState.createEmpty(blockKey).merge({
                     anchorOffset: 0,
-                    focusKey: blockKey,
                     focusOffset: text.length,
                 });
                 newContentState = Modifier.applyInlineStyle(newContentState, range, 'BOLD');
@@ -26,44 +25,54 @@ function CustomEditor({ appendResponse }) {
         return EditorState.push(editorState, newContentState, 'change-inline-style');
     }, []);
 
+    // State to manage the editor state locally
     const [editorState, setEditorState] = useState(() => applyBoldToHeadings(sharedState.editorState));
 
+    // Update local editor state when shared state updates
+    useEffect(() => {
+        setEditorState(applyBoldToHeadings(sharedState.editorState));
+    }, [sharedState.editorState, applyBoldToHeadings]);
+
+    // Handle editor state changes
     const onEditorStateChange = useCallback((newEditorState) => {
-        const styledEditorState = applyBoldToHeadings(newEditorState);
-        setEditorState(styledEditorState);
+        const styledState = applyBoldToHeadings(newEditorState);
+        setEditorState(styledState);
         setSharedState(prevState => ({
             ...prevState,
-            editorState: styledEditorState
+            editorState: styledState
         }));
     }, [setSharedState, applyBoldToHeadings]);
 
-    const appendResponseAndStyle = useCallback((response) => {
-        const currentContent = editorState.getCurrentContent();
-        const currentContentBlock = currentContent.getBlockMap().last();
-        const lengthOfLastBlock = currentContentBlock.getLength();
-        const selectionState = new SelectionState({
-            anchorKey: currentContentBlock.getKey(),
-            anchorOffset: lengthOfLastBlock,
-            focusKey: currentContentBlock.getKey(),
-            focusOffset: lengthOfLastBlock,
-        });
-
-        const newText = `\nQuestion:\n${response.question}\n\nAnswer:\n${response.answer}\n\n`;
-        let newContentState = Modifier.insertText(currentContent, selectionState, newText);
-        return applyBoldToHeadings(EditorState.push(editorState, newContentState, 'insert-characters'));
-    }, [editorState, applyBoldToHeadings]);
-
-    // Handle appending responses
+    // Append response and reapply styles
     useEffect(() => {
         if (appendResponse) {
-            const newEditorState = appendResponseAndStyle(appendResponse);
+            const newEditorState = appendResponseAndStyle(editorState, appendResponse);
             setEditorState(newEditorState);
             setSharedState(prevState => ({
                 ...prevState,
                 editorState: newEditorState
             }));
         }
-    }, [appendResponse, appendResponseAndStyle, setSharedState]);
+    }, [appendResponse, editorState, setSharedState]);
+
+    // Function to append response text and apply styles
+    const appendResponseAndStyle = useCallback((editorState, response) => {
+        const currentContent = editorState.getCurrentContent();
+        const lastBlock = currentContent.getBlockMap().last();
+        const lengthOfLastBlock = lastBlock.getLength();
+        const selectionState = SelectionState.createEmpty(lastBlock.getKey()).merge({
+            anchorOffset: lengthOfLastBlock,
+            focusOffset: lengthOfLastBlock,
+        });
+
+        let newContentState = Modifier.insertText(
+            currentContent,
+            selectionState,
+            `\nQuestion:\n${response.question}\n\nAnswer:\n${response.answer}\n\n`
+        );
+
+        return applyBoldToHeadings(EditorState.push(editorState, newContentState, 'insert-characters'));
+    }, [applyBoldToHeadings]);
 
     return (
         <Editor

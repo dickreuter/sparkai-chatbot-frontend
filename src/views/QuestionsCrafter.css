@@ -334,7 +334,7 @@
 }
 
 .chat-dropdown .dropdown-menu {
-    min-width: 200px;
+    min-width: 350px;
     /* Adjust as necessary */
     max-width: 100%;
     white-space: nowrap;

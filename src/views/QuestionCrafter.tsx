@@ -444,11 +444,7 @@ useEffect(() => {
         <BidNavbar />
         <div className="proposal-header mb-2">
           <h1 className='heavy'>Bid Response</h1>
-          <div >
-            <Button className={`upload-button`}>
-              Next Question
-            </Button>
-          </div>
+         
         </div>
         <div>
 

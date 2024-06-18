@@ -4,7 +4,7 @@ import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button, Card, Col, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
@@ -178,66 +178,81 @@ const BidExtractor = () => {
             </button>
           </h1>
           <div >
-            <Button className={`upload-button`}>
+          <Link to="/calculator">
+            <button className="upload-button">
               Bid no/bid calculator
-            </Button>
+            </button>
+          </Link>
           </div>
         </div>
         <div>
         <div className="input-container">
           <Row className="no-gutters mx-n2">
-            <Col md={4} className="px-2">
-              <div className="card-effect-input-box">
-                <div className="input-box">
-                  <h1 className="inputbox-title">Client name</h1>
-                  <textarea className="inputbox-textarea" placeholder="Enter client name here..."></textarea>
-                </div>
-              </div>
-            </Col>
-            <Col md={4} className="px-2">
-              <div className="card-effect-input-box">
-                <div className="input-box">
-                  <h1 className="inputbox-title">Bid Qualification Result</h1>
-                  <textarea className="inputbox-textarea" placeholder="Enter bid qualification result here..."></textarea>
-                </div>
-              </div>
-            </Col>
-            <Col md={4} className="px-2">
-              <div className="card-effect-input-box">
-                <div className="input-box">
-                  <h1 className="inputbox-title">Opportunity Owner</h1>
-                  <textarea className="inputbox-textarea" placeholder="Enter opportunity owner here..."></textarea>
-                </div>
-              </div>
-            </Col>
+              <Col md={4} className="px-2">
+                  <div className="card-effect-input-box">
+                      <div className="input-box">
+                          <div className="inputbox-container">
+                              <h1 className="inputbox-title">Client Name:</h1>
+                              <textarea className="inputbox-textarea"></textarea>
+                          </div>
+                      </div>
+                  </div>
+              </Col>
+              <Col md={4} className="px-2">
+                  <div className="card-effect-input-box">
+                      <div className="input-box">
+                          <div className="inputbox-container">
+                              <h1 className="inputbox-title">Bid Qualification Result:</h1>
+                              <textarea className="inputbox-textarea"></textarea>
+                          </div>
+                      </div>
+                  </div>
+              </Col>
+              <Col md={4} className="px-2">
+                  <div className="card-effect-input-box">
+                      <div className="input-box">
+                          <div className="inputbox-container">
+                              <h1 className="inputbox-title">Opportunity Owner:</h1>
+                              <textarea className="inputbox-textarea"></textarea>
+                          </div>
+                      </div>
+                  </div>
+              </Col>
           </Row>
           <Row className="no-gutters mt-3 mx-n2">
-            <Col md={4} className="px-2">
-              <div className="card-effect-input-box">
-                <div className="input-box">
-                  <h1 className="inputbox-title">Submission Deadline</h1>
-                  <textarea className="inputbox-textarea" placeholder="Enter submission deadline here..."></textarea>
-                </div>
-              </div>
-            </Col>
-            <Col md={4} className="px-2">
-              <div className="card-effect-input-box">
-                <div className="input-box">
-                  <h1 className="inputbox-title">Bid Manager</h1>
-                  <textarea className="inputbox-textarea" placeholder="Enter bid manager here..."></textarea>
-                </div>
-              </div>
-            </Col>
-            <Col md={4} className="px-2">
-              <div className="card-effect-input-box">
-                <div className="input-box">
-                  <h1 className="inputbox-title">Contributors</h1>
-                  <textarea className="inputbox-textarea" placeholder="Enter contributors here..."></textarea>
-                </div>
-              </div>
-            </Col>
+              <Col md={4} className="px-2">
+                  <div className="card-effect-input-box">
+                      <div className="input-box">
+                          <div className="inputbox-container">
+                              <h1 className="inputbox-title">Submission Deadline:</h1>
+                              <textarea className="inputbox-textarea"></textarea>
+                          </div>
+                      </div>
+                  </div>
+              </Col>
+              <Col md={4} className="px-2">
+                  <div className="card-effect-input-box">
+                      <div className="input-box">
+                          <div className="inputbox-container">
+                              <h1 className="inputbox-title">Bid Manager:</h1>
+                              <textarea className="inputbox-textarea"></textarea>
+                          </div>
+                      </div>
+                  </div>
+              </Col>
+              <Col md={4} className="px-2">
+                  <div className="card-effect-input-box">
+                      <div className="input-box">
+                          <div className="inputbox-container">
+                              <h1 className="inputbox-title">Contributors:</h1>
+                              <textarea className="inputbox-textarea"></textarea>
+                          </div>
+                      </div>
+                  </div>
+              </Col>
           </Row>
-        </div>
+      </div>
+
         <Row className="mt-5 mb-5">
             <Col md={6}>
               <div className="card-title-container mb-2">

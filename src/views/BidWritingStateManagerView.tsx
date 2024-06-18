@@ -23,6 +23,7 @@ const defaultState: BidContextType = {
     backgroundInfo: '',
     questions: [],
     editorState: EditorState.createEmpty(),
+    
   },
   setSharedState: () => {},
 };

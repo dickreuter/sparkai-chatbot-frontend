@@ -24,7 +24,7 @@ const Proposal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [appendResponse, setAppendResponse] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState("-1");
-  const [isSaved, setIsSaved] = useState(false);
+  
 
 
   const exportToDocx = (editorState) => {
@@ -53,34 +53,6 @@ const Proposal = () => {
   };
   
 
-  const saveProposal = async () => {
-    const editorContentState = editorState.getCurrentContent();
-    const editorText = editorContentState.getPlainText('\n');
-  
-    const formData = new FormData();
-    formData.append('bid_title', bidInfo);
-    formData.append('text', editorText);
-    formData.append('status', 'ongoing');
-    formData.append('contract_information', backgroundInfo);
-  
-    try {
-      const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/upload_bids`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-  
-      setIsSaved(true);
-      setTimeout(() => setIsSaved(false), 3000); // Reset after 3 seconds
-    } catch (error) {
-      console.error("Error saving proposal:", error);
-    }
-  };
   
 
   return (
@@ -96,14 +68,6 @@ const Proposal = () => {
             />
         <Row>
           <div className="mb-4">
-            <Button
-              variant={isSaved ? "success" : "primary"}
-              onClick={saveProposal}
-              className={`mt-1 upload-button ${isSaved && 'saved-button'}`}
-              disabled={isLoading || isSaved}
-            >
-              {isSaved ? "Saved" : "Save Proposal"}
-            </Button>
             <Button
               variant={"primary"}
               onClick={() => exportToDocx(editorState)}

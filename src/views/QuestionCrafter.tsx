@@ -19,8 +19,10 @@ const QuestionCrafter = () => {
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const { sharedState, setSharedState } = useContext(BidContext);
+  const { sharedState, setSharedState, getBackgroundInfo } = useContext(BidContext);
   const { editorState } = sharedState;
+  
+  const backgroundInfo = getBackgroundInfo();
   
   const [bids, setBids] = useState([]);
   const [selectedBid, setSelectedBid] = useState(null);
@@ -46,8 +48,10 @@ const QuestionCrafter = () => {
     handleDatasetChange({ target: { value: eventKey } });
   };
 
+  const parsedQuestions = sharedState.questions.split(',').map(question => question.trim());
+
   const handleSelectQuestion = (eventKey) => {
-    const selectedQuestion = sharedState.questions[eventKey];
+    const selectedQuestion = parsedQuestions[eventKey];
     if (selectedQuestion) {
       setInputText(selectedQuestion);
     }
@@ -168,7 +172,7 @@ const QuestionCrafter = () => {
     const [broadness, setBroadness] = useState("2");
 
 
-  const [backgroundInfo, setBackgroundInfo] = useState('');
+ 
 
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
@@ -235,6 +239,8 @@ const QuestionCrafter = () => {
       { type: 'bot', text: 'loading' }
     ]);
 
+    
+
     try {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question`,
@@ -242,7 +248,7 @@ const QuestionCrafter = () => {
           choice: bidPilotchoice,
           broadness: bidPilotbroadness,
           input_text: question,
-          extra_instructions: backgroundInfo,
+          extra_instructions: ' ',
           dataset,
         },
         {
@@ -274,10 +280,11 @@ const QuestionCrafter = () => {
       handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
       setQuestionAsked(true);
       localStorage.setItem('questionAsked', 'true');
+      console.log(backgroundInfo);
       setResponse("");
       setIsLoading(true);
       setStartTime(Date.now()); // Set start time for the timer
-      console.log(dataset)
+      
       try {
           const result = await axios.post(
               `http${HTTP_PREFIX}://${API_URL}/question`,
@@ -486,10 +493,9 @@ useEffect(() => {
                     <Dropdown.Toggle className="upload-button" style={{ backgroundColor: 'black' }} id="dropdown-basic">
                       Select a Question
                     </Dropdown.Toggle>
-
                     <Dropdown.Menu className="w-100">
-                      {sharedState.questions.length > 0 ? (
-                        sharedState.questions.map((question, index) => (
+                      {parsedQuestions.length > 0 ? (
+                        parsedQuestions.map((question, index) => (
                           <Dropdown.Item key={index} eventKey={index.toString()}>
                             {question}
                           </Dropdown.Item>

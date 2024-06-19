@@ -1,77 +1,40 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext } from "react";
 import { NavLink } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
-import axios from 'axios';
-import { API_URL, HTTP_PREFIX } from '../helper/Constants';
+import { Spinner } from 'react-bootstrap';
 import { BidContext } from "../views/BidWritingStateManagerView";
-import { useAuthUser } from 'react-auth-kit';
+import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import "./BidNavbar.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const BidNavbar = () => {
-  const [isSaved, setIsSaved] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Correct use of hooks
-  const getAuth = useAuthUser();
-  const auth = getAuth();
-  const tokenRef = useRef(auth?.token || "default");
-  const { sharedState, setSharedState } = useContext(BidContext);
-  const { bidInfo, backgroundInfo, editorState } = sharedState;
-
-  const saveProposal = async () => {
-    setIsLoading(true);
-    const editorContentState = editorState.getCurrentContent();
-    const editorText = editorContentState.getPlainText('\n');
-  
-    const formData = new FormData();
-    formData.append('bid_title', bidInfo);
-    formData.append('text', editorText);
-    formData.append('status', 'ongoing');
-    formData.append('contract_information', backgroundInfo);
-    formData.append('client_name', 'test');
-    formData.append('bid_qualification_result', 'test');
-    formData.append('opportunity_owner', 'test');
-    formData.append('bid_manager', 'test');
-    formData.append('contributors', 'test');
-    formData.append('submission_deadline', 'test');
-    try {
-      const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/upload_bids`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-  
-      setIsSaved(true);
-      setTimeout(() => setIsSaved(false), 3000); // Reset after 3 seconds
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error saving proposal:", error);
-      setIsLoading(false);
-    }
-  };
+  const { sharedState } = useContext(BidContext);
+  const { isLoading, saveSuccess } = sharedState;
 
   return (
     <div className="bidnav">
-    <div className="bidnav-section">
-    <NavLink to="/bid-extractor" className="bidnav-item" activeClassName="active">Bid Planner</NavLink>
-      <NavLink to="/question-crafter" className="bidnav-item" activeClassName="active">Bid Response</NavLink>
-      <NavLink to="/proposal" className="bidnav-item" activeClassName="active">Proposal</NavLink>
-      <Button
-            variant={isSaved ? "success" : "primary"}
-            onClick={saveProposal}
-            className={`mt-1 upload-button ${isSaved && 'saved-button'}`}
-            disabled={isLoading || isSaved}
-          >
-            {isSaved ? "Saved" : "Save Bid"}
-          </Button>
+      <div className="bidnav-section">
+        <NavLink to="/bid-extractor" className="bidnav-item" activeClassName="active">Bid Planner</NavLink>
+        <NavLink to="/question-crafter" className="bidnav-item" activeClassName="active">Bid Response</NavLink>
+        <NavLink to="/proposal" className="bidnav-item" activeClassName="active">Proposal</NavLink>
+        <div className="status-indicator mt-2">
+          {isLoading ? (
+            <Spinner animation="border" size="lg" style={{ width: '1.4rem', height: '1.4rem' }} />
+          ) : saveSuccess === true ? (
+            <FontAwesomeIcon
+              icon={faCheckCircle}
+              style={{ color: 'green', fontSize: '1.4rem' }}
+              title="Draft saved"
+            />
+          ) : saveSuccess === false ? (
+            <FontAwesomeIcon
+              icon={faTimesCircle}
+              style={{ color: 'red', fontSize: '1.4rem' }}
+              title="Failed to save"
+            />
+          ) : null}
+        </div>
+      </div>
     </div>
-    
-  </div>
   );
 };
 

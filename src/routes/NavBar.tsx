@@ -127,14 +127,6 @@ const NavBar = () => {
           ) : (
             <></>
           )}
-       {auth ? (
-        <li className="nav-item">
-  <button className="btn btn-white nav-link" onClick={() => handleNavLinkClick()}>
-    New Bid
-  </button>
-</li>
-
-) : <></>}
 
 
        {auth ? (

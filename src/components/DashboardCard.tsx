@@ -8,27 +8,20 @@ interface DashboardCardProps {
   icon: IconDefinition;
   title: string;
   description: string;
-  path: string; // Change prop name to 'path'
+  path: string;
   style?: React.CSSProperties;
+  onCardClick?: () => void; // Add this prop
 }
 
-const DashboardCard: React.FC<DashboardCardProps> = ({ icon, title, description, path, style }) => {
+const DashboardCard: React.FC<DashboardCardProps> = ({ icon, title, description, path, style, onCardClick }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (path === '/bid-extractor') {
-      // Add your custom logic here
-      localStorage.removeItem('bidInfo');
-      localStorage.removeItem('backgroundInfo');
-      localStorage.removeItem('response');
-      localStorage.removeItem('inputText');
-      localStorage.removeItem('editorState');
-      localStorage.removeItem('messages');
-      localStorage.removeItem('bidState');
-      console.log('Bid Extractor path clicked!');
-      // You can add any additional logic here before navigating
+    if (path === '/bid-extractor' && onCardClick) {
+      onCardClick(); // Call the provided onCardClick function
+    } else {
+      navigate(path);
     }
-    navigate(path);
   };
 
   return (

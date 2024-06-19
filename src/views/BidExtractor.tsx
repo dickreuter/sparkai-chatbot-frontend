@@ -5,35 +5,59 @@ import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Button, Card, Col, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
-import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-js';
-
+import { EditorState, ContentState } from 'draft-js';
+import { displayAlert } from '../helper/Alert';
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const { sharedState, setSharedState } = useContext(BidContext);
-  const { bidInfo: contextBidInfo, backgroundInfo, questions } = sharedState;
-
-  // Use a default value if bidInfo is null or empty
-  const bidInfo = contextBidInfo || "Bid Name";
-  const bidNameTempRef = useRef(bidInfo);
-  
-  const [isEditing, setIsEditing] = useState(false);
-  const navigate = useNavigate();
-  const bidNameRef = useRef(null);
-
+  const { sharedState, setSharedState, getBackgroundInfo } = useContext(BidContext);
+  const { bidInfo: contextBidInfo, opportunity_information, compliance_requirements, questions, bid_qualification_result, client_name, opportunity_owner, submission_deadline, bid_manager, contributors } = sharedState;
   const CHARACTER_LIMIT = 20;
 
   const location = useLocation();
   const bidData = location.state?.bid || '';
+  const initialBidName = location.state?.bidName // Retrieve bidName from location state
+
+  // Initialize bidInfo with the initial bid name or context bid info
+  const bidInfo = contextBidInfo || initialBidName;
+  const bidNameTempRef = useRef(bidInfo);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const navigate = useNavigate();
+  const bidNameRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
+
+  const [existingBidNames, setExistingBidNames] = useState([]);
+
+  useEffect(() => {
+    const fetchExistingBidNames = async () => {
+      try {
+        const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`,
+            },
+          });
+        if (response.data && response.data.bids) {
+          setExistingBidNames(response.data.bids.map(bid => bid.bid_title));
+        }
+      } catch (error) {
+        console.error("Error fetching bid names:", error);
+      }
+    };
+
+    fetchExistingBidNames();
+  }, [tokenRef]);
+
 
   useEffect(() => {
     const navigatedFromBidsTable = localStorage.getItem('navigatedFromBidsTable');
@@ -42,8 +66,18 @@ const BidExtractor = () => {
       setSharedState(prevState => ({
         ...prevState,
         bidInfo: bidData?.bid_title || '',
-        backgroundInfo: bidData?.contract_information || ''
+        opportunity_information: bidData?.opportunity_information || '',
+        compliance_requirements: bidData?.compliance_requirements || '',
+        client_name: bidData?.client_name || '',
+        bid_qualification_result: bidData?.bid_qualification_result || '',
+        questions: bidData?.questions || '',
+        opportunity_owner: bidData?.opportunity_owner || '',
+        submission_deadline: bidData?.submission_deadline || '',
+        bid_manager: bidData?.bid_manager || '',
+        contributors: bidData?.contributors || ''
       }));
+
+      console.log(sharedState);
   
       if (bidData?.text) {
         console.log(bidData.text);
@@ -56,14 +90,16 @@ const BidExtractor = () => {
       }
   
       localStorage.setItem('navigatedFromBidsTable', 'false');
+    } else if (initialBidName && initialBidName !== '') {
+      // Update bidInfo with the initial bid name if it's provided and not empty
+      setSharedState(prevState => ({
+        ...prevState,
+        bidInfo: initialBidName
+      }));
     }
-  }, [location, bidData, setSharedState]);
-  
+  }, [location, bidData, setSharedState, initialBidName]);
 
-
-  
   useEffect(() => {
-    // Set the initial bid name from the context state
     bidNameTempRef.current = bidInfo;
     if (bidNameRef.current) {
       bidNameRef.current.innerText = bidInfo;
@@ -76,6 +112,7 @@ const BidExtractor = () => {
       bidNameTempRef.current = newText;
     } else {
       e.target.innerText = bidNameTempRef.current;
+      displayAlert(`Bid name cannot exceed ${CHARACTER_LIMIT} characters`, 'warning');
     }
   };
 
@@ -86,8 +123,8 @@ const BidExtractor = () => {
   };
 
   const toggleEditing = () => {
-    setIsEditing(!isEditing);
     if (!isEditing) {
+      setIsEditing(!isEditing);
       setTimeout(() => {
         const range = document.createRange();
         const sel = window.getSelection();
@@ -97,16 +134,53 @@ const BidExtractor = () => {
         sel.addRange(range);
         bidNameRef.current.focus();
       }, 0);
+    } else {
+      // Check if bid name is empty or already exists
+      const newBidName = bidNameRef.current.innerText.trim();
+      if (!newBidName) {
+        displayAlert('Bid name cannot be empty', 'warning');
+        return;
+      }
+      if (newBidName.length > CHARACTER_LIMIT) {
+        displayAlert(`Bid name cannot exceed ${CHARACTER_LIMIT} characters`, 'warning');
+        return;
+      }
+      console.log(newBidName);
+      console.log(contextBidInfo);
+      if (existingBidNames.includes(newBidName) && newBidName !== contextBidInfo) {
+        displayAlert('Bid name already exists', 'warning');
+        return;
+      }
+      // Add any other necessary validation here
+      
+      setSharedState(prevState => ({
+        ...prevState,
+        bidInfo: newBidName
+      }));
+      setIsEditing(false);
     }
   };
+  
 
   const handleBlur = () => {
+    const newBidName = bidNameTempRef.current.trim();
+    if (!newBidName) {
+      displayAlert('Bid name cannot be empty', 'warning');
+      bidNameRef.current.innerText = bidInfo; // Revert to the previous valid bid name
+      return;
+    }
+    if (existingBidNames.includes(newBidName) && newBidName !== contextBidInfo) {
+      displayAlert('Bid name already exists', 'warning');
+      bidNameRef.current.innerText = bidInfo; // Revert to the previous valid bid name
+      return;
+    }
     setSharedState(prevState => ({
       ...prevState,
-      bidInfo: bidNameTempRef.current
+      bidInfo: newBidName
     }));
     setIsEditing(false);
   };
+  
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -129,9 +203,10 @@ const BidExtractor = () => {
       );
 
       const extractedQuestions = result.data.filter((question: string) => question.trim() !== '');
+      const questionsString = extractedQuestions.join(',');
       setSharedState(prevState => ({
         ...prevState,
-        questions: extractedQuestions
+        questions: questionsString
       }));
     } catch (error) {
       console.error("Error extracting questions:", error);
@@ -140,18 +215,73 @@ const BidExtractor = () => {
     }
   };
 
-
   useEffect(() => {
     if (questions.length > 0) {
       console.log("Questions updated:", questions);
     }
   }, [questions]);
 
-  const handleBackgroundInfoChange = (e) => {
-    const newBackgroundInfo = e.target.value;
+  const handleOpportunityInformationChange = (e) => {
+    const newOpportunityInformation = e.target.value;
     setSharedState(prevState => ({
       ...prevState,
-      backgroundInfo: newBackgroundInfo
+      opportunity_information: newOpportunityInformation
+    }));
+  };
+
+  const handleComplianceRequirementsChange = (e) => {
+    const newComplianceRequirements = e.target.value;
+    setSharedState(prevState => ({
+      ...prevState,
+      compliance_requirements: newComplianceRequirements
+    }));
+  };
+
+  const handleBidQualificationResultChange = (e) => {
+    const newBidQualificationResult = e.target.value;
+    setSharedState(prevState => ({
+      ...prevState,
+      bid_qualification_result: newBidQualificationResult
+    }));
+  };
+
+  const handleClientNameResultChange = (e) => {
+    const newClientName = e.target.value;
+    setSharedState(prevState => ({
+      ...prevState,
+      client_name: newClientName
+    }));
+  };
+
+  const handleOpportunityOwnerChange = (e) => {
+    const newOpportunityOwner = e.target.value;
+    setSharedState(prevState => ({
+      ...prevState,
+      opportunity_owner: newOpportunityOwner
+    }));
+  };
+
+  const handleSubmissionDeadlineChange = (e) => {
+    const newSubmissionDeadline = e.target.value;
+    setSharedState(prevState => ({
+      ...prevState,
+      submission_deadline: newSubmissionDeadline
+    }));
+  };
+
+  const handleBidManagerChange = (e) => {
+    const newBidManager = e.target.value;
+    setSharedState(prevState => ({
+      ...prevState,
+      bid_manager: newBidManager
+    }));
+  };
+
+  const handleContributorsChange = (e) => {
+    const newContributors = e.target.value;
+    setSharedState(prevState => ({
+      ...prevState,
+      contributors: newContributors
     }));
   };
 
@@ -187,70 +317,94 @@ const BidExtractor = () => {
         </div>
         <div>
         <div className="input-container">
-          <Row className="no-gutters mx-n2">
-              <Col md={4} className="px-2">
-                  <div className="card-effect-input-box">
-                      <div className="input-box">
-                          <div className="inputbox-container">
-                              <h1 className="inputbox-title">Client Name:</h1>
-                              <textarea className="inputbox-textarea"></textarea>
-                          </div>
-                      </div>
-                  </div>
-              </Col>
-              <Col md={4} className="px-2">
-                  <div className="card-effect-input-box">
-                      <div className="input-box">
-                          <div className="inputbox-container">
-                              <h1 className="inputbox-title">Bid Qualification Result:</h1>
-                              <textarea className="inputbox-textarea"></textarea>
-                          </div>
-                      </div>
-                  </div>
-              </Col>
-              <Col md={4} className="px-2">
-                  <div className="card-effect-input-box">
-                      <div className="input-box">
-                          <div className="inputbox-container">
-                              <h1 className="inputbox-title">Opportunity Owner:</h1>
-                              <textarea className="inputbox-textarea"></textarea>
-                          </div>
-                      </div>
-                  </div>
-              </Col>
-          </Row>
-          <Row className="no-gutters mt-3 mx-n2">
-              <Col md={4} className="px-2">
-                  <div className="card-effect-input-box">
-                      <div className="input-box">
-                          <div className="inputbox-container">
-                              <h1 className="inputbox-title">Submission Deadline:</h1>
-                              <textarea className="inputbox-textarea"></textarea>
-                          </div>
-                      </div>
-                  </div>
-              </Col>
-              <Col md={4} className="px-2">
-                  <div className="card-effect-input-box">
-                      <div className="input-box">
-                          <div className="inputbox-container">
-                              <h1 className="inputbox-title">Bid Manager:</h1>
-                              <textarea className="inputbox-textarea"></textarea>
-                          </div>
-                      </div>
-                  </div>
-              </Col>
-              <Col md={4} className="px-2">
-                  <div className="card-effect-input-box">
-                      <div className="input-box">
-                          <div className="inputbox-container">
-                              <h1 className="inputbox-title">Contributors:</h1>
-                              <textarea className="inputbox-textarea"></textarea>
-                          </div>
-                      </div>
-                  </div>
-              </Col>
-          </Row>
+        <Row className="no-gutters mx-n2">
+        <Col md={4} className="px-2">
+          <div className="card-effect-input-box">
+            <div className="input-box">
+              <div className="inputbox-container">
+                <h1 className="inputbox-title">Client Name:</h1>
+                <textarea
+                  className="inputbox-textarea"
+                  value={sharedState.client_name}
+                  onChange={handleClientNameResultChange}
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </Col>
+        <Col md={4} className="px-2">
+          <div className="card-effect-input-box">
+            <div className="input-box">
+              <div className="inputbox-container">
+                <h1 className="inputbox-title">Bid Qualification Result:</h1>
+                <textarea
+                  className="inputbox-textarea"
+                  value={sharedState.bid_qualification_result}
+                  onChange={handleBidQualificationResultChange}
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </Col>
+        <Col md={4} className="px-2">
+          <div className="card-effect-input-box">
+            <div className="input-box">
+              <div className="inputbox-container">
+                <h1 className="inputbox-title">Opportunity Owner:</h1>
+                <textarea
+                  className="inputbox-textarea"
+                  value={sharedState.opportunity_owner}
+                  onChange={handleOpportunityOwnerChange}
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </Col>
+      </Row>
+      <Row className="no-gutters mt-3 mx-n2">
+        <Col md={4} className="px-2">
+          <div className="card-effect-input-box">
+            <div className="input-box">
+              <div className="inputbox-container">
+                <h1 className="inputbox-title">Submission Deadline:</h1>
+                <textarea
+                  className="inputbox-textarea"
+                  value={sharedState.submission_deadline}
+                  onChange={handleSubmissionDeadlineChange}
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </Col>
+        <Col md={4} className="px-2">
+          <div className="card-effect-input-box">
+            <div className="input-box">
+              <div className="inputbox-container">
+                <h1 className="inputbox-title">Bid Manager:</h1>
+                <textarea
+                  className="inputbox-textarea"
+                  value={sharedState.bid_manager}
+                  onChange={handleBidManagerChange}
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </Col>
+        <Col md={4} className="px-2">
+          <div className="card-effect-input-box">
+            <div className="input-box">
+              <div className="inputbox-container">
+                <h1 className="inputbox-title">Contributors:</h1>
+                <textarea
+                  className="inputbox-textarea"
+                  value={sharedState.contributors}
+                  onChange={handleContributorsChange}
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </Col>
+      </Row>
       </div>
 
         <Row className="mt-5 mb-5">
@@ -273,9 +427,9 @@ const BidExtractor = () => {
               <div className="question-extractor">
                 <textarea
                   className="card-textarea"
-                  placeholder="Enter client details here..."
-                  value={backgroundInfo}
-                  onChange={handleBackgroundInfoChange}
+                  placeholder="Enter background info here..."
+                  value={opportunity_information}
+                  onChange={handleOpportunityInformationChange}
                 ></textarea>
               </div>
             </Col>
@@ -297,7 +451,12 @@ const BidExtractor = () => {
                 <h1 className="lib-title">Compliance Requirements</h1>
               </div>
               <div className="question-extractor">
-                <textarea className="card-textarea" placeholder="Enter bid proposition here..."></textarea>
+              <textarea
+                  className="card-textarea"
+                  placeholder="Enter compliance requirements here..."
+                  value={compliance_requirements}
+                  onChange={handleComplianceRequirementsChange}
+                ></textarea>
               </div>
             </Col>
           </Row>
@@ -333,7 +492,7 @@ const BidExtractor = () => {
     </div>
     <div className="question-extractor-flex mb-5">
       <div className="question-list">
-        {questions.length === 0 ? (
+        {questions === " " ? (
           <>
             <div className="question-item">Question 1</div>
             <div className="question-item">Question 2</div>
@@ -343,7 +502,7 @@ const BidExtractor = () => {
             <div className="question-item">Question 6</div>
           </>
         ) : (
-          questions.map((question, index) => (
+          questions.split(',').map((question, index) => (
             <div key={index} className="question-item">
               {question}
             </div>

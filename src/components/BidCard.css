@@ -17,7 +17,8 @@
 
 .card-effect-long {
     flex: 1;
-    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    /* Increased shadow values for a slightly heavier effect */
     background-color: #fff;
     padding: 25px;
     transition: all 0.35s ease;

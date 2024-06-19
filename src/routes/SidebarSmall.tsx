@@ -35,10 +35,6 @@ const SideBarSmall = () => {
           <FontAwesomeIcon icon={faTachometerAlt} />
           <span>Dashboard</span>
         </Link>
-        <Link to="/bid-extractor" className={`sidebarsmalllink ${isActive('/bid-extractor') ? 'sidebarsmalllink-active' : ''}`}>
-          <FontAwesomeIcon icon={faFileContract} />
-          <span>Bid Editor</span>
-        </Link>
         <Link to="/bids" className={`sidebarsmalllink ${isActive('/bids') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faLayerGroup} />
           <span>Bid Register</span>

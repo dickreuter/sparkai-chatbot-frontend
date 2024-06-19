@@ -116,7 +116,7 @@
 
 .question-extractor-flex {
     width: 100%;
-    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     background-color: #fff;
     padding: 10px;
     transition: all 0.35s ease;
@@ -127,7 +127,7 @@
 
 .question-extractor {
     flex: 1;
-    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     background-color: #fff;
     padding: 10px;
     transition: all 0.35s ease;
@@ -241,7 +241,7 @@
 .card-effect-input-box {
     flex: 1;
     background-color: #fff;
-    padding: 15px;
+    padding: 10px;
     margin: 0;
     word-wrap: break-word;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -254,8 +254,8 @@
 }
 
 .inputbox-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 550;
     margin-right: 10px;
     /* Adjust the space between title and input */
 }

@@ -1,0 +1,14 @@
+/* Custom modal styles */
+
+.custom-modal-newbid .modal-dialog {
+    max-width: 28%;
+}
+
+.custom-modal-newbid .modal-title {
+    font-size: 1.25rem;
+    /* Adjust the font size as needed */
+}
+
+.custom-modal-newbid .modal-content {
+    border-radius: 10px;
+}

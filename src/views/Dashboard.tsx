@@ -126,7 +126,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div id="chatbot-page">
+    <div >
       <SideBarSmall />
 
       <div className="lib-container">
@@ -226,10 +226,10 @@ const Dashboard = () => {
      */}
  </div> 
  <Modal show={showModal} onHide={handleModalClose} className="custom-modal-newbid">
-        <Modal.Header closeButton>
+        <Modal.Header closeButton className="px-4 py-3">
           <Modal.Title>Enter Bid Name</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="px-4 py-4">
           <CustomTextField
             label="Bid Name"
             variant="outlined"

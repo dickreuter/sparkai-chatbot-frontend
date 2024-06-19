@@ -183,20 +183,20 @@
 
 .tooltip-container {
     position: relative;
-    /* This sets the positioning context for the absolute children */
     display: inline-flex;
     align-items: center;
     cursor: pointer;
     font-size: 30px;
-    margin-left: 1%;
-    color: black;
+    margin-left: 1.2%;
+    color: darkgrey;
+    transform: translateY(-10%);
 }
 
 .tooltip-text {
     visibility: hidden;
     width: 700px;
-    background-color: black;
-    color: #fff;
+    background-color: #ededed;
+    color: #4d4d4d;
     border-radius: 6px;
     padding: 8px;
     position: absolute;
@@ -204,7 +204,7 @@
     font-size: 12px;
     bottom: 120%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-60%);
     margin-bottom: 5px;
     padding-top: 20px;
 }
@@ -212,8 +212,8 @@
 .tooltip-text-cd {
     visibility: hidden;
     width: 550px;
-    background-color: black;
-    color: #fff;
+    background-color: #ededed;
+    color: #4d4d4d;
     border-radius: 6px;
     padding: 8px;
     position: absolute;
@@ -222,6 +222,7 @@
     bottom: 120%;
     margin-bottom: 5px;
     padding-top: 20px;
+    transform: translateX(-50%);
 }
 
 .tooltip-container:hover .tooltip-text-cd {
@@ -232,10 +233,22 @@
     visibility: visible;
 }
 
+.tooltip-icon-container {
+    background-color: #ededed;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    width: 22px;
+    height: 22px;
+}
+
 .tooltip-icon {
-    font-size: 17px;
-    /* Adjusted font size for a smaller icon */
-    margin-right: 7px;
+    font-size: 10px;
+    color: #4d4d4d;
+    z-index: 1;
+    margin-right: 8%;
 }
 
 .card-effect-input-box {

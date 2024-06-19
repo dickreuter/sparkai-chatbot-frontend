@@ -407,59 +407,65 @@ const BidExtractor = () => {
       </Row>
       </div>
 
-        <Row className="mt-5 mb-5">
-            <Col md={6}>
-              <div className="card-title-container mb-2">
-                <div className="tooltip-container">
-                  <i className="fas fa-info-circle tooltip-icon"></i>
-                  <span className="tooltip-text-cd">
-                    <strong style={{ marginLeft: "15px" }}>What are the client’s business issues that have led them to release this tender?</strong>
-                    <ul>
-                      <li>What will happen if they don’t address these issues?</li>
-                      <li>What value results from addressing these issues?</li>
-                      <li>What business objectives do they want to achieve?</li>
-                      <li>Which objective is the most important to the client?</li>
-                    </ul>
-                  </span>
-                </div>
-                <h1 className="lib-title">Opportunity Information</h1>
-              </div>
-              <div className="question-extractor">
-                <textarea
-                  className="card-textarea"
-                  placeholder="Enter background info here..."
-                  value={opportunity_information}
-                  onChange={handleOpportunityInformationChange}
-                ></textarea>
-              </div>
-            </Col>
-            <Col md={6}>
-              <div className="card-title-container mb-2">
-                <div className="tooltip-container">
-                    <i className="fas fa-info-circle tooltip-icon"></i>
-                    <span className="tooltip-text">
-                      <strong style={{marginLeft: "15px"}}>What are the client’s business issues that have led them to release this tender?</strong>
-                      <ul>
-                        <li>What products/services/applications can you provide to address the issue?</li>
-                        <li>What outcomes would result from each of your suggestions?</li>
-                        <li>When comparing the impact of your solution with the issues the client seeks to mitigate, which recommendation stands out as the most advantageous?</li>
-                        <li>What makes you confident that your recommendation will be the right fit for the client?</li>
-                        <li>Why should the client select your solution and not your competitors’?</li>
-                      </ul>
-                    </span>
-                </div>
-                <h1 className="lib-title">Compliance Requirements</h1>
-              </div>
-              <div className="question-extractor">
-              <textarea
-                  className="card-textarea"
-                  placeholder="Enter compliance requirements here..."
-                  value={compliance_requirements}
-                  onChange={handleComplianceRequirementsChange}
-                ></textarea>
-              </div>
-            </Col>
-          </Row>
+      <Row className="mt-4 mb-4">
+  <Col md={6}>
+    <div className="card-title-container mb-1">
+      <h1 className="lib-title">Opportunity Information</h1>
+      <div className="tooltip-container">
+      <div className="tooltip-icon-container">
+        <i className="fas fa-info tooltip-icon"></i>
+      </div>
+        <span className="tooltip-text-cd">
+          <strong style={{ marginLeft: "15px" }}>What are the client’s business issues that have led them to release this tender?</strong>
+          <ul>
+            <li>What will happen if they don’t address these issues?</li>
+            <li>What value results from addressing these issues?</li>
+            <li>What business objectives do they want to achieve?</li>
+            <li>Which objective is the most important to the client?</li>
+          </ul>
+        </span>
+      </div>
+    </div>
+    <div className="question-extractor">
+      <textarea
+        className="card-textarea"
+        placeholder="Enter background info here..."
+        value={opportunity_information.trim() || ''}
+        onChange={handleOpportunityInformationChange}
+      ></textarea>
+    </div>
+  </Col>
+  <Col md={6}>
+    <div className="card-title-container mb-1">
+      
+      <h1 className="lib-title">Compliance Requirements</h1>
+      <div className="tooltip-container">
+      <div className="tooltip-icon-container">
+        <i className="fas fa-info tooltip-icon"></i>
+      </div>
+        <span className="tooltip-text">
+          <strong style={{ marginLeft: "15px" }}>What are the client’s business issues that have led them to release this tender?</strong>
+          <ul>
+            <li>What products/services/applications can you provide to address the issue?</li>
+            <li>What outcomes would result from each of your suggestions?</li>
+            <li>When comparing the impact of your solution with the issues the client seeks to mitigate, which recommendation stands out as the most advantageous?</li>
+            <li>What makes you confident that your recommendation will be the right fit for the client?</li>
+            <li>Why should the client select your solution and not your competitors’?</li>
+          </ul>
+        </span>
+      </div>
+    </div>
+    <div className="question-extractor">
+      <textarea
+        className="card-textarea"
+        placeholder="Enter compliance requirements here..."
+        value={compliance_requirements.trim() || ''}
+        onChange={handleComplianceRequirementsChange}
+      ></textarea>
+    </div>
+  </Col>
+</Row>
+
           <Row>
          
           <Col md={12}>
@@ -492,7 +498,7 @@ const BidExtractor = () => {
     </div>
     <div className="question-extractor-flex mb-5">
       <div className="question-list">
-        {questions === " " ? (
+        {questions === " " || questions === "" ? (
           <>
             <div className="question-item">Question 1</div>
             <div className="question-item">Question 2</div>

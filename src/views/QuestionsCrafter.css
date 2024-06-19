@@ -45,7 +45,7 @@
     padding: 10px;
     display: flex;
     flex-direction: column;
-    background-color: #e0e0e0;
+    background-color: rgba(200, 200, 200, 0.3);
 }
 
 .prompts-container {
@@ -53,7 +53,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    background-color: #e0e0e0;
+    background-color: rgba(200, 200, 200, 0.3);
     opacity: 1;
     transition: opacity 0.5s ease;
 }
@@ -151,7 +151,7 @@
 }
 
 .message-bubble-small.bot {
-    background-color: #f0f0f0;
+    background-color: rgba(200, 200, 200, 0.4);
     align-self: flex-start;
     border-top-left-radius: 0;
     color: black;

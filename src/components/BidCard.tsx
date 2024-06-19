@@ -8,18 +8,15 @@ const BidCard = ({ title, lastUpdated, completion }) => {
 
   return (
     <div className="bid-card">
-      <div className="card-effect-long">
+     
         <div className="bid-card-content">
           <div className="completion-wrapper">
             <h5>{title}</h5>
-            <div className="progress-wrapper">
-              <p className="completion-text">Completion:</p>
-              <LinearProgress variant="determinate" value={completion} className="progress-bar" />
-            </div>
+            
           </div>
           <p className="last-updated">Last Updated: {formattedDate}</p>
         </div>
-      </div>
+     
     </div>
   );
 };

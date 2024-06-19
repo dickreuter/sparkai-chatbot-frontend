@@ -138,7 +138,7 @@ const Bids = () => {
                             <button
                             onClick={() => deleteBid(bid.bid_title)}
                             className="upload-button"
-                            style={{backgroundColor: 'black'}}
+                           
                             >
                             Delete
                             </button>

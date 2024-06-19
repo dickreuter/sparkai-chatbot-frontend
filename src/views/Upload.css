@@ -9,7 +9,7 @@
 }
 
 .upload-button {
-    background-color: #007bff;
+    background-color: #262626;
     /* Example primary button color */
     color: white;
     padding: 8px 12px;
@@ -28,7 +28,15 @@
 
 .upload-button:disabled,
 .upload-button.btn-disabled {
-    background-color: #70b3fa;
+    background-color: #5c5b5b;
     color: white;
     cursor: not-allowed;
+}
+
+.upload-button:hover {
+    background-color: #3b3b3b
+}
+
+.upload-button:active {
+    background-color: #3b3b3b
 }

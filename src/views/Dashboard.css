@@ -1,5 +1,13 @@
 /* Custom modal styles */
 
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    /* Full viewport height */
+}
+
 .custom-modal-newbid .modal-dialog {
     max-width: 32%;
 }

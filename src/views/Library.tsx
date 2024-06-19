@@ -428,7 +428,7 @@ return (
         <Button 
             className="upload-button"
             onClick={handleOpenTextModal}
-            style={{ backgroundColor: 'black' }}
+          
         >
             Upload Text
         </Button>
@@ -443,7 +443,7 @@ return (
                   <th>{activeFolder ? `Documents in ${activeFolder}` : 'Folders'}</th>
                   <th colSpan={3}>
                     {activeFolder && (
-                      <Button className="upload-button" style={{backgroundColor: 'black'}} onClick={() => setActiveFolder(null)}>Back to Folders</Button>
+                      <Button className="upload-button" onClick={() => setActiveFolder(null)}>Back to Folders</Button>
                     )}
                   </th>
                 </tr>

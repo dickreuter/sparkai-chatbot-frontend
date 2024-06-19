@@ -10,7 +10,7 @@ import { faFileSignature, faComments } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
 import handleGAEvent from '../utilities/handleGAEvent';
 import BidCard from "../components/BidCard.tsx";
-import { Card, Col, Row, Modal, Button, Form, Alert } from "react-bootstrap";
+import { Card, Col, Row, Modal, Button, Alert, Spinner } from "react-bootstrap";
 import "./Dashboard.css"
 import { TextField } from "@mui/material";
 import CustomTextField from "../components/CustomTextField.tsx";
@@ -25,27 +25,13 @@ const Dashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [bidName, setBidName] = useState('');
   const [bidNameError, setBidNameError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchBids();
   }, []);
-
-  const [tasks, setTasks] = useState([
-    { id: 1, description: 'Review Compliance Matrix', assignee: 'Jamie', status: 'To-Do' },
-    { id: 2, description: 'Make final draft', assignee: 'Sam', status: 'To-Do' },
-    { id: 3, description: 'Q3', assignee: 'Gerald', status: 'To-Do' },
-    { id: 4, description: 'Exec Summary', assignee: 'Theresa', status: 'To-Do' },
-  ]);
-
-  const toggleTaskStatus = (id) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === id ? { ...task, status: task.status === 'To-Do' ? 'Done' : 'To-Do' } : task
-      )
-    );
-  };
 
   const fetchBids = async () => {
     try {
@@ -62,6 +48,8 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching bids:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -124,6 +112,17 @@ const Dashboard = () => {
     navigate('/bid-extractor', { state: { bid: bid, fromBidsTable: true } });
     fetchBids();
   };
+
+  if (isLoading) {
+    return (
+      <div>
+      <SideBarSmall />
+      <div className="loading-container">
+        <Spinner animation="border" variant="primary" />
+      </div>
+      </div>
+    );
+  }
 
   return (
     <div >

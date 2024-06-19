@@ -20,7 +20,7 @@ const QuestionCrafter = () => {
   const tokenRef = useRef(auth?.token || "default");
 
   const { sharedState, setSharedState, getBackgroundInfo } = useContext(BidContext);
-  const { editorState } = sharedState;
+  const { editorState, questions } = sharedState;
   
   const backgroundInfo = getBackgroundInfo();
   
@@ -48,7 +48,7 @@ const QuestionCrafter = () => {
     handleDatasetChange({ target: { value: eventKey } });
   };
 
-  const parsedQuestions = sharedState.questions.split(',').map(question => question.trim());
+  const parsedQuestions = questions.trim() ? questions.split(',') : [];
 
   const handleSelectQuestion = (eventKey) => {
     const selectedQuestion = parsedQuestions[eventKey];
@@ -502,7 +502,7 @@ useEffect(() => {
                         ))
                       ) : (
                         <Dropdown.Item eventKey="none" disabled>
-                          No questions available
+                          Upload some questions to get started
                         </Dropdown.Item>
                       )}
                     </Dropdown.Menu>
@@ -566,10 +566,13 @@ useEffect(() => {
                   onChange={(e) => setResponse(e.target.value)}
                 ></textarea>
               </div>
+              <div className="text-muted mt-2">
+                  Word Count: {response.split(/\s+/).filter(Boolean).length}
+              </div>
 
               <Button
                         variant={isAppended ? "success" : "primary"}
-                        className="upload-button mt-3 mb-4" 
+                        className="upload-button mt-2 mb-4" 
                         onClick={handleAppendResponseToEditor}
                         disabled={isLoading || isAppended} 
               >   

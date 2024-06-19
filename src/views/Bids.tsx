@@ -97,7 +97,7 @@ const Bids = () => {
 
 
     return (
-        <div id="chatbot-page">
+        <div >
             <SideBarSmall />
 
 

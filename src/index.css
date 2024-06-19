@@ -66,3 +66,27 @@ button:focus-visible {
         background-color: #f9f9f9;
     }
 }
+
+::-webkit-scrollbar {
+    width: 12px;
+    /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Track background color */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    /* Thumb color */
+    border-radius: 10px;
+    border: 3px solid #f1f1f1;
+    /* Adds padding around the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    /* Thumb color on hover */
+}

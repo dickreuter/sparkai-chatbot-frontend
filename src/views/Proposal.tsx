@@ -59,7 +59,7 @@ const Proposal = () => {
     <div className="chatpage">
       <SideBarSmall />
       <div className="lib-container">
-      <BidNavbar />
+        <BidNavbar />
         <ProposalEditor
               bidData={editorState}
               appendResponse={appendResponse}
@@ -73,7 +73,7 @@ const Proposal = () => {
               onClick={() => exportToDocx(editorState)}
               className="mt-1 ml-2 upload-button"
               disabled={isLoading}
-              style={{ marginLeft: "5px", backgroundColor: "black" }}
+              style={{ marginLeft: "5px"}}
             >
               Export to Word
             </Button>

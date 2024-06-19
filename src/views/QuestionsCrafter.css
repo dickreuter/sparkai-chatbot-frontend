@@ -347,3 +347,21 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.custom-dropdown-toggle {
+    background-color: #262626 !important;
+    /* Ensure the background color stays the same */
+    color: white !important;
+    /* Ensure the text color stays the same */
+    border: none !important;
+}
+
+.custom-dropdown-toggle:focus,
+.custom-dropdown-toggle:active {
+    background-color: #262626 !important;
+    /* Override the focus and active background color */
+    box-shadow: none !important;
+    /* Remove the blue outline */
+    color: white !important;
+    /* Ensure the text color stays the same */
+}

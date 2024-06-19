@@ -6,7 +6,8 @@
     margin: 0;
     width: 100%;
     margin-bottom: 0;
-    z-index: 100;
+    z-index: 1000;
+    /* Set a high z-index to ensure the navbar is above other elements */
 }
 
 .navbar-brand,
@@ -57,7 +58,7 @@
 }
 
 .btn-dark.nav-link {
-    background-color: black !important;
+    background-color: #262626 !important;
     color: white !important;
 }
 

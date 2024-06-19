@@ -8,25 +8,67 @@
 
 .bid-card {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     margin-bottom: 20px;
     cursor: pointer;
     color: black;
-}
-
-.card-effect-long {
-    flex: 1;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    /* Increased shadow values for a slightly heavier effect */
+    position: relative;
+    width: 100%;
     background-color: #fff;
+    max-width: 100%;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    z-index: 2;
     padding: 25px;
-    transition: all 0.35s ease;
-    margin: 0;
 }
 
-.card-effect-long:hover {
-    transform: translateY(5px);
+.bid-card-content {
+    width: 100%;
+    text-align: left;
+    /* Align text to the left */
+}
+
+.completion-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bid-card::after {
+    content: "";
+    width: 40px;
+    height: 40px;
+    background: #262626;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transition: all 0.5s ease;
+}
+
+.bid-card:hover::after {
+    width: 100%;
+    height: 100%;
+    background: #262626;
+    z-index: -1;
+}
+
+.bid-card:hover h5,
+.bid-card:hover p {
+    color: white;
+}
+
+.last-updated {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: gray;
+}
+
+.bid-card:hover .iconbox {
+    color: black;
 }
 
 .bid-card-content {
@@ -43,28 +85,4 @@
     margin: 5px 0 0;
     font-size: 12px;
     color: #777;
-}
-
-.completion-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.progress-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.completion-text {
-    margin-bottom: 6px;
-    font-size: 14px;
-    font-weight: 400px;
-}
-
-.progress-bar {
-    width: 200px;
-    /* Adjust width as needed */
 }

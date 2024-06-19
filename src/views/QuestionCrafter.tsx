@@ -474,7 +474,7 @@ useEffect(() => {
                 <div className="dropdown-container">
 
                   <Dropdown onSelect={handleSelect} className="w-100 mx-auto chat-dropdown">
-                    <Dropdown.Toggle className="upload-button" style={{ backgroundColor: 'black' }} id="dropdown-basic">
+                    <Dropdown.Toggle className="upload-button"  style={{backgroundColor: 'orange', color: 'black'}} id="dropdown-basic">
                       {dataset || "Select a dataset"}
                     </Dropdown.Toggle>
 
@@ -490,7 +490,7 @@ useEffect(() => {
 
 
                   <Dropdown onSelect={handleSelectQuestion} className="w-100 mx-auto chat-dropdown">
-                    <Dropdown.Toggle className="upload-button" style={{ backgroundColor: 'black' }} id="dropdown-basic">
+                    <Dropdown.Toggle className="upload-button custom-dropdown-toggle"  id="dropdown-basic">
                       Select a Question
                     </Dropdown.Toggle>
                     <Dropdown.Menu className="w-100">

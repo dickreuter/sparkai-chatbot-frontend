@@ -104,7 +104,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
                 <div className="dropdown-container">
                     <TemplateLoader token={tokenRef.current} handleSelect={handleSelectTemplate} />
                     <Dropdown onSelect={handleSelect}>
-                    <Dropdown.Toggle className="upload-button" style={{ backgroundColor: 'black' }} id="dropdown-basic">
+                    <Dropdown.Toggle className="upload-button custom-dropdown-toggle" id="dropdown-basic">
                         Navigate to Question
                     </Dropdown.Toggle>
 

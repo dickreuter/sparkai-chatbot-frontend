@@ -180,6 +180,7 @@ const AdminPannel = () => {
 
     // Render
     return (
+    <div className="adminContainer">
         <div className="strategy-form">
             <h2>User Configuration</h2>
 
@@ -448,6 +449,8 @@ const AdminPannel = () => {
                 {" "}
                 {/* Invoke saveStrategy when clicked */}
             </div>
+        </div>
+
         </div>
     );
 };

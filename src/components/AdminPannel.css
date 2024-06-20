@@ -2,7 +2,20 @@
     font-family: Arial, sans-serif;
     padding: 20px;
     border: 1px solid #e0e0e0;
+}
 
+.adminContainer {
+    width: 100%;
+    /* Adjusted to account for padding-left */
+    height: 100vh;
+    /* Assuming 40px top margin and 30px top padding */
+    margin-bottom: 0;
+    background-color: white;
+    justify-content: center;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 40px;
+    /* Use auto instead of scroll to handle both overflow cases */
 }
 
 .strategy-form h2 {
@@ -109,5 +122,6 @@
 
 .prompt textarea {
     width: 30vw;
-    height: 10em; /* This will give the textarea enough space for about 5 lines of text */
+    height: 10em;
+    /* This will give the textarea enough space for about 5 lines of text */
 }

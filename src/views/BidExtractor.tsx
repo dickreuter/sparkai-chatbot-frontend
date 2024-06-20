@@ -66,8 +66,8 @@ const BidExtractor = () => {
       setSharedState(prevState => ({
         ...prevState,
         bidInfo: bidData?.bid_title || '',
-        opportunity_information: bidData?.opportunity_information || '',
-        compliance_requirements: bidData?.compliance_requirements || '',
+        opportunity_information: bidData?.opportunity_information.trim() || '',
+        compliance_requirements: bidData?.compliance_requirements.trim() || '',
         client_name: bidData?.client_name || '',
         bid_qualification_result: bidData?.bid_qualification_result || '',
         questions: bidData?.questions || '',
@@ -430,7 +430,7 @@ const BidExtractor = () => {
       <textarea
         className="card-textarea"
         placeholder="Enter background info here..."
-        value={opportunity_information.trim() || ''}
+        value={opportunity_information || ''}
         onChange={handleOpportunityInformationChange}
       ></textarea>
     </div>
@@ -459,7 +459,7 @@ const BidExtractor = () => {
       <textarea
         className="card-textarea"
         placeholder="Enter compliance requirements here..."
-        value={compliance_requirements.trim() || ''}
+        value={compliance_requirements || ''}
         onChange={handleComplianceRequirementsChange}
       ></textarea>
     </div>

@@ -102,8 +102,8 @@ const Bids = () => {
 
 
             <div className="lib-container">
-                <h1 className='heavy'>Bid Tracker</h1>
-                <table className="bids-table mt-4">
+                <h1 className='heavy'>Bid Repository</h1>
+                <table className="bids-table mt-3">
                     <thead>
                         <tr>
                             <th>Bid Title</th>

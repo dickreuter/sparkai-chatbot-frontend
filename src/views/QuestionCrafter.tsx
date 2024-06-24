@@ -5,13 +5,14 @@ import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import handleGAEvent from '../utilities/handleGAEvent';
-import { Button, Card, Col, Dropdown, Form, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Dropdown, Form, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./QuestionsCrafter.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faChevronLeft, faChevronRight, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import FolderLogic from "../components/Folders.tsx";
-import { EditorState, convertToRaw, convertFromRaw, Modifier, SelectionState } from 'draft-js';
+import { Editor, EditorState, Modifier, SelectionState, convertToRaw, ContentState, RichUtils } from 'draft-js';
+import 'draft-js/dist/Draft.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 
 const QuestionCrafter = () => {
@@ -21,26 +22,55 @@ const QuestionCrafter = () => {
 
   const { sharedState, setSharedState, getBackgroundInfo } = useContext(BidContext);
   const { editorState, questions } = sharedState;
-  
+
   const backgroundInfo = getBackgroundInfo();
-  
+
   const [bids, setBids] = useState([]);
   const [selectedBid, setSelectedBid] = useState(null);
-  
+
   const [dataset, setDataset] = useState("default");
-  const [availableCollections, setAvailableCollections] = useState<string[]>([]);
+  const [availableCollections, setAvailableCollections] = useState([]);
   const [folderContents, setFolderContents] = useState({});
   const [isAppended, setIsAppended] = useState(false);
   const [appendResponse, setAppendResponse] = useState(false);
-  const [selectedQuestionId, setSelectedQuestionId] = useState("-1"); // Default to "Full Proposal"
+  const [selectedQuestionId, setSelectedQuestionId] = useState("-1");
 
   const [isCopilotVisible, setIsCopilotVisible] = useState(false);
   const [selectedText, setSelectedText] = useState('');
-  const textAreaRef = useRef(null);  // Reference to the textarea
+  const [originalText, setOriginalText] = useState('');
+  const [tempText, setTempText] = useState('');
+  const [copilotOptions, setCopilotOptions] = useState([]);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [showOptions, setShowOptions] = useState(false);
+  const [copilotLoading, setCopilotLoading] = useState(false);
+
+  const [selectionStart, setSelectionStart] = useState(null);
+  const [selectionEnd, setSelectionEnd] = useState(null);
+  const [isEditorFocused, setIsEditorFocused] = useState(false);
+  
+  const [inputText, setInputText] = useState(localStorage.getItem('inputText') || '');
+  const [responseEditorState, setResponseEditorState] = useState(
+    EditorState.createWithContent(
+      ContentState.createFromText(localStorage.getItem('response') || '')
+    )
+  );
+  const [selectionRange, setSelectionRange] = useState({ start: null, end: null });
+
+  const cursorPositionRef = useRef(null);
+
+  useEffect(() => {
+    localStorage.setItem('response', convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n'));
+  }, [responseEditorState]);
+
+  const styleMap = {
+    ORANGE: {
+      backgroundColor: 'orange',
+    },
+  };
 
   const handleDatasetChange = (e) => {
     const newDataset = e.target.value;
-    setDataset(newDataset); // Update the state with the new dataset value
+    setDataset(newDataset);
     handleGAEvent('Chatbot', 'Dataset Selection', 'Select Dataset Button');
   };
 
@@ -59,8 +89,8 @@ const QuestionCrafter = () => {
 
   const handleAppendResponseToEditor = () => {
     handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
-    setSelectedQuestionId("-1"); // Reset dropdown to "Full Proposal"
-  
+    setSelectedQuestionId("-1");
+
     setTimeout(() => {
       const currentContent = editorState.getCurrentContent();
       const lastBlock = currentContent.getBlockMap().last();
@@ -69,86 +99,312 @@ const QuestionCrafter = () => {
         anchorOffset: lengthOfLastBlock,
         focusOffset: lengthOfLastBlock,
       });
-  
+
       const contentStateWithNewText = Modifier.insertText(
         currentContent,
         selectionState,
-        `\nQuestion:\n${inputText}\n\nAnswer:\n${response}\n\n`
+        `\nQuestion:\n${inputText}\n\nAnswer:\n${convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n')}\n\n`
       );
-  
+
       const newEditorState = EditorState.push(editorState, contentStateWithNewText, 'insert-characters');
-  
+
       setSharedState((prevState) => ({
         ...prevState,
         editorState: newEditorState
       }));
-  
+
       setIsAppended(true);
       setTimeout(() => setIsAppended(false), 3000);
     }, 100);
   };
-  
-  const askCopilot = async (copilotInput: string, instructions: string, copilot_mode: string) => {
+
+  const askCopilot = async (copilotInput, instructions, copilot_mode) => {
     setQuestionAsked(true);
     localStorage.setItem('questionAsked', 'true');
     handleGAEvent('Chatbot', 'Copilot Input', copilotInput);
-    setIsLoading(true);
+    setCopilotLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
 
     console.log({
-        input_text: copilotInput,
-        extra_instructions: instructions,
-        copilot_mode: copilot_mode,
-        dataset,
-      });
-      
+      input_text: copilotInput,
+      extra_instructions: instructions,
+      copilot_mode: copilot_mode,
+      dataset,
+    });
 
     try {
-        const result = await axios.post(
-            `http${HTTP_PREFIX}://${API_URL}/copilot`,
-            {
-                input_text: copilotInput,
-                extra_instructions: instructions,
-                copilot_mode: copilot_mode,
-                dataset,
+      const requests = [
+        axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/copilot`,
+          {
+            input_text: copilotInput,
+            extra_instructions: instructions,
+            copilot_mode: copilot_mode,
+            dataset,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`,
             },
-            {
-                headers: {
-                    Authorization: `Bearer ${tokenRef.current}`,
-                },
-            }
-        );
+          }
+        ),
+        axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/copilot`,
+          {
+            input_text: copilotInput,
+            extra_instructions: instructions,
+            copilot_mode: copilot_mode,
+            dataset,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`,
+            },
+          }
+        ),
+        axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/copilot`,
+          {
+            input_text: copilotInput,
+            extra_instructions: instructions,
+            copilot_mode: copilot_mode,
+            dataset,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`,
+            },
+          }
+        )
+      ];
 
-        // Assuming the original 'response' state contains the text you're working with
-        // and 'copilotInput' is the text selected by the user that was sent for processing
-        // Replace the 'copilotInput' in the 'response' with 'result.data'
-        if (response.includes(copilotInput)) {
-            const updatedResponse = response.replace(copilotInput, result.data);
-            setResponse(updatedResponse);
-        } else {
-            console.error("Selected text not found in the response.");
-            // Optionally handle the case where the selected text isn't found
-            // For example, you might want to append the result or alert the user
-        }
+      const results = await Promise.all(requests);
+      const options = results.map(result => result.data);
+      setCopilotOptions(options);
     } catch (error) {
-        console.error("Error sending question:", error);
-        setResponse(error.message); // Consider how you want to handle errors, e.g., appending them or alerting the user
+      console.error("Error sending question:", error);
+      
     }
-    setIsLoading(false);
-};
-
-
-  const handleLinkClick = (linkName) => (e) => {
-    e.preventDefault(); // Prevent the default link behavior
-    //console.log(`${linkName} clicked`);
-    const copilot_mode = linkName.toLowerCase().replace(/\s+/g, '_');
-    //console.log(`${copilot_mode}`);
-    const instructions = '';
-    //console.log(selectedText);
-    askCopilot(selectedText, instructions, copilot_mode ); 
-
-    // Here you can add any logic you need to handle the click
+    setCopilotLoading(false);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.draft-editor')) {
+        setResponseEditorState(EditorState.moveSelectionToEnd(responseEditorState));
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [responseEditorState]);
+
+ 
+  
+  
+  
+  const handleTick = () => {
+    const contentState = responseEditorState.getCurrentContent();
+    const blocks = contentState.getBlockMap();
+  
+    let newContentState = contentState;
+  
+    // Remove ORANGE style from all blocks
+    blocks.forEach(block => {
+      const blockKey = block.getKey();
+      const length = block.getLength();
+      const blockSelection = SelectionState.createEmpty(blockKey).merge({
+        anchorOffset: 0,
+        focusOffset: length
+      });
+  
+      newContentState = Modifier.removeInlineStyle(newContentState, blockSelection, 'ORANGE');
+    });
+  
+    let newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
+  
+    // Clear the selection
+    const firstBlockKey = newEditorState.getCurrentContent().getFirstBlock().getKey();
+    const emptySelection = SelectionState.createEmpty(firstBlockKey);
+    newEditorState = EditorState.forceSelection(newEditorState, emptySelection);
+  
+    setResponseEditorState(newEditorState);
+    setShowOptions(false);
+    setIsCopilotVisible(false);
+    setSelectedText('');
+  
+    console.log("handleTick - clearedText");
+  };
+  
+  
+  
+  // Handle text selection changes
+  const handleEditorChange = (editorState) => {
+    const selectionState = editorState.getSelection();
+    const currentContent = editorState.getCurrentContent();
+    const anchorKey = selectionState.getAnchorKey();
+    const currentContentBlock = currentContent.getBlockForKey(anchorKey);
+    const start = selectionState.getStartOffset();
+    const end = selectionState.getEndOffset();
+    const selectedText = currentContentBlock.getText().slice(start, end);
+  
+    console.log("handleEditorChange - selectedText:", selectedText);
+  
+    if (selectedText.length > 0) {
+      setSelectedText(selectedText);
+      setIsCopilotVisible(true);
+      setSelectionRange({
+        anchorKey: selectionState.getAnchorKey(),
+        anchorOffset: selectionState.getAnchorOffset(),
+        focusKey: selectionState.getFocusKey(),
+        focusOffset: selectionState.getFocusOffset(),
+      });
+      console.log("handleEditorChange - setSelectionRange:", selectionState.toJS());
+    } else {
+      setSelectedText('');
+      setIsCopilotVisible(false);
+    }
+  
+    setResponseEditorState(editorState); // Always update the state
+  };
+  
+  const handleOptionSelect = (option) => {
+    const contentState = responseEditorState.getCurrentContent();
+    const { anchorKey, anchorOffset, focusKey, focusOffset } = selectionRange;
+  
+    // Log the initial state
+    console.log("handleOptionSelect - Initial Content State:", convertToRaw(contentState));
+    console.log("handleOptionSelect - Initial Selection Range:", selectionRange);
+  
+    // Create a new selection state that covers the entire range
+    const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
+      anchorOffset: Math.min(anchorOffset, focusOffset),
+      focusKey: focusKey,
+      focusOffset: Math.max(anchorOffset, focusOffset),
+    });
+  
+    // Log the new selection state
+    console.log("handleOptionSelect - New Selection State:", newSelectionState.toJS());
+  
+    // Remove any existing text within the selection range
+    const clearedContentState = Modifier.removeRange(contentState, newSelectionState, 'backward');
+  
+    // Log the cleared content state
+    console.log("handleOptionSelect - Cleared Content State:", convertToRaw(clearedContentState));
+  
+    // Collapse the selection to the start of the cleared range
+    const collapsedSelection = SelectionState.createEmpty(anchorKey).merge({
+      anchorOffset: newSelectionState.getStartOffset(),
+      focusOffset: newSelectionState.getStartOffset(),
+    });
+  
+    // Log the collapsed selection state
+    console.log("handleOptionSelect - Collapsed Selection State:", collapsedSelection.toJS());
+  
+    // Insert new option text at the collapsed selection
+    const newContentState = Modifier.insertText(
+      clearedContentState,
+      collapsedSelection,
+      option
+    );
+  
+    // Log the new content state after insertion
+    console.log("handleOptionSelect - New Content State After Insertion:", convertToRaw(newContentState));
+  
+    // Apply the ORANGE style to the new text
+    const finalSelectionState = collapsedSelection.merge({
+      focusOffset: collapsedSelection.getStartOffset() + option.length,
+    });
+  
+    // Log the final selection state
+    console.log("handleOptionSelect - Final Selection State:", finalSelectionState.toJS());
+  
+    const newContentStateWithStyle = Modifier.applyInlineStyle(
+      newContentState,
+      finalSelectionState,
+      'ORANGE'
+    );
+  
+    let newEditorState = EditorState.push(responseEditorState, newContentStateWithStyle, 'change-inline-style');
+  
+    // Force the selection to the end of the newly inserted text
+    newEditorState = EditorState.forceSelection(newEditorState, finalSelectionState);
+  
+    // Log the final content state with style
+    console.log("handleOptionSelect - Final Content State With Style:", convertToRaw(newContentStateWithStyle));
+  
+    setResponseEditorState(newEditorState);
+  
+    setTempText(option);
+    setSelectedOption(option);
+  
+    // Log the final text in the editor
+    console.log("handleOptionSelect - finalText:", convertToRaw(newContentStateWithStyle).blocks.map(block => block.text).join('\n'));
+  
+    // Force re-render of the editor component by updating a dummy state
+    setDummyState((prev) => !prev);
+  };
+  
+  // Dummy state to force re-render of the editor component
+  const [dummyState, setDummyState] = useState(false);
+  
+  // Example of logging for additional context (if needed)
+  const handleLinkClick = (linkName) => (e) => {
+    e.preventDefault();
+    const copilot_mode = linkName.toLowerCase().replace(/\s+/g, '_');
+    const instructions = '';
+  
+    const contentState = responseEditorState.getCurrentContent();
+    const selectionState = responseEditorState.getSelection();
+  
+    const start = selectionState.getStartOffset();
+    const end = selectionState.getEndOffset();
+    const anchorKey = selectionState.getAnchorKey();
+    const currentContentBlock = contentState.getBlockForKey(anchorKey);
+    const highlightedText = currentContentBlock.getText().slice(start, end);
+  
+    console.log("handleLinkClick - highlightedText:", highlightedText);
+  
+    // Apply ORANGE style to highlighted text
+    const newContentState = Modifier.applyInlineStyle(
+      contentState,
+      selectionState,
+      'ORANGE'
+    );
+  
+    const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
+    setResponseEditorState(newEditorState);
+  
+    setOriginalText(highlightedText);
+  
+    // Correcting selection range
+    const correctedSelectionRange = {
+      anchorKey: selectionState.getAnchorKey(),
+      anchorOffset: Math.min(selectionState.getAnchorOffset(), selectionState.getFocusOffset()),
+      focusKey: selectionState.getFocusKey(),
+      focusOffset: Math.max(selectionState.getAnchorOffset(), selectionState.getFocusOffset()),
+    };
+    setSelectionRange(correctedSelectionRange);
+  
+    console.log("handleLinkClick - setSelectionRange:", correctedSelectionRange);
+  
+    setTimeout(() => {
+      askCopilot(highlightedText, instructions, copilot_mode);
+      setShowOptions(true);
+    }, 0);
+  };
+  
+
+
+  
+  
+
+  
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 
   const [messages, setMessages] = useState(() => {
@@ -160,8 +416,7 @@ const QuestionCrafter = () => {
     // Save messages to localStorage whenever they change
     localStorage.setItem('messages', JSON.stringify(messages));
   }, [messages]);
-  
-  
+
   const [inputValue, setInputValue] = useState("");
 
   const [bidPilotchoice, setBidPilotChoice] = useState("2");
@@ -169,10 +424,7 @@ const QuestionCrafter = () => {
   const [isBidPilotLoading, setIsBidPilotLoading] = useState(false);
 
   const [choice, setChoice] = useState("3");
-    const [broadness, setBroadness] = useState("2");
-
-
- 
+  const [broadness, setBroadness] = useState("2");
 
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
@@ -182,36 +434,21 @@ const QuestionCrafter = () => {
   const [apiChoices, setApiChoices] = useState([]);
   const [wordAmounts, setWordAmounts] = useState({});
 
-
-
-  const [inputText, setInputText] = useState(
-    localStorage.getItem('inputText') || ''
-  );
-
-  const [response, setResponse] = useState(
-    localStorage.getItem('response') || ''
-  );
-
- 
-
   useEffect(() => {
     localStorage.setItem('inputText', inputText);
-    localStorage.setItem('response', response);
-  }, [inputText, response]);
+  }, [inputText]);
 
   useEffect(() => {
     let interval = null;
     if (isLoading && startTime) {
-        interval = setInterval(() => {
-            setElapsedTime((Date.now() - startTime) / 1000); // Update elapsed time in seconds
-        }, 100);
+      interval = setInterval(() => {
+        setElapsedTime((Date.now() - startTime) / 1000); // Update elapsed time in seconds
+      }, 100);
     } else if (!isLoading) {
-        clearInterval(interval);
+      clearInterval(interval);
     }
     return () => clearInterval(interval);
-}, [isLoading, startTime]);
-
-
+  }, [isLoading, startTime]);
 
   const handleSendMessage = () => {
     if (inputValue.trim() !== "") {
@@ -238,8 +475,6 @@ const QuestionCrafter = () => {
       ...prevMessages,
       { type: 'bot', text: 'loading' }
     ]);
-
-    
 
     try {
       const result = await axios.post(
@@ -274,174 +509,140 @@ const QuestionCrafter = () => {
     setIsBidPilotLoading(false);
   };
 
-
   const sendQuestionToChatbot = async () => {
-      //console.log("question asked");
-      handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
-      setQuestionAsked(true);
-      localStorage.setItem('questionAsked', 'true');
-      console.log(backgroundInfo);
-      setResponse("");
-      setIsLoading(true);
-      setStartTime(Date.now()); // Set start time for the timer
-      
-      try {
-          const result = await axios.post(
-              `http${HTTP_PREFIX}://${API_URL}/question`,
-              {
-                  choice: choice === "3" ? "3a" : choice,
-                  broadness: broadness,
-                  input_text: inputText,
-                  extra_instructions: backgroundInfo,
-                  dataset,
-              },
-              {
-                  headers: {
-                      Authorization: `Bearer ${tokenRef.current}`,
-                  },
-              }
-          );
-          if (choice != "3") {
-              setResponse(result.data);
-          }
-          if (choice === "3") {
-              let choicesArray = [];
-
-              // Check if result.data contains comma-separated values
-              if (result.data && result.data.includes(",")) {
-                  choicesArray = result.data.split(",").map((choice) => choice.trim());
-              }
-              //console.log("API Response:", result);
-
-              //console.log("Choices Array: " + choicesArray);
-
-              setApiChoices(choicesArray);
-          }
-      } catch (error) {
-          console.error("Error sending question:", error);
-          setResponse(error.message);
+    handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
+    setQuestionAsked(true);
+    localStorage.setItem('questionAsked', 'true');
+    console.log(backgroundInfo);
+    setResponseEditorState(EditorState.createEmpty());
+    setIsLoading(true);
+    setStartTime(Date.now()); // Set start time for the timer
+    
+    try {
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/question`,
+        {
+          choice: choice === "3" ? "3a" : choice,
+          broadness: broadness,
+          input_text: inputText,
+          extra_instructions: backgroundInfo,
+          dataset,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        }
+      );
+      if (choice != "3") {
+        const contentState = ContentState.createFromText(result.data);
+        setResponseEditorState(EditorState.createWithContent(contentState));
       }
-      setIsLoading(false);
-  };
+      if (choice === "3") {
+        let choicesArray = [];
 
+        // Check if result.data contains comma-separated values
+        if (result.data && result.data.includes(",")) {
+          choicesArray = result.data.split(",").map((choice) => choice.trim());
+        }
+
+        setApiChoices(choicesArray);
+      }
+    } catch (error) {
+      console.error("Error sending question:", error);
+      const contentState = ContentState.createFromText(error.message);
+      setResponseEditorState(EditorState.createWithContent(contentState));
+    }
+    setIsLoading(false);
+  };
 
   const handleChoiceSelection = (selectedChoice) => {
     if (selectedChoices.includes(selectedChoice)) {
-        setSelectedChoices(
-            selectedChoices.filter((choice) => choice !== selectedChoice)
-        );
-        setWordAmounts((prevWordAmounts) => {
-            const newWordAmounts = { ...prevWordAmounts };
-            delete newWordAmounts[selectedChoice];
-            return newWordAmounts;
-        });
+      setSelectedChoices(
+        selectedChoices.filter((choice) => choice !== selectedChoice)
+      );
+      setWordAmounts((prevWordAmounts) => {
+        const newWordAmounts = { ...prevWordAmounts };
+        delete newWordAmounts[selectedChoice];
+        return newWordAmounts;
+      });
     } else {
-        setSelectedChoices([...selectedChoices, selectedChoice]);
-        setWordAmounts((prevWordAmounts) => ({
-            ...prevWordAmounts,
-            [selectedChoice]: 500 // Default word amount
-        }));
+      setSelectedChoices([...selectedChoices, selectedChoice]);
+      setWordAmounts((prevWordAmounts) => ({
+        ...prevWordAmounts,
+        [selectedChoice]: 500 // Default word amount
+      }));
     }
-};
+  };
 
-const renderChoices = () => {
+  const renderChoices = () => {
     return (
-        <div className="choices-container">
-            {apiChoices.map((choice, index) => (
-                <div key={index} className="choice-item d-flex align-items-center">
-                    <Form.Check
-                        type="checkbox"
-                        label={choice}
-                        checked={selectedChoices.includes(choice)}
-                        onChange={() => handleChoiceSelection(choice)}
-                    />
-                    {selectedChoices.includes(choice) && (
-                        <Form.Control
-                            type="number"
-                            value={wordAmounts[choice] || 500}
-                            onChange={(e) => setWordAmounts({
-                                ...wordAmounts,
-                                [choice]: parseInt(e.target.value, 10)
-                            })}
-                            min={1}
-                            className="ml-2"
-                            placeholder="500"
-                            style={{ width: '120px', marginLeft: '10px' }}
-                        />
-                    )}
-                </div>
-            ))}
-        </div>
+      <div className="choices-container">
+        {apiChoices.map((choice, index) => (
+          <div key={index} className="choice-item d-flex align-items-center">
+            <Form.Check
+              type="checkbox"
+              label={choice}
+              checked={selectedChoices.includes(choice)}
+              onChange={() => handleChoiceSelection(choice)}
+            />
+            {selectedChoices.includes(choice) && (
+              <Form.Control
+                type="number"
+                value={wordAmounts[choice] || 500}
+                onChange={(e) => setWordAmounts({
+                  ...wordAmounts,
+                  [choice]: parseInt(e.target.value, 10)
+                })}
+                min={1}
+                className="ml-2"
+                placeholder="500"
+                style={{ width: '120px', marginLeft: '10px' }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
     );
-};
+  };
 
-
-const submitSelections = async () => {
+  const submitSelections = async () => {
     setIsLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
     try {
-        const word_amounts = selectedChoices.map((choice) => wordAmounts[choice] || 100);
-        const result = await axios.post(
-            `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
-            {
-                choice: "3b",
-                broadness: broadness,
-                input_text: inputText,
-                extra_instructions: backgroundInfo,
-                selected_choices: selectedChoices,
-                dataset,
-                word_amounts
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${tokenRef.current}`,
-                },
-            }
-        );
-        setResponse(result.data); // Assuming this is the final answer
-        setApiChoices([]); // Clear choices
-        setSelectedChoices([]); // Clear selected choices
-        setWordAmounts({}); // Clear word amounts
+      const word_amounts = selectedChoices.map((choice) => wordAmounts[choice] || 100);
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
+        {
+          choice: "3b",
+          broadness: broadness,
+          input_text: inputText,
+          extra_instructions: backgroundInfo,
+          selected_choices: selectedChoices,
+          dataset,
+          word_amounts
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        }
+      );
+      const contentState = ContentState.createFromText(result.data);
+      setResponseEditorState(EditorState.createWithContent(contentState));
+      setApiChoices([]); // Clear choices
+      setSelectedChoices([]); // Clear selected choices
+      setWordAmounts({}); // Clear word amounts
     } catch (error) {
-        console.error("Error submitting selections:", error);
-        setResponse(error.message);
+      console.error("Error submitting selections:", error);
+      const contentState = ContentState.createFromText(error.message);
+      setResponseEditorState(EditorState.createWithContent(contentState));
     }
     setIsLoading(false);
-};
-
-useEffect(() => {
-  const checkTextSelection = () => {
-      if (textAreaRef.current && document.activeElement === textAreaRef.current) {
-          const textArea = textAreaRef.current;
-          const selectedText = textArea.value.substring(textArea.selectionStart, textArea.selectionEnd);
-          setIsCopilotVisible(!!selectedText);
-          setSelectedText(selectedText);
-          console.log(selectedText);
-          
-          if (!selectedText) {
-              // Delay clearing the selection state to allow for link clicks to be processed
-              setTimeout(() => {
-                  setIsCopilotVisible(false);
-              }, 100); // 100 ms delay
-          }
-      } else {
-          setTimeout(() => {
-              setIsCopilotVisible(false);
-              setSelectedText('');
-          }, 100); // 100 ms delay
-      }
   };
 
-  // Listen for mouse up and key up events to capture text selections
-  document.addEventListener('mouseup', checkTextSelection);
-  document.addEventListener('keyup', checkTextSelection);
 
-  return () => {
-      document.removeEventListener('mouseup', checkTextSelection);
-      document.removeEventListener('keyup', checkTextSelection);
-  };
-}, []);
-
+  
 
   return (
     <div className="chatpage">
@@ -449,32 +650,26 @@ useEffect(() => {
 
       <div className="lib-container">
         <BidNavbar />
-        <div className="proposal-header mb-2">
-          <h1 className='heavy'>Bid Response</h1>
-         
-        </div>
+        
         <div>
-
-        <Row className="justify-content-md-center mt-4" style={{ visibility: 'hidden', height: 0, overflow: 'hidden' }}>
-                        <FolderLogic
-                            tokenRef={tokenRef}
-                            setAvailableCollections={setAvailableCollections}
-                            setFolderContents={setFolderContents}
-                            availableCollections={availableCollections}
-                            folderContents={folderContents}
-                        />
-        </Row>
-
+          <Row className="justify-content-md-center" style={{ visibility: 'hidden', height: 0, overflow: 'hidden'  }}>
+            <FolderLogic
+              tokenRef={tokenRef}
+              setAvailableCollections={setAvailableCollections}
+              setFolderContents={setFolderContents}
+              availableCollections={availableCollections}
+              folderContents={folderContents}
+            />
+          </Row>
 
           <Row>
-            <Col md={8}>
-
+            <Col md={7}>
+              <h1 className='heavy'>Bid Builder</h1>
               <div className="proposal-header mb-2">
                 <h1 className="lib-title">Question</h1>
                 <div className="dropdown-container">
-
                   <Dropdown onSelect={handleSelect} className="w-100 mx-auto chat-dropdown">
-                    <Dropdown.Toggle className="upload-button"  style={{backgroundColor: 'orange', color: 'black'}} id="dropdown-basic">
+                    <Dropdown.Toggle className="upload-button" style={{backgroundColor: 'orange', color: 'black'}} id="dropdown-basic">
                       {dataset || "Select a dataset"}
                     </Dropdown.Toggle>
 
@@ -486,11 +681,8 @@ useEffect(() => {
                       ))}
                     </Dropdown.Menu>
                   </Dropdown>
-              
-
-
                   <Dropdown onSelect={handleSelectQuestion} className="w-100 mx-auto chat-dropdown">
-                    <Dropdown.Toggle className="upload-button custom-dropdown-toggle"  id="dropdown-basic">
+                    <Dropdown.Toggle className="upload-button custom-dropdown-toggle" id="dropdown-basic">
                       Select a Question
                     </Dropdown.Toggle>
                     <Dropdown.Menu className="w-100">
@@ -507,11 +699,8 @@ useEffect(() => {
                       )}
                     </Dropdown.Menu>
                   </Dropdown>
-
-                  </div>
                 </div>
-
-              
+              </div>
 
               <div className="question-answer-box">
                 <textarea
@@ -522,65 +711,65 @@ useEffect(() => {
                 ></textarea>
               </div>
               <div className="text-muted mt-2">
-                  Word Count: {inputText.split(/\s+/).filter(Boolean).length}
+                Word Count: {inputText.split(/\s+/).filter(Boolean).length}
               </div>
-              <Button  className="upload-button mt-2" onClick={sendQuestionToChatbot}>
+              <Button
+                className="upload-button mt-1"
+                onClick={sendQuestionToChatbot}
+                disabled={inputText.trim() === ''}
+              >
                 Submit
               </Button>
 
               <Row>
-                    <div className="mb-3" style={{textAlign: "left"}}>
-
-
-                        {isLoading && (
-                            <div className="my-3">
-                                <Spinner animation="border"/>
-                                <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
-                            </div>
-                        )}
-                        {choice === "3" && apiChoices.length > 0 && (
-                            <div>
-                                {renderChoices()}
-                                <Button
-                                    variant="primary"
-                                    onClick={submitSelections}
-                                    className="upload-button mt-3"
-                                    disabled={selectedChoices.length === 0}
-                                >
-                                    Generate answers for selected subsections
-                                </Button>
-                            </div>
-                        )}
-                        </div>
+                <div className="" style={{textAlign: "left"}}>
+                  {isLoading && (
+                    <div className="my-3">
+                      <Spinner animation="border"/>
+                      <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
+                    </div>
+                  )}
+                  {choice === "3" && apiChoices.length > 0 && (
+                    <div>
+                      {renderChoices()}
+                      <Button
+                        variant="primary"
+                        onClick={submitSelections}
+                        className="upload-button mt-3"
+                        disabled={selectedChoices.length === 0}
+                      >
+                        Generate answers for selected subsections
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </Row>
 
-              <h1 className="lib-title mt-4 mb-3">Response</h1>
+              <h1 className="lib-title mt-3 mb-2">Response</h1>
+              <div className="response-box draft-editor">
+              <Editor
+  editorState={responseEditorState}
+  onChange={handleEditorChange}
+  customStyleMap={styleMap}
+/>
 
-              <div className="response-box">
-                <textarea
-                  ref={textAreaRef}
-                  as="textarea"
-                  className="card-textarea"
-                  placeholder="Enter response here..."
-                  value={response}
-                  onChange={(e) => setResponse(e.target.value)}
-                ></textarea>
+
+
               </div>
+
               <div className="text-muted mt-2">
-                  Word Count: {response.split(/\s+/).filter(Boolean).length}
+                Word Count: {convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').split(/\s+/).filter(Boolean).length}
               </div>
-
               <Button
-                        variant={isAppended ? "success" : "primary"}
-                        className="upload-button mt-2 mb-4" 
-                        onClick={handleAppendResponseToEditor}
-                        disabled={isLoading || isAppended} 
-              >   
-                    {isAppended ? "Added" : "Add to Proposal"}
+                variant={isAppended ? 'success' : 'primary'}
+                className="upload-button mt-1 mb-4"
+                onClick={handleAppendResponseToEditor}
+                disabled={isLoading || isAppended || convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').trim() === ''}
+              >
+                {isAppended ? 'Added' : 'Add to Proposal'}
               </Button>
-
             </Col>
-            <Col md={4}>
+            <Col md={5}>
               <div className="input-header">
                 <div className="proposal-header mb-2">
                   <h1 className="lib-title" style={{ color: "white" }}>Bid Pilot</h1>
@@ -597,17 +786,51 @@ useEffect(() => {
 
               <div className="bid-pilot-container">
                 <div className="chatResponse-container">
-                {isCopilotVisible ? (
-                  <div className={`prompts-container ${!isCopilotVisible ? 'fade-out' : ''}`}>
-                    <div className="prompts">
-                      <Button className="prompt-button" onClick={handleLinkClick('Summarise')}>Summarise</Button>
-                      <Button className="prompt-button" onClick={handleLinkClick('Expand')}>Expand</Button>
-                      <Button className="prompt-button" onClick={handleLinkClick('Rephrase')}>Rephrase</Button>
-                      <Button className="prompt-button" onClick={handleLinkClick('Incorporate')}>Incorporate</Button>
+                  {showOptions ? (
+                    <div className="options-container">
+                      {copilotLoading ? (
+                        <div className="spinner-container">
+                          <Spinner animation="border" />
+                          <p>Generating Options...</p>
+                        </div>
+                      ) : (
+                        copilotOptions.map((option, index) => (
+                          <div key={index} className="option">
+                            <Button
+                              onClick={() => handleOptionSelect(option)}
+                              className={`upload-button mb-2 ${selectedOption === option ? 'selected' : ''}`}
+                              style={{
+                                backgroundColor: selectedOption === option ? 'orange' : '#262626',
+                                color: selectedOption === option ? 'black' : '#fff',
+                              }}
+                            >
+                              <span>Option {index + 1}</span>
+                            </Button>
+                            {selectedOption === option && (
+                              <FontAwesomeIcon 
+                                icon={faCheck} 
+                                className="tick-icon" 
+                                onClick={handleTick}
+                              />
+                            )}
+                            <div className="option-item">
+                              <p>{option}</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
-                  </div>
-                ) : (
-                                  <div className="mini-messages">
+                  ) : isCopilotVisible ? (
+                    <div className={`prompts-container ${!isCopilotVisible ? 'fade-out' : ''}`}>
+                      <div className="prompts">
+                        <Button className="prompt-button" onClick={handleLinkClick('Summarise')}>Summarise</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Expand')}>Expand</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Rephrase')}>Rephrase</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Incorporate')}>Incorporate</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mini-messages">
                       {messages.map((message, index) => (
                         <div key={index} className={`message-bubble-small ${message.type}`}>
                           {message.text === 'loading' ? (
@@ -655,7 +878,6 @@ useEffect(() => {
                   </div>
                 </div>
               </div>
-
             </Col>
           </Row>
         </div>
@@ -663,6 +885,5 @@ useEffect(() => {
     </div>
   );
 }
-
 
 export default withAuth(QuestionCrafter);

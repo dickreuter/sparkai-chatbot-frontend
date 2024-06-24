@@ -10,7 +10,6 @@
 
 .upload-button {
     background-color: #262626;
-    /* Example primary button color */
     color: white;
     padding: 8px 12px;
     border: none;
@@ -18,6 +17,10 @@
     font-weight: 600;
     font-size: 0.9rem;
     border-radius: 8px;
+    outline: none !important;
+    /* Ensure no focus outline */
+    box-shadow: none !important;
+    /* Ensure no box-shadow */
 }
 
 .uploader-input {
@@ -28,15 +31,24 @@
 
 .upload-button:disabled,
 .upload-button.btn-disabled {
-    background-color: #5c5b5b;
-    color: white;
+    background-color: #262626 !important;
+    /* Black background when disabled */
+    color: white !important;
     cursor: not-allowed;
 }
 
-.upload-button:hover {
-    background-color: #3b3b3b
+.upload-button:hover:not(:disabled) {
+    background-color: #3b3b3b;
 }
 
-.upload-button:active {
-    background-color: #3b3b3b
+.upload-button:active:not(:disabled) {
+    background-color: #3b3b3b;
+}
+
+.upload-button:focus,
+.upload-button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    background-color: #262626;
+    /* Ensures it doesn't flash blue */
 }

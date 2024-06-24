@@ -33,27 +33,6 @@ h1 {
     line-height: 1.1;
 }
 
-button {
-    border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    background-color: #1a1a1a;
-    cursor: pointer;
-    transition: border-color 0.25s;
-}
-
-button:hover {
-    border-color: #646cff;
-}
-
-button:focus,
-button:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
-}
-
 @media (prefers-color-scheme: light) {
      :root {
         color: #213547;
@@ -69,24 +48,23 @@ button:focus-visible {
 
 ::-webkit-scrollbar {
     width: 12px;
-    /* Width of the scrollbar */
 }
 
+
+/* Adding padding to the track to prevent the thumb from touching the top and bottom */
+
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    /* Track background color */
-    border-radius: 10px;
+    background: white;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: #888;
-    /* Thumb color */
     border-radius: 10px;
-    border: 3px solid #f1f1f1;
-    /* Adds padding around the thumb */
+    border: 3px solid white;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
-    /* Thumb color on hover */
 }

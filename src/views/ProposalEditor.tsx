@@ -100,7 +100,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
     return (
         <>
              <div className="proposal-header">
-                <h1 className='heavy'>Proposal</h1>
+                <h1 className='heavy'>Bid Response</h1>
                 <div className="dropdown-container">
                     <TemplateLoader token={tokenRef.current} handleSelect={handleSelectTemplate} />
                     <Dropdown onSelect={handleSelect}>

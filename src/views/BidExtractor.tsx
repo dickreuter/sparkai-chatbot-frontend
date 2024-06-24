@@ -482,11 +482,13 @@ const BidExtractor = () => {
   ) : (
         <>
           <Button
-            className={`upload-button`}
+            className="upload-button"
             onClick={() => document.getElementById("fileInput").click()}
+            style={{ outline: 'none' }}
           >
             Retrieve Questions
           </Button>
+
           <input
             type="file"
             id="fileInput"

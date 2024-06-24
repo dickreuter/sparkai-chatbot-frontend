@@ -409,7 +409,7 @@ return (
     <div className="lib-container">
       <h1 className='heavy'>Company Library</h1>
 
-      <div className="library-container mt-4">
+      <div className="library-container mt-3">
         <Row>
           <Col md={12}>
           <Card className="lib-custom-card">

@@ -269,6 +269,7 @@
     font-size: 16px;
     font-weight: 550;
     margin-right: 10px;
+    margin-top: 10px;
     /* Adjust the space between title and input */
 }
 
@@ -281,11 +282,10 @@
     resize: none;
     overflow: hidden;
     /* Hide any text that overflows the textarea */
-    height: 30px;
+    height: 25px;
     white-space: nowrap;
     /* Prevent text from wrapping to a new line */
     text-overflow: ellipsis;
-    margin-bottom: 5px;
     /* Show ellipsis when text overflows */
 }
 

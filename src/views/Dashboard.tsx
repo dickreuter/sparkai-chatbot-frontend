@@ -118,7 +118,7 @@ const Dashboard = () => {
       <div>
       <SideBarSmall />
       <div className="loading-container">
-        <Spinner animation="border" variant="primary" />
+        <Spinner animation="border" variant="primary" className="spinner" />
       </div>
       </div>
     );
@@ -129,7 +129,7 @@ const Dashboard = () => {
       <SideBarSmall />
 
       <div className="lib-container">
-        <div className="mb-4">
+        <div className="mb-3">
           <h1 className='heavy'>Dashboard</h1>
         </div>
 

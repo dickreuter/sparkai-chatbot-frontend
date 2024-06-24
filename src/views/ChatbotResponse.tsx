@@ -101,22 +101,22 @@ const ChatbotResponse = () => {
         setIsLoading(false);
       };
     
-    return (
+      return (
         <div className="chatpage">
             <SideBarSmall />
             <div className="chatResponse-container">
                 <div className="messages">
                     {messages.map((message, index) => (
                         <div key={index} className={`message-bubble ${message.type}`}>
-                             {message.text === 'loading' ? (
-                          <div className="loading-dots">
-                            <span>. </span>
-                            <span>. </span>
-                            <span>. </span>
-                          </div>
-                        ) : (
-                          message.text
-                        )}
+                            {message.text === 'loading' ? (
+                                <div className="loading-dots">
+                                    <span>. </span>
+                                    <span>. </span>
+                                    <span>. </span>
+                                </div>
+                            ) : (
+                                message.text
+                            )}
                         </div>
                     ))}
                 </div>
@@ -135,6 +135,7 @@ const ChatbotResponse = () => {
             </div>
         </div>
     );
+    
 };
 
 export default withAuth(ChatbotResponse);

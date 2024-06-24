@@ -2,7 +2,7 @@
     flex: 1;
     margin: 0;
     word-wrap: break-word;
-    height: 700px;
+    height: 760px;
     display: flex;
     flex-direction: column;
     margin-bottom: 40px;
@@ -46,6 +46,157 @@
     display: flex;
     flex-direction: column;
     background-color: rgba(200, 200, 200, 0.3);
+}
+
+.options-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(200, 200, 200, 0.3);
+    padding: 10px;
+}
+
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    /* Ensure the spinner is centered within the container */
+}
+
+.spinner-container p {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #333;
+    /* Adjust the color as needed */
+}
+
+.upload-button.selected {
+    background-color: orange;
+    color: black;
+}
+
+.upload-button.selected:hover,
+.upload-button.selected:active {
+    background-color: orange !important;
+    color: black !important;
+}
+
+.response-box {
+    position: relative;
+    flex: 1;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+    padding: 10px;
+    transition: all 0.35s ease;
+    margin: 0;
+    word-wrap: break-word;
+    height: 410px;
+    overflow: auto;
+    /* Ensure the box is scrollable */
+}
+
+.response-contenteditable {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+    outline: none;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: auto;
+    /* Ensure the content is scrollable */
+}
+
+.highlight {
+    background-color: orange;
+}
+
+.option-item {
+    background-color: rgba(200, 200, 200, 0.4);
+    align-self: flex-start;
+    border-top-left-radius: 0;
+    color: black;
+    display: flex;
+    /* Inline block to fit content */
+    max-width: 100%;
+    min-width: 60px;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+    font-size: 14px;
+    max-height: 144px;
+    /* Set your preferred maximum height */
+    overflow-y: auto;
+}
+
+.options-button {
+    cursor: pointer;
+    background-color: #262626;
+    color: #fff;
+    padding: 8px 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    position: relative;
+    transition: background 0s ease-in-out;
+    border: none;
+    border-radius: 12px;
+    /* Add rounded corners */
+}
+
+.options-button svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 4;
+    stroke-dasharray: 480;
+    stroke-dashoffset: 0;
+}
+
+.options-button svg rect {
+    rx: 12;
+    ry: 12;
+}
+
+.options-button span {
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+.options-button.selected svg {
+    animation: dashAnimation 2s linear infinite;
+}
+
+@keyframes dashAnimation {
+    0% {
+        stroke-dashoffset: 150;
+    }
+    25% {
+        stroke-dashoffset: 240;
+    }
+    50% {
+        stroke-dashoffset: 300;
+    }
+    75% {
+        stroke-dashoffset: 360;
+    }
+    100% {
+        stroke-dashoffset: 480;
+    }
+}
+
+.tick-icon {
+    margin-left: 10px;
+    cursor: pointer;
 }
 
 .prompts-container {
@@ -144,7 +295,7 @@
 }
 
 .message-bubble-small.user {
-    background-color: #ff9900;
+    background-color: orange;
     align-self: flex-end;
     border-top-right-radius: 0;
     color: white;
@@ -202,7 +353,7 @@
     height: 40px;
     border: none;
     border-radius: 50%;
-    background-color: #ffa500;
+    background-color: orange;
     color: white;
     cursor: pointer;
     display: flex;
@@ -284,18 +435,6 @@
     margin: 0;
     word-wrap: break-word;
     height: 200px;
-    /* Ensure children start at the top */
-}
-
-.response-box {
-    flex: 1;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    background-color: #fff;
-    padding: 10px;
-    transition: all 0.35s ease;
-    margin: 0;
-    word-wrap: break-word;
-    height: 375px;
     /* Ensure children start at the top */
 }
 

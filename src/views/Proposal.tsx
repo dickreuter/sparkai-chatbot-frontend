@@ -71,9 +71,9 @@ const Proposal = () => {
             <Button
               variant={"primary"}
               onClick={() => exportToDocx(editorState)}
-              className="mt-1 ml-2 upload-button"
+              className="ml-2 upload-button"
               disabled={isLoading}
-              style={{ marginLeft: "5px"}}
+           
             >
               Export to Word
             </Button>

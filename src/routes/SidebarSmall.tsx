@@ -37,7 +37,7 @@ const SideBarSmall = () => {
         </Link>
         <Link to="/bids" className={`sidebarsmalllink ${isActive('/bids') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faLayerGroup} />
-          <span>Bid Register</span>
+          <span>Bid Repository</span>
         </Link>
         <Link to="/library" className={`sidebarsmalllink ${isActive('/library') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faBookOpen} />
@@ -49,7 +49,7 @@ const SideBarSmall = () => {
         </Link>
       </div>
       <div className="signout-container">
-      <Link to="/dashboard" className={`sidebarsmalllink ${isActive('/dashboard') ? 'sidebarsmalllink-active' : ''}`}s>
+      <Link to="/dashboard" className={`sidebarsmalllink ${isActive('/dashboard') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faCircleQuestion} />
           <span>How To</span>
         </Link>

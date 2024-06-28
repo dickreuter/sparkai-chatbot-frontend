@@ -1,41 +1,122 @@
-import React, {useEffect, useRef, useState} from "react";
-import { API_URL, HTTP_PREFIX } from '../helper/Constants';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
-import {Button, Col,  Row, Card, Modal} from "react-bootstrap";
-import UploadPDF from './UploadPDF';
-import UploadText from './UploadText';
-import "./Library.css";
-import SideBarSmall from '../routes/SidebarSmall.tsx' ;
-import handleGAEvent from "../utilities/handleGAEvent.tsx";
-import { faEye, faTrash, faFolder, faFileAlt,  faArrowUpFromBracket, faEllipsisVertical} from '@fortawesome/free-solid-svg-icons';
-import "./Chatbot.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { UploadPDFModal, UploadTextModal, UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
+import SideBarSmall from '../routes/SidebarSmall.tsx';
+import VideoCard from "../components/VideoCard.tsx";
+import './HowTo.css';
+import './Chatbot.css';
+import BidResponseProposal from '../resources/videos/Bid Response + Proposal.mp4';
+import BidPlannerV1 from '../resources/videos/bid planner v1.mp4';
+import CompanyLibrarySecurity from '../resources/videos/Company Library Security.mp4';
+import CompanyLibraryV1 from '../resources/videos/Company Library v1.mp4';
+import DashboardBidRegistrar from '../resources/videos/Dashboard + Bid Registrar.mp4';
+import IntroBest from '../resources/videos/Intro (Best_).mp4';
+import QAChatFunction from '../resources/videos/Q&A Chat Function.mp4';
+import Spinner from 'react-bootstrap/Spinner'; // Ensure you have react-bootstrap installed
 
-
-const Library = () => {
+const HowTo = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
-  const tokenRef = useRef(auth?.token || "default");
+  
+  const videoData = [
+    {
+      videoUrl: IntroBest,
+      videoTitle: 'Introduction to mytender.io',
+      channelName: 'Intro',
+      views: 'An introduction to mytender.io',
+      time: '3:45'
+    },
+    {
+      videoUrl: DashboardBidRegistrar,
+      videoTitle: 'Dashboard Navigation',
+      channelName: 'Dashboard + Bid Registrar',
+      views: 'Learn how to navigate the platform',
+      time: '5:30'
+    },
+    {
+      videoUrl: BidPlannerV1,
+      videoTitle: 'Bid Planner Guide',
+      channelName: 'Bid Planner',
+      views: 'Start writing a proposal',
+      time: '4:20'
+    },
+    {
+      videoUrl: BidResponseProposal,
+      videoTitle: 'Bid Response & Proposal',
+      channelName: 'Bid Response + Proposal',
+      views: 'How to write your tender',
+      time: '6:10'
+    },
+    {
+      videoUrl: CompanyLibrarySecurity,
+      videoTitle: 'Data Security Overview',
+      channelName: 'Data Security',
+      views: 'How we make sure your data is secure',
+      time: '2:45'
+    },
+    {
+      videoUrl: CompanyLibraryV1,
+      videoTitle: 'Company Library Usage',
+      channelName: 'Company Library',
+      views: 'Upload documents to mytender.io',
+      time: '3:55'
+    },
+    {
+      videoUrl: QAChatFunction,
+      videoTitle: 'Q&A Chat Function',
+      channelName: 'Q&A Chat Function',
+      views: 'Quickly retrieve information from your library',
+      time: '4:05'
+    },
+  ];
 
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    // Simulate loading time by using a timeout
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000); // Adjust this delay as necessary
 
+    return () => clearTimeout(timer); // Clean up the timer if the component unmounts
+  }, []);
 
-return (
-  <div className="chatpage">
-    <SideBarSmall />
+  if (loading) {
+    return (
+      <div>
+        <SideBarSmall />
+        <div className="loading-container">
+          <Spinner animation="border" variant="primary" className="spinner" />
+        </div>
+      </div>
+    );
+  }
 
-    <div className="lib-container">
-      <h1 className='heavy'>How To</h1>
+  return (
+    <div className="chatpage">
+      <SideBarSmall />
 
-      <div className="library-container mt-4">
-       </div>
-       
+      <div className="lib-container">
+        <h1 className='heavy'>How To</h1>
+
+        <div className="howto-container mt-4">
+          <div className="row">
+            {videoData.map((video, index) => (
+              <div className="col-lg-4 col-md-6 col-sm-12 mb-4" key={index}>
+                <VideoCard
+                  videoUrl={video.videoUrl}
+                  videoTitle={video.videoTitle}
+                  channelName={video.channelName}
+                  views={video.views}
+                  time={video.time}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
-export default withAuth(Library);
+export default withAuth(HowTo);

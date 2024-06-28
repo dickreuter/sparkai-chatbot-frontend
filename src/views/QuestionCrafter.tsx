@@ -664,7 +664,7 @@ const QuestionCrafter = () => {
 
           <Row>
             <Col md={7}>
-              <h1 className='heavy'>Bid Builder</h1>
+              <h1 className='heavy'>Bid Creator</h1>
               <div className="proposal-header mb-2">
                 <h1 className="lib-title">Question</h1>
                 <div className="dropdown-container">
@@ -747,11 +747,13 @@ const QuestionCrafter = () => {
 
               <h1 className="lib-title mt-3 mb-2">Response</h1>
               <div className="response-box draft-editor">
-              <Editor
-  editorState={responseEditorState}
-  onChange={handleEditorChange}
-  customStyleMap={styleMap}
-/>
+              <div className="editor-container">
+                                  <Editor
+                      editorState={responseEditorState}
+                      onChange={handleEditorChange}
+                      customStyleMap={styleMap}
+                    />
+              </div>
 
 
 

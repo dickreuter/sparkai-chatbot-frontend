@@ -46,15 +46,18 @@ h1 {
     }
 }
 
+
+/* Set the scrollbar width */
+
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 10px;
 }
 
 
 /* Adding padding to the track to prevent the thumb from touching the top and bottom */
 
 ::-webkit-scrollbar-track {
-    background: white;
+    background: none;
     padding-top: 10px;
     padding-bottom: 10px;
 }
@@ -62,7 +65,8 @@ h1 {
 ::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 10px;
-    border: 3px solid white;
+    border: 3px solid;
+    border-color: white;
 }
 
 ::-webkit-scrollbar-thumb:hover {

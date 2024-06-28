@@ -240,7 +240,6 @@ const QuestionCrafter = () => {
   
   
   
-  // Handle text selection changes
   const handleEditorChange = (editorState) => {
     const selectionState = editorState.getSelection();
     const currentContent = editorState.getCurrentContent();
@@ -252,23 +251,26 @@ const QuestionCrafter = () => {
   
     console.log("handleEditorChange - selectedText:", selectedText);
   
-    if (selectedText.length > 0) {
-      setSelectedText(selectedText);
-      setIsCopilotVisible(true);
-      setSelectionRange({
-        anchorKey: selectionState.getAnchorKey(),
-        anchorOffset: selectionState.getAnchorOffset(),
-        focusKey: selectionState.getFocusKey(),
-        focusOffset: selectionState.getFocusOffset(),
-      });
-      console.log("handleEditorChange - setSelectionRange:", selectionState.toJS());
-    } else {
-      setSelectedText('');
-      setIsCopilotVisible(false);
-    }
+    setSelectedText(selectedText);
+    setSelectionRange({
+      anchorKey: selectionState.getAnchorKey(),
+      anchorOffset: selectionState.getAnchorOffset(),
+      focusKey: selectionState.getFocusKey(),
+      focusOffset: selectionState.getFocusOffset(),
+    });
   
     setResponseEditorState(editorState); // Always update the state
   };
+
+  useEffect(() => {
+    if (selectedText.length > 0) {
+      setIsCopilotVisible(true);
+    } else {
+      setIsCopilotVisible(false);
+    }
+  }, [selectedText]);
+  
+  
   
   const handleOptionSelect = (option) => {
     const contentState = responseEditorState.getCurrentContent();
@@ -407,15 +409,27 @@ const QuestionCrafter = () => {
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  const [messages, setMessages] = useState(() => {
-    const savedMessages = localStorage.getItem('messages');
-    return savedMessages ? JSON.parse(savedMessages) : [];
-  });
+const [messages, setMessages] = useState(() => {
+  const savedMessages = localStorage.getItem('messages');
+  console.log('Saved messages:', savedMessages);
 
-  useEffect(() => {
-    // Save messages to localStorage whenever they change
-    localStorage.setItem('messages', JSON.stringify(messages));
-  }, [messages]);
+  if (savedMessages) {
+    const parsedMessages = JSON.parse(savedMessages);
+    if (parsedMessages.length > 0) {
+      return parsedMessages;
+    }
+  }
+
+  return [{ type: 'bot', text: 'Welcome to Bid Pilot! Ask questions about your company library data or select text in the response box to use copilot.' }];
+});
+
+
+
+useEffect(() => {
+  // Save messages to localStorage whenever they change
+  localStorage.setItem('messages', JSON.stringify(messages));
+}, [messages]);
+
 
   const [inputValue, setInputValue] = useState("");
 
@@ -570,7 +584,7 @@ const QuestionCrafter = () => {
       setSelectedChoices([...selectedChoices, selectedChoice]);
       setWordAmounts((prevWordAmounts) => ({
         ...prevWordAmounts,
-        [selectedChoice]: 500 // Default word amount
+        [selectedChoice]: 300 // Default word amount
       }));
     }
   };
@@ -589,14 +603,14 @@ const QuestionCrafter = () => {
             {selectedChoices.includes(choice) && (
               <Form.Control
                 type="number"
-                value={wordAmounts[choice] || 500}
+                value={wordAmounts[choice] || 300}
                 onChange={(e) => setWordAmounts({
                   ...wordAmounts,
                   [choice]: parseInt(e.target.value, 10)
                 })}
                 min={1}
                 className="ml-2"
-                placeholder="500"
+                placeholder="300"
                 style={{ width: '120px', marginLeft: '10px' }}
               />
             )}
@@ -662,8 +676,8 @@ const QuestionCrafter = () => {
             />
           </Row>
 
-          <Row>
-            <Col md={7}>
+          
+            <Col md={12}>
               <h1 className='heavy'>Bid Creator</h1>
               <div className="proposal-header mb-2">
                 <h1 className="lib-title">Question</h1>
@@ -744,12 +758,18 @@ const QuestionCrafter = () => {
                   )}
                 </div>
               </Row>
+            </Col>
 
-              <h1 className="lib-title mt-3 mb-2">Response</h1>
+          <Row className="mt-2">
+
+              
+          <Col md={7}>
+              <h1 className="lib-title mt-3 mb-3">Response</h1>
               <div className="response-box draft-editor">
               <div className="editor-container">
                                   <Editor
                       editorState={responseEditorState}
+                       placeholder="Your response will be generated here..."
                       onChange={handleEditorChange}
                       customStyleMap={styleMap}
                     />
@@ -882,6 +902,7 @@ const QuestionCrafter = () => {
               </div>
             </Col>
           </Row>
+          
         </div>
       </div>
     </div>

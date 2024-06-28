@@ -416,13 +416,7 @@ const BidExtractor = () => {
         <i className="fas fa-info tooltip-icon"></i>
       </div>
         <span className="tooltip-text-cd">
-          <strong style={{ marginLeft: "15px" }}>What are the client’s business issues that have led them to release this tender?</strong>
-          <ul>
-            <li>What will happen if they don’t address these issues?</li>
-            <li>What value results from addressing these issues?</li>
-            <li>What business objectives do they want to achieve?</li>
-            <li>Which objective is the most important to the client?</li>
-          </ul>
+          <strong style={{ }}>Provide information about the opportunity you are bidding for, including the client objectives, scope, and key details to help give the AI context to tailor the responses to.</strong>
         </span>
       </div>
     </div>
@@ -444,14 +438,7 @@ const BidExtractor = () => {
         <i className="fas fa-info tooltip-icon"></i>
       </div>
         <span className="tooltip-text">
-          <strong style={{ marginLeft: "15px" }}>What are the client’s business issues that have led them to release this tender?</strong>
-          <ul>
-            <li>What products/services/applications can you provide to address the issue?</li>
-            <li>What outcomes would result from each of your suggestions?</li>
-            <li>When comparing the impact of your solution with the issues the client seeks to mitigate, which recommendation stands out as the most advantageous?</li>
-            <li>What makes you confident that your recommendation will be the right fit for the client?</li>
-            <li>Why should the client select your solution and not your competitors’?</li>
-          </ul>
+          <strong style={{marginTop: "0"}}>Outline the essential compliance criteria and regulations relevant to the bid such as certifications or legal requirements that must be met to ensure it's directly referenced in the response.</strong>
         </span>
       </div>
     </div>

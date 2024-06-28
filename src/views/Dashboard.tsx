@@ -15,7 +15,7 @@ import "./Dashboard.css"
 import { TextField } from "@mui/material";
 import CustomTextField from "../components/CustomTextField.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
-
+import "./Upload.css";
 const Dashboard = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();

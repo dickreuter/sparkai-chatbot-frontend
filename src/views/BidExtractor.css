@@ -133,7 +133,7 @@
     transition: all 0.35s ease;
     margin: 0;
     word-wrap: break-word;
-    height: 280px;
+    height: 250px;
     /* Ensure children start at the top */
 }
 
@@ -193,7 +193,7 @@
 
 .tooltip-text {
     visibility: hidden;
-    width: 700px;
+    width: 450px;
     background-color: #ededed;
     color: #4d4d4d;
     border-radius: 6px;
@@ -205,12 +205,11 @@
     left: 50%;
     transform: translateX(-60%);
     margin-bottom: 5px;
-    padding-top: 20px;
 }
 
 .tooltip-text-cd {
     visibility: hidden;
-    width: 550px;
+    width: 450px;
     background-color: #ededed;
     color: #4d4d4d;
     border-radius: 6px;
@@ -220,7 +219,6 @@
     font-size: 12px;
     bottom: 120%;
     margin-bottom: 5px;
-    padding-top: 20px;
     transform: translateX(-50%);
 }
 
@@ -269,7 +267,7 @@
     font-size: 16px;
     font-weight: 550;
     margin-right: 10px;
-    margin-top: 10px;
+    margin-top: 5px;
     /* Adjust the space between title and input */
 }
 
@@ -286,6 +284,7 @@
     white-space: nowrap;
     /* Prevent text from wrapping to a new line */
     text-overflow: ellipsis;
+    margin-bottom: 5px;
     /* Show ellipsis when text overflows */
 }
 

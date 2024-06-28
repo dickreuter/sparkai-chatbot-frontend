@@ -14,8 +14,8 @@ const BidNavbar = () => {
     <div className="bidnav">
       <div className="bidnav-section">
         <NavLink to="/bid-extractor" className="bidnav-item" activeClassName="active">Bid Planner</NavLink>
-        <NavLink to="/question-crafter" className="bidnav-item" activeClassName="active">Bid Response</NavLink>
-        <NavLink to="/proposal" className="bidnav-item" activeClassName="active">Proposal</NavLink>
+        <NavLink to="/question-crafter" className="bidnav-item" activeClassName="active">Bid Creator</NavLink>
+        <NavLink to="/proposal" className="bidnav-item" activeClassName="active">Bid Complier</NavLink>
         <div className="status-indicator mt-2">
           {isLoading ? (
             <Spinner animation="border" size="lg" style={{ width: '1.4rem', height: '1.4rem' }} />

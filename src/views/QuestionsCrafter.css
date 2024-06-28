@@ -89,13 +89,13 @@
     flex: 1;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     background-color: #fff;
-    padding: 10px;
+    padding: 20px;
     transition: all 0.35s ease;
     margin: 0;
     word-wrap: break-word;
     height: 410px;
-    overflow: auto;
-    /* Ensure the box is scrollable */
+    overflow-y: auto;
+    /* Show scrollbar only when necessary */
 }
 
 .response-contenteditable {
@@ -116,7 +116,7 @@
 }
 
 .option-item {
-    background-color: rgba(200, 200, 200, 0.4);
+    background-color: #e3e4e6;
     align-self: flex-start;
     border-top-left-radius: 0;
     color: black;
@@ -124,14 +124,22 @@
     /* Inline block to fit content */
     max-width: 100%;
     min-width: 60px;
-    padding: 10px;
-    border-radius: 15px;
+    padding: 14px;
+    border-radius: 10px;
     margin-bottom: 10px;
     word-wrap: break-word;
     font-size: 14px;
     max-height: 144px;
     /* Set your preferred maximum height */
     overflow-y: auto;
+}
+
+.option-item::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+    border: 3px solid;
+    border-color: #e3e4e6;
+    max-height: 10px;
 }
 
 .options-button {

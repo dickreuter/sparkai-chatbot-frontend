@@ -11,10 +11,10 @@
 .upload-button {
     background-color: #262626;
     color: white;
-    padding: 8px 12px;
+    padding: 8px 14px;
     border: none;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 550;
     font-size: 0.9rem;
     border-radius: 8px;
     outline: none !important;

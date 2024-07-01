@@ -63,6 +63,9 @@ const QuestionCrafter = () => {
   const handleCloseModal = () => setShowModal(false);
   const handleShowModal = () => setShowModal(true);
 
+  const responseBoxRef = useRef(null); // Ref for the response box
+  const promptsContainerRef = useRef(null); // Ref for the prompts container
+
 
   useEffect(() => {
     localStorage.setItem('response', convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n'));
@@ -196,19 +199,74 @@ const QuestionCrafter = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!event.target.closest('.draft-editor')) {
-        setResponseEditorState(EditorState.moveSelectionToEnd(responseEditorState));
+      console.log("click outside")
+      if (
+        !responseBoxRef.current.contains(event.target) 
+      ) {
+       
+        setIsCopilotVisible(false);
       }
     };
-
+  
     document.addEventListener('click', handleClickOutside);
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [responseEditorState]);
-
- 
+  }, [showOptions, isCopilotVisible]);
   
+  
+  
+  const optionsContainerRef = useRef(null); // Ref for the options container
+
+  const [originalEditorState, setOriginalEditorState] = useState(responseEditorState);
+
+
+  const resetEditorState = () => {
+    const contentState = originalEditorState.getCurrentContent();
+    const blocks = contentState.getBlockMap();
+  
+    let newContentState = contentState;
+  
+    // Remove ORANGE style from all blocks
+    blocks.forEach(block => {
+      const blockKey = block.getKey();
+      const length = block.getLength();
+      const blockSelection = SelectionState.createEmpty(blockKey).merge({
+        anchorOffset: 0,
+        focusOffset: length
+      });
+  
+      newContentState = Modifier.removeInlineStyle(newContentState, blockSelection, 'ORANGE');
+    });
+  
+    const newEditorState = EditorState.createWithContent(newContentState);
+    setResponseEditorState(newEditorState);
+    setIsCopilotVisible(false);
+    setSelectedText('');
+  };
+  
+  
+  //only hide options if show Options equals true and the user clicks somewhere else in the response box. So clicking on an option and the selected text changing should not trigger this
+  useEffect(() => {
+    const handleClickOutsideOptions = (event) => {
+      if (
+        responseBoxRef.current &&
+        optionsContainerRef.current &&
+        responseBoxRef.current.contains(event.target) &&
+        !optionsContainerRef.current.contains(event.target) &&
+        showOptions
+      ) {
+        setShowOptions(false);
+        // Clear the orange style and reset the text
+        resetEditorState();
+      }
+    };
+  
+    document.addEventListener('click', handleClickOutsideOptions);
+    return () => {
+      document.removeEventListener('click', handleClickOutsideOptions);
+    };
+  }, [showOptions, responseEditorState]);
   
   
   const handleTick = () => {
@@ -303,83 +361,85 @@ useEffect(() => {
 }, [selectedText]);
 
   
-  const handleOptionSelect = (option) => {
-    const contentState = responseEditorState.getCurrentContent();
-    const { anchorKey, anchorOffset, focusKey, focusOffset } = selectionRange;
-  
-    // Log the initial state
-    console.log("handleOptionSelect - Initial Content State:", convertToRaw(contentState));
-    console.log("handleOptionSelect - Initial Selection Range:", selectionRange);
-  
-    // Create a new selection state that covers the entire range
-    const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
-      anchorOffset: Math.min(anchorOffset, focusOffset),
-      focusKey: focusKey,
-      focusOffset: Math.max(anchorOffset, focusOffset),
-    });
-  
-    // Log the new selection state
-    console.log("handleOptionSelect - New Selection State:", newSelectionState.toJS());
-  
-    // Remove any existing text within the selection range
-    const clearedContentState = Modifier.removeRange(contentState, newSelectionState, 'backward');
-  
-    // Log the cleared content state
-    console.log("handleOptionSelect - Cleared Content State:", convertToRaw(clearedContentState));
-  
-    // Collapse the selection to the start of the cleared range
-    const collapsedSelection = SelectionState.createEmpty(anchorKey).merge({
-      anchorOffset: newSelectionState.getStartOffset(),
-      focusOffset: newSelectionState.getStartOffset(),
-    });
-  
-    // Log the collapsed selection state
-    console.log("handleOptionSelect - Collapsed Selection State:", collapsedSelection.toJS());
-  
-    // Insert new option text at the collapsed selection
-    const newContentState = Modifier.insertText(
-      clearedContentState,
-      collapsedSelection,
-      option
-    );
-  
-    // Log the new content state after insertion
-    console.log("handleOptionSelect - New Content State After Insertion:", convertToRaw(newContentState));
-  
-    // Apply the ORANGE style to the new text
-    const finalSelectionState = collapsedSelection.merge({
-      focusOffset: collapsedSelection.getStartOffset() + option.length,
-    });
-  
-    // Log the final selection state
-    console.log("handleOptionSelect - Final Selection State:", finalSelectionState.toJS());
-  
-    const newContentStateWithStyle = Modifier.applyInlineStyle(
-      newContentState,
-      finalSelectionState,
-      'ORANGE'
-    );
-  
-    let newEditorState = EditorState.push(responseEditorState, newContentStateWithStyle, 'change-inline-style');
-  
-    // Force the selection to the end of the newly inserted text
-    newEditorState = EditorState.forceSelection(newEditorState, finalSelectionState);
-  
-    // Log the final content state with style
-    console.log("handleOptionSelect - Final Content State With Style:", convertToRaw(newContentStateWithStyle));
-  
-    setResponseEditorState(newEditorState);
-  
-    setTempText(option);
-    setSelectedOption(option);
-  
-    // Log the final text in the editor
-    console.log("handleOptionSelect - finalText:", convertToRaw(newContentStateWithStyle).blocks.map(block => block.text).join('\n'));
-  
-    // Force re-render of the editor component by updating a dummy state
-    setDummyState((prev) => !prev);
-  };
-  
+const handleOptionSelect = (option) => {
+
+  const contentState = responseEditorState.getCurrentContent();
+  const { anchorKey, anchorOffset, focusKey, focusOffset } = selectionRange;
+
+  // Log the initial state
+  console.log("handleOptionSelect - Initial Content State:", convertToRaw(contentState));
+  console.log("handleOptionSelect - Initial Selection Range:", selectionRange);
+
+  // Create a new selection state that covers the entire range
+  const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
+    anchorOffset: Math.min(anchorOffset, focusOffset),
+    focusKey: focusKey,
+    focusOffset: Math.max(anchorOffset, focusOffset),
+  });
+
+  // Log the new selection state
+  console.log("handleOptionSelect - New Selection State:", newSelectionState.toJS());
+
+  // Remove any existing text within the selection range
+  const clearedContentState = Modifier.removeRange(contentState, newSelectionState, 'backward');
+
+  // Log the cleared content state
+  console.log("handleOptionSelect - Cleared Content State:", convertToRaw(clearedContentState));
+
+  // Collapse the selection to the start of the cleared range
+  const collapsedSelection = SelectionState.createEmpty(anchorKey).merge({
+    anchorOffset: newSelectionState.getStartOffset(),
+    focusOffset: newSelectionState.getStartOffset(),
+  });
+
+  // Log the collapsed selection state
+  console.log("handleOptionSelect - Collapsed Selection State:", collapsedSelection.toJS());
+
+  // Insert new option text at the collapsed selection
+  const newContentState = Modifier.insertText(
+    clearedContentState,
+    collapsedSelection,
+    option
+  );
+
+  // Log the new content state after insertion
+  console.log("handleOptionSelect - New Content State After Insertion:", convertToRaw(newContentState));
+
+  // Apply the ORANGE style to the new text
+  const finalSelectionState = collapsedSelection.merge({
+    focusOffset: collapsedSelection.getStartOffset() + option.length,
+  });
+
+  // Log the final selection state
+  console.log("handleOptionSelect - Final Selection State:", finalSelectionState.toJS());
+
+  const newContentStateWithStyle = Modifier.applyInlineStyle(
+    newContentState,
+    finalSelectionState,
+    'ORANGE'
+  );
+
+  let newEditorState = EditorState.push(responseEditorState, newContentStateWithStyle, 'change-inline-style');
+
+  // Force the selection to the end of the newly inserted text
+  newEditorState = EditorState.forceSelection(newEditorState, finalSelectionState);
+
+  // Log the final content state with style
+  console.log("handleOptionSelect - Final Content State With Style:", convertToRaw(newContentStateWithStyle));
+
+  setResponseEditorState(newEditorState);
+
+  setTempText(option);
+  setSelectedOption(option);
+  setShowOptions(true); // Ensure options remain visible
+
+  // Log the final text in the editor
+  console.log("handleOptionSelect - finalText:", convertToRaw(newContentStateWithStyle).blocks.map(block => block.text).join('\n'));
+
+  // Force re-render of the editor component by updating a dummy state
+  setDummyState((prev) => !prev);
+};
+
   // Dummy state to force re-render of the editor component
   const [dummyState, setDummyState] = useState(false);
   
@@ -399,6 +459,9 @@ useEffect(() => {
     const highlightedText = currentContentBlock.getText().slice(start, end);
   
     console.log("handleLinkClick - highlightedText:", highlightedText);
+  
+    // Store the original state before making any changes
+    setOriginalEditorState(responseEditorState);
   
     // Apply ORANGE style to highlighted text
     const newContentState = Modifier.applyInlineStyle(
@@ -796,19 +859,20 @@ useEffect(() => {
               
           <Col md={7}>
               <h1 className="lib-title mt-4 mb-3">Response</h1>
-              <div className="response-box draft-editor">
-              <div className="editor-container">
-                                  <Editor
-                      editorState={responseEditorState}
-                       placeholder="Your response will be generated here..."
-                      onChange={handleEditorChange}
-                      customStyleMap={styleMap}
-                    />
-              </div>
+              <div className="response-box draft-editor" ref={responseBoxRef}>
+  <div className="editor-container">
+    <Editor
+      editorState={responseEditorState}
+      placeholder="Your response will be generated here..."
+      onChange={handleEditorChange}
+      customStyleMap={styleMap}
+    />
+  </div>
+</div>
 
 
 
-              </div>
+            
 
               <div className="text-muted mt-2">
                 Word Count: {convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').split(/\s+/).filter(Boolean).length}
@@ -840,41 +904,41 @@ useEffect(() => {
               <div className="bid-pilot-container">
                 <div className="chatResponse-container">
                   {showOptions ? (
-                    <div className="options-container">
-                      {copilotLoading ? (
+                   <div className="options-container" ref={optionsContainerRef}>
+                   {copilotLoading ? (
                         <div className="spinner-container">
                           <Spinner animation="border" />
                           <p>Generating Options...</p>
                         </div>
                       ) : (
                         copilotOptions.map((option, index) => (
-                          <div key={index} className="option">
-                            <Button
-                              onClick={() => handleOptionSelect(option)}
-                              className={`upload-button mb-2 ${selectedOption === option ? 'selected' : ''}`}
-                              style={{
-                                backgroundColor: selectedOption === option ? 'orange' : '#262626',
-                                color: selectedOption === option ? 'black' : '#fff',
-                              }}
-                            >
-                              <span>Option {index + 1}</span>
-                            </Button>
-                            {selectedOption === option && (
-                              <FontAwesomeIcon 
-                                icon={faCheck} 
-                                className="tick-icon" 
-                                onClick={handleTick}
-                              />
-                            )}
-                            <div className="option-item">
-                              <p>{option}</p>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
+                     <div key={index} className="option">
+                       <Button
+                         onClick={() => handleOptionSelect(option)}
+                         className={`upload-button mb-2 ${selectedOption === option ? 'selected' : ''}`}
+                         style={{
+                           backgroundColor: selectedOption === option ? 'orange' : '#262626',
+                           color: selectedOption === option ? 'black' : '#fff',
+                         }}
+                       >
+                         <span>Option {index + 1}</span>
+                       </Button>
+                       {selectedOption === option && (
+                         <FontAwesomeIcon 
+                           icon={faCheck} 
+                           className="tick-icon" 
+                           onClick={handleTick}
+                         />
+                       )}
+                       <div className="option-item">
+                         <p>{option}</p>
+                       </div>
+                     </div>
+                   )))}
+                 </div>
+                 
                   ) : isCopilotVisible ? (
-                    <div className={`prompts-container ${!isCopilotVisible ? 'fade-out' : ''}`}>
+                    <div className={`prompts-container ${!isCopilotVisible ? 'fade-out' : ''}`} ref={promptsContainerRef}>
                       <div className="prompts">
                         <Button className="prompt-button" onClick={handleLinkClick('Summarise')}>Summarise</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Expand')}>Expand</Button>
@@ -882,6 +946,7 @@ useEffect(() => {
                         <Button className="prompt-button" onClick={handleLinkClick('Incorporate')}>Incorporate</Button>
                       </div>
                     </div>
+
                   ) : (
                     <div className="mini-messages">
                       {messages.map((message, index) => (

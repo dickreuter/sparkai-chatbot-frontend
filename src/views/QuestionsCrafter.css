@@ -96,6 +96,14 @@
     /* Show scrollbar only when necessary */
 }
 
+.no-selection {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+}
+
 
 /* In your CSS file (e.g., Signin.css or a new CSS file) */
 

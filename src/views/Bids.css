@@ -27,6 +27,7 @@
     overflow: hidden;
     margin-bottom: 20px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ced4da;
 }
 
 .bids-table th,

@@ -4,7 +4,7 @@ import sidebarIcon from '../resources/images/mytender.io_badge.png';
 
 const VideoCard = ({ videoUrl, videoTitle, channelName, views, time }) => {
   return (
-    <Card sx={{ maxWidth: '100%' }}>
+    <Card sx={{ maxWidth: '100%', boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)', border: '1px solid #ced4da' }}>
       <video width="100%" controls>
         <source src={videoUrl} type="video/mp4" />
         Your browser does not support the video tag.
@@ -28,14 +28,14 @@ const VideoCard = ({ videoUrl, videoTitle, channelName, views, time }) => {
             <Typography
               variant="h6"
               component="div"
-              sx={{ fontFamily: 'ClashDisplay', marginBottom: '-5px' }}
+              sx={{ fontFamily: 'ClashDisplay', marginBottom: '-5px', fontWeight: '600' }}
             >
               {channelName}
             </Typography>
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{ fontFamily: 'ClashDisplay', mt: 0 }}
+              sx={{ fontFamily: 'ClashDisplay', mt: 0, fontWeight: '550'}}
             >
               {views}
             </Typography>

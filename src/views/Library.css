@@ -4,11 +4,11 @@
     height: 92vh;
     /* Assuming 40px top margin and 30px top padding */
     margin-top: 55px;
-    background-color: white;
+    background-color: #fcfafa;
     justify-content: center;
     padding-top: 10px;
     padding-left: 205px;
-    padding-right: 10px;
+    padding-right: 15px;
     overflow-x: hidden;
     overflow-y: auto;
     /* Use auto instead of scroll to handle both overflow cases */
@@ -16,6 +16,7 @@
 
 .library-container {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ced4da;
     margin-bottom: 20px;
 }
 

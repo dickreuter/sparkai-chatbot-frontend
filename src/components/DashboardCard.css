@@ -25,6 +25,7 @@
 .card-effect {
     flex: 1;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ced4da;
     background-color: #fff;
     padding: 25px;
     transition: all 0.35s ease;

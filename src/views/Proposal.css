@@ -27,14 +27,13 @@
 }
 
 .proposal-container {
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     border: 1px solid #ced4da;
     margin-top: 0;
     padding: 0rem;
     justify-content: center;
     overflow-y: scroll;
     padding: 1%;
-    height: 700px;
+    height: 800px;
     margin-bottom: 15px;
 }

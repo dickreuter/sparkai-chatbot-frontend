@@ -58,6 +58,12 @@ const QuestionCrafter = () => {
 
   const cursorPositionRef = useRef(null);
 
+  const [showModal, setShowModal] = useState(false);
+
+  const handleCloseModal = () => setShowModal(false);
+  const handleShowModal = () => setShowModal(true);
+
+
   useEffect(() => {
     localStorage.setItem('response', convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n'));
   }, [responseEditorState]);
@@ -241,36 +247,61 @@ const QuestionCrafter = () => {
   
   
   const handleEditorChange = (editorState) => {
-    const selectionState = editorState.getSelection();
-    const currentContent = editorState.getCurrentContent();
-    const anchorKey = selectionState.getAnchorKey();
-    const currentContentBlock = currentContent.getBlockForKey(anchorKey);
-    const start = selectionState.getStartOffset();
-    const end = selectionState.getEndOffset();
-    const selectedText = currentContentBlock.getText().slice(start, end);
-  
-    console.log("handleEditorChange - selectedText:", selectedText);
-  
-    setSelectedText(selectedText);
-    setSelectionRange({
-      anchorKey: selectionState.getAnchorKey(),
-      anchorOffset: selectionState.getAnchorOffset(),
-      focusKey: selectionState.getFocusKey(),
-      focusOffset: selectionState.getFocusOffset(),
-    });
-  
-    setResponseEditorState(editorState); // Always update the state
-  };
+  const selectionState = editorState.getSelection();
+  const currentContent = editorState.getCurrentContent();
+  const anchorKey = selectionState.getAnchorKey();
+  const focusKey = selectionState.getFocusKey();
+  const anchorOffset = selectionState.getAnchorOffset();
+  const focusOffset = selectionState.getFocusOffset();
+  const isBackward = selectionState.getIsBackward();
 
-  useEffect(() => {
-    if (selectedText.length > 0) {
-      setIsCopilotVisible(true);
-    } else {
-      setIsCopilotVisible(false);
-    }
-  }, [selectedText]);
-  
-  
+  const startKey = isBackward ? focusKey : anchorKey;
+  const endKey = isBackward ? anchorKey : focusKey;
+  const startOffset = isBackward ? focusOffset : anchorOffset;
+  const endOffset = isBackward ? anchorOffset : focusOffset;
+
+  const startBlock = currentContent.getBlockForKey(startKey);
+  const endBlock = currentContent.getBlockForKey(endKey);
+
+  let selectedText = '';
+
+  if (startBlock === endBlock) {
+    selectedText = startBlock.getText().slice(startOffset, endOffset);
+  } else {
+    const startText = startBlock.getText().slice(startOffset);
+    const endText = endBlock.getText().slice(0, endOffset);
+    const middleText = currentContent
+      .getBlockMap()
+      .skipUntil(block => block.getKey() === startKey)
+      .skip(1)
+      .takeUntil(block => block.getKey() === endKey)
+      .map(block => block.getText())
+      .join('\n');
+
+    selectedText = [startText, middleText, endText].filter(Boolean).join('\n');
+  }
+
+  console.log("handleEditorChange - selectedText:", selectedText);
+
+  setSelectedText(selectedText);
+  setSelectionRange({
+    anchorKey: selectionState.getAnchorKey(),
+    anchorOffset: selectionState.getAnchorOffset(),
+    focusKey: selectionState.getFocusKey(),
+    focusOffset: selectionState.getFocusOffset(),
+  });
+
+  setResponseEditorState(editorState); // Always update the state
+};
+
+useEffect(() => {
+  if (selectedText && selectedText.length > 0) {
+    setIsCopilotVisible(true);
+  } else {
+    setIsCopilotVisible(false);
+  }
+}, [selectedText]);
+
   
   const handleOptionSelect = (option) => {
     const contentState = responseEditorState.getCurrentContent();
@@ -764,7 +795,7 @@ useEffect(() => {
 
               
           <Col md={7}>
-              <h1 className="lib-title mt-3 mb-3">Response</h1>
+              <h1 className="lib-title mt-4 mb-3">Response</h1>
               <div className="response-box draft-editor">
               <div className="editor-container">
                                   <Editor

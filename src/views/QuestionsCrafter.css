@@ -2,14 +2,14 @@
     flex: 1;
     margin: 0;
     word-wrap: break-word;
-    height: 775px;
+    height: 798px;
     display: flex;
     flex-direction: column;
     margin-bottom: 40px;
     /* Lightened border color */
-    border-bottom-left-radius: 8px;
-    /* Rounded bottom left corner */
-    border-bottom-right-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ced4da;
+    border-top: none;
     /* Rounded bottom right corner */
     /* Ensure children start at the top */
 }
@@ -17,22 +17,17 @@
 .input-header {
     flex: 1;
     padding: 14px;
-    border-top-left-radius: 8px;
-    /* Only the top left corner rounded */
-    border-top-right-radius: 8px;
-    /* Only the top right corner rounded */
     display: flex;
     flex-direction: column;
-    height: 80px;
+    height: 66px;
     background-color: #262626;
+    border: 1px solid #ced4da;
+    border-bottom: none;
 }
 
 .input-console {
     flex: 1;
     padding: 14px;
-    border-bottom-left-radius: 8px;
-    /* Only the top left corner rounded */
-    border-bottom-right-radius: 8px;
     display: flex;
     flex-direction: column;
     max-height: 140px;
@@ -45,7 +40,8 @@
     padding: 10px;
     display: flex;
     flex-direction: column;
-    background-color: rgba(200, 200, 200, 0.3);
+    background-color: white;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .options-container {
@@ -53,7 +49,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    background-color: rgba(200, 200, 200, 0.3);
+    background-color: white;
     padding: 10px;
 }
 
@@ -88,6 +84,7 @@
     position: relative;
     flex: 1;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ced4da;
     background-color: #fff;
     padding: 20px;
     transition: all 0.35s ease;
@@ -95,6 +92,7 @@
     word-wrap: break-word;
     height: 800px;
     overflow-y: auto;
+    padding-top: 10px;
     /* Show scrollbar only when necessary */
 }
 
@@ -220,7 +218,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    background-color: rgba(200, 200, 200, 0.3);
+    background-color: white;
     opacity: 1;
     transition: opacity 0.5s ease;
 }
@@ -318,7 +316,9 @@
 }
 
 .message-bubble-small.bot {
-    background-color: rgba(200, 200, 200, 0.4);
+    background-color: #f5f5f5;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ced4da;
     align-self: flex-start;
     border-top-left-radius: 0;
     color: black;
@@ -445,6 +445,7 @@
 .question-answer-box {
     flex: 1;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ced4da;
     background-color: #fff;
     padding: 10px;
     transition: all 0.35s ease;

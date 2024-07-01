@@ -125,7 +125,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
                 </div>
             </div>
             
-            <div className="proposal-container" ref={proposalContainerRef}>
+            <div className="proposal-container mt-1" ref={proposalContainerRef}>
                 <Row className="justify-content-md-center">
                     <Col md={12}>
                         <CustomEditor

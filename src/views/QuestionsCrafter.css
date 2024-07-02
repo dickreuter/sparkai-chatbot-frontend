@@ -96,14 +96,6 @@
     /* Show scrollbar only when necessary */
 }
 
-.no-selection {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-}
-
 
 /* In your CSS file (e.g., Signin.css or a new CSS file) */
 
@@ -231,12 +223,23 @@
     transition: opacity 0.5s ease;
 }
 
+.prompts::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+    border: 3px solid;
+    border-color: #262626 !important;
+    max-height: 10px;
+}
+
 .prompts-container.fade-out {
     opacity: 0;
 }
 
 .prompts {
     background-color: #262626;
+    max-height: 175px;
+    /* Assuming each button is around 40px tall */
+    overflow-y: auto;
 }
 
 .prompt-button {
@@ -298,7 +301,6 @@
 }
 
 .prompt-button:hover {
-    font-size: 15px;
     background-color: #262626;
     border: 2px solid #555555;
     border-bottom: none;

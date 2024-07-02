@@ -65,7 +65,7 @@ const QuestionCrafter = () => {
 
   const responseBoxRef = useRef(null); // Ref for the response box
   const promptsContainerRef = useRef(null); // Ref for the prompts container
-
+  const editorRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem('response', convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n'));
@@ -860,14 +860,14 @@ useEffect(() => {
           <Col md={7}>
               <h1 className="lib-title mt-4 mb-3">Response</h1>
               <div className="response-box draft-editor" ref={responseBoxRef}>
-  <div className="editor-container">
-    <Editor
-      editorState={responseEditorState}
-      placeholder="Your response will be generated here..."
-      onChange={handleEditorChange}
-      customStyleMap={styleMap}
-    />
-  </div>
+              <div className="editor-container" ref={editorRef}>
+            <Editor
+              editorState={responseEditorState}
+              placeholder="Your response will be generated here..."
+              onChange={handleEditorChange}
+              customStyleMap={styleMap}
+            />
+          </div>
 </div>
 
 
@@ -943,7 +943,13 @@ useEffect(() => {
                         <Button className="prompt-button" onClick={handleLinkClick('Summarise')}>Summarise</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Expand')}>Expand</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Rephrase')}>Rephrase</Button>
-                        <Button className="prompt-button" onClick={handleLinkClick('Incorporate')}>Incorporate</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Translate to English')}>Translate to English</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('We will Active Voice')}>We will</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Improve Grammar')}>Improve Grammar</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Word cutting adjectives')}>Word cutting adjectives</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Word cutting adverbs')}>Word cutting adverbs</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Add Statistics')}>Add Statistic</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('For Example')}>For Example</Button>
                       </div>
                     </div>
 

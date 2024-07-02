@@ -55,6 +55,7 @@ const QuestionCrafter = () => {
     )
   );
   const [selectionRange, setSelectionRange] = useState({ start: null, end: null });
+  const [isInternetSearch, setIsInternetSearch] = useState(false);
 
   const cursorPositionRef = useRef(null);
 
@@ -559,12 +560,67 @@ useEffect(() => {
   }, [isLoading, startTime]);
 
   const handleSendMessage = () => {
+    console.log("handleMessage");
     if (inputValue.trim() !== "") {
       setMessages([...messages, { type: 'user', text: inputValue }]);
       sendQuestion(inputValue);
       setInputValue("");
     }
   };
+
+  const handleInternetSearch = () => {
+    // Implement your internet search logic here
+    console.log("Internet Search function called");
+    if (inputValue.trim() !== "") {
+      setMessages([...messages, { type: 'user', text: inputValue }]);
+      sendInternetQuestion(inputValue);
+      setInputValue("");
+    }
+  };
+
+  const sendInternetQuestion = async (question) => {
+    handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
+    setQuestionAsked(true);
+    setIsBidPilotLoading(true);
+    setStartTime(Date.now()); // Set start time for the timer
+    console.log(dataset);
+    // Add a temporary bot message with loading dots
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { type: 'bot', text: 'loading' }
+    ]);
+
+    try {
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/perplexity`,
+        {
+          input_text: question,
+          dataset,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        }
+      );
+
+      // Replace the temporary loading message with the actual response
+      setMessages((prevMessages) => [
+        ...prevMessages.slice(0, -1),
+        { type: 'bot', text: result.data }
+      ]);
+    } catch (error) {
+      console.error("Error sending question:", error);
+      // Replace the temporary loading message with the error message
+      setMessages((prevMessages) => [
+        ...prevMessages.slice(0, -1),
+        { type: 'bot', text: error.response?.status === 400 ? 'Message failed, please contact support...' : error.message }
+      ]);
+    }
+    setIsBidPilotLoading(false);
+  };
+
+  
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -978,9 +1034,16 @@ useEffect(() => {
                           Company Library
                         </label>
                         <label className="checkbox-label">
-                          <input type="checkbox" name="internet-search" className="checkbox" />
+                          <input 
+                            type="checkbox" 
+                            name="internet-search" 
+                            className="checkbox" 
+                            checked={isInternetSearch}
+                            onChange={() => setIsInternetSearch(!isInternetSearch)} 
+                          />
                           Internet Search
                         </label>
+
                       </div>
                       <div className="dropdown-container mb-2">
                         <Button className="option-button">Prompts</Button>
@@ -995,10 +1058,11 @@ useEffect(() => {
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
                       />
-                      <button onClick={handleSendMessage}>
+                      <button onClick={isInternetSearch ? handleInternetSearch : handleSendMessage}>
                         <FontAwesomeIcon icon={faPaperPlane} />
                       </button>
                     </div>
+
                   </div>
                 </div>
               </div>

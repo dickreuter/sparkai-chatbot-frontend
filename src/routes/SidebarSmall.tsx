@@ -45,7 +45,7 @@ const SideBarSmall = () => {
         </Link>
         <Link to="/chatResponse" className={`sidebarsmalllink ${isActive('/chatResponse') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faComments} />
-          <span>Q/A Chat</span>
+          <span>Library Chat</span>
         </Link>
       </div>
       <div className="signout-container">

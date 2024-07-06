@@ -356,7 +356,6 @@
     padding: 5px;
     background-color: #383838;
     box-sizing: border-box;
-    z-index: 1000;
     border-radius: 25px;
     height: 50px;
 }
@@ -444,12 +443,13 @@
 .option-button {
     background-color: #383838;
     color: white;
-    padding: 8px 12px;
+    padding: 8px 16px;
     border: none;
     cursor: pointer;
     font-weight: 600;
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     border-radius: 8px;
+    margin-left: 5px;
 }
 
 .question-answer-box {
@@ -530,4 +530,8 @@
     /* Remove the blue outline */
     color: white !important;
     /* Ensure the text color stays the same */
+}
+
+.dropdown-clear-container {
+    display: flex;
 }

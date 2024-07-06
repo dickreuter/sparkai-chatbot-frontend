@@ -11,84 +11,135 @@
         <div class="row">
             <div class="col-md-6">
                 <h1 class="display-2 fw-bold text-white" data-aos="fade-up">Bidding with AI <span class="nowrap"><span class="text-brand">beats</span> bidding without it.</span></h1>
-                <h4 data-aos="fade-up" data-aos-delay="100" class="mt-3 mb-4 text-white">Bespoke LLM architecture at an enterprise level, crafting high-quality bids</h4>
-                <div data-aos="fade-up" data-aos-delay="200"><a href="https://calendly.com/sam-od9g/discovery-call?month=2024-06" class="btn btn-brand">Book a demo</a></div>
+                <h4 data-aos="fade-up" data-aos-delay="100" class="mt-3 mb-4 text-white nowrap" id="headline">Not Winning Enough Bids? Discover the Power of Corporate AI.</h4>
+                <div data-aos="fade-up" data-aos-delay="200"><a href="https://calendly.com/sam-od9g/discovery-call?month=2024-06" class="button">Book a demo</a></div>
             </div>
         </div>
+        
     </div>
 </section>
-
-
-
 <section id="about" class="section-padding">
     <div class="container">
         <div class="row">
             <div class="col-12 text-center" data-aos="fade-down" data-aos-delay="150">
                 <div class="section-title">
-                    <h1 class="display-4 fw-semibold">About us</h1>
+                    <h1 class="display-4 fw-semibold">Our Offer</h1>
                     <div class="line"></div>
-                    <p>Why choose us?</p>
+                    <p>Get ahead of the competition. Learn more in our demo to transform your bid writing.</p>
+
+                    <div><a href="https://calendly.com/sam-od9g/discovery-call?month=2024-06" class="button">Book a demo</a></div>
                 </div>
             </div>
         </div>
 
-        <div class="row" data-aos="fade-down" data-aos-delay="50">
+        <!-- Swiper -->
+        <div class="swiper-container" data-aos="fade-down" data-aos-delay="100">
+            <div class="swiper-wrapper">
 
-            
-            <div class="col-lg-5">
-
-                <div>
-
-                    <div class="d-flex mb-3">
-                        <div class="iconbox me-4 rounded">
-                            <i class="ri-pencil-fill"></i>
+                <!-- Repeat for other slides -->
+                <div class="swiper-slide">
+                    <div class="row">
+                        <div class="col-lg-8" id="left-click">
+                            <div class="laptop-frame">
+                                <img src="{% static 'images/QuestionScreenshot.png' %}" alt="Screenshot" class="screenshot-image">
+                            </div>
                         </div>
-                        <div>
-                            <h5>Enhanced quality</h5>
-                            <p>Each client get's their own language model trained and tailored to their business, allowing continuous improvement in their responses.</p>
+                        <div class="col-lg-4" id="right-click">
+                            <div class="mt-3">
+                                <div class="d-flex mb-3">
+                                    <div class="iconbox me-4 rounded">
+                                        <i class="ri-speed-fill"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Write Bids Faster</h5>
+                                        <p class="heavy-paragraph">Our technology revolutionizes the bid writing process by reducing the time required to draft high-quality bids. Instead, you can focus on refining and perfecting your bid strategy, knowing that our AI has the groundwork covered.</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex mb-3">
+                                    <div class="iconbox me-4 rounded">
+                                        <i class="ri-trophy-fill"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Win More Bids</h5>
+                                        <p class="heavy-paragraph">In the competitive world of tendering, standing out is crucial. We enhance your bid writing capabilities, enabling you to create persuasive, customized responses that capture the attention of evaluators.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="d-flex mb-3">
-                        <div class="iconbox me-4 rounded">
-                            <i class="ri-lock-fill"></i>
+                </div>
+
+                <div class="swiper-slide">
+                    <div class="row" data-aos="fade-down" data-aos-delay="50">
+                        <div class="col-lg-8" id="left-click">
+                            <div class="laptop-frame">
+                                <img src="{% static 'images/LibraryScreenshot.png' %}" alt="Screenshot" class="screenshot-image">
+                            </div>
                         </div>
-                        <div>
-                            <h5>Data Security
-                            </h5>
-                            <p>Each client get's their own database inside of a AWS EC2 instance, meaning clients data is stored individually in their own secure environment.</p>
+                        <div class="col-lg-4" id="right-click">
+                            <div class="mt-3">
+                                <div class="d-flex mb-3">
+                                    <div class="iconbox me-4 rounded">
+                                        <i class="ri-pencil-fill"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Enhanced quality</h5>
+                                        <p class="heavy-paragraph">Each client gets their own language model trained and tailored to their business, allowing continuous improvement in their responses. This means no more starting from scratch or spending countless hours on repetitive tasks.</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex mb-3">
+                                    <div class="iconbox me-4 rounded">
+                                        <i class="ri-lock-fill"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Data Security</h5>
+                                        <p class="heavy-paragraph">Each client gets their own database inside of an AWS EC2 instance, meaning client data is stored individually in their own secure environment. We comply with GDPR, SOC 2, and ISO27001 standards.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="d-flex">
-                        <div class="iconbox me-4 rounded">
-                            <i class="ri-time-fill"></i>
+                </div>
+
+                <!-- Repeat for other slides -->
+                <div class="swiper-slide">
+                    <div class="row" data-aos="fade-down" data-aos-delay="50">
+                        <div class="col-lg-8" id="left-click">
+                            <div class="laptop-frame">
+                                <img src="{% static 'images/copilotScreenshot2.png' %}" alt="Screenshot" class="screenshot-image">
+                            </div>
                         </div>
-                        <div>
-                            <h5>Time saving</h5>
-                            <p>Bids go from weeks to minutes, allowing you to compete for more opportunities.</p>
+                        <div class="col-lg-4" id="right-click">
+                            <div class="mt-3">
+                                <div class="d-flex mb-3">
+                                    <div class="iconbox me-4 rounded">
+                                        <i class="ri-edit-fill"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Refine Responses</h5>
+                                        <p class="heavy-paragraph">In the realm of tender bid writing, precision and relevance are paramount. Refine your responses with ease using advanced copilot prompts, making them stand out by addressing specific client needs and showcasing your expertise.</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex mb-3">
+                                    <div class="iconbox me-4 rounded">
+                                        <i class="ri-search-2-line"></i>
+                                    </div>
+                                    <div>
+                                        <h5>Internet Search</h5>
+                                        <p class="heavy-paragraph">Having access to the most current and relevant information can be a game-changer in bid writing. Quickly gather data, verify facts, and find inspiration for your responses, giving you a competitive edge.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-lg-7" > 
-               
-                <video class="small-video" autoplay loop muted>
-                    <source src="{% static 'videos/chatbotVideo.mp4' %}" type="video/mp4">
-                    Your browser does not support the video tag.
-                  </video>
-                  
-
-           
-             </div>
-
-
-           
+            <!-- Add Pagination -->
+            <div class="swiper-pagination"></div>
 
         </div>
     </div>
 </section>
-
-
 
     <!-- SERVICES -->
     <section id="services" class="section-padding border-top">
@@ -96,13 +147,26 @@
             <div class="row">
                 <div class="col-12 text-center" data-aos="fade-down" data-aos-delay="150">
                     <div class="section-title">
-                        <h1 class="display-4 fw-semibold">Our Services</h1>
+                        <h1 class="display-4 fw-semibold">Our Sectors</h1>
                         <div class="line"></div>
                         <p>Built with quality, security and integrity.</p>
                     </div>
                 </div>
             </div>
             <div class="row g-4 text-center">
+
+                <!-- Business Intelligence -->
+                <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="350">
+                    <div class="service theme-shadow p-lg-5 p-4 rounded">
+                        <div class="iconbox">
+                            <i class="ri-building-2-fill"></i> <!-- Icon Placeholder -->
+                        </div>
+                        <h5 class="mt-4 mb-3"> Construction </h5>
+                        <p>Empower facility management and construction bidding with AI-driven insights and tailored responses.</p>
+
+                        <a href="{% url 'facilitymanagement' %}" class="button me-2">Learn More</a>
+                    </div>
+                </div>
                 <!-- Data-Driven Market Research -->
                 <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="150">
                     <div class="service theme-shadow p-lg-5 p-4 rounded">
@@ -111,7 +175,7 @@
                         </div>
                         <h5 class="mt-4 mb-3">IT Services</h5>
                         <p>Leverage advanced AI and centralised data management to streamline the IT services bidding process.</p>
-                        <a href="{% url 'ITservices' %}" class="btn btn-brand me-2">Learn More</a>
+                        <a href="{% url 'ITservices' %}" class="button me-2">Learn More</a>
 
                     </div>
                 </div>
@@ -125,22 +189,11 @@
                         <h5 class="mt-4 mb-3">Financial Services</h5>
                         <p>Enhance the financial services bidding process with secure cloud technologies and data processing.</p>
 
-                        <a href="{% url 'financialservices' %}" class="btn btn-brand me-2">Learn More</a>
+                        <a href="{% url 'financialservices' %}" class="button me-2">Learn More</a>
                     </div>
                 </div>
 
-                <!-- Business Intelligence -->
-                <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="350">
-                    <div class="service theme-shadow p-lg-5 p-4 rounded">
-                        <div class="iconbox">
-                            <i class="ri-building-2-fill"></i> <!-- Icon Placeholder -->
-                        </div>
-                        <h5 class="mt-4 mb-3"> Construction </h5>
-                        <p>Empower facility management and construction bidding with AI-driven insights and tailored responses.</p>
-
-                        <a href="{% url 'facilitymanagement' %}" class="btn btn-brand me-2">Learn More</a>
-                    </div>
-                </div>
+                
 
                 <!-- Language Engines -->
                 <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="450">
@@ -150,7 +203,7 @@
                         </div>
                         <h5 class="mt-4 mb-3">Healthcare</h5>
                         <p>Optimise healthcare and pharmaceutical bid processes with AI powered contextual data inputs.</p>
-                        <a href="{% url 'healthcare' %}" class="btn btn-brand me-2">Learn More</a>
+                        <a href="{% url 'healthcare' %}" class="button me-2">Learn More</a>
 
                     </div>
                 </div>
@@ -163,7 +216,7 @@
                         </div>
                         <h5 class="mt-4 mb-3">Data Centres and Telecoms</h5>
                         <p>Streamline the bid process for data centre and telecom sectors with tailored proposals. </p>
-                        <a href="{% url 'telecoms' %}" class="btn btn-brand me-2">Learn More</a>
+                        <a href="{% url 'telecoms' %}" class="button me-2">Learn More</a>
                     </div>
                 </div>
 
@@ -175,7 +228,7 @@
                         </div>
                         <h5 class="mt-4 mb-3">Public Sector Vendors</h5>
                         <p>Enhance public sector bidding processes with AI powered proposals and large-scale information retrieval.</p>
-                        <a href="{% url 'publicsector' %}" class="btn btn-brand me-2">Learn More</a>
+                        <a href="{% url 'publicsector' %}" class="button me-2">Learn More</a>
                     </div>
                 </div>
             </div>
@@ -185,38 +238,77 @@
     <section id="team" class="section-padding border-top" data-aos="fade-down" data-aos-delay="50">
         <div class="container">
             <div class="row">
-                <div class="col-12 text-center" >
+                <div class="col-12 text-center">
                     <div class="section-title">
-                        <h1 class="display-4 fw-semibold">Associated Partners</h1>
+                        <h1 class="display-4 fw-semibold">Engineers</h1>
+                        
                         <div class="line"></div>
-                        <p>We are proud to be partners with the following companies.</p>
+                        <p>Backed by Engineers from:</p>
+                       
                     </div>
                 </div>
             </div>
             <div class="row">
-                
-                <div class="col-lg-4 col-md-6" >
-                    <div class="feature-block text-center">
-                        <img src="{% static 'images/soton.png' %}" alt="Soton" class="img-fluid mx-auto d-block p-2 ">
-                        
+                <div class="col-12">
+                    <div class="partner-carousel">
+                        <div class="partner-track">
+                            <div class="partner-item">
+                                <img src="{% static 'images/soton.png' %}" alt="Soton" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/bidsolutions.jpeg' %}" alt="Bid Solutions" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/santanderx.jpg' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/nvidia.png' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/aws.png' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/deutscheBank.png' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/goldmansachs.jpg' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/bankOfAmerica.png' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/soton.png' %}" alt="Soton" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/bidsolutions.jpeg' %}" alt="Bid Solutions" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/santanderx.jpg' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/nvidia.png' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/aws.png' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/deutscheBank.png' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/goldmansachs.jpg' %}" alt="Santander" class="partner-img">
+                            </div>
+                            <div class="partner-item">
+                                <img src="{% static 'images/bankOfAmerica.png' %}" alt="Santander" class="partner-img">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6" >
-                    <div class="feature-block text-center">
-                        <img src="{% static 'images/bidsolutions.jpeg' %}" alt="Bid Solutions" class="img-fluid mx-auto d-block p-2 " style="max-width: 350px; max-height:300px;">
-                        
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6" >
-                    <div class="feature-block text-center">
-                        <img src="{% static 'images/santander.png' %}" alt="Santander" class="img-fluid mx-auto d-block p-2 ">
-                        
-                    </div>
-                </div>
-                
             </div>
         </div>
     </section>
+    
+    
+    
     <!--
     <section id="team" class="section-padding border-top" data-aos="fade-down" data-aos-delay="50">
         <div class="container">
@@ -305,36 +397,39 @@
                 <div class="section-title">
                     <h1 class="display-4 text-white fw-semibold">Get in touch</h1>
                     <div class="line bg-white"></div>
-                    <p class="text-white bold">We'd love to hear from you if you have any questions!</p>
+                    <p class="text-white heavy-paragraph" style="font-size: 1.1rem;">We'd love to hear from you if you have any questions!</p>
                 </div>
             </div>
         </div>
         <div class="row justify-content-center">
             <div class="col-lg-8" data-aos="fade-down" data-aos-delay="250">
-                <form class="row g-3 p-lg-5 p-4 bg-white theme-shadow rounded">
-                    
-                    <div class="form-group col-lg-6">
-                        <input type="text" name="first_name" class="form-control" placeholder="Enter First Name" required>
-                    </div>
-                    <div class="form-group col-lg-6">
-                        <input type="text" name="last_name" class="form-control" placeholder="Enter Last Name" required>
-                    </div>
+                <form method="post" class="row g-3 p-lg-5 p-2 bg-white theme-shadow rounded">
+                    {% csrf_token %}
                     <div class="form-group col-lg-12">
                         <input type="email" name="email" class="form-control" placeholder="Enter Email Address" required>
                     </div>
                     <div class="form-group col-lg-12">
-                        <input type="text" name="subject" class="form-control" placeholder="Enter Subject" required>
+                        <select name="referral" class="form-control" required>
+                            <option class="option" value="" disabled selected>How did you hear about us?</option>
+                            <option value="social_media_facebook">Facebook</option>
+                            <option value="social_media_linkedin">LinkedIn</option>
+                            <option value="search_engine">Search Engine</option>
+                            <option value="friend">Friend/Family</option>
+                            <option value="advertisement">Advertisement</option>
+                            <option value="other">Other</option>
+                        </select>
                     </div>
                     <div class="form-group col-lg-12">
                         <textarea name="message" rows="5" class="form-control" placeholder="Enter Message" required></textarea>
                     </div>
-                    
                     <div class="form-group col-lg-12 d-grid">
-                        <button type="submit" class="btn btn-brand" style="background: var(--c-brand); border: none;">Send Message</button>
+                        <button type="submit" class="button" style="border: none;">Send Message</button>
                     </div>
                 </form>
             </div>
         </div>
+        
+        
     </div>
 </section>
 
@@ -346,7 +441,9 @@
             <div class="col-12 text-center" >
                 <div class="section-title">
                     <h1 class="display-4 fw-semibold">Working to build your trust</h1>
-                    <div class="line"></div>
+                    <div class="line">
+
+                    </div>
                     <p>Built with quality, security, and integrity</p>
                 </div>
             </div>
@@ -359,6 +456,14 @@
                     <p>At mytender.io, we operate in 100% accordance with GDPR, SOC 2, and ISO27001 standards, demonstrating our unwavering commitment to data privacy and security.</p>
                 </div>
             </div>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                <div class="feature-block text-center">
+                    <img src="{% static 'images/gdpr.jpg' %}" alt="Cloud Security" class="img-fluid centered-image mb-0">
+                    <h4 class="mt-3">Cloud Security</h4>
+                    <p>Our software runs on AWS EC2, renowned for its robust data security infrastructure. This platform ensures multiple layers of protection for our customer data.</p>
+                </div>
+            </div>
+            
             <div class="col-lg-4 col-md-6 col-sm-12 mb-3" > 
                 <div class="feature-block text-center">
                     <img src="{% static 'images/irsm.jpg' %}" alt="Accreditations" class="img-fluid centered-image mb-0">
@@ -366,13 +471,7 @@
                     <p>We are proud to hold IIRSM and CPD accreditations, underscoring our dedication to the continuous enhancement of our data security and operational excellence.</p>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-3" >
-                <div class="feature-block text-center">
-                    <img src="{% static 'images/gdpr.jpg' %}" alt="Cloud Security" class="img-fluid centered-image mb-0 ">
-                    <h4 class="mt-3">Cloud Security</h4>
-                    <p>Our software runs on AWS EC2, renowned for its robust data security infrastructure. This platform ensures multiple layers of protection for our customer data.</p>
-                </div>
-            </div>
+           
         </div>
     </div>
 </section>
@@ -391,12 +490,21 @@
                 </div>
             </div>
             <div class="row">
-                
+                <div class="col-lg-4 col-sm-12" >
+                    <div class="blog-post bg-light rounded">
+                        <img class= "rounded-top" src="{% static 'images/blog-post-2.jpg' %}" alt="">
+                        <div class="blog-post-content p-4  d-flex flex-column">
+                            <h5 class="title">How is AI Leveraged in Modern Businesses? </h5>
+                            <p class="my-3">AI in the corporate world, exemplified by Amazon's supply chain optimization and Netflix's personalization, has revolutionized business models by enhancing efficiency, customer experience, and operational strategies. </p> &nbsp;
+                            <a href="{% url 'intro' %}">Read More</a>
+                        </div>
+                    </div>
+                </div>
                     <div class="col-lg-4 col-sm-12" >
                         <div class="blog-post bg-light rounded">
-                            <img class="rounded-top" src="{% static 'images/blog-post-1.jpg' %}" alt="">
+                            <img class="rounded-top" src="{% static 'images/aibusiness.jpg' %}" alt="">
                             <div class="blog-post-content p-4  d-flex flex-column">
-                                <h5 class="title">Artificial Intelligence (AI) in 2024: Transforming Businesses and Beyond
+                                <h5 class="title">How is AI Transforming Businesses in 2024?
                                 </h5>
                                 <p class="my-3">AI is transforming the global economy by enhancing efficiency, customer service, and revenue growth across various sectors, as evidenced by case studies in healthcare diagnostics, manufacturing maintenance, and personalized marketing. </p>
                                 <a href="{% url 'futureai' %}">Read More</a>
@@ -404,21 +512,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-12" >
-                        <div class="blog-post bg-light rounded">
-                            <img class= "rounded-top" src="{% static 'images/blog-post-2.jpg' %}" alt="">
-                            <div class="blog-post-content p-4  d-flex flex-column">
-                                <h5 class="title">An Introduction to Corporate AI: How is AI Leveraged in Modern Businesses? </h5>
-                                <p class="my-3">AI in the corporate world, exemplified by Amazon's supply chain optimization and Netflix's personalization, has revolutionized business models by enhancing efficiency, customer experience, and operational strategies. </p> &nbsp;
-                                <a href="{% url 'intro' %}">Read More</a>
-                            </div>
-                        </div>
-                    </div>
+                   
                     <div class="col-lg-4 col-sm-12" >
                         <div class="blog-post bg-light rounded">
                             <img class= "rounded-top" src="{% static 'images/blog-post-3.jpg' %}" alt="">
                             <div class="blog-post-content p-4  d-flex flex-column">
-                                <h5 class="title">Story of mytender.io: Pioneering AI Innovations from Academia to Industry</h5>
+                                <h5 class="title">Who are we? Read about the story of mytender.io</h5>
                                 <p class="my-3">Originating from the University of Southampton, mytender.io has risen as a pivotal force in the AI industry, transforming business efficiency and success with its expertise and unwavering commitment to quality, integrity, and security. </p>&nbsp;
                                     <a href="{% url 'story' %}">Read More</a>
                             </div>

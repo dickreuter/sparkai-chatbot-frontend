@@ -1029,10 +1029,7 @@ useEffect(() => {
                   <div className="input-console">
                     <div className="proposal-header mb-2">
                       <div className="checkbox-container">
-                        <label className="checkbox-label">
-                          <input type="checkbox" name="company-library" className="checkbox" />
-                          Company Library
-                        </label>
+                       
                         <label className="checkbox-label">
                           <input 
                             type="checkbox" 

@@ -14,15 +14,15 @@ def home(request):
             message = form.cleaned_data['message']
             
             # Combine referral source with message
-            full_message = f"Referral Source: {referral}\n\nMessage:\n{message}"
+            full_message = f"Referral Source: {referral}\n\nMessage:\n{message}\n\nFrom: \n{email}\n"
 
             try:
                 # Send the email
                 send_mail(
                     subject="New Contact Form Submission",
                     message=full_message,
-                    from_email=email,  # Sender's email address
-                    recipient_list=['sam@mytender.io'],  # Send to this email address
+                    from_email='alexanderhoyle123@gmail.com',  # Sender's email address
+                    recipient_list=['sam@mytender.io', 'alexanderhoyle123@gmail.com'],  # Send to this email address
                     fail_silently=False,
                 )
                 logger.debug("Email sent successfully.")

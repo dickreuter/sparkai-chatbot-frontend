@@ -1,10 +1,39 @@
 {% load static %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script src="{% static 'js/main.js' %}"></script>
 
 
+<script>
+    var swiper = new Swiper('.swiper-container', {
+        slidesPerView: 1,
+        spaceBetween: 30,
+        loop: true,
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        autoplay: {
+            delay: 10000,
+            disableOnInteraction: false,
+        },
+    });
+
+    // Add click event listeners for left and right navigation
+    document.querySelectorAll('#left-click').forEach(function(element) {
+        element.addEventListener('click', function() {
+            swiper.slidePrev();
+        });
+    });
+
+    document.querySelectorAll('#right-click').forEach(function(element) {
+        element.addEventListener('click', function() {
+            swiper.slideNext();
+        });
+    });
+</script>

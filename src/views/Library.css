@@ -100,6 +100,8 @@
     margin-right: 5px;
     background-color: black;
     color: white;
+    border: none;
+    border-radius: 5px;
 }
 
 .lib-custom-card {

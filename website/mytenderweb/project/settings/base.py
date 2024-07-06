@@ -112,10 +112,3 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
-EMAIL_HOST = 'email-smtp.eu-central-1.amazonaws.com'
-EMAIL_PORT = 465
-#EMAIL_HOST_USER = os.environ.get('AWS_SES_SMTP_USER')
-#EMAIL_HOST_PASSWORD = os.environ.get('AWS_SES_PASSWORD')
-EMAIL_USE_SSL = True

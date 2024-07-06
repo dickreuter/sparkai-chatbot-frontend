@@ -55,7 +55,7 @@ const QuestionCrafter = () => {
     )
   );
   const [selectionRange, setSelectionRange] = useState({ start: null, end: null });
-  const [isInternetSearch, setIsInternetSearch] = useState(false);
+  const [isInternetSearch, setIsInternetSearch] = useState(true);
 
   const cursorPositionRef = useRef(null);
 
@@ -96,6 +96,15 @@ const QuestionCrafter = () => {
       setInputText(selectedQuestion);
     }
   };
+
+  const handleClearMessages = () => {
+    setMessages([{ type: 'bot', text: 'Welcome to Bid Pilot! Ask questions about your company library data or search the internet for up to date information. Select text in the response box to use copilot and refine the response.' }]);
+    localStorage.removeItem('messages');
+    resetEditorState();
+    setIsCopilotVisible(false);
+    setShowOptions(false);
+  };
+  
 
   const handleAppendResponseToEditor = () => {
     handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
@@ -515,8 +524,9 @@ const [messages, setMessages] = useState(() => {
     }
   }
 
-  return [{ type: 'bot', text: 'Welcome to Bid Pilot! Ask questions about your company library data or select text in the response box to use copilot.' }];
+  return [{ type: 'bot', text: 'Welcome to Bid Pilot! Ask questions about your company library data or search the internet for up to date information. Select text in the response box to use copilot and refine the response.' }];
 });
+
 
 
 
@@ -562,6 +572,9 @@ useEffect(() => {
   const handleSendMessage = () => {
     console.log("handleMessage");
     if (inputValue.trim() !== "") {
+      resetEditorState();
+      setIsCopilotVisible(false);
+      setShowOptions(false);
       setMessages([...messages, { type: 'user', text: inputValue }]);
       sendQuestion(inputValue);
       setInputValue("");
@@ -572,6 +585,9 @@ useEffect(() => {
     // Implement your internet search logic here
     console.log("Internet Search function called");
     if (inputValue.trim() !== "") {
+      resetEditorState();
+      setIsCopilotVisible(false);
+      setShowOptions(false);
       setMessages([...messages, { type: 'user', text: inputValue }]);
       sendInternetQuestion(inputValue);
       setInputValue("");
@@ -595,7 +611,7 @@ useEffect(() => {
         `http${HTTP_PREFIX}://${API_URL}/perplexity`,
         {
           input_text: question,
-          dataset,
+          dataset: 'default',
         },
         {
           headers: {
@@ -623,10 +639,11 @@ useEffect(() => {
   
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
+    if (e.key === 'Enter' && !isBidPilotLoading) {
+      isInternetSearch ? handleInternetSearch() : handleSendMessage();
     }
   };
+
 
   const sendQuestion = async (question) => {
     handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
@@ -947,12 +964,7 @@ useEffect(() => {
                 <div className="proposal-header mb-2">
                   <h1 className="lib-title" style={{ color: "white" }}>Bid Pilot</h1>
                   <div className="dropdown-container">
-                    <Button className={`arrow-button`}>
-                      <FontAwesomeIcon icon={faChevronLeft} />
-                    </Button>
-                    <Button className={`arrow-button`}>
-                      <FontAwesomeIcon icon={faChevronRight} />
-                    </Button>
+                   
                   </div>
                 </div>
               </div>
@@ -1027,39 +1039,30 @@ useEffect(() => {
                     </div>
                   )}
                   <div className="input-console">
-                    <div className="proposal-header mb-2">
-                      <div className="checkbox-container">
-                       
-                        <label className="checkbox-label">
-                          <input 
-                            type="checkbox" 
-                            name="internet-search" 
-                            className="checkbox" 
-                            checked={isInternetSearch}
-                            onChange={() => setIsInternetSearch(!isInternetSearch)} 
-                          />
-                          Internet Search
-                        </label>
-
-                      </div>
-                      <div className="dropdown-container mb-2">
-                        <Button className="option-button">Prompts</Button>
-                        <Button className="option-button">Clear</Button>
-                      </div>
-                    </div>
+                  <div className="dropdown-clear-container mb-3">
+        <Dropdown onSelect={(key) => setIsInternetSearch(key === 'internet-search')} className="chat-dropdown">
+          <Dropdown.Toggle className="upload-button" style={{ backgroundColor: '#383838', color: 'white' }}>
+            {isInternetSearch ? 'Internet Search' : 'Library Chat'}
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item eventKey="internet-search">Internet Search</Dropdown.Item>
+            <Dropdown.Item eventKey="library-chat">Library Chat</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+        <Button className="option-button" onClick={handleClearMessages}>Clear</Button>
+      </div>
                     <div className="bid-input-bar">
-                      <input
-                        type="text"
-                        placeholder="Please type your question in here..."
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                      />
-                      <button onClick={isInternetSearch ? handleInternetSearch : handleSendMessage}>
-                        <FontAwesomeIcon icon={faPaperPlane} />
-                      </button>
-                    </div>
-
+                        <input
+                          type="text"
+                          placeholder="Please type your question in here..."
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                        />
+                          <button onClick={!isBidPilotLoading ? (isInternetSearch ? handleInternetSearch : handleSendMessage) : null} disabled={isBidPilotLoading}>
+          <FontAwesomeIcon icon={faPaperPlane} />
+        </button>
+                      </div>
                   </div>
                 </div>
               </div>

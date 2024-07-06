@@ -9,16 +9,29 @@ import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import handleGAEvent from '../utilities/handleGAEvent';
 import { HTTP_PREFIX, API_URL } from '../helper/Constants';
 import axios from 'axios';
+import { Button } from 'react-bootstrap';
 
 const ChatbotResponse = () => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
 
-     const [messages, setMessages] = useState(() => {
+
+  const [messages, setMessages] = useState(() => {
     const savedMessages = localStorage.getItem('chatResponseMessages');
-    return savedMessages ? JSON.parse(savedMessages) : [];
+    console.log('Saved messages:', savedMessages);
+  
+    if (savedMessages) {
+      const parsedMessages = JSON.parse(savedMessages);
+      if (parsedMessages.length > 0) {
+        return parsedMessages;
+      }
+    }
+  
+    return [{ type: 'bot', text: 'Welcome to Library Chat! You ask questions here about your Company Library data.'}];
   });
+  
+  
 
   useEffect(() => {
     // Save messages to localStorage whenever they change
@@ -50,10 +63,16 @@ const ChatbotResponse = () => {
     };
 
     const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !isLoading) {
             handleSendMessage();
         }
     };
+
+    const handleClearMessages = () => {
+      setMessages([{ type: 'bot', text: 'Welcome to Library Chat! You ask questions here about your Company Library data.' }]);
+      localStorage.removeItem('chatResponseMessages');
+    };
+    
 
     const sendQuestion = async (question) => {
         handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
@@ -128,10 +147,13 @@ const ChatbotResponse = () => {
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
                     />
-                    <button onClick={handleSendMessage}>
+                    {/* <Button className="chat-Response-Clear-Button" onClick={handleClearMessages}>Clear</Button> */}
+                    <button onClick={!isLoading ? (handleSendMessage) : null} disabled={isLoading} className='bar-button'>
                         <FontAwesomeIcon icon={faPaperPlane} />
                     </button>
+                   
                 </div>
+               
             </div>
         </div>
     );

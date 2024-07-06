@@ -82,7 +82,7 @@
     /* White text for better contrast */
 }
 
-.input-bar button {
+.bar-button {
     width: 40px;
     height: 40px;
     border: none;
@@ -95,13 +95,26 @@
     justify-content: center;
 }
 
-.input-bar button:hover {
+.bar-button:hover {
     background-color: #ed9a02;
 }
 
-.input-bar button svg {
+.bar-button svg {
     width: 16px;
     /* Adjust the size of the icon */
     height: 16px;
     /* Adjust the size of the icon */
+}
+
+.chat-Response-Clear-Button {
+    transform: translateX(180%);
+    background-color: #383838;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    margin-left: 5px;
 }

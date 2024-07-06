@@ -100,9 +100,14 @@ const QuestionCrafter = () => {
   const handleClearMessages = () => {
     setMessages([{ type: 'bot', text: 'Welcome to Bid Pilot! Ask questions about your company library data or search the internet for up to date information. Select text in the response box to use copilot and refine the response.' }]);
     localStorage.removeItem('messages');
-    resetEditorState();
+    
     setIsCopilotVisible(false);
+    
+    if (showOptions == true){
+      resetEditorState();
+    }
     setShowOptions(false);
+    
   };
   
 
@@ -572,7 +577,10 @@ useEffect(() => {
   const handleSendMessage = () => {
     console.log("handleMessage");
     if (inputValue.trim() !== "") {
-      resetEditorState();
+      if (showOptions == true){
+        resetEditorState();
+      }
+      
       setIsCopilotVisible(false);
       setShowOptions(false);
       setMessages([...messages, { type: 'user', text: inputValue }]);
@@ -585,7 +593,10 @@ useEffect(() => {
     // Implement your internet search logic here
     console.log("Internet Search function called");
     if (inputValue.trim() !== "") {
-      resetEditorState();
+      if (showOptions == true){
+        resetEditorState();
+      }
+      
       setIsCopilotVisible(false);
       setShowOptions(false);
       setMessages([...messages, { type: 'user', text: inputValue }]);

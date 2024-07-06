@@ -516,3 +516,4 @@ package-lock.json
 db/
 .env.*
 .idea
+website/local/settings.dev.py

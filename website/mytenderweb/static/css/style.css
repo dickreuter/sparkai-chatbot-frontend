@@ -633,6 +633,19 @@ a:hover {
     /* Adjust the pixel value to make the underline thicker */
 }
 
+
+/* Add this new CSS rule */
+
+.team-member-content h5 {
+    margin-bottom: 5px;
+    /* Adjust this value to reduce the space */
+}
+
+.team-member-content p {
+    transform: translateY(-20%) !important;
+    /* Ensure no additional margin at the top of the paragraph */
+}
+
 .image-zoom-wrapper {
     width: 100%;
     /* Adjust if you want a different size, but make sure all are the same */
@@ -923,4 +936,55 @@ footer .line {
 
 .option {
     font-family: 'ClashDisplay', sans-serif !important;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    /* Adjust the spacing between profiles as needed */
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 16px;
+    /* Adjust the spacing between the image and the text as needed */
+}
+
+.profile img {
+    width: 60px;
+    /* Adjust the size as needed */
+    height: 60px;
+    /* Adjust the size as needed */
+    border-radius: 50%;
+    /* Makes the image circular */
+    object-fit: cover;
+    /* Ensures the image covers the entire area */
+}
+
+.profile p {
+    margin: 0;
+    /* Remove default margin */
+    line-height: 1.5;
+    /* Adjust line-height for better alignment */
+}
+
+@media (max-width: 768px) {
+    .profile {
+        flex-direction: column;
+        align-items: flex-start;
+        box-shadow: var(--box-shadow);
+        background-color: #fff;
+        padding: 25px;
+        transition: all 0.35s ease;
+    }
+    .profile img {
+        margin-bottom: 8px;
+        width: 80px;
+        /* Adjust the size as needed */
+        height: 80px;
+        /* Adjust spacing between the image and the paragraph */
+    }
 }

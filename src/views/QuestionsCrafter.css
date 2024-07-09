@@ -21,8 +21,10 @@
     flex-direction: column;
     height: 66px;
     background-color: #262626;
-    border: 1px solid #ced4da;
-    border-bottom: none;
+    border-top: 1px solid #ced4da;
+    border-right: 1px solid #ced4da;
+    border-left: 1px solid #ced4da;
+    /* Change this color to the desired border-bottom color */
 }
 
 .input-console {
@@ -135,7 +137,7 @@
     margin-bottom: 10px;
     word-wrap: break-word;
     font-size: 14px;
-    max-height: 144px;
+    max-height: 260px;
     /* Set your preferred maximum height */
     overflow-y: auto;
 }
@@ -248,7 +250,7 @@
     color: white;
     text-align: left;
     border: 2px solid #555555;
-    border-bottom: none;
+    border-top: none;
     width: 100%;
     font-weight: 500;
     font-size: 14px;
@@ -286,7 +288,7 @@
 .prompt-button:hover {
     background-color: #262626;
     border: 2px solid #555555;
-    border-bottom: none;
+    border-top: none;
 }
 
 .message-bubble-small {
@@ -435,6 +437,11 @@
     margin-left: 5px;
 }
 
+.option-button:hover {
+    background-color: #505050;
+    /* Replace with a more appropriate color */
+}
+
 .question-answer-box {
     flex: 1;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
@@ -517,4 +524,44 @@
 
 .dropdown-clear-container {
     display: flex;
+}
+
+.custom-prompt-button {
+    background-color: #383838;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    margin-left: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.custom-prompt-button:hover {
+    background-color: #505050;
+    /* Replace with a more appropriate color */
+}
+
+.custom-prompt-container {
+    background-color: #262626;
+    margin-top: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    max-height: 100px;
+    padding: 15px;
+    animation: slideIn 0.5s forwards;
+    padding-bottom: 60px;
+    border-radius: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-prompt-input {
+    max-width: 80%;
+    padding: 2px;
+}
+
+.custom-prompt-input:focus {
+    outline: 1px solid white;
+    /* Replace 'yourColor' with the desired color */
 }

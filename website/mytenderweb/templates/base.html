@@ -59,6 +59,7 @@
                           
 
                             <li class="nav-item"><a class="nav-link" href="{% url 'home' %}#hero" > Home </a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'about' %}" >About </a></li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownServices" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Product
@@ -78,7 +79,7 @@
                                     <!-- Add your dropdown items here -->
                                     <li><a class="dropdown-item" href="{% url 'ITservices' %}">IT</a></li>
                                     <li><a class="dropdown-item" href="{% url 'financialservices' %}">Financial</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'facilitymanagement' %}">Facility Management</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'facilitymanagement' %}">Construction & FM</a></li>
                                     <li><a class="dropdown-item" href="{% url 'healthcare' %}">Healthcare</a></li>
                                     <li><a class="dropdown-item" href="{% url 'telecoms' %}">Telecoms</a></li>
                                     <li><a class="dropdown-item" href="{% url 'publicsector' %}">Public Sector Vendors</a></li>
@@ -86,7 +87,7 @@
                             </li>
                             
             
-                            <li class="nav-item"><a class="nav-link"  href="{% url 'home' %}#team">Team</a></li>
+                            <!-- <li class="nav-item"><a class="nav-link"  href="{% url 'home' %}#team">Team</a></li>-->
                             <a href="{% url 'home' %}#contact" class="button ms-lg-3">Contact Us</a>
 
                         </li>
@@ -111,15 +112,16 @@
    <!-- FOOTER -->
    <footer class="bg-dark">
     <div class="footer-top">
-        <div class="container">
-            <div class="row gy-5">
+        <div class="container ">
+            <div class="row gy-5 px-2">
                 <div class="col-lg-3 col-sm-6">
                     <h5 class="mb-0 text-white">mytender.io</h5>
                     <div class="line"></div>
                     <p>City Road 128 London EC1V 2NX UK</p>
-                    <p>Built with quality, security and integrity.</p>
+                    <p>Sir James Matthews Building, 157-187 Above Bar St, Southampton SO14 7NN</p>
+                    <p>Sunninghill, Sandton, Johannesburg, South Africa</p>
                     <div class="social-icons">
-                        <a href="#"><i class="ri-twitter-fill"></i></a>
+                        <a href="https://www.linkedin.com/company/mytender-io/?originalSubdomain=uk"><i class="ri-linkedin-box-fill"></i></a>
                         <a href="#"><i class="ri-instagram-fill"></i></a>
                         <a href="#"><i class="ri-github-fill"></i></a>
                         <a href="#"><i class="ri-dribbble-fill"></i></a>
@@ -131,8 +133,10 @@
                     <ul>
                         <li><a  href="{% url 'ITservices' %}">IT Services</a></li>
                         <li><a href="{% url 'financialservices' %}">Financial Services</a></li>
-                        <li><a  href="{% url 'facilitymanagement' %}">Facility Management</a></li>
+                        <li><a  href="{% url 'facilitymanagement' %}">Construction and FM</a></li>
                         <li><a  href="{% url 'healthcare' %}">Healthcare</a></li>
+                        <li><a href="{% url 'telecoms' %}">Telecoms</a></li>
+                        <li><a href="{% url 'publicsector' %}">Public Sector Vendors</a></li>
                        
                     </ul>
                 </div>

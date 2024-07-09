@@ -185,20 +185,6 @@ const QuestionCrafter = () => {
               Authorization: `Bearer ${tokenRef.current}`,
             },
           }
-        ),
-        axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/copilot`,
-          {
-            input_text: copilotInput,
-            extra_instructions: instructions,
-            copilot_mode: copilot_mode,
-            dataset,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-            },
-          }
         )
       ];
 
@@ -216,7 +202,10 @@ const QuestionCrafter = () => {
     const handleClickOutside = (event) => {
       console.log("click outside")
       if (
-        !responseBoxRef.current.contains(event.target) 
+        responseBoxRef.current &&
+        promptsContainerRef.current &&
+        !responseBoxRef.current.contains(event.target) &&
+        !promptsContainerRef.current.contains(event.target)
       ) {
        
         setIsCopilotVisible(false);
@@ -507,8 +496,66 @@ const handleOptionSelect = (option) => {
     }, 0);
   };
   
+  const [customPrompt, setCustomPrompt] = useState('');
 
+  const handleCustomPromptInputChange = (event) => {
+    setCustomPrompt(event.target.value);
+  };
 
+  const handleCustomPromptSubmit = () => {
+    // Handle custom prompt submission
+    if (customPrompt.trim()) {
+      console.log(`Custom Prompt: ${customPrompt}`);
+      // Add your logic here to handle the custom prompt
+     
+      const copilot_mode = customPrompt.toLowerCase().replace(/\s+/g, '_');
+      const instructions = '';
+    
+      const contentState = responseEditorState.getCurrentContent();
+      const selectionState = responseEditorState.getSelection();
+    
+      const start = selectionState.getStartOffset();
+      const end = selectionState.getEndOffset();
+      const anchorKey = selectionState.getAnchorKey();
+      const currentContentBlock = contentState.getBlockForKey(anchorKey);
+      const highlightedText = currentContentBlock.getText().slice(start, end);
+    
+      console.log("handleLinkClick - highlightedText:", highlightedText);
+    
+      // Store the original state before making any changes
+      setOriginalEditorState(responseEditorState);
+    
+      // Apply ORANGE style to highlighted text
+      const newContentState = Modifier.applyInlineStyle(
+        contentState,
+        selectionState,
+        'ORANGE'
+      );
+    
+      const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
+      setResponseEditorState(newEditorState);
+    
+      setOriginalText(highlightedText);
+    
+      // Correcting selection range
+      const correctedSelectionRange = {
+        anchorKey: selectionState.getAnchorKey(),
+        anchorOffset: Math.min(selectionState.getAnchorOffset(), selectionState.getFocusOffset()),
+        focusKey: selectionState.getFocusKey(),
+        focusOffset: Math.max(selectionState.getAnchorOffset(), selectionState.getFocusOffset()),
+      };
+      setSelectionRange(correctedSelectionRange);
+    
+      console.log("handleLinkClick - setSelectionRange:", correctedSelectionRange);
+    
+      setTimeout(() => {
+        askCopilot(highlightedText, instructions, copilot_mode);
+        setShowOptions(true);
+      }, 0);
+
+      setCustomPrompt(''); // Clear the input field
+    }
+  };
   
   
 
@@ -1019,7 +1066,7 @@ useEffect(() => {
                   ) : isCopilotVisible ? (
                     <div className={`prompts-container ${!isCopilotVisible ? 'fade-out' : ''}`} ref={promptsContainerRef}>
                       <div className="prompts">
-                        <Button className="prompt-button" onClick={handleLinkClick('Summarise')}>Summarise</Button>
+                        <Button className="prompt-button" style={{ borderTop: '2px solid #555555' }} onClick={handleLinkClick('Summarise')}>Summarise</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Expand')}>Expand</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Rephrase')}>Rephrase</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Translate to English')}>Translate to English</Button>
@@ -1030,7 +1077,21 @@ useEffect(() => {
                         <Button className="prompt-button" onClick={handleLinkClick('Add Statistics')}>Add Statistic</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('For Example')}>For Example</Button>
                       </div>
+
+                      <div className="custom-prompt-container">
+                      <h2 className="lib-title" style={{ color: "white" }}>Custom Prompt</h2>
+                        <input
+                          type="text"
+                          value={customPrompt}
+                          onChange={handleCustomPromptInputChange}
+                          placeholder="Enter Custom Prompt"
+                          className="custom-prompt-input "
+                        />
+                        <Button className="custom-prompt-button" onClick={handleCustomPromptSubmit}>Submit</Button>
+                      </div>
                     </div>
+
+                     
 
                   ) : (
                     <div className="mini-messages">

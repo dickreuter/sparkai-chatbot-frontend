@@ -309,56 +309,67 @@ const QuestionCrafter = () => {
   
   
   const handleEditorChange = (editorState) => {
-  const selectionState = editorState.getSelection();
-  const currentContent = editorState.getCurrentContent();
-  const anchorKey = selectionState.getAnchorKey();
-  const focusKey = selectionState.getFocusKey();
-  const anchorOffset = selectionState.getAnchorOffset();
-  const focusOffset = selectionState.getFocusOffset();
-  const isBackward = selectionState.getIsBackward();
+    const selectionState = editorState.getSelection();
+    const currentContent = editorState.getCurrentContent();
+    const anchorKey = selectionState.getAnchorKey();
+    const focusKey = selectionState.getFocusKey();
+    const anchorOffset = selectionState.getAnchorOffset();
+    const focusOffset = selectionState.getFocusOffset();
+    const isBackward = selectionState.getIsBackward();
 
-  const startKey = isBackward ? focusKey : anchorKey;
-  const endKey = isBackward ? anchorKey : focusKey;
-  const startOffset = isBackward ? focusOffset : anchorOffset;
-  const endOffset = isBackward ? anchorOffset : focusOffset;
+    const startKey = isBackward ? focusKey : anchorKey;
+    const endKey = isBackward ? anchorKey : focusKey;
+    const startOffset = isBackward ? focusOffset : anchorOffset;
+    const endOffset = isBackward ? anchorOffset : focusOffset;
 
-  const startBlock = currentContent.getBlockForKey(startKey);
-  const endBlock = currentContent.getBlockForKey(endKey);
+    const startBlock = currentContent.getBlockForKey(startKey);
+    const endBlock = currentContent.getBlockForKey(endKey);
 
-  let selectedText = '';
+    let selectedText = '';
 
-  if (startBlock === endBlock) {
-    selectedText = startBlock.getText().slice(startOffset, endOffset);
-  } else {
-    const startText = startBlock.getText().slice(startOffset);
-    const endText = endBlock.getText().slice(0, endOffset);
-    const middleText = currentContent
-      .getBlockMap()
-      .skipUntil(block => block.getKey() === startKey)
-      .skip(1)
-      .takeUntil(block => block.getKey() === endKey)
-      .map(block => block.getText())
-      .join('\n');
+    if (startBlock === endBlock) {
+      selectedText = startBlock.getText().slice(startOffset, endOffset);
+    } else {
+      const startText = startBlock.getText().slice(startOffset);
+      const endText = endBlock.getText().slice(0, endOffset);
+      const middleText = currentContent
+        .getBlockMap()
+        .skipUntil(block => block.getKey() === startKey)
+        .skip(1)
+        .takeUntil(block => block.getKey() === endKey)
+        .map(block => block.getText())
+        .join('\n');
 
-    selectedText = [startText, middleText, endText].filter(Boolean).join('\n');
-  }
+      selectedText = [startText, middleText, endText].filter(Boolean).join('\n');
+    }
 
-  console.log("handleEditorChange - selectedText:", selectedText);
+    console.log("handleEditorChange - selectedText:", selectedText);
 
-  setSelectedText(selectedText);
-  setSelectionRange({
-    anchorKey: selectionState.getAnchorKey(),
-    anchorOffset: selectionState.getAnchorOffset(),
-    focusKey: selectionState.getFocusKey(),
-    focusOffset: selectionState.getFocusOffset(),
-  });
+    setSelectedText(selectedText);
+    setSelectionRange({
+      anchorKey: selectionState.getAnchorKey(),
+      anchorOffset: selectionState.getAnchorOffset(),
+      focusKey: selectionState.getFocusKey(),
+      focusOffset: selectionState.getFocusOffset(),
+    });
 
-  setResponseEditorState(editorState); // Always update the state
+    setResponseEditorState(editorState); // Always update the state
 };
 
 useEffect(() => {
   if (selectedText && selectedText.length > 0) {
-    setIsCopilotVisible(true);
+    // added extra check because sometimes an empty string would be passed to the copilot
+    const contentState = responseEditorState.getCurrentContent();
+    const selectionState = responseEditorState.getSelection();
+
+    const start = selectionState.getStartOffset();
+    const end = selectionState.getEndOffset();
+    const anchorKey = selectionState.getAnchorKey();
+    const currentContentBlock = contentState.getBlockForKey(anchorKey);
+    const highlightedText = currentContentBlock.getText().slice(start, end);
+    if (highlightedText && highlightedText.length > 0) {
+      setIsCopilotVisible(true);
+    }
   } else {
     setIsCopilotVisible(false);
   }

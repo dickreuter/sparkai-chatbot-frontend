@@ -549,11 +549,11 @@
     margin-right: 10px;
     margin-left: 10px;
     max-height: 100px;
-    padding: 15px;
+    padding: 20px;
     animation: slideIn 0.5s forwards;
-    padding-bottom: 60px;
     border-radius: 8px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    padding-bottom: 85px;
 }
 
 .custom-prompt-input {

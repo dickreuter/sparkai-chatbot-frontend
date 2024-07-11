@@ -263,7 +263,7 @@ a:hover {
         /* Reduced font size for small screens */
     }
     #hero h4 {
-        font-size: 1.2rem !important;
+        font-size: 1.1rem !important;
         word-break: normal !important;
         white-space: normal;
         /* You can also use a specific size like 16px */

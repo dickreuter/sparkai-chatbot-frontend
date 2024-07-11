@@ -988,3 +988,50 @@ footer .line {
         /* Adjust spacing between the image and the paragraph */
     }
 }
+
+.calculator-container {
+    background-color: #fff;
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    max-width: 400px;
+    width: 100%;
+}
+
+.calculator-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.calculator-form-group {
+    margin-bottom: 0.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: 500;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    background-color: #fff;
+    border-color: #007bff;
+    outline: none;
+}

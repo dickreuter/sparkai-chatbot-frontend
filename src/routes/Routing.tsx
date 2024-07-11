@@ -20,6 +20,7 @@ import Calculator from "../views/Calculator.tsx"
 import BidManagement from "../views/BidWritingStateManagerView.tsx"
 import HowTo from "../views/HowTo.tsx"
 
+
 function Routing() {
     return (
         <div>

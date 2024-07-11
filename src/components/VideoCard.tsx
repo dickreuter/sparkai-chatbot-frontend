@@ -5,8 +5,8 @@ import sidebarIcon from '../resources/images/mytender.io_badge.png';
 const VideoCard = ({ videoUrl, videoTitle, channelName, views, time }) => {
   return (
     <Card sx={{ maxWidth: '100%', boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)', border: '1px solid #ced4da' }}>
-      <video width="100%" controls>
-        <source src={videoUrl} type="video/mp4" />
+       <video width="100%" controls data-testid="video-element">
+        <source src={videoUrl} type="video/mp4" data-testid="video-source" />
         Your browser does not support the video tag.
       </video>
       <CardContent>

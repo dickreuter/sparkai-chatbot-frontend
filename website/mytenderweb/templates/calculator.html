@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}ROI Calculator{% endblock %}
+{% load static %}
+
+{% block content %}
+<section id="about" class="section-padding">
+    <div class="container">
+        <div class="row mb-0">
+            <div class="col-12 text-center">
+                <div class="section-title">
+                    <h1 class="display-4 fw-semibold">ROI Calculator</h1>
+                    <div class="line"></div>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center align-items-center px-2">
+            <div class="col-lg-8" data-aos="fade-down" data-aos-delay="250">
+                <form method="post" action="{% url 'calculator' %}" class="row g-3 p-lg-5 p-2 bg-white theme-shadow rounded">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="calculator-form-group col-lg-12">
+                        <label class="form-label" for="id_hours_saved_per_bid">Hours Saved per Bid</label>
+                        {{ form.hours_saved_per_bid.errors }}
+                        <input type="number" id="id_hours_saved_per_bid" name="hours_saved_per_bid" class="form-control" min="0">
+                    </div>
+                    <div class="calculator-form-group col-lg-12">
+                        <label class="form-label" for="id_hourly_rate">Hourly Rate</label>
+                        {{ form.hourly_rate.errors }}
+                        <input type="number" id="id_hourly_rate" name="hourly_rate" class="form-control" min="0">
+                    </div>
+                    <div class="calculator-form-group col-lg-12">
+                        <label class="form-label" for="id_software_cost">Software Cost</label>
+                        {{ form.software_cost.errors }}
+                        <input type="number" id="id_software_cost" name="software_cost" class="form-control" min="0">
+                    </div>
+                    <div class="calculator-form-group col-lg-12">
+                        <label class="form-label" for="id_number_of_bids">Number of Bids</label>
+                        {{ form.number_of_bids.errors }}
+                        <input type="number" id="id_number_of_bids" name="number_of_bids" class="form-control" min="0">
+                    </div>
+                    <div class="calculator-form-group col-lg-12">
+                        <label class="form-label" for="id_current_time_per_tender">Current Time per Tender</label>
+                        {{ form.current_time_per_tender.errors }}
+                        <input type="number" id="id_current_time_per_tender" name="current_time_per_tender" class="form-control" min="0">
+                    </div>
+                    <div class="calculator-form-group col-lg-12">
+                        <label class="form-label" for="email">Email Address</label>
+                        <input type="email" name="email" class="form-control" placeholder="Enter email address to receive results..." required>
+                    </div>
+                    <div class="calculator-form-group col-lg-12 d-grid">
+                        <button type="submit" class="button mt-2" style="border: none;">Calculate</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        
+    </div>
+</section>
+{% endblock %}

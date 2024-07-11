@@ -6,7 +6,7 @@ import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import { useAuthUser } from 'react-auth-kit';
 import { displayAlert } from '../helper/Alert';
 
-interface SharedState {
+export interface SharedState {
   bidInfo: string;
   opportunity_information: string;
   compliance_requirements: string;
@@ -23,7 +23,7 @@ interface SharedState {
   saveSuccess: boolean | null; // null: no attempt, true: success, false: failure
 }
 
-interface BidContextType {
+export interface BidContextType {
   sharedState: SharedState;
   setSharedState: React.Dispatch<React.SetStateAction<SharedState>>;
   saveProposal: () => void;

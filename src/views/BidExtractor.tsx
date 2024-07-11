@@ -4,7 +4,7 @@ import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { Button, Col, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
@@ -30,7 +30,6 @@ const BidExtractor = () => {
   const bidNameTempRef = useRef(bidInfo);
 
   const [isEditing, setIsEditing] = useState(false);
-  const navigate = useNavigate();
   const bidNameRef = useRef(null);
 
   const [loading, setLoading] = useState(false);

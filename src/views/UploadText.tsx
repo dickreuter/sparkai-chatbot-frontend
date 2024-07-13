@@ -10,14 +10,14 @@ import TextField from '@mui/material/TextField';
 import handleGAEvent from "../utilities/handleGAEvent";
 import { Spinner } from 'react-bootstrap'; // Import Spinner component
 
-const UploadText = ({folder, get_collections, onClose}) => {
+const UploadText = ({ folder, get_collections, onClose }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const [text, setText] = useState(null);
+  const [text, setText] = useState('');
   const [profileName, setProfileName] = useState(folder || 'default');
-  const [fileName, setFileName] = useState(null);
+  const [fileName, setFileName] = useState('');
   const [textFormat, setTextFormat] = useState("plain");
   const [isUploading, setIsUploading] = useState(false);
   const [isFormFilled, setIsFormFilled] = useState(false);
@@ -31,19 +31,32 @@ const UploadText = ({folder, get_collections, onClose}) => {
   const handleTextSubmit = async () => {
     const formData = new FormData();
     setIsUploading(true);
+
+    const trimmedProfileName = profileName.trim(); // Remove leading and trailing spaces
+    const formattedProfileName = trimmedProfileName.replace(/\s+/g, '_');
+
+    const trimmedFileName = fileName.trim(); // Remove leading and trailing spaces
+    const formattedFileName = trimmedFileName.replace(/\s+/g, '_');
+   
     formData.append("text", text);
-    formData.append("filename", fileName);
-    formData.append("profile_name", profileName);
+    formData.append("filename", formattedFileName);
+    formData.append("profile_name", formattedProfileName);
     formData.append("mode", textFormat);
 
-    if (/\s/.test(profileName)) {
-      displayAlert('Folder name should not contain spaces', 'warning');
+    if (!/^[a-zA-Z0-9_-]{3,}$/.test(formattedProfileName)) {
+      displayAlert('Folder name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
       setIsUploading(false);
       return;
     }
 
-    if (!/^[a-zA-Z0-9_-]{3,}$/.test(profileName)) {
-      displayAlert('Folder name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
+    if (!/^[a-zA-Z0-9_-]{3,}$/.test(formattedFileName)) {
+      displayAlert('File name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
+      setIsUploading(false);
+      return;
+    }
+
+    if (text.length < 30) {
+      displayAlert('Minimum input text is 30 characters', 'warning');
       setIsUploading(false);
       return;
     }
@@ -54,7 +67,8 @@ const UploadText = ({folder, get_collections, onClose}) => {
         formData,
         {
           headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${tokenRef.current}` // Adding the token in the request headers
           },
         }
       );
@@ -81,6 +95,7 @@ const UploadText = ({folder, get_collections, onClose}) => {
           value={profileName}
           onChange={(e) => setProfileName(e.target.value)}
           disabled={!!folder} // Disable if folder prop is provided
+          inputProps={{ maxLength: 50 }} // Set character limit for folder name
         />
 
         <CustomTextField
@@ -89,6 +104,7 @@ const UploadText = ({folder, get_collections, onClose}) => {
           variant="outlined"
           value={fileName}
           onChange={(e) => setFileName(e.target.value)}
+          inputProps={{ maxLength: 50 }} // Set character limit for file name
         />
         <TextField
           fullWidth

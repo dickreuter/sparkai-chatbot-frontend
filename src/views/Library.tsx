@@ -360,7 +360,8 @@ const renderFolders = () => {
           onClick={(event) => event.stopPropagation()} 
           style={{ cursor: 'pointer', marginRight: '10px' }} 
         /> 
-        {folder}
+        {folder.replace(/_/g, ' ')}
+
       </td>
       <td colSpan={3}>
         <UploadButtonWithDropdown

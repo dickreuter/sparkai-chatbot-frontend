@@ -1,8 +1,17 @@
 import logging
+import os
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from .forms import CalculatorForm, ContactForm
-
+import io
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.core.mail import EmailMessage
+from reportlab.lib.units import inch
+from reportlab.graphics.shapes import Drawing, Rect, String
+from reportlab.graphics.charts.barcharts import VerticalBarChart
+from reportlab.graphics import renderPDF
+from reportlab.lib import colors
 logger = logging.getLogger(__name__)
 
 def home(request):
@@ -67,6 +76,64 @@ def calculate_metrics(hours_saved_per_bid, hourly_rate, software_cost, number_of
         "ROI (%)": roi
     }
 
+
+
+
+def generate_pdf(metrics):
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+
+    # Determine the path to the logo image relative to the current script
+    current_dir = os.path.dirname(__file__)
+    logo_path = os.path.join(current_dir, '../static/images/mytender.io_badge.png')
+    logo_path = os.path.normpath(logo_path)
+
+    # Draw the logo in the top right corner, smaller and further down
+    logo_width = 0.75 * inch
+    logo_height = 0.75 * inch
+    p.drawImage(logo_path, 450, 720, width=logo_width, height=logo_height)
+
+    # Title
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, 750, "ROI Calculation Results")
+
+    # Add a chart
+    drawing = Drawing(400, 200)
+    data = [(metrics["Bid Writer Time Saved (hours)"], metrics["Bid Writer Cost Saved"], metrics["ROI (%)"])]
+    bc = VerticalBarChart()
+    bc.x = 50
+    bc.y = 50
+    bc.height = 125
+    bc.width = 300
+    bc.data = data
+    bc.strokeColor = colors.black
+    bc.valueAxis.valueMin = 0
+    bc.valueAxis.valueMax = max(metrics["Bid Writer Time Saved (hours)"], metrics["Bid Writer Cost Saved"], metrics["ROI (%)"]) * 1.2
+    bc.valueAxis.valueStep = max(metrics["Bid Writer Time Saved (hours)"], metrics["Bid Writer Cost Saved"], metrics["ROI (%)"]) // 5
+    drawing.add(bc)
+
+    renderPDF.draw(drawing, p, 100, 500)
+
+    # Add metrics with explanations
+    p.setFont("Helvetica", 12)
+    y = 450
+    explanations = {
+        "Bid Writer Time Saved (hours)": "This is the total time saved for bid writing based on your inputs.",
+        "Bid Writer Cost Saved": "This represents the cost savings due to reduced bid writing time.",
+        "Number of Additional Tenders": "This is the number of additional tenders you can apply for with the time saved.",
+        "Number of Times More per Tender": "This shows how many more times you can spend on each tender.",
+        "ROI (%)": "This is the return on investment based on your inputs."
+    }
+    for key, value in metrics.items():
+        p.drawString(100, y, f"{key}: {value}")
+        p.drawString(100, y - 15, explanations[key])
+        y -= 40
+
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    return buffer
+
 def calculator(request):
     if request.method == 'POST':
         form = CalculatorForm(request.POST)
@@ -78,37 +145,51 @@ def calculator(request):
             number_of_bids = form.cleaned_data['number_of_bids']
             current_time_per_tender = form.cleaned_data['current_time_per_tender']
             email = form.cleaned_data['email']
-            
+
             # Calculate metrics
             metrics = calculate_metrics(hours_saved_per_bid, hourly_rate, software_cost, number_of_bids, current_time_per_tender)
-            
-            # Convert metrics to a string
-            metrics_str = "\n".join([f"{key}: {value}" for key, value in metrics.items()])
-            
+
+            # Generate PDF
+            pdf_buffer = generate_pdf(metrics)
+
             try:
-                # Send email to the user
-                send_mail(
+                # Create email with PDF attachment
+                email_message = EmailMessage(
                     'Your ROI Calculation Results',
-                    f'Thank you for using our calculator. Here are your results:\n\n{metrics_str}',
-                    from_email='sam@mytender.io',  # use the configured default email
-                    recipient_list=[email],
-                    fail_silently=False,
+                    'Thank you for using our calculator. Please find your results attached. Here is a summary:\n\n'
+                    f'Bid Writer Time Saved (hours): {metrics["Bid Writer Time Saved (hours)"]}\n'
+                    f'Bid Writer Cost Saved: {metrics["Bid Writer Cost Saved"]}\n'
+                    f'Number of Additional Tenders: {metrics["Number of Additional Tenders"]}\n'
+                    f'Number of Times More per Tender: {metrics["Number of Times More per Tender"]}\n'
+                    f'ROI (%): {metrics["ROI (%)"]}\n\n'
+                    'We hope you find these insights useful. If you have any questions, feel free to contact us.',
+                    'sam@mytender.io',  # use the configured default email
+                    [email]
                 )
-                print("ROI email sent successfully.")
+                email_message.attach('ROI_Calculation_Results.pdf', pdf_buffer.getvalue(), 'application/pdf')
+                email_message.send()
+                print("ROI email with PDF sent successfully.")
+
                 # Send notification email
-                send_mail(
+                notification_email = EmailMessage(
                     subject="New ROI Form Submission",
-                    message=f"Here are the results:\n\n{metrics_str}\n\nfor: {email}",
+                    body=f"Here are the results for: {email}\n\n"
+                         f'Bid Writer Time Saved (hours): {metrics["Bid Writer Time Saved (hours)"]}\n'
+                         f'Bid Writer Cost Saved: {metrics["Bid Writer Cost Saved"]}\n'
+                         f'Number of Additional Tenders: {metrics["Number of Additional Tenders"]}\n'
+                         f'Number of Times More per Tender: {metrics["Number of Times More per Tender"]}\n'
+                         f'ROI (%): {metrics["ROI (%)"]}',
                     from_email='alexanderhoyle123@gmail.com',  # Sender's email address
-                    recipient_list=['sam@mytender.io', 'alexanderhoyle123@gmail.com'],  # Send to this email address
-                    fail_silently=False,
+                    to=['sam@mytender.io', 'alexanderhoyle123@gmail.com']  # Send to these email addresses
                 )
-                logger.debug("Emails sent successfully.")
-                print("Emails sent successfully.")
+                notification_email.attach('ROI_Calculation_Results.pdf', pdf_buffer.getvalue(), 'application/pdf')
+                notification_email.send()
+                logger.debug("Emails with PDF sent successfully.")
+                print("Emails with PDF sent successfully.")
             except Exception as e:
                 logger.error(f"Error sending email: {e}")
                 print(f"Error sending email: {e}")
-            
+
             # Pass metrics to the thank you template
             return render(request, 'calculatorThankYou.html', {'metrics': metrics})
         else:

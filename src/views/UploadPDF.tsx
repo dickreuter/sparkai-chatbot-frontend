@@ -17,16 +17,19 @@ const UploadPDF = ({folder, get_collections, onClose}) => {
 
     const handleFileSelect = async (file, profileName) => {
         setSelectedFile(file);
+        const trimmedProfileName = profileName.trim(); // Remove leading and trailing spaces
+        const formattedProfileName = trimmedProfileName.replace(/\s+/g, '_');
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('profile_name', profileName);
-
+        formData.append("profile_name", formattedProfileName);
+        
         // Check if profile name is valid
-        if (!/^[a-zA-Z0-9_-]{3,}$/.test(profileName)) {
-            displayAlert('Folder name should only contain alphanumeric characters and be at least 3 characters long', 'warning');
-            setIsUploading(false)
+        if (!/^[a-zA-Z0-9_-]{3,}$/.test(formattedProfileName)) {
+            displayAlert('Folder name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
+            setIsUploading(false);
             return;
-        }
+            }
+
 
         try {
             const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/uploadfile/`, formData, {

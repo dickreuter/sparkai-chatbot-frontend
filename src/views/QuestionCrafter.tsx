@@ -68,6 +68,9 @@ const QuestionCrafter = () => {
   const promptsContainerRef = useRef(null); // Ref for the prompts container
   const editorRef = useRef(null);
 
+  const [selectedDropdownOption, setSelectedDropdownOption] = useState('library-chat');
+  const bidPilotRef = useRef(null);
+
   useEffect(() => {
     localStorage.setItem('response', convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n'));
   }, [responseEditorState]);
@@ -200,14 +203,15 @@ const QuestionCrafter = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      console.log("click outside")
+      console.log("click outside");
       if (
         responseBoxRef.current &&
         promptsContainerRef.current &&
+        bidPilotRef.current &&
         !responseBoxRef.current.contains(event.target) &&
-        !promptsContainerRef.current.contains(event.target)
+        !promptsContainerRef.current.contains(event.target) &&
+        !bidPilotRef.current.contains(event.target)
       ) {
-       
         setIsCopilotVisible(false);
       }
     };
@@ -217,6 +221,7 @@ const QuestionCrafter = () => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, [showOptions, isCopilotVisible]);
+  
   
   
   
@@ -504,22 +509,17 @@ const handleOptionSelect = (option) => {
     setTimeout(() => {
       askCopilot(highlightedText, instructions, copilot_mode);
       setShowOptions(true);
+      setIsCopilotVisible(false);
     }, 0);
   };
   
-  const [customPrompt, setCustomPrompt] = useState('');
-
-  const handleCustomPromptInputChange = (event) => {
-    setCustomPrompt(event.target.value);
-  };
-
   const handleCustomPromptSubmit = () => {
     // Handle custom prompt submission
-    if (customPrompt.trim()) {
-      console.log(`Custom Prompt: ${customPrompt}`);
+    if (inputValue.trim()) {
+      console.log(`Custom Prompt: ${inputValue}`);
       // Add your logic here to handle the custom prompt
      
-      const copilot_mode = customPrompt.toLowerCase().replace(/\s+/g, '_');
+      const copilot_mode = inputValue.toLowerCase().replace(/\s+/g, '_');
       const instructions = '';
     
       const contentState = responseEditorState.getCurrentContent();
@@ -563,11 +563,11 @@ const handleOptionSelect = (option) => {
         askCopilot(highlightedText, instructions, copilot_mode);
         setShowOptions(true);
       }, 0);
-
-      setCustomPrompt(''); // Clear the input field
+  
+      setInputValue(''); // Clear the input field
+      setIsCopilotVisible(false);
     }
   };
-  
   
 
   
@@ -679,7 +679,7 @@ useEffect(() => {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/perplexity`,
         {
-          input_text: question,
+          input_text: question + "Respond in a full sentence format.",
           dataset: 'default',
         },
         {
@@ -709,9 +709,25 @@ useEffect(() => {
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !isBidPilotLoading) {
-      isInternetSearch ? handleInternetSearch() : handleSendMessage();
+      if (selectedDropdownOption === 'internet-search') {
+        handleInternetSearch();
+      } else if (selectedDropdownOption === 'custom-prompt' && isCopilotVisible) {
+        handleCustomPromptSubmit();
+      } else {
+        handleSendMessage();
+      }
     }
   };
+  
+  useEffect(() => {
+    if (isCopilotVisible) {
+      setSelectedDropdownOption('custom-prompt');
+    } else {
+      setSelectedDropdownOption('internet-search');
+    }
+  }, [isCopilotVisible]);
+
+  
 
 
   const sendQuestion = async (question) => {
@@ -1089,7 +1105,7 @@ useEffect(() => {
                         <Button className="prompt-button" onClick={handleLinkClick('For Example')}>For Example</Button>
                       </div>
 
-                      <div className="custom-prompt-container">
+                      {/*<div className="custom-prompt-container">
                       <h2 className="lib-title" style={{ color: "white" }}>Custom Prompt</h2>
                         <input
                           type="text"
@@ -1099,8 +1115,8 @@ useEffect(() => {
                           className="custom-prompt-input "
                         />
                         <Button className="custom-prompt-button" onClick={handleCustomPromptSubmit}>Submit</Button>
-                      </div>
-                    </div>
+                      </div>*/}
+                    </div>  
 
                      
 
@@ -1122,30 +1138,35 @@ useEffect(() => {
                     </div>
                   )}
                   <div className="input-console">
-                  <div className="dropdown-clear-container mb-3">
-        <Dropdown onSelect={(key) => setIsInternetSearch(key === 'internet-search')} className="chat-dropdown">
-          <Dropdown.Toggle className="upload-button" style={{ backgroundColor: '#383838', color: 'white' }}>
-            {isInternetSearch ? 'Internet Search' : 'Library Chat'}
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            <Dropdown.Item eventKey="internet-search">Internet Search</Dropdown.Item>
-            <Dropdown.Item eventKey="library-chat">Library Chat</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-        <Button className="option-button" onClick={handleClearMessages}>Clear</Button>
-      </div>
-                    <div className="bid-input-bar">
-                        <input
-                          type="text"
-                          placeholder="Please type your question in here..."
-                          value={inputValue}
-                          onChange={(e) => setInputValue(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                        />
-                          <button onClick={!isBidPilotLoading ? (isInternetSearch ? handleInternetSearch : handleSendMessage) : null} disabled={isBidPilotLoading}>
-          <FontAwesomeIcon icon={faPaperPlane} />
-        </button>
-                      </div>
+                    <div className="dropdown-clear-container mb-3">
+                      <Dropdown onSelect={(key) => setSelectedDropdownOption(key)} className="chat-dropdown">
+                        <Dropdown.Toggle className="upload-button" style={{ backgroundColor: selectedDropdownOption === 'custom-prompt' ? 'orange' : '#383838', color: selectedDropdownOption === 'custom-prompt' ? 'black' : 'white' }}>
+                          {selectedDropdownOption === 'internet-search' ? 'Internet Search' : selectedDropdownOption === 'custom-prompt' ? 'Custom Prompt' : 'Library Chat'}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item eventKey="internet-search">Internet Search</Dropdown.Item>
+                          <Dropdown.Item eventKey="library-chat">Library Chat</Dropdown.Item>
+                          <Dropdown.Item eventKey="custom-prompt">Custom Prompt</Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
+                      <Button className="option-button" onClick={handleClearMessages}>Clear</Button>
+                    </div>
+                    <div className="bid-input-bar" ref={bidPilotRef}>
+                      <input
+                        type="text"
+                        placeholder={selectedDropdownOption === 'internet-search' ? "Please type your question in here..." : selectedDropdownOption === 'custom-prompt' ? "Type in a custom prompt here..." : "Please type your question in here..."}
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        style={{
+                          color: selectedDropdownOption === 'custom-prompt' ? 'white' : 'lightgray',
+                          
+                        }}
+                      />
+                      <button onClick={!isBidPilotLoading ? (selectedDropdownOption === 'internet-search' ? handleInternetSearch : selectedDropdownOption === 'custom-prompt' && isCopilotVisible ? handleCustomPromptSubmit : handleSendMessage) : null} disabled={isBidPilotLoading}>
+                        <FontAwesomeIcon icon={faPaperPlane} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

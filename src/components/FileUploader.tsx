@@ -46,12 +46,9 @@ const FileUploader = ({ onFileSelect, folder, onClose }) => {
 
   const handleUpload = () => {
     if (isFormFilled && selectedFile && profileName) {
-      if (/\s/.test(profileName)) {
-        displayAlert('Folder name should not contain spaces', 'warning');
-        return;
-      }
-
-      if (!/^[a-zA-Z0-9_-]{3,}$/.test(profileName)) {
+      const trimmedProfileName = profileName.trim(); // Remove leading and trailing spaces
+      const formattedProfileName = trimmedProfileName.replace(/\s+/g, '_');
+      if (!/^[a-zA-Z0-9_-]{3,}$/.test(formattedProfileName)) {
         displayAlert('Folder name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
         return;
       }

@@ -37,7 +37,6 @@ const QuestionCrafter = () => {
 
   const [isCopilotVisible, setIsCopilotVisible] = useState(false);
   const [selectedText, setSelectedText] = useState('');
-  const [originalText, setOriginalText] = useState('');
   const [tempText, setTempText] = useState('');
   const [copilotOptions, setCopilotOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -70,6 +69,7 @@ const QuestionCrafter = () => {
 
   const [selectedDropdownOption, setSelectedDropdownOption] = useState('library-chat');
   const bidPilotRef = useRef(null);
+  const [highlightedText, setHighlightedText] = useState('');
 
   useEffect(() => {
     localStorage.setItem('response', convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n'));
@@ -362,23 +362,14 @@ const QuestionCrafter = () => {
 };
 
 useEffect(() => {
-  if (selectedText && selectedText.length > 0) {
-    // added extra check because sometimes an empty string would be passed to the copilot
-    const contentState = responseEditorState.getCurrentContent();
-    const selectionState = responseEditorState.getSelection();
-
-    const start = selectionState.getStartOffset();
-    const end = selectionState.getEndOffset();
-    const anchorKey = selectionState.getAnchorKey();
-    const currentContentBlock = contentState.getBlockForKey(anchorKey);
-    const highlightedText = currentContentBlock.getText().slice(start, end);
-    if (highlightedText && highlightedText.length > 0) {
-      setIsCopilotVisible(true);
+    if (selectedText.trim() && selectedText.trim().length > 0) {
+      // added extra check because sometimes an empty string would be passed to the copilot
+        console.log(selectedText);
+        setIsCopilotVisible(true);
+    } else {
+        setIsCopilotVisible(false);
     }
-  } else {
-    setIsCopilotVisible(false);
-  }
-}, [selectedText]);
+  }, [selectedText, responseEditorState]);
 
   
 const handleOptionSelect = (option) => {
@@ -458,43 +449,36 @@ const handleOptionSelect = (option) => {
 
   // Force re-render of the editor component by updating a dummy state
   setDummyState((prev) => !prev);
+
+  
 };
 
   // Dummy state to force re-render of the editor component
   const [dummyState, setDummyState] = useState(false);
   
-  // Example of logging for additional context (if needed)
   const handleLinkClick = (linkName) => (e) => {
     e.preventDefault();
     const copilot_mode = linkName.toLowerCase().replace(/\s+/g, '_');
     const instructions = '';
-  
-    const contentState = responseEditorState.getCurrentContent();
-    const selectionState = responseEditorState.getSelection();
-  
-    const start = selectionState.getStartOffset();
-    const end = selectionState.getEndOffset();
-    const anchorKey = selectionState.getAnchorKey();
-    const currentContentBlock = contentState.getBlockForKey(anchorKey);
-    const highlightedText = currentContentBlock.getText().slice(start, end);
-  
-    console.log("handleLinkClick - highlightedText:", highlightedText);
-  
+
     // Store the original state before making any changes
     setOriginalEditorState(responseEditorState);
-  
+
+    
     // Apply ORANGE style to highlighted text
+    const contentState = responseEditorState.getCurrentContent();
+    const selectionState = responseEditorState.getSelection();
+
     const newContentState = Modifier.applyInlineStyle(
       contentState,
       selectionState,
       'ORANGE'
     );
-  
+
     const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
     setResponseEditorState(newEditorState);
-  
-    setOriginalText(highlightedText);
-  
+
+
     // Correcting selection range
     const correctedSelectionRange = {
       anchorKey: selectionState.getAnchorKey(),
@@ -503,11 +487,11 @@ const handleOptionSelect = (option) => {
       focusOffset: Math.max(selectionState.getAnchorOffset(), selectionState.getFocusOffset()),
     };
     setSelectionRange(correctedSelectionRange);
-  
-    console.log("handleLinkClick - setSelectionRange:", correctedSelectionRange);
-  
+
+    //console.log("handleLinkClick - setSelectionRange:", correctedSelectionRange);
+
     setTimeout(() => {
-      askCopilot(highlightedText, instructions, copilot_mode);
+      askCopilot(selectedText, instructions, copilot_mode);
       setShowOptions(true);
       setIsCopilotVisible(false);
     }, 0);
@@ -525,13 +509,6 @@ const handleOptionSelect = (option) => {
       const contentState = responseEditorState.getCurrentContent();
       const selectionState = responseEditorState.getSelection();
     
-      const start = selectionState.getStartOffset();
-      const end = selectionState.getEndOffset();
-      const anchorKey = selectionState.getAnchorKey();
-      const currentContentBlock = contentState.getBlockForKey(anchorKey);
-      const highlightedText = currentContentBlock.getText().slice(start, end);
-    
-      console.log("handleLinkClick - highlightedText:", highlightedText);
     
       // Store the original state before making any changes
       setOriginalEditorState(responseEditorState);
@@ -546,7 +523,7 @@ const handleOptionSelect = (option) => {
       const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
       setResponseEditorState(newEditorState);
     
-      setOriginalText(highlightedText);
+    
     
       // Correcting selection range
       const correctedSelectionRange = {
@@ -560,7 +537,7 @@ const handleOptionSelect = (option) => {
       console.log("handleLinkClick - setSelectionRange:", correctedSelectionRange);
     
       setTimeout(() => {
-        askCopilot(highlightedText, instructions, copilot_mode);
+        askCopilot(selectedText, instructions, copilot_mode);
         setShowOptions(true);
       }, 0);
   
@@ -706,6 +683,11 @@ useEffect(() => {
   };
 
   
+  useEffect(() => {
+    if (showOptions) {
+      setSelectedDropdownOption('internet-search');
+    }
+  }, [selectedDropdownOption]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !isBidPilotLoading) {

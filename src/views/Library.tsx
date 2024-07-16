@@ -13,6 +13,9 @@ import { faEye, faTrash, faFolder, faFileAlt,  faArrowUpFromBracket, faEllipsisV
 import "./Chatbot.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UploadPDFModal, UploadTextModal, UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
+import { Menu, MenuItem, IconButton } from '@mui/material';
+import { MoreVert as MoreVertIcon } from '@mui/icons-material';
+
 
 
 const Library = () => {
@@ -46,6 +49,23 @@ const Library = () => {
   const [fileToDelete, setFileToDelete] = useState(null);
 
   const [uploadFolder, setUploadFolder] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+  
+  const handleMenuItemClick = (action) => {
+    handleMenuClose();
+    if (action === 'pdf') handleOpenPDFModal();
+    else if (action === 'text') handleOpenTextModal();
+  
+  };
 
   const handleDelete = async (folderTitle) => {
     // Your delete folder logic here
@@ -418,23 +438,28 @@ return (
             <div className="header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h1 className="lib-custom-card-title">Resources</h1>
               <div style={{ display: 'flex' }}>
-                <Button
-            className="upload-button"
-            onClick={handleOpenPDFModal}
-            style={{ marginRight: '10px' }} // Add some space between the buttons
-        >
-            Upload PDF
-        </Button>
-       
-        <Button 
-            className="upload-button"
-            onClick={handleOpenTextModal}
-          
-        >
-            Upload Text
-        </Button>
-            
-              </div>
+              <Button
+                 aria-controls="simple-menu"
+                aria-haspopup="true"
+                onClick={handleMenuClick}
+                className = "upload-button"
+              >
+                New Folder
+              </Button>
+              <Menu
+                id="long-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={open}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Upload PDF</MenuItem>
+                <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Upload Text</MenuItem>
+                
+              </Menu>
+            </div>
+
+
             </div>
             
             {/* Table Structure */}

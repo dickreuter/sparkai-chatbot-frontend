@@ -1,0 +1,211 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ROI Calculation Results</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.2/css/boxicons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{% static 'css/clash-display.css' %}">
+    <style>
+        :root {
+            --c-dark: black;
+            --c-brand: #f58218;
+            --c-brand-light: #ffa654;
+            --c-brand-rgb: 245, 130, 24;
+            --c-body: black;
+            --font-base: "ClashDisplay", sans-serif;
+            --box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+            --transition: all 0.5s ease;
+        }
+
+        body {
+            font-family: var(--font-base);
+            line-height: 1.7;
+            color: var(--c-body);
+        }
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .h1,
+        .h2,
+        .h3,
+        .h4,
+        .h5,
+        .h6 {
+            font-weight: 600;
+            color: var(--c-dark);
+        }
+        
+        .logo {
+            width: 200px;
+            height: auto;
+            margin-top: 40px;
+        }
+        .metrics {
+            margin-top: 20px;
+        }
+        .metrics div {
+            margin-bottom: 10px;
+        }
+
+        .card-effect {
+            box-shadow: var(--box-shadow);
+            background-color: #fff;
+            padding: 25px;
+            transition: all 0.35s ease;
+        }
+        
+        
+        .round_iconbox {
+            width: 54px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--c-brand);
+            color: #fff;
+            font-size: 32px;
+            border-radius: 100px;
+            margin-right: 15px; /* Add some space between icon and text */
+        }
+        
+        .iconbox {
+            width: 70px;
+            height: 70px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(var(--c-brand-rgb), 0.1);
+            color: var(--c-brand);
+            font-size: 34px;
+            flex: none;
+        }
+
+        .section-title {
+            margin-bottom: 60px;
+        }
+
+        .section-title .line {
+            width: 60px;
+            height: 4px;
+            background-color: var(--c-brand);
+            margin: 16px auto 24px auto;
+        }
+
+        .section-title p {
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .card-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .metric-value {
+            font-size: 40px;
+            font-weight: bold;
+            
+        }
+        
+    </style>
+</head>
+<body>
+    <section class="section" style="margin-bottom: 140px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <div class="section-title">
+                        <img src="{% static 'images/mytender.io_badge.png' %}" alt="Logo" class="logo">
+                        <h1 class="display-4 fw-semibold">ROI Calculation Results</h1>
+                        <div class="line"></div>
+                        <p>Thanks for visiting mytender.io, here are your results.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4 col-sm-6">
+                    <div class="card-effect">
+                        <div class="card-content">
+                            <div class="round_iconbox">
+                                <i class="bx bx-briefcase"></i>
+                            </div>
+                            <span class="metric-value">70%</span>
+                        </div>
+                        <h5 class="mt-2 mb-2">Faster</h5>
+                        <p>This is how much faster you can write bids with mytender.io</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <div class="card-effect">
+                        <div class="card-content">
+                            <div class="round_iconbox">
+                                <i class="bx bx-time-five"></i>
+                            </div>
+                            <span class="metric-value">{{ metrics.bid_writer_time_saved }}</span>
+                        </div>
+                        <h5 class="mt-2 mb-2">Bid Writer Time Saved (hours)</h5>
+                        <p>This is the total time saved for bid writing based on your inputs.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <div class="card-effect">
+                        <div class="card-content">
+                            <div class="round_iconbox">
+                                <i class="bx bx-dollar-circle"></i>
+                            </div>
+                            <span class="metric-value">{{ metrics.bid_writer_cost_saved }}</span>
+                        </div>
+                        <h5 class="mt-2 mb-2">Bid Writer Cost Saved</h5>
+                        <p>This represents the cost savings due to reduced bid writing time.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <div class="card-effect">
+                        <div class="card-content">
+                            <div class="round_iconbox">
+                                <i class="bx bx-duplicate"></i>
+                            </div>
+                            <span class="metric-value">{{ metrics.additional_revenue_per_year }}</span>
+                        </div>
+                        <h5 class="mt-2 mb-2">Additional Revenue per Year</h5>
+                        <p>This is the additional revenue per year based on your inputs.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <div class="card-effect">
+                        <div class="card-content">
+                            <div class="round_iconbox">
+                                <i class="bx bx-repeat"></i>
+                            </div>
+                            <span class="metric-value">{{ metrics.number_of_times_more_per_tender }}</span>
+                        </div>
+                        <h5 class="mt-2 mb-2">Number of Times More per Tender</h5>
+                        <p>How much more time you can allocate to each tender after using mytender.io</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <div class="card-effect">
+                        <div class="card-content">
+                            <div class="round_iconbox">
+                                <i class="bx bx-chart"></i>
+                            </div>
+                            <span class="metric-value">{{ metrics.roi }}%</span>
+                        </div>
+                        <h5 class="mt-2 mb-2">ROI (%)</h5>
+                        <p>This is the return on investment based on your inputs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+</body>
+</html>

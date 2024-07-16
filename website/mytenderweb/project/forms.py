@@ -26,24 +26,24 @@ class CalculatorForm(forms.Form):
 
     def clean_number_of_bid_writers(self):
         data = self.cleaned_data['number_of_bid_writers']
-        if data < 0:
-            raise forms.ValidationError("This value cannot be negative.")
+        if data <= 0:
+            raise forms.ValidationError("This value cannot be less than zero.")
         return data
 
     def clean_average_bids_per_month(self):
         data = self.cleaned_data['average_bids_per_month']
-        if data < 0:
-            raise forms.ValidationError("This value cannot be negative.")
+        if data <= 0:
+            raise forms.ValidationError("This value cannot be less than zero.")
         return data
 
     def clean_average_time_per_bid(self):
         data = self.cleaned_data['average_time_per_bid']
-        if data < 0:
-            raise forms.ValidationError("This value cannot be negative.")
+        if data <= 0:
+            raise forms.ValidationError("This value cannot be less than zero.")
         return data
 
     def clean_average_bid_value(self):
         data = self.cleaned_data['average_bid_value']
-        if data < 0:
-            raise forms.ValidationError("This value cannot be negative.")
+        if data <= 0:
+            raise forms.ValidationError("This value cannot be less than zero.")
         return data

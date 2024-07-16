@@ -108,7 +108,7 @@ def calculator(request):
                          f'ROI (%): {metrics["roi"]}\n'
                          f'Number of Times More per Tender: {metrics["number_of_times_more_per_tender"]}',
                     from_email='alexanderhoyle123@gmail.com',
-                    to=['alexanderhoyle123@gmail.com', 'sam@mytender.io' ]
+                    to=['alexanderhoyle123@gmail.com', 'sam@mytender.io']
                 )
                 notification_email.send()
                 print("Email sent successfully.")
@@ -118,7 +118,8 @@ def calculator(request):
             return render(request, 'roi_results.html', {'metrics': metrics})
         else:
             print("Form is not valid.")
-            return render(request, 'index.html', {'form': form})
+            print(form.errors)  # Print form errors to the console for debugging
+            return render(request, 'calculator.html', {'form': form})
     else:
         form = CalculatorForm()
         return render(request, 'calculator.html', {'form': form})

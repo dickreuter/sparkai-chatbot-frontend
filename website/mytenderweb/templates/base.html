@@ -10,10 +10,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
-          integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"/>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
           integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"/>
 
@@ -26,12 +22,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.2/css/boxicons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 
-
-
-
-
-
-
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X8S1ZMRM3C"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+      
+        gtag('config', 'G-X8S1ZMRM3C');
+      
+        // Track a custom event for visits
+        gtag('event', 'visit', {
+          'event_category': 'engagement',
+          'event_label': 'page_visit'
+        });
+      </script>
+      
 </head>
 
 
@@ -87,9 +93,9 @@
                             </li>
                             
 
-                            <!--<li class="nav-item"><a class="nav-link" href="{% url 'calculator' %}" >ROI Calculator</a></li> -->
+                            <li class="nav-item"><a class="nav-link" href="{% url 'calculator' %}" >ROI Calculator</a></li> 
                             <!-- <li class="nav-item"><a class="nav-link"  href="{% url 'home' %}#team">Team</a></li>-->
-                            <a href="https://calendly.com/sam-od9g/discovery-call?month=2024-06" class="button ms-lg-3">Book a Demo</a>
+                            <a href="https://calendly.com/naeemah-mytender/30min?month=2024-07" class="button ms-lg-3">Book a Demo</a>
 
                         </li>
 

@@ -20,33 +20,33 @@
                     {% csrf_token %}
                     {{ form.non_field_errors }}
                     <div class="calculator-form-group col-lg-12">
-                        <label class="form-label" for="id_hours_saved_per_bid">Hours Saved per Bid</label>
-                        {{ form.hours_saved_per_bid.errors }}
-                        <input type="number" id="id_hours_saved_per_bid" name="hours_saved_per_bid" class="form-control" min="0">
+                        <label class="form-label" for="id_industry">What Industry are you?</label>
+                        {{ form.industry.errors }}
+                        <input type="text" id="id_industry" name="industry" class="form-control">
                     </div>
                     <div class="calculator-form-group col-lg-12">
-                        <label class="form-label" for="id_hourly_rate">Hourly Rate</label>
-                        {{ form.hourly_rate.errors }}
-                        <input type="number" id="id_hourly_rate" name="hourly_rate" class="form-control" min="0">
+                        <label class="form-label" for="id_number_of_bid_writers">How many Bid Writers do you have?</label>
+                        {{ form.number_of_bid_writers.errors }}
+                        <input type="number" id="id_number_of_bid_writers" name="number_of_bid_writers" class="form-control" min="0">
                     </div>
                     <div class="calculator-form-group col-lg-12">
-                        <label class="form-label" for="id_software_cost">Software Cost</label>
-                        {{ form.software_cost.errors }}
-                        <input type="number" id="id_software_cost" name="software_cost" class="form-control" min="0">
+                        <label class="form-label" for="id_average_bids_per_month">Average Number of Bids per month</label>
+                        {{ form.average_bids_per_month.errors }}
+                        <input type="number" id="id_average_bids_per_month" name="average_bids_per_month" class="form-control" min="0">
                     </div>
                     <div class="calculator-form-group col-lg-12">
-                        <label class="form-label" for="id_number_of_bids">Number of Bids</label>
-                        {{ form.number_of_bids.errors }}
-                        <input type="number" id="id_number_of_bids" name="number_of_bids" class="form-control" min="0">
+                        <label class="form-label" for="id_average_time_per_bid">Average time per Bid (hours)</label>
+                        {{ form.average_time_per_bid.errors }}
+                        <input type="number" id="average_time_per_bid" name="average_time_per_bid" class="form-control" min="0">
                     </div>
                     <div class="calculator-form-group col-lg-12">
-                        <label class="form-label" for="id_current_time_per_tender">Current Time per Tender</label>
-                        {{ form.current_time_per_tender.errors }}
-                        <input type="number" id="id_current_time_per_tender" name="current_time_per_tender" class="form-control" min="0">
+                        <label class="form-label" for="id_average_bid_value">Average Bid Value (£) </label>
+                        {{ form.average_bid_value.errors }}
+                        <input type="number" id="id_average_bid_value" name="average_bid_value" class="form-control" min="0">
                     </div>
                     <div class="calculator-form-group col-lg-12">
-                        <label class="form-label" for="email">Email Address</label>
-                        <input type="email" name="email" class="form-control" placeholder="Enter email address to receive results..." required>
+                        <label class="form-label" for="id_email">Email Address</label>
+                        <input type="email" id="id_email" name="email" class="form-control" placeholder="Enter email address to receive results..." required>
                     </div>
                     <div class="calculator-form-group col-lg-12 d-grid">
                         <button type="submit" class="button mt-2" style="border: none;">Calculate</button>
@@ -54,6 +54,7 @@
                 </form>
             </div>
         </div>
+        
         
         
     </div>

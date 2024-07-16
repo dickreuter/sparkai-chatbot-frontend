@@ -539,6 +539,7 @@ const handleOptionSelect = (option) => {
       setTimeout(() => {
         askCopilot(selectedText, instructions, copilot_mode);
         setShowOptions(true);
+        setSelectedDropdownOption('internet-search');
       }, 0);
   
       setInputValue(''); // Clear the input field
@@ -1047,28 +1048,34 @@ useEffect(() => {
                         </div>
                       ) : (
                         copilotOptions.map((option, index) => (
-                     <div key={index} className="option">
-                       <Button
-                         onClick={() => handleOptionSelect(option)}
-                         className={`upload-button mb-2 ${selectedOption === option ? 'selected' : ''}`}
-                         style={{
-                           backgroundColor: selectedOption === option ? 'orange' : '#262626',
-                           color: selectedOption === option ? 'black' : '#fff',
-                         }}
-                       >
-                         <span>Option {index + 1}</span>
-                       </Button>
-                       {selectedOption === option && (
-                         <FontAwesomeIcon 
-                           icon={faCheck} 
-                           className="tick-icon" 
-                           onClick={handleTick}
-                         />
-                       )}
-                       <div className="option-item">
-                         <p>{option}</p>
-                       </div>
-                     </div>
+                          <div key={index} className="option">
+                            <div className="option-content">
+                              <Button
+                                onClick={() => handleOptionSelect(option)}
+                                className={`upload-button ${selectedOption === option ? 'selected' : ''}`}
+                                style={{
+                                  backgroundColor: selectedOption === option ? 'orange' : '#262626',
+                                  color: selectedOption === option ? 'black' : '#fff',
+                                }}
+                              >
+                                <span>Option {index + 1}</span>
+                              </Button>
+                              {selectedOption === option && (
+                                <Button 
+                                  onClick={handleTick}
+                                  className="tick-button"
+                                >
+                                  <FontAwesomeIcon 
+                                    icon={faCheck} 
+                                    className="tick-icon"
+                                  />
+                                </Button>
+                              )}
+                            </div>
+                            <div className="option-item mt-2">
+                              <p>{option}</p>
+                            </div>
+                          </div>
                    )))}
                  </div>
                  

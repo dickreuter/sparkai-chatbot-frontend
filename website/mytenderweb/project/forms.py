@@ -17,39 +17,33 @@ class ContactForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea, required=True)
 
 class CalculatorForm(forms.Form):
-    hours_saved_per_bid = forms.FloatField(label='Hours Saved per Bid', min_value=0)
-    hourly_rate = forms.FloatField(label='Hourly Rate', min_value=0)
-    software_cost = forms.FloatField(label='Software Cost', min_value=0)
-    number_of_bids = forms.IntegerField(label='Number of Bids', min_value=0)
-    current_time_per_tender = forms.FloatField(label='Current Time per Tender', min_value=0)
-    email = forms.EmailField(label='Your email')
-    
-    def clean_hours_saved_per_bid(self):
-        data = self.cleaned_data['hours_saved_per_bid']
+    industry = forms.CharField(label='What Industry are you?', max_length=100)
+    number_of_bid_writers = forms.IntegerField(label='How many Bid Writers do you have?', min_value=0)
+    average_bids_per_month = forms.IntegerField(label='Average Number of Bids per month', min_value=0)
+    average_time_per_bid = forms.FloatField(label='Average Time per Bid (hours)', min_value=0)
+    average_bid_value = forms.FloatField(label='Average Bid Value', min_value=0)
+    email = forms.EmailField(label='Email Address')
+
+    def clean_number_of_bid_writers(self):
+        data = self.cleaned_data['number_of_bid_writers']
         if data < 0:
             raise forms.ValidationError("This value cannot be negative.")
         return data
 
-    def clean_hourly_rate(self):
-        data = self.cleaned_data['hourly_rate']
+    def clean_average_bids_per_month(self):
+        data = self.cleaned_data['average_bids_per_month']
         if data < 0:
             raise forms.ValidationError("This value cannot be negative.")
         return data
 
-    def clean_software_cost(self):
-        data = self.cleaned_data['software_cost']
+    def clean_average_time_per_bid(self):
+        data = self.cleaned_data['average_time_per_bid']
         if data < 0:
             raise forms.ValidationError("This value cannot be negative.")
         return data
 
-    def clean_number_of_bids(self):
-        data = self.cleaned_data['number_of_bids']
-        if data < 0:
-            raise forms.ValidationError("This value cannot be negative.")
-        return data
-
-    def clean_current_time_per_tender(self):
-        data = self.cleaned_data['current_time_per_tender']
+    def clean_average_bid_value(self):
+        data = self.cleaned_data['average_bid_value']
         if data < 0:
             raise forms.ValidationError("This value cannot be negative.")
         return data

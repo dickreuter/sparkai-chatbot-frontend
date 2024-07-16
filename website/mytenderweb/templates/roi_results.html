@@ -114,6 +114,50 @@
             font-weight: bold;
             
         }
+
+        .button {
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-radius: 0;
+            padding: 10px 18px;
+            background-color: #f58218;
+            border-color: #f58218;
+            color: white;
+            text-decoration: none;
+            /* Remove underline */
+            display: inline-block;
+            /* Ensure proper button sizing */
+        }
+
+        .button:hover {
+            color: white;
+            background-color: #f58218;
+            border-color: #f58218;
+            text-decoration: none;
+            /* Ensure underline is not added on hover */
+        }
+
+        .button-black {
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-radius: 0;
+            padding: 10px 18px;
+            background-color: #000;
+            border-color: #000;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .button-black:hover {
+            color: white;
+            background-color: #000;
+            border-color: #000;
+            text-decoration: none;
+            /* Ensure underline is not added on hover */
+        }
         
     </style>
 </head>
@@ -126,7 +170,11 @@
                         <img src="{% static 'images/mytender.io_badge.png' %}" alt="Logo" class="logo">
                         <h1 class="display-4 fw-semibold">ROI Calculation Results</h1>
                         <div class="line"></div>
-                        <p>Thanks for visiting mytender.io, here are your results.</p>
+                        <p>Thanks for completing this form. Schedule a call now to see how we can save you time and money on bids.</p>
+                        <div class="d-flex justify-content-center gap-2 mt-3">
+                            <a href="https://calendly.com/naeemah-mytender/30min?month=2024-07" class="button">Book a demo</a>
+                            <a href="/" class="button-black">Back to Home</a>
+                        </div>
                     </div>
                 </div>
             </div>

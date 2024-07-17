@@ -47,3 +47,6 @@ class CalculatorForm(forms.Form):
         if data <= 0:
             raise forms.ValidationError("This value cannot be less than zero.")
         return data
+    
+class GuideForm(forms.Form):
+    email = forms.EmailField(label='Email', max_length=100)

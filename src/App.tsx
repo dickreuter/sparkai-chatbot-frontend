@@ -24,7 +24,7 @@ const Layout = () => {
   }, [auth?.token]);
 
   const isAuthenticated = auth?.token !== undefined;
-  const showNavBarPaths = ['/library', '/howto', '/bids', '/', '/dashboard', '/chatResponse', "/bid-extractor", "/question-crafter", "/proposal", "/calculator"  ];
+  const showNavBarPaths = ['/library', '/howto', '/bids', '/', '/dashboard', '/chatResponse', "/bid-extractor", "/question-crafter", "/proposal", "/calculator", "/profile"  ];
   const shouldShowNavBar = showNavBarPaths.includes(location.pathname);
 
   return (

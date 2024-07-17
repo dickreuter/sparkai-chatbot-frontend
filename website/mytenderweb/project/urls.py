@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from .views import calculator, home
+from .views import calculator, guide, home
 from django.views.generic import TemplateView
 
 urlpatterns = [
@@ -18,6 +18,7 @@ urlpatterns = [
     path("about", TemplateView.as_view(template_name="about.html"), name='about'),
     path('calculator/', calculator, name='calculator'),
     path('thankyou', TemplateView.as_view(template_name="thankyou.html"), name='thankyou'),
+    path('guide/', guide, name='guide'),
     path("", home, name='home'),
 
 ]

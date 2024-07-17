@@ -16,7 +16,8 @@ import {
   faTachometerAlt,
   faFileContract, // Icon for proposals or contracts
   faComments,
-  faCircleQuestion
+  faCircleQuestion,
+  faUser
 } from '@fortawesome/free-solid-svg-icons';
 // Import the image
 import sidebarIcon from '../resources/images/mytender.io_badge.png';
@@ -53,10 +54,16 @@ const SideBarSmall = () => {
           <FontAwesomeIcon icon={faCircleQuestion} />
           <span>How To</span>
         </Link>
+        <Link to="/profile" className={`sidebarsmalllink ${isActive('/profile') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faUser} />
+          <span>Profile</span>
+        </Link>
       <Link to="https://mytender.io/" className="sidebarsmall-image-link">
           <img src={sidebarIcon} alt="Sidebar Icon" />
           <span>Site</span>
         </Link>
+
+        
       
       </div>
     </div>

@@ -2,7 +2,7 @@ import logging
 import os
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
-from .forms import CalculatorForm, ContactForm
+from .forms import CalculatorForm, ContactForm, GuideForm
 import io
 from io import BytesIO
 from xhtml2pdf import pisa
@@ -123,3 +123,36 @@ def calculator(request):
     else:
         form = CalculatorForm()
         return render(request, 'calculator.html', {'form': form})
+
+
+
+def guide(request):
+    if request.method == 'POST':
+        form = GuideForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+
+            # Send the guide email
+            try:
+                send_mail(
+                    subject="Your Free Guide",
+                    message="Thank you for requesting our free guide on prompt engineering. Please find the guide attached.",
+                    from_email='sam@mytender.io',
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+                print("Guide email sent successfully.")
+                return render(request, 'guideThankYouForm.html')
+            except Exception as e:
+               
+                print(f"Error sending guide email: {e}")
+                return redirect('guide')
+
+        else:
+            logger.debug("Form is not valid.")
+            print("Form is not valid.")
+    else:
+        form = GuideForm()
+        logger.debug("Rendering form.")
+
+    return render(request, 'guide.html', {'form': form})

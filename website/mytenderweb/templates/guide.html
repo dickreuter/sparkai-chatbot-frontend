@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Guide{% endblock %}
+{% load static %}
+
+{% block content %}
+
+<section id="guide" style="margin-top: 100px; margin-bottom: 160px;">
+    <div class="container">
+        <div class="col-12 text-center">
+            <div class="section-title">
+                <h1 class="display-1 fw-semibold">Free Guide</h1>
+                <h3 class="display-subheading mt-4">How to Use Prompt Engineering to Fast Track Your Bid Writing</h3>
+                <div class="line"></div>
+                <div class="guide-text-container">
+                    <p class="align-items-center guide-text">Using AI effectively is the quickest and most cost-effective way to win and respond to more RFPs.</p>
+                    <p class="align-items-center guide-text p2">In this free guide, we tell you how to do exactly that. No jargon, just an easy-to-follow step-by-step guide of exactly what to do.</p>
+                </div>
+                <form method="post" action="{% url 'guide' %}" class="input-container mt-4">
+                  {% csrf_token %}
+                  <input type="email" name="email" placeholder="Enter your e-mail" class="email-input" required>
+                  <button type="submit" class="get-started-btn">Get the Guide</button>
+              </form>
+              
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

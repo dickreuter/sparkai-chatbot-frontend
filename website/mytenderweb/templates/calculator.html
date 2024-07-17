@@ -16,7 +16,7 @@
         </div>
         <div class="row justify-content-center align-items-center px-2">
             <div class="col-lg-8" data-aos="fade-down" data-aos-delay="250">
-                <form method="post" action="{% url 'calculator' %}" class="row g-3 p-lg-5 p-2 bg-white theme-shadow rounded">
+                <form method="post" action="{% url 'calculator' %}" class="row g-3 p-lg-5 p-2 bg-white theme-shadow rounded calculator-form">
                     {% csrf_token %}
                     {{ form.non_field_errors }}
                     <div class="calculator-form-group col-lg-12">

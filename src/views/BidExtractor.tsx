@@ -5,7 +5,7 @@ import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import { useLocation, Link } from 'react-router-dom';
-import { Button, Col, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
@@ -35,6 +35,10 @@ const BidExtractor = () => {
   const [loading, setLoading] = useState(false);
 
   const [existingBidNames, setExistingBidNames] = useState([]);
+
+  const [showPasteModal, setShowPasteModal] = useState(false);
+  const [pastedQuestions, setPastedQuestions] = useState('');
+
 
   useEffect(() => {
     const fetchExistingBidNames = async () => {
@@ -461,29 +465,44 @@ const BidExtractor = () => {
         Question Extractor{" "}
         <span className="beta-label">beta</span>
       </h1>
-      {loading ? (
-    <div className="loading-spinner">
-      <Spinner animation="border" variant="primary" style={{ width: '1.5rem', height: '1.5rem' }} />
-    </div>
-  ) : (
-        <>
-          <Button
-            className="upload-button"
-            onClick={() => document.getElementById("fileInput").click()}
-            style={{ outline: 'none' }}
-          >
-            Retrieve Questions
-          </Button>
+      <div className="dropdown-container">
+     
+              {loading ? (
+            <div className="loading-spinner">
+              <Spinner animation="border" variant="primary" style={{ width: '1.5rem', height: '1.5rem' }} />
+            </div>
+          ) : (
+                <>
 
-          <input
-            type="file"
-            id="fileInput"
-            style={{ display: "none" }}
-            onChange={handleFileUpload}
-          />
-        </>
-      )}
+                  <Button
+                    className="upload-button"
+                    onClick={() => document.getElementById("fileInput").click()}
+                    style={{ outline: 'none' }}
+                  >
+                    Retrieve Questions
+                  </Button>
+
+                  <input
+                    type="file"
+                    id="fileInput"
+                    style={{ display: "none" }}
+                    onChange={handleFileUpload}
+                  />
+                </>
+              )}
+
+<Button
+          className="upload-button"
+          onClick={() => setShowPasteModal(true)}
+          style={{ outline: 'none', marginLeft: '10px' }}
+        >
+          Paste Questions
+        </Button>
+              
+        </div>
     </div>
+   
+
     <div className="question-extractor-flex mb-5">
       <div className="question-list">
         {questions === " " || questions === "" ? (
@@ -507,10 +526,58 @@ const BidExtractor = () => {
   </div>
 </Col>
     </Row>
-       
+    <Modal show={showPasteModal} onHide={() => setShowPasteModal(false)} dialogClassName="paste-modal">
+  <Modal.Header closeButton className="p-4">
+    <Modal.Title>Paste Questions</Modal.Title>
+  </Modal.Header>
+  <Modal.Body className="p-4">
+    <Form>
+      <Form.Group>
+        <Form.Label>Paste in some questions, make sure each one ends with a question mark.</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={5}
+          value={pastedQuestions}
+          onChange={(e) => setPastedQuestions(e.target.value)}
+        />
+      </Form.Group>
+    </Form>
+    
+    <Button
+  className="upload-button mt-3"
+  onClick={() => {
+    const questionsArray = pastedQuestions.split('?')
+      .map(question => question.trim())
+      .filter(question => question.length > 0)
+      .map(question => question.endsWith('?') ? question : `${question}?`);
+
+    // Join all questions except the last one with a comma and then add the last question without a comma
+    const formattedQuestions = questionsArray.slice(0, -1).map(question => `${question},`).concat(questionsArray.slice(-1));
+
+    setSharedState((prevState) => ({
+      ...prevState,
+      questions: formattedQuestions.join(' ')
+    }));
+    setShowPasteModal(false);
+  }}
+>
+  Save Changes
+</Button>
+  </Modal.Body>
+ 
+
+
+
+  
+</Modal>
+
+
         </div>
       </div>
     </div>
+
+
+    
   );
 }
 

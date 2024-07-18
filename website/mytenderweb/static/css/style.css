@@ -231,6 +231,15 @@ a:hover {
 
 /* Styles for smaller screens */
 
+
+/* Media query for larger screens */
+
+@media (min-width: 1200px) {
+    #hero .container-fluid {
+        margin-top: -4% !important;
+    }
+}
+
 @media (max-width: 450px) {
     h1.display-2 {
         font-size: 1.6rem !important;
@@ -1117,4 +1126,36 @@ footer .line {
     /* 24px */
     margin-bottom: 40px;
     /* 24px */
+}
+
+.logo {
+    width: 200px;
+    height: auto;
+    margin-top: 40px;
+}
+
+.metrics {
+    margin-top: 20px;
+}
+
+.metrics div {
+    margin-bottom: 10px;
+}
+
+.results-card {
+    box-shadow: var(--box-shadow);
+    background-color: #fff;
+    padding: 25px;
+    transition: all 0.35s ease;
+}
+
+.card-content {
+    display: flex;
+    align-items: center;
+}
+
+.metric-value {
+    font-size: 40px;
+    font-weight: bold;
+    margin-left: 15px;
 }

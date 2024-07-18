@@ -16,7 +16,7 @@ from reportlab.graphics.charts.barcharts import VerticalBarChart
 from reportlab.graphics import renderPDF
 from reportlab.lib import colors
 from django.template.loader import render_to_string
-
+from .brevo import add_email_to_brevo_list
 logger = logging.getLogger(__name__)
 
 def home(request):
@@ -41,6 +41,10 @@ def home(request):
                 )
                 logger.debug("Email sent successfully.")
                 print("Email sent successfully.")
+
+                 # Add email to Brevo list contact-us, 5
+                add_email_to_brevo_list(email, 5)
+
                 return redirect('thankyou')  # Redirect to thank you page
             except Exception as e:
                 logger.error(f"Error sending email: {e}")
@@ -112,6 +116,10 @@ def calculator(request):
                 )
                 notification_email.send()
                 print("Email sent successfully.")
+
+                # Add email to Brevo list roi-calculator, 4
+                add_email_to_brevo_list(email, 4)
+
             except Exception as e:
                 print(f"Error sending email: {e}")
 
@@ -142,9 +150,12 @@ def guide(request):
                     fail_silently=False,
                 )
                 print("Guide email sent successfully.")
+
+                # Add email to Brevo list meta-guide-download, 3
+                add_email_to_brevo_list(email, 3)
+
                 return render(request, 'guideThankYouForm.html')
             except Exception as e:
-               
                 print(f"Error sending guide email: {e}")
                 return redirect('guide')
 

@@ -453,9 +453,15 @@ return (
                 open={open}
                 onClose={handleMenuClose}
               >
-                <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Upload PDF</MenuItem>
-                <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Upload Text</MenuItem>
-                
+                <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                  <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
+                  Upload PDF
+                </MenuItem>
+                <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                  <i className="fas fa-file-alt" style={{ marginRight: '12px' }}></i>
+                  Upload Text
+                </MenuItem>
+
               </Menu>
             </div>
 

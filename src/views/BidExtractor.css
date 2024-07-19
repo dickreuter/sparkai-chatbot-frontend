@@ -175,9 +175,25 @@
     max-height: 400px;
 }
 
-.question-item {
+.question-item-default {
     padding: 12px;
     border-bottom: 1px solid #ccc;
+}
+
+.question-item {
+    padding: 5px 10px;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-question-button {
+    background-color: transparent;
+    border: none;
+    color: black;
+    cursor: pointer;
+    font-size: 30px;
 }
 
 .card-title-container {

@@ -11,6 +11,8 @@ import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { EditorState, ContentState } from 'draft-js';
 import { displayAlert } from '../helper/Alert';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
@@ -38,6 +40,41 @@ const BidExtractor = () => {
 
   const [showPasteModal, setShowPasteModal] = useState(false);
   const [pastedQuestions, setPastedQuestions] = useState('');
+
+  const removeQuestion = (indexToRemove) => {
+    const updatedQuestions = questions.split(',')
+      .map(question => question.trim())
+      .filter((_, index) => index !== indexToRemove);
+  
+    setSharedState(prevState => ({
+      ...prevState,
+      questions: updatedQuestions.join(', ')
+    }));
+  };
+  
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleRetrieveQuestions = () => {
+   
+    document.getElementById("fileInput").click();
+    handleClose();
+  };
+  
+
+  const handlePasteQuestions = () => {
+    setShowPasteModal(true);
+    handleClose();
+  };
 
 
   useEffect(() => {
@@ -188,12 +225,11 @@ const BidExtractor = () => {
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
+    setLoading(true);
     const formData = new FormData();
     formData.append("file", file);
-
+  
     try {
-      setLoading(true);
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/extract_questions_from_pdf`,
         formData,
@@ -204,7 +240,7 @@ const BidExtractor = () => {
           }
         }
       );
-
+  
       const extractedQuestions = result.data.filter((question: string) => question.trim() !== '');
       const questionsString = extractedQuestions.join(',');
       setSharedState(prevState => ({
@@ -217,6 +253,7 @@ const BidExtractor = () => {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     if (questions.length > 0) {
@@ -466,40 +503,44 @@ const BidExtractor = () => {
         <span className="beta-label">beta</span>
       </h1>
       <div className="dropdown-container">
-     
-              {loading ? (
-            <div className="loading-spinner">
-              <Spinner animation="border" variant="primary" style={{ width: '1.5rem', height: '1.5rem' }} />
-            </div>
-          ) : (
-                <>
-
-                  <Button
-                    className="upload-button"
-                    onClick={() => document.getElementById("fileInput").click()}
-                    style={{ outline: 'none' }}
-                  >
-                    Retrieve Questions
-                  </Button>
-
-                  <input
-                    type="file"
-                    id="fileInput"
-                    style={{ display: "none" }}
-                    onChange={handleFileUpload}
-                  />
-                </>
-              )}
-
-<Button
+    {loading ? (
+      <Spinner animation="border" variant="primary" style={{ width: '1.5rem', height: '1.5rem' }} />
+    ) : (
+      <>
+        <Button
           className="upload-button"
-          onClick={() => setShowPasteModal(true)}
-          style={{ outline: 'none', marginLeft: '10px' }}
+          onClick={handleClick}
+          style={{ outline: 'none' }}
+          aria-controls="simple-menu"
+          aria-haspopup="true"
         >
-          Paste Questions
+          Retrieve or Paste Questions
         </Button>
-              
-        </div>
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={handleRetrieveQuestions} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+            <i className="fas fa-download" style={{ marginRight: '10px' }}></i>
+            Retrieve Questions
+          </MenuItem>
+          <MenuItem onClick={handlePasteQuestions} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+            <i className="fas fa-paste" style={{ marginRight: '13px' }}></i>
+            Paste Questions
+          </MenuItem>
+
+        </Menu>
+        <input
+          type="file"
+          id="fileInput"
+          style={{ display: "none" }}
+          onChange={handleFileUpload}
+        />
+      </>
+    )}
+  </div>
+
     </div>
    
 
@@ -507,22 +548,29 @@ const BidExtractor = () => {
       <div className="question-list">
         {questions === " " || questions === "" ? (
           <>
-            <div className="question-item">Question 1</div>
-            <div className="question-item">Question 2</div>
-            <div className="question-item">Question 3</div>
-            <div className="question-item">Question 4</div>
-            <div className="question-item">Question 5</div>
-            <div className="question-item">Question 6</div>
+            <div className="question-item-default">Question 1</div>
+            <div className="question-item-default">Question 2</div>
+            <div className="question-item-default">Question 3</div>
+            <div className="question-item-default">Question 4</div>
+            <div className="question-item-default">Question 5</div>
+            <div className="question-item-default">Question 6</div>
           </>
         ) : (
           questions.split(',').map((question, index) => (
             <div key={index} className="question-item">
               {question}
+              <button
+                className="remove-question-button"
+                onClick={() => removeQuestion(index)}
+              >
+                &minus;
+              </button>
             </div>
           ))
         )}
       </div>
     </div>
+
   </div>
 </Col>
     </Row>

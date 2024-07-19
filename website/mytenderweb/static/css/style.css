@@ -250,6 +250,9 @@ a:hover {
         word-break: normal !important;
         white-space: normal;
     }
+    #hero .container-fluid {
+        margin-top: -40% !important;
+    }
 }
 
 .small-video {

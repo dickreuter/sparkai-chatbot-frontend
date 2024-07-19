@@ -83,9 +83,19 @@ const UploadButtonWithDropdown = ({
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                <MenuItem onClick={handlePDFClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Upload PDF</MenuItem>
-                <MenuItem onClick={handleTextClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Upload Text</MenuItem>
-                <MenuItem onClick={handleDeleteClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>Delete Folder</MenuItem>
+               <MenuItem onClick={handlePDFClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                    <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
+                    Upload PDF
+                    </MenuItem>
+                    <MenuItem onClick={handleTextClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                    <i className="fas fa-file-alt" style={{ marginRight: '12px' }}></i>
+                    Upload Text
+                    </MenuItem>
+                    <MenuItem onClick={handleDeleteClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                    <i className="fas fa-trash-alt" style={{ marginRight: '12px' }}></i>
+                    Delete Folder
+                    </MenuItem>
+
             </Menu>
         </div>
     );

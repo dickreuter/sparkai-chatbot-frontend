@@ -302,6 +302,11 @@ a:hover {
     /* Ensure proper button sizing */
 }
 
+.button-block {
+    display: block !important;
+    width: 100% !important;
+}
+
 .button-light {
     z-index: 1000;
 }

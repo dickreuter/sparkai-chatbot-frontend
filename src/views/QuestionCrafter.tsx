@@ -789,10 +789,10 @@ useEffect(() => {
       }
       if (choice === "3") {
         let choicesArray = [];
-
+        console.log(result.data);
         // Check if result.data contains comma-separated values
-        if (result.data && result.data.includes(",")) {
-          choicesArray = result.data.split(",").map((choice) => choice.trim());
+        if (result.data && result.data.includes(";")) {
+          choicesArray = result.data.split(";").map((choice) => choice.trim());
         }
 
         setApiChoices(choicesArray);

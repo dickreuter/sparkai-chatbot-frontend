@@ -374,8 +374,8 @@ const Chatbot = () => {
                 let choicesArray = [];
 
                 // Check if result.data contains comma-separated values
-                if (result.data && result.data.includes(",")) {
-                    choicesArray = result.data.split(",").map((choice) => choice.trim());
+                if (result.data && result.data.includes(";")) {
+                    choicesArray = result.data.split(";").map((choice) => choice.trim());
                 }
                 //console.log("API Response:", result);
 

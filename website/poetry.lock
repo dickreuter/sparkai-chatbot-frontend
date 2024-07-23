@@ -1461,6 +1461,21 @@ doc = ["sphinx"]
 test = ["pytest", "pytest-cov"]
 
 [[package]]
+name = "stripe"
+version = "10.4.0"
+description = "Python bindings for the Stripe API"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "stripe-10.4.0-py2.py3-none-any.whl", hash = "sha256:b37ca0d23fabb4bc3533761051b5b27187819e346c7550007d3be25ae2272780"},
+    {file = "stripe-10.4.0.tar.gz", hash = "sha256:59155dbd5916227c9dedebafaebe92b950dd32f05ddba615b3bc52479a977070"},
+]
+
+[package.dependencies]
+requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
+typing-extensions = {version = ">=4.5.0", markers = "python_version >= \"3.7\""}
+
+[[package]]
 name = "svglib"
 version = "1.5.1"
 description = "A pure-Python library for reading and converting SVG"
@@ -1774,4 +1789,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5a1f3445aea79cf0f2bc34f431c2bac6263354ebe3bdf837bdff5279b6b3879d"
+content-hash = "3cce1625a57d520008050710bbc9dfb94964051c522bb997cce32e7f80389f58"

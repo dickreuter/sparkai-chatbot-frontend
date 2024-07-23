@@ -5,7 +5,6 @@ from django.shortcuts import render, redirect
 from .forms import CalculatorForm, ContactForm, GuideForm
 import io
 from io import BytesIO
-from xhtml2pdf import pisa
 from django.conf import settings
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -16,10 +15,22 @@ from reportlab.graphics.charts.barcharts import VerticalBarChart
 from reportlab.graphics import renderPDF
 from reportlab.lib import colors
 from django.template.loader import render_to_string
+
 from .brevo import add_email_to_brevo_list
+import stripe
+from django.views.generic import TemplateView
+from django.views import View
+from django.http import JsonResponse, HttpResponse
+from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect, reverse
+
 logger = logging.getLogger(__name__)
 
 def home(request):
+
+    stripe_publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY_TEST')
+
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -58,7 +69,7 @@ def home(request):
         form = ContactForm()
         logger.debug("Rendering form.")
 
-    return render(request, 'index.html', {'form': form})
+    return render(request, 'index.html', {'form': form, 'stripe_publishable_key': stripe_publishable_key})
 
 
 
@@ -167,3 +178,88 @@ def guide(request):
         logger.debug("Rendering form.")
 
     return render(request, 'guide.html', {'form': form})
+
+
+
+########################### PAYMENT ################################################################################
+
+
+
+
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY_TEST')
+
+
+def cancel(request) -> HttpResponse:
+    return render(request, 'index.html')
+
+
+def success(request) -> HttpResponse:
+
+    print(f'{request.session = }')
+
+    stripe_checkout_session_id = request.GET['session_id']
+
+    return render(request, 'success.html')
+
+def testingEnrollment(request):
+
+    stripe_publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY_TEST')
+    
+    return render(request, 'enrollmentTesting.html', {'stripe_publishable_key': stripe_publishable_key})
+
+
+
+DOMAIN = os.getenv('DOMAIN')
+
+def create_checkout_session(request) -> HttpResponse:
+    price_lookup_key = request.POST['price_lookup_key']
+    try:
+        prices = stripe.Price.list(lookup_keys=[price_lookup_key], expand=['data.product'])
+        price_item = prices.data[0]
+
+        checkout_session = stripe.checkout.Session.create(
+            line_items=[
+                {'price': price_item.id, 'quantity': 1},
+                # You could add differently priced services here, e.g., standard, business, first-class.
+            ],
+            mode='subscription',
+            success_url=DOMAIN + reverse('success') + '?session_id={CHECKOUT_SESSION_ID}',
+            cancel_url=DOMAIN + reverse('cancel')
+        )
+
+        print("create checkout session")
+
+        return redirect(
+            checkout_session.url,  # Either the success or cancel url.
+            code=303
+        )
+    except Exception as e:
+        print(e)
+        return HttpResponse("Server error", status=500)
+
+
+
+@csrf_exempt
+def collect_stripe_webhook(request) -> JsonResponse:
+    """
+    Stripe sends webhook events to this endpoint.
+    We verify the webhook signature and updates the database record.
+    """
+    webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET')
+    signature = request.META["HTTP_STRIPE_SIGNATURE"]
+    payload = request.body
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload=payload, sig_header=signature, secret=webhook_secret
+        )
+    except ValueError as e:  # Invalid payload.
+        raise ValueError(e)
+    except stripe.error.SignatureVerificationError as e:  # Invalid signature
+        raise stripe.error.SignatureVerificationError(e)
+
+    print("update record")
+
+    return JsonResponse({'status': 'success'})
+
+

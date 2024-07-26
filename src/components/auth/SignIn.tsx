@@ -16,7 +16,7 @@ const FullScreenTwoCards = () => {
 
     // Simple form validation
     if (!formData.email || !formData.password) {
-      setSnackbarMessage('Email and Password are required');
+      setSnackbarMessage('Username and Password are required');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       return;
@@ -45,7 +45,7 @@ const FullScreenTwoCards = () => {
           <div className="input-field">
             <TextField
               fullWidth
-              label="Enter your account number"
+              label="Enter your username"
               variant="outlined"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}

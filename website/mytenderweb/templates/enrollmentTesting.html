@@ -3,84 +3,84 @@
 
 {% block content %}
 
- 
+<section id="Pricing" class="section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center" data-aos="fade-down" data-aos-delay="150">
+                <div class="section-title">
+                    <h1 class="display-4 fw-semibold">Pricing</h1>
+                    <div class="line"></div>
+                    <p>Want to try before buying? Contact us at info@mytender.io. This is to prevent spammers or fraudulent accounts from using our software.</p>
+                </div>
+            </div>
+        </div>
 
-      
-<input type="hidden" id="csrf-token" value="{% csrf_token %}">
-    <input type="hidden" id="stripe-publishable-key" value="{{ stripe_publishable_key }}">
-
-
-    <section id="Pricing" class="section-padding">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 text-center" data-aos="fade-down" data-aos-delay="150">
-                    <div class="section-title">
-                        <h1 class="display-4 fw-semibold">Pricing</h1>
-                        <div class="line"></div>
-                        <p>Want to try before buying? Contact us at info@mytender.io. This is to prevent spammers or fraudulent accounts from using our software.</p>
+        <div class="row row-cols-1 row-cols-md-3">
+            <div class="col mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h2 class="mt-2">Small</h2>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="my-0 font-weight-normal">£350 <small class="text-muted">/mo</small></h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li><i class="fa fa-check-circle feature-check"></i> Access for 1-5 users</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Basic Support</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Feature A</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Feature B</li>
+                        </ul>
+                        <form class="checkout-form" action="{% url 'create-checkout-session' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="price_lookup_key" value="basic_membership" />
+                            <button type="submit" class="button" style="border: none; width: 100%; display: block;">Sign Up</button>
+                        </form>
                     </div>
                 </div>
             </div>
-    
-            <div class="row row-cols-1 row-cols-md-3">
-                <div class="col mb-4" data-aos="fade-up" data-aos-delay="300">
-                    <div class="card shadow-sm">
-                        <div class="card-header">
-                            <h4 class="mt-2">Small</h4>
-                        </div>
-                        <div class="card-body">
-                            <h1 class="my-0 font-weight-normal">£350 <small class="text-muted">/mo</small></h1>
-                            <ul class="list-unstyled mt-3 mb-4">
-                                <li>1-5</li>
-                            </ul>
-                            <form class="checkout-form" action="{% url 'create-checkout-session' %}" method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="price_lookup_key" value="basic_membership" />
-                                <button type="submit" class="button" style="border: none; width: 100%;, display: block;">Sign Up</button>
-                            </form>
-                        </div>
+            <div class="col mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="card shadow-sm bg-dark">
+                    <div class="card-header">
+                        <h2 class="mt-2">Medium</h2>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="my-0 font-weight-normal">£650 <small class="text-muted">/mo</small></h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li><i class="fa fa-check-circle feature-check"></i> Access for 6-10 users</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Priority Support</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Feature C</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Feature D</li>
+                        </ul>
+                        <form class="checkout-form" action="{% url 'create-checkout-session' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="price_lookup_key" value="pro_membership" />
+                            <button type="submit" class="button button-block" style="border: none; width: 100%; display: block;">Sign Up</button>
+                        </form>
                     </div>
                 </div>
-                <div class="col mb-4" data-aos="fade-up" data-aos-delay="400">
-                    <div class="card shadow-sm">
-                        <div class="card-header">
-                            <h4 class="mt-2">Medium</h4>
-                        </div>
-                        <div class="card-body">
-                            <h1 class="my-0 font-weight-normal">£650 <small class="text-muted">/mo</small></h1>
-                            <ul class="list-unstyled mt-3 mb-4">
-                                <li>6-10</li>
-                            </ul>
-                            <form class="checkout-form" action="{% url 'create-checkout-session' %}" method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="price_lookup_key" value="pro_membership" />
-                                <button type="submit" class="button button-block" style="border: none; width: 100%;, display: block;">Sign Up</button>
-                            </form>
-                        </div>
+            </div>
+            <div class="col mb-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h2 class="mt-2">Large</h2>
                     </div>
-                </div>
-                <div class="col mb-4" data-aos="fade-up" data-aos-delay="500">
-                    <div class="card shadow-sm">
-                        <div class="card-header">
-                            <h4 class="mt-2">Large</h4>
-                        </div>
-                        <div class="card-body">
-                            <h1 class="my-0 font-weight-normal">£1000 <small class="text-muted">/mo</small></h1>
-                            <ul class="list-unstyled mt-3 mb-4">
-                                <li>Unlimited</li>
-                            </ul>
-                            <form class="checkout-form" action="{% url 'create-checkout-session'%}" method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="price_lookup_key" value="enterprise_membership" />
-                                <button type="submit" class="button" style="border: none; width: 100%;, display: block;">Sign Up</button>
-                            </form>
-                        </div>
+                    <div class="card-body">
+                        <h1 class="my-0 font-weight-normal">£1000 <small class="text-muted">/mo</small></h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li><i class="fa fa-check-circle feature-check"></i> Unlimited users</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> 24/7 Support</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Feature E</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Feature F</li>
+                        </ul>
+                        <form class="checkout-form" action="{% url 'create-checkout-session'%}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="price_lookup_key" value="enterprise_membership" />
+                            <button type="submit" class="button" style="border: none; width: 100%; display: block;">Sign Up</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    
+    </div>
+</section>
 
-  
 {% endblock content %}

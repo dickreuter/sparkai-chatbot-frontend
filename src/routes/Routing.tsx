@@ -20,6 +20,7 @@ import Calculator from "../views/Calculator.tsx"
 import BidManagement from "../views/BidWritingStateManagerView.tsx"
 import HowTo from "../views/HowTo.tsx"
 import ProfilePage from "../views/Profile.tsx"
+import Signup from "../views/Signup.tsx"
 
 function Routing() {
     return (
@@ -39,6 +40,7 @@ function Routing() {
                 <Route path="/library" element={<Library />} />
                 <Route path="/howto" element={<HowTo/>} />
                 <Route path="/profile" element={<ProfilePage/>} />
+                <Route path="/signup" element={<Signup/>} />
                 {/* Wrap related routes inside a single parent Route with BidManagement */}
                 <Route element={<BidManagement />}>
                     <Route path="/bid-extractor" element={<BidExtractor />} />

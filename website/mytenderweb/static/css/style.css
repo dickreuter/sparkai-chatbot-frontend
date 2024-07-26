@@ -1167,3 +1167,82 @@ footer .line {
     font-weight: bold;
     margin-left: 15px;
 }
+
+
+/* Custom card colors */
+
+.card.bg-dark {
+    background-color: #333;
+    color: #fff;
+}
+
+.card.bg-dark .card-header,
+.card.bg-dark .card-body {
+    border-color: #444;
+}
+
+
+/* Custom check circle icon styling */
+
+.feature-check {
+    color: #4CAF50;
+    /* Green color for check icon */
+    margin-right: 5px;
+}
+
+
+/* Adjust card height and shadow */
+
+.card {
+    min-height: 450px;
+    /* Adjust the height as needed */
+    margin-bottom: 30px;
+    /* Space between cards */
+    border: lightgray solid 1px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    /* More shadow */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+/* Ensure white text on dark background */
+
+.card.bg-dark .card-header,
+.card.bg-dark .card-body,
+.card.bg-dark .list-unstyled li,
+.card.bg-dark h2,
+.card.bg-dark h1,
+.card.bg-dark h4 {
+    color: #fff;
+}
+
+
+/* Adjust bullet point spacing */
+
+.list-unstyled li {
+    margin-bottom: 5px;
+    /* Adjust the spacing as needed */
+}
+
+
+/* Style the signup button to be at the bottom of the card */
+
+.card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5%;
+}
+
+.card .card-header {
+    padding: 10px 5%;
+    /* 10px vertical, 5% horizontal */
+}
+
+.card .checkout-form {
+    margin-top: auto;
+}

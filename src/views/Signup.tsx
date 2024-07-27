@@ -62,7 +62,11 @@ const Signup = () => {
       window.location.href = '/login';  // Redirect to the login page
     } catch (error) {
       console.error('Error during signup:', error);
-      setError('An error occurred during signup. Please try again or contact support.');  // Set error message
+      if (error.response && error.response.data) {
+        setError(error.response.data.detail);  // Show the error message returned by the backend
+      } else {
+        setError('An error occurred during signup. Please try again or contact support.');  // Set generic error message
+      }
     }
   };
 

@@ -69,7 +69,8 @@ const QuestionCrafter = () => {
 
   const [selectedDropdownOption, setSelectedDropdownOption] = useState('library-chat');
   const bidPilotRef = useRef(null);
-  const [highlightedText, setHighlightedText] = useState('');
+
+
 
   useEffect(() => {
     localStorage.setItem('response', convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n'));
@@ -465,30 +466,49 @@ const handleOptionSelect = (option) => {
     setOriginalEditorState(responseEditorState);
 
     
-    // Apply ORANGE style to highlighted text
     const contentState = responseEditorState.getCurrentContent();
-    const selectionState = responseEditorState.getSelection();
+    const { anchorKey, anchorOffset, focusKey, focusOffset } = selectionRange;
 
-    const newContentState = Modifier.applyInlineStyle(
-      contentState,
-      selectionState,
+    // Create a new selection state that covers the entire range
+    const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
+      anchorOffset: Math.min(anchorOffset, focusOffset),
+      focusKey: focusKey,
+      focusOffset: Math.max(anchorOffset, focusOffset),
+    });
+
+  
+    const clearedContentState = Modifier.removeRange(contentState, newSelectionState, 'backward');
+
+    // Collapse the selection to the start of the cleared range
+    const collapsedSelection = SelectionState.createEmpty(anchorKey).merge({
+      anchorOffset: newSelectionState.getStartOffset(),
+      focusOffset: newSelectionState.getStartOffset(),
+    });
+
+    // Insert new option text at the collapsed selection
+    const newContentState = Modifier.insertText(
+      clearedContentState,
+      collapsedSelection,
+      selectedText
+    );
+
+    // Apply the ORANGE style to the new text
+    const finalSelectionState = collapsedSelection.merge({
+      focusOffset: collapsedSelection.getStartOffset() + selectedText.length,
+    });
+
+    const newContentStateWithStyle = Modifier.applyInlineStyle(
+      newContentState,
+      finalSelectionState,
       'ORANGE'
     );
 
-    const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
+    let newEditorState = EditorState.push(responseEditorState, newContentStateWithStyle, 'change-inline-style');
+
+    // Force the selection to the end of the newly inserted text
+    newEditorState = EditorState.forceSelection(newEditorState, finalSelectionState);
+
     setResponseEditorState(newEditorState);
-
-
-    // Correcting selection range
-    const correctedSelectionRange = {
-      anchorKey: selectionState.getAnchorKey(),
-      anchorOffset: Math.min(selectionState.getAnchorOffset(), selectionState.getFocusOffset()),
-      focusKey: selectionState.getFocusKey(),
-      focusOffset: Math.max(selectionState.getAnchorOffset(), selectionState.getFocusOffset()),
-    };
-    setSelectionRange(correctedSelectionRange);
-
-    //console.log("handleLinkClick - setSelectionRange:", correctedSelectionRange);
 
     setTimeout(() => {
       askCopilot(selectedText, instructions, copilot_mode);
@@ -496,46 +516,69 @@ const handleOptionSelect = (option) => {
       setIsCopilotVisible(false);
     }, 0);
   };
+
+  const handleCustomPromptFocus = () => {
+
+    setOriginalEditorState(responseEditorState);
+    
+    const contentState = responseEditorState.getCurrentContent();
+    const selectionState = responseEditorState.getSelection();
   
-  const handleCustomPromptSubmit = () => {
-    // Handle custom prompt submission
-    if (inputValue.trim()) {
-      console.log(`Custom Prompt: ${inputValue}`);
-      // Add your logic here to handle the custom prompt
-     
-      const copilot_mode = inputValue.toLowerCase().replace(/\s+/g, '_');
-      const instructions = '';
-    
-      const contentState = responseEditorState.getCurrentContent();
-      const selectionState = responseEditorState.getSelection();
-    
-    
-      // Store the original state before making any changes
-      setOriginalEditorState(responseEditorState);
-    
-      // Apply ORANGE style to highlighted text
+    if (!selectionState.isCollapsed()) {
       const newContentState = Modifier.applyInlineStyle(
         contentState,
         selectionState,
         'ORANGE'
       );
-    
+  
       const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
       setResponseEditorState(newEditorState);
-    
-    
-    
-      // Correcting selection range
-      const correctedSelectionRange = {
-        anchorKey: selectionState.getAnchorKey(),
-        anchorOffset: Math.min(selectionState.getAnchorOffset(), selectionState.getFocusOffset()),
-        focusKey: selectionState.getFocusKey(),
-        focusOffset: Math.max(selectionState.getAnchorOffset(), selectionState.getFocusOffset()),
-      };
-      setSelectionRange(correctedSelectionRange);
-    
-      console.log("handleLinkClick - setSelectionRange:", correctedSelectionRange);
-    
+    }
+  };
+
+  let isSubmitButtonClicked = false;
+
+
+  const handleMouseDownOnSubmit = () => {
+    isSubmitButtonClicked = true;
+  };
+
+ 
+  
+  // Handle blur (loss of focus) on input field for custom prompt and remove ORANGE style
+  const handleCustomPromptBlur = () => {
+    if (!isSubmitButtonClicked) {
+      const contentState = responseEditorState.getCurrentContent();
+      const blocks = contentState.getBlockMap();
+      
+      // Remove ORANGE style from all blocks
+      let newContentState = contentState;
+      blocks.forEach(block => {
+        const blockKey = block.getKey();
+        const length = block.getLength();
+        const blockSelection = SelectionState.createEmpty(blockKey).merge({
+          anchorOffset: 0,
+          focusOffset: length,
+        });
+  
+        newContentState = Modifier.removeInlineStyle(newContentState, blockSelection, 'ORANGE');
+      });
+  
+      const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
+      setResponseEditorState(newEditorState);
+    }
+    isSubmitButtonClicked = false; // Reset flag after handling
+  };
+  
+  const handleCustomPromptSubmit = () => {
+    // Handle custom prompt submission
+    if (inputValue.trim()) {
+      isSubmitButtonClicked = true;
+      console.log(`Custom Prompt: ${inputValue}`);
+      // Add your logic here to handle the custom prompt
+      const copilot_mode = inputValue.toLowerCase().replace(/\s+/g, '_');
+      const instructions = '';
+  
       setTimeout(() => {
         askCopilot(selectedText, instructions, copilot_mode);
         setShowOptions(true);
@@ -1145,6 +1188,8 @@ useEffect(() => {
                         type="text"
                         placeholder={selectedDropdownOption === 'internet-search' ? "Please type your question in here..." : selectedDropdownOption === 'custom-prompt' ? "Type in a custom prompt here..." : "Please type your question in here..."}
                         value={inputValue}
+                        onFocus={selectedDropdownOption === 'custom-prompt' ? handleCustomPromptFocus : null}
+                        onBlur={handleCustomPromptBlur}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
                         style={{
@@ -1152,7 +1197,7 @@ useEffect(() => {
                           
                         }}
                       />
-                      <button onClick={!isBidPilotLoading ? (selectedDropdownOption === 'internet-search' ? handleInternetSearch : selectedDropdownOption === 'custom-prompt' && isCopilotVisible ? handleCustomPromptSubmit : handleSendMessage) : null} disabled={isBidPilotLoading}>
+                      <button onMouseDown={handleMouseDownOnSubmit} onClick={!isBidPilotLoading ? (selectedDropdownOption === 'internet-search' ? handleInternetSearch : selectedDropdownOption === 'custom-prompt' && isCopilotVisible ? handleCustomPromptSubmit : handleSendMessage) : null} disabled={isBidPilotLoading}>
                         <FontAwesomeIcon icon={faPaperPlane} />
                       </button>
                     </div>

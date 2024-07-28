@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Form, Button, Row, Col, Card, Alert } from 'react-bootstrap';
@@ -152,7 +152,8 @@ const Signup = () => {
                     placeholder="Enter your email"
                     name="email"
                     value={formData.email}
-                    readOnly
+                    onChange={handleChange}  // Allow user to modify email if needed
+                    defaultValue={formData.email}  // Display the default email from the token validation response
                     className="custom-input"
                   />
                 </Form.Group>

@@ -1178,7 +1178,7 @@ useEffect(() => {
                         <Dropdown.Menu>
                           <Dropdown.Item eventKey="internet-search">Internet Search</Dropdown.Item>
                           <Dropdown.Item eventKey="library-chat">Library Chat</Dropdown.Item>
-                          <Dropdown.Item eventKey="custom-prompt">Custom Prompt</Dropdown.Item>
+                          {/* Removed the Custom Prompt option */}
                         </Dropdown.Menu>
                       </Dropdown>
                       <Button className="option-button" onClick={handleClearMessages}>Clear</Button>
@@ -1194,7 +1194,6 @@ useEffect(() => {
                         onKeyDown={handleKeyDown}
                         style={{
                           color: selectedDropdownOption === 'custom-prompt' ? 'white' : 'lightgray',
-                          
                         }}
                       />
                       <button onMouseDown={handleMouseDownOnSubmit} onClick={!isBidPilotLoading ? (selectedDropdownOption === 'internet-search' ? handleInternetSearch : selectedDropdownOption === 'custom-prompt' && isCopilotVisible ? handleCustomPromptSubmit : handleSendMessage) : null} disabled={isBidPilotLoading}>
@@ -1202,6 +1201,7 @@ useEffect(() => {
                       </button>
                     </div>
                   </div>
+
                 </div>
               </div>
             </Col>

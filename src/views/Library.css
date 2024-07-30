@@ -88,22 +88,6 @@
     border-bottom: none;
 }
 
-.pagination-controls {
-    margin-left: 15px;
-    padding-top: 0;
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-
-.pagination-controls button {
-    padding: 5px 10px;
-    margin-right: 5px;
-    background-color: black;
-    color: white;
-    border: none;
-    border-radius: 5px;
-}
-
 .lib-custom-card {
     background-color: white;
     border: none;
@@ -116,7 +100,6 @@
 .lib-custom-card-title {
     font-size: 22px;
     font-weight: 600;
-    margin-left: 15px;
     margin-top: 20px;
 }
 
@@ -159,4 +142,134 @@
 .ellipsis-button:hover {
     background-color: #f2f2f2;
     /* Slightly darker for better visibility on hover */
+}
+
+.search-bar-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    /* Adjust this value for desired max width */
+    min-width: 500px;
+    background-color: none;
+    /* Match the search bar background */
+    /* Add border to match the search bar */
+    border-radius: 25px;
+    /* Initial full border radius */
+}
+
+.search-bar-library {
+    background-color: #333;
+    /* Light black background */
+    color: white;
+    padding: 10px;
+    padding-left: 50px;
+    border-radius: 25px !important;
+    /* Make the search bar pill-shaped */
+    width: 100%;
+    /* Ensure the input takes full width */
+    outline: none;
+    box-shadow: none;
+    border: none !important;
+    border-right: 1px white solid !important;
+    /* Remove default bootstrap focus outline */
+    box-sizing: border-box;
+    /* Ensure padding is included in width/height calculations */
+    transition: border-radius ease;
+    /* Smooth transition for border radius change */
+}
+
+.search-bar-library.dropdown-visible {
+    border-top-left-radius: 25px !important;
+    border-top-right-radius: 25px !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+}
+
+.search-bar-library:focus {
+    background-color: #333;
+    color: white;
+    outline: none;
+    box-shadow: none;
+    box-sizing: border-box;
+}
+
+.search-bar-library::placeholder {
+    color: white;
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    color: white !important;
+    pointer-events: none;
+    font-size: 1rem !important;
+    z-index: 100;
+    /* Ensure the icon is above the input field */
+}
+
+.search-results-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #333;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 0;
+    border-radius: 0 0 25px 25px !important;
+    border: none !important;
+    border-top: 1px gray solid !important;
+}
+
+.search-result-item {
+    padding: 10px;
+    padding-left: 18px;
+    cursor: pointer;
+    color: white;
+    /* Match text color */
+    background-color: #333;
+    margin: 0%
+}
+
+.search-result-item:hover {
+    background-color: #444;
+    /* Slightly lighter for hover effect */
+}
+
+.result-icon {
+    margin-right: 20px;
+}
+
+.library-card-body-content {
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    overflow: hidden;
+}
+
+.library-card-content-wrapper {
+    flex: 1;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    /* Space between content and pagination */
+}
+
+.pagination-controls {
+    flex-shrink: 0;
+    /* Ensures the pagination doesn't shrink */
+    margin-top: auto;
+    display: flex;
+    padding: 1rem 0;
+    margin-left: 10px;
+}
+
+.pagination-controls button {
+    padding: 5px 10px;
+    margin-right: 5px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
 }

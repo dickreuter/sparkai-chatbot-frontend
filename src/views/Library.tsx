@@ -43,6 +43,10 @@ const Library = () => {
   const [filteredResults, setFilteredResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
+
+  const [showPdfViewerModal, setShowPdfViewerModal] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState('');
+
   const searchBarRef = useRef(null);
 
   const handleMenuClick = (event) => {
@@ -97,6 +101,13 @@ const Library = () => {
   const handleOpenTextModal = () => {
     setUploadFolder(null);
     setShowTextModal(true);
+  };
+
+  const modalRef = useRef();
+  const closeModal = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      setShowPdfViewerModal(false);
+    }
   };
 
   const UploadPDFModal = ({ show, onHide, folder, get_collections }) => (
@@ -244,9 +255,9 @@ const Library = () => {
         `http${HTTP_PREFIX}://${API_URL}/show_file_content`,
         formData,
         {
-            headers: {
-                'Authorization': `Bearer ${tokenRef.current}`
-            },
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`
+          },
         }
       );
       setModalContent(response.data);
@@ -257,6 +268,38 @@ const Library = () => {
     }
   };
 
+  const viewPdfFile = async (fileName, folderName) => {
+    const formData = new FormData();
+    formData.append('file_name', fileName);
+    formData.append('profile_name', folderName);
+
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/show_file_content_pdf_format`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+          },
+          responseType: 'blob', // Important to get the response as a blob
+        }
+      );
+
+      // Create a URL for the PDF file
+      const fileURL = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      setPdfUrl(fileURL);
+      setShowPdfViewerModal(true);
+
+    } catch (error) {
+      console.error('Error viewing PDF file:', error);
+
+      if (error.response && error.response.status === 404) {
+        // Try using the viewFile function if the file was not found as a PDF
+        console.warn('PDF file not found, attempting to view as text content.');
+        viewFile(fileName, folderName);
+      }
+    }
+  };
   const deleteDocument = async (uniqueId) => {
     const formData = new FormData();
     formData.append('unique_id', uniqueId);
@@ -365,21 +408,26 @@ const Library = () => {
     const end = start + rowsPerPage;
     const currentFiles = folderContents[activeFolder]?.slice(start, end) || [];
   
-    return currentFiles.map(({ filename, unique_id }, index) => (
-      <tr key={index} onClick={() => viewFile(filename, activeFolder)} style={{ cursor: 'pointer' }}>
-        <td><FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {filename}</td>
-        <td colSpan={3}>
-          <FontAwesomeIcon
-            icon={faTrash}
-            className="action-icon delete-icon"
-            onClick={(event) => handleDeleteFileClick(event, unique_id, filename)}
-            style={{ cursor: 'pointer', marginRight: '15px'}}
-          />
-        </td>
-      </tr>
-    ));
-  };
+    return currentFiles.map(({ filename, unique_id }, index) => {
+      const isPdf = filename.toLowerCase().endsWith('.pdf');
   
+      return (
+        <tr key={index} style={{ cursor: 'pointer' }}>
+          <td onClick={() => isPdf ? viewPdfFile(filename, activeFolder) : viewFile(filename, activeFolder)}>
+            <FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {filename}
+          </td>
+          <td colSpan={3}>
+            <FontAwesomeIcon
+              icon={faTrash}
+              className="action-icon delete-icon"
+              onClick={(event) => handleDeleteFileClick(event, unique_id, filename)}
+              style={{ cursor: 'pointer', marginRight: '15px' }}
+            />
+          </td>
+        </tr>
+      );
+    });
+  };
   
   
   
@@ -602,6 +650,17 @@ const Library = () => {
           folder={uploadFolder}
           get_collections={get_collections}
         />
+        <>
+    
+      {/* Modal Component */}
+      {showPdfViewerModal && (
+        <div className="pdf-viewer-modal" onClick={closeModal}>
+          <div className="pdf-viewer-modal-content" ref={modalRef}>
+            <iframe src={pdfUrl} width="100%" height="600px"></iframe>
+          </div>
+        </div>
+      )}
+    </>
       </div>
     </div>
   );

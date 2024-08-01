@@ -32,21 +32,18 @@ const SideBarSmall = () => {
   return (
     <div className="sidebarsmall">
       <div>
-        <Link to="/dashboard" className={`sidebarsmalllink ${isActive('/dashboard') ? 'sidebarsmalllink-active' : ''}`}>
-          <FontAwesomeIcon icon={faTachometerAlt} />
-          <span>Dashboard</span>
-        </Link>
+
         <Link to="/bids" className={`sidebarsmalllink ${isActive('/bids') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faLayerGroup} />
-          <span>Bid Repository</span>
+          <span>Dashboard</span>
         </Link>
         <Link to="/library" className={`sidebarsmalllink ${isActive('/library') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faBookOpen} />
-          <span>Library</span>
+          <span>Content Library</span>
         </Link>
         <Link to="/chatResponse" className={`sidebarsmalllink ${isActive('/chatResponse') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faComments} />
-          <span>Library Chat</span>
+          <span>Quick Question</span>
         </Link>
       </div>
       <div className="signout-container">
@@ -58,10 +55,7 @@ const SideBarSmall = () => {
           <FontAwesomeIcon icon={faUser} />
           <span>Profile</span>
         </Link>
-      <Link to="https://mytender.io/" className="sidebarsmall-image-link">
-          <img src={sidebarIcon} alt="Sidebar Icon" />
-          <span>Site</span>
-        </Link>
+     
 
         
       

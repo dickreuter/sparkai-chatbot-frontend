@@ -5,7 +5,7 @@ import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import { useLocation, Link } from 'react-router-dom';
-import { Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
@@ -301,14 +301,13 @@ const BidExtractor = () => {
     }));
   };
 
-  const handleSubmissionDeadlineChange = (e) => {
-    const newSubmissionDeadline = e.target.value;
-    setSharedState(prevState => ({
+  const handleSubmissionDeadlineChange = (newDate) => {
+    setSharedState((prevState) => ({
       ...prevState,
-      submission_deadline: newSubmissionDeadline
+      submission_deadline: newDate
     }));
   };
-
+  
   const handleBidManagerChange = (e) => {
     const newBidManager = e.target.value;
     setSharedState(prevState => ({
@@ -348,148 +347,160 @@ const BidExtractor = () => {
             </button>
           </h1>
           <div >
-          <Link to="/calculator">
-            <button className="upload-button">
-              Bid no/bid calculator
-            </button>
-          </Link>
+         
           </div>
         </div>
         <div>
         <div className="input-container">
-        <Row className="no-gutters mx-n2">
-        <Col md={4} className="px-2">
-          <div className="card-effect-input-box">
-            <div className="input-box">
-              <div className="inputbox-container">
-                <h1 className="inputbox-title">Client Name:</h1>
-                <textarea
-                  className="inputbox-textarea"
-                  value={sharedState.client_name}
-                  onChange={handleClientNameResultChange}
-                ></textarea>
-              </div>
-            </div>
-          </div>
-        </Col>
-        <Col md={4} className="px-2">
-          <div className="card-effect-input-box">
-            <div className="input-box">
-              <div className="inputbox-container">
-                <h1 className="inputbox-title">Bid Qualification Result:</h1>
-                <textarea
-                  className="inputbox-textarea"
-                  value={sharedState.bid_qualification_result}
-                  onChange={handleBidQualificationResultChange}
-                ></textarea>
-              </div>
-            </div>
-          </div>
-        </Col>
-        <Col md={4} className="px-2">
-          <div className="card-effect-input-box">
-            <div className="input-box">
-              <div className="inputbox-container">
-                <h1 className="inputbox-title">Opportunity Owner:</h1>
-                <textarea
-                  className="inputbox-textarea"
-                  value={sharedState.opportunity_owner}
-                  onChange={handleOpportunityOwnerChange}
-                ></textarea>
-              </div>
-            </div>
-          </div>
-        </Col>
-      </Row>
-      <Row className="no-gutters mt-3 mx-n2">
-        <Col md={4} className="px-2">
-          <div className="card-effect-input-box">
-            <div className="input-box">
-              <div className="inputbox-container">
-                <h1 className="inputbox-title">Submission Deadline:</h1>
-                <textarea
-                  className="inputbox-textarea"
-                  value={sharedState.submission_deadline}
-                  onChange={handleSubmissionDeadlineChange}
-                ></textarea>
-              </div>
-            </div>
-          </div>
-        </Col>
-        <Col md={4} className="px-2">
-          <div className="card-effect-input-box">
-            <div className="input-box">
-              <div className="inputbox-container">
-                <h1 className="inputbox-title">Bid Manager:</h1>
-                <textarea
-                  className="inputbox-textarea"
-                  value={sharedState.bid_manager}
-                  onChange={handleBidManagerChange}
-                ></textarea>
-              </div>
-            </div>
-          </div>
-        </Col>
-        <Col md={4} className="px-2">
-          <div className="card-effect-input-box">
-            <div className="input-box">
-              <div className="inputbox-container">
-                <h1 className="inputbox-title">Contributors:</h1>
-                <textarea
-                  className="inputbox-textarea"
-                  value={sharedState.contributors}
-                  onChange={handleContributorsChange}
-                ></textarea>
-              </div>
-            </div>
-          </div>
-        </Col>
-      </Row>
-      </div>
+  <Row className="no-gutters mx-n2">
+    <Col md={4} className="px-2">
+      <Card className="mb-4 same-height-card">
+        <Card.Header>
+          <h1 className="inputbox-title mb-0 mt-1">Client Name:</h1>
+        </Card.Header>
+        <Card.Body className="py-0 pl-2">
+          <textarea
+            className="form-control single-line-textarea"
+            value={sharedState.client_name}
+            onChange={handleClientNameResultChange}
+          ></textarea>
+        </Card.Body>
+      </Card>
+    </Col>
+
+    <Col md={4} className="px-2">
+      <Card className="mb-4 same-height-card">
+        <Card.Header>
+          <h1 className="inputbox-title mb-0 mt-1">Submission Deadline:</h1>
+        </Card.Header>
+        <Card.Body className="py-0 pl-2">
+          <input
+            type="date"
+            className="form-control"
+            value={sharedState.submission_deadline}
+            onChange={(e) => handleSubmissionDeadlineChange(e.target.value)}
+            style={{border: "none"}}
+          />
+        </Card.Body>
+      </Card>
+    </Col>
+
+    <Col md={4} className="px-2">
+      <Card className="mb-4 same-height-card">
+        <Card.Header>
+          <h1 className="inputbox-title mb-0 mt-1">Bid Manager:</h1>
+        </Card.Header>
+        <Card.Body className="py-0 pl-2">
+          <textarea
+            className="form-control single-line-textarea"
+            value={sharedState.bid_manager}
+            onChange={handleBidManagerChange}
+          ></textarea>
+        </Card.Body>
+      </Card>
+    </Col>
+  </Row>
+  <Row className="no-gutters mt-0 mx-n2">
+    <Col md={4} className="px-2">
+      <Card className="mb-4 same-height-card">
+        <Card.Header>
+          <h1 className="inputbox-title mb-0 mt-1">Opportunity Owner:</h1>
+        </Card.Header>
+        <Card.Body className="py-0 pl-2">
+          <textarea
+            className="form-control single-line-textarea"
+            value={sharedState.opportunity_owner}
+            onChange={handleOpportunityOwnerChange}
+          ></textarea>
+        </Card.Body>
+      </Card>
+    </Col>
+
+    <Col md={4} className="px-2">
+      <Card className="mb-4 same-height-card">
+        <Card.Header>
+          <h1 className="inputbox-title mb-0 mt-1">Contributors:</h1>
+        </Card.Header>
+        <Card.Body className="py-0 pl-2">
+          <textarea
+            className="form-control single-line-textarea"
+            value={sharedState.contributors}
+            onChange={handleContributorsChange}
+          ></textarea>
+        </Card.Body>
+      </Card>
+    </Col>
+
+    <Col md={4} className="px-2">
+      <Card className="mb-4 same-height-card">
+        <Card.Header>
+          <h1 className="inputbox-title mb-0 mt-1">Bid Qualification Result:</h1>
+        </Card.Header>
+        <Card.Body className="py-0 pl-2">
+          <textarea
+            className="form-control single-line-textarea"
+            value={sharedState.bid_qualification_result}
+            onChange={handleBidQualificationResultChange}
+          ></textarea>
+        </Card.Body>
+      </Card>
+    </Col>
+  </Row>
+</div>
+
+
+
 
       <Row className="mt-4 mb-4">
   <Col md={6}>
-    <div className="card-title-container mb-1">
-      <h1 className="lib-title">Opportunity Information</h1>
-      <div className="tooltip-container">
-      <div className="tooltip-icon-container">
-        <i className="fas fa-info tooltip-icon"></i>
-      </div>
-        <span className="tooltip-text-cd">
-          <strong style={{ }}>Provide information about the opportunity you are bidding for, including the client objectives, scope, and key details to help give the AI context to tailor the responses to.</strong>
-        </span>
-      </div>
-    </div>
-    <div className="question-extractor">
-      <textarea
-        className="card-textarea"
-        placeholder="Enter background info here..."
-        value={opportunity_information || ''}
-        onChange={handleOpportunityInformationChange}
-      ></textarea>
-    </div>
+    <Card className="mb-4">
+      <Card.Header className="d-flex justify-content-between align-items-center ">
+        <h1 className="requirements-title mt-1">Opportunity Information</h1>
+        <div className="tooltip-container mt-1">
+          <div className="tooltip-icon-container">
+            <i className="fas fa-info tooltip-icon"></i>
+          </div>
+          <span className="tooltip-text-cd">
+            <strong>
+              Provide information about the opportunity you are bidding for, including the client objectives, scope, and key details to help give the AI context to tailor the responses to.
+            </strong>
+          </span>
+        </div>
+      </Card.Header>
+      <Card.Body className="px-0 py-1">
+        <textarea
+          className="form-control requirements-textarea"
+          placeholder="Enter background info here..."
+          value={opportunity_information || ''}
+          onChange={handleOpportunityInformationChange}
+        ></textarea>
+      </Card.Body>
+    </Card>
   </Col>
   <Col md={6}>
-    <div className="card-title-container mb-1">
-      
-      <h1 className="lib-title">Compliance Requirements</h1>
-      <div className="tooltip-container">
-      <div className="tooltip-icon-container">
-        <i className="fas fa-info tooltip-icon"></i>
-      </div>
-        <span className="tooltip-text">
-          <strong style={{marginTop: "0"}}>Outline the essential compliance criteria and regulations relevant to the bid such as certifications or legal requirements that must be met to ensure it's directly referenced in the response.</strong>
-        </span>
-      </div>
-    </div>
-    <div className="question-extractor">
-      <textarea
-        className="card-textarea"
-        placeholder="Enter compliance requirements here..."
-        value={compliance_requirements || ''}
-        onChange={handleComplianceRequirementsChange}
-      ></textarea>
-    </div>
+    <Card className="mb-4">
+      <Card.Header className="d-flex justify-content-between align-items-center">
+        <h1 className=" requirements-title mt-1">Compliance Requirements</h1>
+        <div className="tooltip-container mt-1">
+          <div className="tooltip-icon-container">
+            <i className="fas fa-info tooltip-icon"></i>
+          </div>
+          <span className="tooltip-text">
+            <strong>
+              Outline the essential compliance criteria and regulations relevant to the bid such as certifications or legal requirements that must be met to ensure it's directly referenced in the response.
+            </strong>
+          </span>
+        </div>
+      </Card.Header>
+      <Card.Body className="px-0 py-1">
+        <textarea
+          className="form-control requirements-textarea"
+          placeholder="Enter compliance requirements here..."
+          value={compliance_requirements || ''}
+          onChange={handleComplianceRequirementsChange}
+        ></textarea>
+      </Card.Body>
+    </Card>
   </Col>
 </Row>
 

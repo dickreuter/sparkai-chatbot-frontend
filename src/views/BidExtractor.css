@@ -347,3 +347,57 @@
     width: 100%;
     /* Ensure the content takes full width */
 }
+
+.same-height-card {
+    height: 80px;
+    /* Adjust the height as needed */
+}
+
+.single-line-textarea {
+    height: 10px;
+    /* Adjust to fit one line of text */
+    overflow: hidden;
+    /* Hide extra content */
+    resize: none;
+    /* Prevent resizing */
+    margin: 0;
+    outline: none;
+    border: none;
+    /* Ensure border is also removed if not needed */
+}
+
+.single-line-textarea:focus {
+    outline: none;
+    /* Remove blue outline on focus */
+    box-shadow: none;
+    /* Remove any box-shadow */
+    border: none;
+    /* Ensure no border is applied on focus */
+}
+
+.requirements-textarea {
+    height: 250px;
+    /* Adjust to fit one line of text */
+    overflow: hidden;
+    /* Hide extra content */
+    resize: none;
+    margin: 0;
+    outline: none;
+    border: none;
+    padding-left: 18px;
+    /* Prevent resizing */
+}
+
+.requirements-textarea:focus {
+    outline: none;
+    /* Remove blue outline on focus */
+    box-shadow: none;
+    /* Remove any box-shadow */
+    border: none;
+    /* Ensure no border is applied on focus */
+}
+
+.requirements-title {
+    font-size: 18px;
+    font-weight: 550 !important;
+}

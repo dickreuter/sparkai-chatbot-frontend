@@ -14,7 +14,7 @@ const BidNavbar = () => {
     <div className="bidnav">
       <div className="bidnav-section">
         <NavLink to="/bid-extractor" className="bidnav-item" activeClassName="active">Bid Planner</NavLink>
-        <NavLink to="/question-crafter" className="bidnav-item" activeClassName="active">Bid Creator</NavLink>
+        <NavLink to="/question-crafter" className="bidnav-item" activeClassName="active">Q&A Generator </NavLink>
         <NavLink to="/proposal" className="bidnav-item" activeClassName="active">Bid Complier</NavLink>
         <div className="status-indicator mt-2">
           {isLoading ? (

@@ -32,7 +32,6 @@
 
 .bids-table th,
 .bids-table td {
-    text-align: left;
     white-space: nowrap;
     overflow: hidden;
     padding: 12px;
@@ -60,6 +59,7 @@
 .bids-table th:last-child,
 .bids-table td:last-child {
     width: 8%;
+    justify-content: center;
 }
 
 .bids-table tr:last-child td {
@@ -70,4 +70,39 @@
     z-index: 1050;
     position: absolute;
     will-change: transform;
+}
+
+
+/* Add this to your CSS file */
+
+
+/* Add this to your CSS file */
+
+.sort-options {
+    display: flex;
+    align-items: center;
+    font-family: 'ClashDisplay', sans-serif;
+    /* Ensure you have this font imported */
+}
+
+.sort-options label {
+    margin-right: 10px;
+    font-family: 'ClashDisplay', sans-serif;
+}
+
+.sort-select {
+    font-family: 'ClashDisplay', sans-serif;
+    padding: 5px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #495057;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    /* Remove default arrow */
+}
+
+.sort-select-option {
+    font-family: 'ClashDisplay', sans-serif !important;
 }

@@ -9,12 +9,14 @@ import UploadText from './UploadText';
 import "./Library.css";
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
-import { faEye, faTrash, faFolder, faFileAlt, faArrowUpFromBracket, faEllipsisVertical, faSearch, faQuestionCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTrash, faFolder, faFileAlt, faArrowUpFromBracket, faEllipsisVertical, faSearch, faQuestionCircle, faPlus, faArrowLeft, faReply } from '@fortawesome/free-solid-svg-icons';
 import "./Chatbot.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UploadPDFModal, UploadTextModal, UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
 import { Menu, MenuItem, IconButton } from '@mui/material';
 import { MoreVert as MoreVertIcon } from '@mui/icons-material';
+import FileContentModal from "../components/FileContentModal.tsx";
+import { displayAlert } from "../helper/Alert.tsx";
 
 const Library = () => {
   const getAuth = useAuthUser();
@@ -25,6 +27,8 @@ const Library = () => {
   const [folderContents, setFolderContents] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState('');
+  const [currentFileName, setCurrentFileName] = useState(null);
+  const [currentFileId, setCurrentFileId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 9;
   const [totalPages, setTotalPages] = useState(0);
@@ -107,6 +111,7 @@ const Library = () => {
   const closeModal = (e) => {
     if (modalRef.current && !modalRef.current.contains(e.target)) {
       setShowPdfViewerModal(false);
+      setShowModal(true); // Close the modal after saving
     }
   };
 
@@ -126,22 +131,27 @@ const Library = () => {
     </Modal>
   );
 
-  const UploadTextModal = ({ show, onHide, folder, get_collections }) => (
-    <Modal 
-        show={show} 
-        onHide={() => { onHide(); }}
-        onClick={(e) => e.stopPropagation()}
-        size="lg"
+  const UploadTextModal = ({ show, onHide, folder, get_collections}) => (
+    <Modal
+      show={show}
+      onHide={() => { onHide(); }}
+      onClick={(e) => e.stopPropagation()}
+      size="lg"
     >
-        <Modal.Header closeButton onClick={(e) => e.stopPropagation()}>
-            <Modal.Title>Text Uploader</Modal.Title>
-        </Modal.Header>
-        <Modal.Body onClick={(e) => e.stopPropagation()}>
-            <UploadText folder={folder} get_collections={get_collections} onClose={onHide} />
-        </Modal.Body>
+      <Modal.Header closeButton onClick={(e) => e.stopPropagation()}>
+        <Modal.Title>Text Uploader</Modal.Title>
+      </Modal.Header>
+      <Modal.Body onClick={(e) => e.stopPropagation()}>
+        <UploadText 
+          folder={folder} 
+          get_collections={get_collections} 
+          onClose={onHide}
+          
+        />
+      </Modal.Body>
     </Modal>
   );
-
+  
   const DeleteFolderModal = ({ show, onHide, onDelete, folderTitle }) => (
     <Modal show={show} onHide={onHide} size="lg">
         <Modal.Header closeButton>
@@ -180,32 +190,6 @@ const Library = () => {
     </Modal>
   );
 
-  // Modal component to display file content
-  const FileContentModal = () => (
-    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
-      <Modal.Header closeButton style={{ display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
-        <div style={{ flex: '1 1 auto' }}>
-          <Modal.Title style={{ textAlign: 'center' }}>
-            File Content
-          </Modal.Title>
-        </div>
-      </Modal.Header>
-      <Modal.Body style={{
-        height: '600px',
-        overflowY: 'auto'
-      }}>
-        <pre style={{
-          textAlign: 'center',
-          padding: '20px',
-          whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word',
-          overflowX: 'hidden'
-        }}>
-          {modalContent}
-        </pre>
-      </Modal.Body>
-    </Modal>
-  );
 
   const fetchFolderFilenames = async (folderName) => {
     try {
@@ -214,6 +198,7 @@ const Library = () => {
         { collection_name: folderName },
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
+      
 
       const filesWithIds = response.data.map(item => ({
         filename: item.meta,
@@ -245,11 +230,40 @@ const Library = () => {
     }
   };
 
-  const viewFile = async (fileName, folderName) => {
+  const saveFileContent = async (id, newContent, folderName) => {
+    try {
+      const formData = new FormData();
+      formData.append('id', id); // Make sure this matches your FastAPI endpoint's expected field
+      formData.append('text', newContent);
+      formData.append('profile_name', folderName);
+      formData.append('mode', 'plain');
+  
+      console.log(formData);
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/updatetext`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`
+          },
+        }
+      );
+  
+      setModalContent(newContent); // Update the modal content with the new content
+      
+      console.log('Content updated successfully');
+    } catch (error) {
+      console.error('Error saving file content:', error);
+    }
+  };
+  
+  
+
+  const viewFile = async (fileName, folderName, unique_id) => {
     const formData = new FormData();
     formData.append('file_name', fileName);
     formData.append("profile_name", folderName);
-
+  
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/show_file_content`,
@@ -260,14 +274,18 @@ const Library = () => {
           },
         }
       );
+  
       setModalContent(response.data);
+      setCurrentFileId(unique_id); // Set the current file ID
+      setCurrentFileName(fileName); // Set the current file name
       setShowModal(true);
-      handleGAEvent('Library', 'View', 'View Button');
     } catch (error) {
       console.error('Error viewing file:', error);
     }
   };
-
+  
+  
+  
   const viewPdfFile = async (fileName, folderName) => {
     const formData = new FormData();
     formData.append('file_name', fileName);
@@ -295,8 +313,8 @@ const Library = () => {
 
       if (error.response && error.response.status === 404) {
         // Try using the viewFile function if the file was not found as a PDF
-        console.warn('PDF file not found, attempting to view as text content.');
-        viewFile(fileName, folderName);
+        displayAlert('PDF file not found, try reuploading the pdf file', "danger");
+        
       }
     }
   };
@@ -413,7 +431,7 @@ const Library = () => {
   
       return (
         <tr key={index} style={{ cursor: 'pointer' }}>
-          <td onClick={() => isPdf ? viewPdfFile(filename, activeFolder) : viewFile(filename, activeFolder)}>
+          <td onClick={() =>  viewFile(filename, activeFolder, unique_id)}>
             <FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {filename}
           </td>
           <td colSpan={3}>
@@ -527,41 +545,15 @@ const Library = () => {
       <SideBarSmall />
 
       <div className="lib-container">
-        <h1 className='heavy'>Company Library</h1>
-
-        <Row>
+        <h1 className='heavy'>Content Library</h1>
+  
+            <Row>
   <Col md={12}>
-    <Card className="mb-4">
+    <Card className="mb-4 mt-2">
       <Card.Body className="library-card-body-content">
         <div className="library-card-content-wrapper">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Button
-                aria-controls="simple-menu"
-                aria-haspopup="true"
-                onClick={handleMenuClick}
-                className="upload-button"
-              >
-                <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
-                New Folder
-              </Button>
-              <Menu
-                id="long-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={open}
-                onClose={handleMenuClose}
-              >
-                <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "180px" }}>
-                  <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
-                  Upload PDF
-                </MenuItem>
-                <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
-                  <i className="fas fa-file-alt" style={{ marginRight: '12px' }}></i>
-                  Upload Text
-                </MenuItem>
-              </Menu>
-            </div>
+          <div className="header-row mt-2">
+            <div className="lib-title">Resources</div>
 
             <InputGroup className={`search-bar-container ${showDropdown ? 'dropdown-visible' : ''}`} ref={searchBarRef} >
               <FontAwesomeIcon icon={faSearch} className="search-icon" />
@@ -585,6 +577,32 @@ const Library = () => {
               />
               {renderSearchResults()}
             </InputGroup>
+
+            <Button
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              onClick={handleMenuClick}
+              className="upload-button"
+            >
+              <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+              New Folder
+            </Button>
+            <Menu
+              id="long-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={open}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "180px" }}>
+                <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
+                Upload PDF
+              </MenuItem>
+              <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                <i className="fas fa-file-alt" style={{ marginRight: '12px' }}></i>
+                Upload Text
+              </MenuItem>
+            </Menu>
           </div>
 
           <table className="library-table">
@@ -592,9 +610,16 @@ const Library = () => {
               <tr>
                 <th>{activeFolder ? `Documents in ${activeFolder}` : 'Folders'}</th>
                 <th colSpan={3}>
-                  {activeFolder && (
-                    <Button className="upload-button" onClick={() => setActiveFolder(null)}>Back to Folders</Button>
-                  )}
+                {activeFolder && (
+  <div 
+    className="back-to-folders" 
+    onClick={() => setActiveFolder(null)} 
+    style={{ cursor: 'pointer', padding: '5px'}}
+  >
+    <FontAwesomeIcon icon={faReply}  />
+    <span style={{ marginLeft: "10px"}}>Back to Folders</span>
+  </div>
+)}
                 </th>
               </tr>
             </thead>
@@ -619,7 +644,20 @@ const Library = () => {
 
 
 
-        <FileContentModal />
+<FileContentModal
+  showModal={showModal}
+  setShowModal={setShowModal}
+  modalContent={modalContent}
+  onSave={(newContent) => saveFileContent(currentFileId, newContent, activeFolder)} // Pass the folder name
+  documentId={currentFileId}
+  fileName={currentFileName}
+  folderName={activeFolder}
+  onViewPdf={viewPdfFile} // Pass the viewPdfFile function
+/>
+
+
+
+
 
         <DeleteFolderModal
           show={showDeleteFolderModal}

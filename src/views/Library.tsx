@@ -98,14 +98,15 @@ const Library = () => {
   };
 
   const handleOpenPDFModal = () => {
-    setUploadFolder(null);
+    setUploadFolder(activeFolder || null); // Set to activeFolder if available, otherwise null
     setShowPDFModal(true);
   };
-
+  
   const handleOpenTextModal = () => {
-    setUploadFolder(null);
+    setUploadFolder(activeFolder || null); // Set to activeFolder if available, otherwise null
     setShowTextModal(true);
   };
+  
 
   const modalRef = useRef();
   const closeModal = (e) => {
@@ -585,7 +586,7 @@ const Library = () => {
               className="upload-button"
             >
               <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
-              New Folder
+              {activeFolder ? "New File" : "New Folder"}
             </Button>
             <Menu
               id="long-menu"

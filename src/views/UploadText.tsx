@@ -79,7 +79,12 @@ const UploadText = ({ folder, get_collections, onClose }) => {
       handleGAEvent('Library', 'Text Upload', 'Upload Text Button');
     } catch (error) {
       console.error("Error saving strategy:", error);
-      displayAlert("Failed to save", "danger");
+  
+      if (error.response && error.response.status === 409) {
+        displayAlert("A file with this name already exists in this folder", "danger");
+      } else {
+        displayAlert("Failed to save", "danger");
+      }
     } finally {
       setIsUploading(false); // Set isUploading to false when the upload ends
     }

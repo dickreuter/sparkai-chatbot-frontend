@@ -43,6 +43,7 @@
     margin: 20px auto;
     overflow: hidden;
     margin-bottom: 0;
+    margin-top: 30px;
 }
 
 .library-table th,
@@ -103,6 +104,13 @@
     margin-top: 20px;
 }
 
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
 .lib-title {
     font-size: 22px;
     font-weight: 600;
@@ -149,13 +157,14 @@
     align-items: center;
     position: relative;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     /* Adjust this value for desired max width */
     min-width: 500px;
     background-color: none;
     /* Match the search bar background */
     /* Add border to match the search bar */
     border-radius: 25px;
+    z-index: 1;
     /* Initial full border radius */
 }
 
@@ -245,7 +254,7 @@
 .library-card-body-content {
     display: flex;
     flex-direction: column;
-    height: 600px;
+    height: 620px;
     overflow: hidden;
 }
 
@@ -284,6 +293,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 20;
 }
 
 .pdf-viewer-modal-content {
@@ -293,19 +303,6 @@
     background: white;
     border-radius: 8px;
     overflow: hidden;
-}
-
-.pdf-viewer-modal button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #f00;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
 }
 
 .pdf-viewer-modal iframe {

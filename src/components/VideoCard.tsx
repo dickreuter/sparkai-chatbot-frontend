@@ -3,10 +3,12 @@ import { Card, CardContent, Typography, Avatar, Grid } from '@mui/material';
 import sidebarIcon from '../resources/images/mytender.io_badge.png';
 
 const VideoCard = ({ videoUrl, videoTitle, channelName, views, time }) => {
+  console.log('Video URL:', videoUrl); // Debugging step
+
   return (
     <Card sx={{ maxWidth: '100%', boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)', border: '1px solid #ced4da' }}>
-       <video width="100%" controls data-testid="video-element">
-        <source src={videoUrl} type="video/mp4" data-testid="video-source" />
+      <video width="100%" controls>
+        <source src={videoUrl} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       <CardContent>
@@ -41,7 +43,6 @@ const VideoCard = ({ videoUrl, videoTitle, channelName, views, time }) => {
             </Typography>
           </Grid>
         </Grid>
-      
       </CardContent>
     </Card>
   );

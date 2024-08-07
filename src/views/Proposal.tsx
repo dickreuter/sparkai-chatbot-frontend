@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import withAuth from '../routes/withAuth';
@@ -12,30 +12,32 @@ import { Document, Packer, Paragraph, TextRun } from 'docx';
 import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-js';
 import "./Proposal.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
+import { TabProvider } from "../routes/TabProvider.tsx";
 
 const Proposal = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const { sharedState, setSharedState } = useContext(BidContext);
-  const { bidInfo, backgroundInfo, editorState } = sharedState;
+  const { sharedState, setSharedState, saveProposal, addDocument, removeDocument, selectDocument } = useContext(BidContext);
+  const { bidInfo } = sharedState;
 
   const [isLoading, setIsLoading] = useState(false);
   const [appendResponse, setAppendResponse] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState("-1");
-  
+  const [isSaved, setIsSaved] = useState(false);
 
+  const typingTimeout = useRef(null);
 
   const exportToDocx = (editorState) => {
     if (!editorState) {
       console.error("No editor state available");
       return;
     }
-  
+
     const contentState = editorState.getCurrentContent();
     const contentText = contentState.getPlainText('\n');
-  
+
     const doc = new Document({
       sections: [{
         properties: {},
@@ -44,40 +46,54 @@ const Proposal = () => {
         }))
       }]
     });
-  
+
     Packer.toBlob(doc).then(blob => {
       saveAs(blob, 'proposal.docx');
     }).catch(err => {
       console.error('Error creating DOCX:', err);
     });
   };
-  
 
-  
+  const handleSaveProposal = async () => {
+    setIsLoading(true);
+    setIsSaved(false);
+    await saveProposal();
+    setIsLoading(false);
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 3000); // Reset after 3 seconds
+  };
 
   return (
     <div className="chatpage">
       <SideBarSmall />
       <div className="lib-container">
         <BidNavbar />
-        <ProposalEditor
-              bidData={editorState}
-              appendResponse={appendResponse}
-              selectedQuestionId={selectedQuestionId}
-              setSelectedQuestionId={setSelectedQuestionId}
-            />
+        <TabProvider>
+          <ProposalEditor
+            bidData={sharedState.documents[sharedState.currentDocumentIndex]?.editorState}
+            appendResponse={appendResponse}
+            selectedQuestionId={selectedQuestionId}
+            setSelectedQuestionId={setSelectedQuestionId}
+          />
+        </TabProvider>
         <Row>
           <div className="mb-4">
             <Button
               variant={"primary"}
-              onClick={() => exportToDocx(editorState)}
+              onClick={() => exportToDocx(sharedState.documents[sharedState.currentDocumentIndex]?.editorState)}
               className="ml-2 upload-button"
-              disabled={isLoading}
-           
+             
             >
               Export to Word
             </Button>
-
+            <Button
+              style={{  marginLeft: '5px' }}
+              onClick={handleSaveProposal}
+              className="save-button"
+              disabled={isLoading}
+            >
+              {isSaved ? "Saved" : "Save Document"}
+            </Button>
           </div>
         </Row>
       </div>

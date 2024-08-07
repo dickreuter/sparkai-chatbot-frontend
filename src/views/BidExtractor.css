@@ -208,39 +208,40 @@
     cursor: pointer;
     font-size: 30px;
     margin-left: 1.2%;
-    color: darkgrey;
     transform: translateY(-10%);
 }
 
 .tooltip-text {
     visibility: hidden;
-    width: 450px;
-    background-color: #ededed;
+    width: 500px;
+    background-color: #dbd9d9;
     color: #4d4d4d;
     border-radius: 6px;
     padding: 8px;
     position: absolute;
-    z-index: 999000;
-    font-size: 12px;
+    z-index: 10;
+    font-size: 14px;
     bottom: 120%;
     left: 50%;
-    transform: translateX(-60%);
+    transform: translateX(-95%);
     margin-bottom: 5px;
+    font-weight: 400 !important;
 }
 
 .tooltip-text-cd {
     visibility: hidden;
-    width: 450px;
-    background-color: #ededed;
+    width: 550px;
+    background-color: #dbd9d9;
     color: #4d4d4d;
     border-radius: 6px;
     padding: 8px;
     position: absolute;
-    z-index: 999000;
-    font-size: 12px;
+    z-index: 1000000000000000;
+    font-size: 14px;
     bottom: 120%;
     margin-bottom: 5px;
     transform: translateX(-50%);
+    font-weight: 400 !important;
 }
 
 .tooltip-container:hover .tooltip-text-cd {
@@ -252,12 +253,11 @@
 }
 
 .tooltip-icon-container {
-    background-color: #ededed;
+    background-color: #dbd9d9;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    z-index: 10;
     width: 22px;
     height: 22px;
 }
@@ -266,7 +266,6 @@
     font-size: 10px;
     color: #4d4d4d;
     z-index: 1;
-    margin-right: 8%;
 }
 
 .card-effect-input-box {
@@ -400,4 +399,11 @@
 .requirements-title {
     font-size: 18px;
     font-weight: 550 !important;
+}
+
+.dark-grey-header {
+    background-color: #f0f0f0;
+    z-index: 1;
+    /* You can adjust this color to your preferred shade of dark grey */
+    /* This ensures the text is visible on the dark background */
 }

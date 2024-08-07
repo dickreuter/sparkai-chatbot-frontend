@@ -6,12 +6,16 @@ import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import { useAuthUser } from 'react-auth-kit';
 import { displayAlert } from '../helper/Alert';
 
+export interface Document {
+  name: string;
+  editorState: EditorState;
+}
+
 export interface SharedState {
   bidInfo: string;
   opportunity_information: string;
   compliance_requirements: string;
   questions: string;
-  editorState: EditorState;
   client_name: string;
   bid_qualification_result: string;
   opportunity_owner: string;
@@ -20,14 +24,21 @@ export interface SharedState {
   contributors: string;
   isSaved: boolean;
   isLoading: boolean;
-  saveSuccess: boolean | null; // null: no attempt, true: success, false: failure
+  saveSuccess: boolean | null;
+  object_id: string | null;
+  documents: Document[]; // Add documents array
+  currentDocumentIndex: number; // Track the current document being edited
 }
+
 
 export interface BidContextType {
   sharedState: SharedState;
   setSharedState: React.Dispatch<React.SetStateAction<SharedState>>;
   saveProposal: () => void;
   getBackgroundInfo: () => string;
+  addDocument: () => void;
+  removeDocument: (index: number) => void;
+  selectDocument: (index: number) => void;
 }
 
 const defaultState: BidContextType = {
@@ -36,7 +47,6 @@ const defaultState: BidContextType = {
     opportunity_information: '',
     compliance_requirements: '',
     questions: '',
-    editorState: EditorState.createEmpty(),
     client_name: '',
     bid_qualification_result: '',
     opportunity_owner: '',
@@ -46,10 +56,16 @@ const defaultState: BidContextType = {
     isSaved: false,
     isLoading: false,
     saveSuccess: null,
+    object_id: null,
+    documents: [{ name: 'Document 1', editorState: EditorState.createEmpty() }],
+    currentDocumentIndex: 0,
   },
   setSharedState: () => {},
   saveProposal: () => {},
   getBackgroundInfo: () => '',
+  addDocument: () => {},
+  removeDocument: (index: number) => {},
+  selectDocument: (index: number) => {},
 };
 
 export const BidContext = createContext<BidContextType>(defaultState);
@@ -61,12 +77,17 @@ const BidManagement: React.FC = () => {
       const parsedState = JSON.parse(savedState);
       return {
         ...parsedState,
-        editorState: parsedState.editorState
-          ? EditorState.createWithContent(convertFromRaw(JSON.parse(parsedState.editorState)))
-          : EditorState.createEmpty(),
+        documents: parsedState.documents.map(doc => ({
+          ...doc,
+          editorState: doc.editorState
+            ? EditorState.createWithContent(convertFromRaw(JSON.parse(doc.editorState)))
+            : EditorState.createEmpty(),
+        })),
         isSaved: false,
         isLoading: false,
         saveSuccess: null,
+        object_id: parsedState.object_id || null,
+        currentDocumentIndex: parsedState.currentDocumentIndex || 0,
       };
     }
     return defaultState.sharedState;
@@ -82,29 +103,63 @@ const BidManagement: React.FC = () => {
     return `${sharedState.opportunity_information}\n${sharedState.compliance_requirements}`;
   };
 
+  const addDocument = (name) => {
+    setSharedState((prevState) => {
+      const newDocument = {
+        name: name || `Document ${prevState.documents.length + 1}`,
+        editorState: EditorState.createEmpty()
+      };
+      return {
+        ...prevState,
+        documents: [...prevState.documents, newDocument],
+        currentDocumentIndex: prevState.documents.length
+      };
+    });
+  };
+  
+  const removeDocument = (index) => {
+    setSharedState((prevState) => {
+      const updatedDocuments = prevState.documents.filter((_, docIndex) => docIndex !== index);
+      const newIndex = Math.min(prevState.currentDocumentIndex, updatedDocuments.length - 1);
+      return {
+        ...prevState,
+        documents: updatedDocuments,
+        currentDocumentIndex: newIndex
+      };
+    });
+  };
+  
+  const selectDocument = (index) => {
+    setSharedState((prevState) => ({
+      ...prevState,
+      currentDocumentIndex: index
+    }));
+  };
+  
+
   const saveProposal = async () => {
-    const { bidInfo, compliance_requirements, opportunity_information, editorState, bid_qualification_result, client_name, opportunity_owner, submission_deadline, bid_manager, contributors, questions } = sharedState;
+    const {
+        bidInfo, compliance_requirements, opportunity_information, documents, 
+        bid_qualification_result, client_name, opportunity_owner, submission_deadline, 
+        bid_manager, contributors, questions, object_id
+    } = sharedState;
 
     if (!bidInfo || bidInfo.trim() === '') {
-      displayAlert('Please type in a bid name...', 'warning');
-      return;
+        displayAlert('Please type in a bid name...', 'warning');
+        return;
     }
 
-    console.log("saving")
-    
     setSharedState(prevState => ({ ...prevState, isLoading: true, saveSuccess: null }));
 
-    const editorContentState = editorState.getCurrentContent();
-    const editorText = editorContentState.getPlainText('\n');
     const backgroundInfo = getBackgroundInfo();
 
     const formData = new FormData();
     const appendFormData = (key, value) => {
-      formData.append(key, value && value.trim() !== '' ? value : ' ');
+        formData.append(key, value && value.trim() !== '' ? value : ' ');
     };
 
     appendFormData('bid_title', bidInfo);
-    appendFormData('text', editorText);
+    appendFormData('text', 'Sample text'); // Assuming this is a required field
     appendFormData('status', 'ongoing');
     appendFormData('contract_information', backgroundInfo);
     appendFormData('compliance_requirements', compliance_requirements);
@@ -117,33 +172,57 @@ const BidManagement: React.FC = () => {
     appendFormData('submission_deadline', submission_deadline);
     appendFormData('questions', questions);
 
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Adding a delay before starting the save
-      await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/upload_bids`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+    // Prepare documents field
+    const documentsFormatted = documents.map(doc => ({
+        name: doc.name,
+        text: doc.editorState.getCurrentContent().getPlainText()
+    }));
+    formData.append('documents', JSON.stringify(documentsFormatted));
 
-      setSharedState(prevState => ({ ...prevState, isSaved: true, isLoading: false, saveSuccess: true }));
-      setTimeout(() => setSharedState(prevState => ({ ...prevState, isSaved: false })), 3000); // Reset after 3 seconds
-    } catch (error) {
-      console.error("Error saving proposal:", error);
-      setSharedState(prevState => ({ ...prevState, isLoading: false, saveSuccess: false }));
+    if (object_id) {
+        appendFormData('object_id', object_id);
     }
-  };
+
+    console.log(formData);
+
+    try {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Adding a delay before starting the save
+        const response = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/upload_bids`,
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${tokenRef.current}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+
+        const { bid_id } = response.data;
+
+        setSharedState(prevState => ({
+            ...prevState,
+            isSaved: true,
+            isLoading: false,
+            saveSuccess: true,
+            object_id: bid_id, // Update the object_id in the shared state
+        }));
+        setTimeout(() => setSharedState(prevState => ({ ...prevState, isSaved: false })), 3000); // Reset after 3 seconds
+    } catch (error) {
+        console.error("Error saving proposal:", error);
+        setSharedState(prevState => ({ ...prevState, isLoading: false, saveSuccess: false }));
+    }
+};
+
+
 
   useEffect(() => {
     const stateToSave = {
       ...sharedState,
-      editorState: sharedState.editorState
-        ? JSON.stringify(convertToRaw(sharedState.editorState.getCurrentContent()))
-        : ''
+      documents: sharedState.documents.map(doc => ({
+        ...doc,
+        editorState: JSON.stringify(convertToRaw(doc.editorState.getCurrentContent()))
+      }))
     };
     localStorage.setItem('bidState', JSON.stringify(stateToSave));
 
@@ -159,17 +238,17 @@ const BidManagement: React.FC = () => {
     sharedState.opportunity_information,
     sharedState.compliance_requirements,
     sharedState.questions,
-    sharedState.editorState,
     sharedState.client_name,
     sharedState.bid_qualification_result,
     sharedState.opportunity_owner,
     sharedState.submission_deadline,
     sharedState.bid_manager,
-    sharedState.contributors
+    sharedState.contributors,
+    sharedState.documents
   ]);
 
   return (
-    <BidContext.Provider value={{ sharedState, setSharedState, saveProposal, getBackgroundInfo }}>
+    <BidContext.Provider value={{ sharedState, setSharedState, saveProposal, getBackgroundInfo, addDocument, removeDocument, selectDocument }}>
       <Outlet />
     </BidContext.Provider>
   );

@@ -49,7 +49,7 @@ const SideBarSmall = () => {
       <div className="signout-container">
       <Link to="/howto" className={`sidebarsmalllink ${isActive('/howto') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faCircleQuestion} />
-          <span>How To</span>
+          <span >How To</span>
         </Link>
         <Link to="/profile" className={`sidebarsmalllink ${isActive('/profile') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faUser} />

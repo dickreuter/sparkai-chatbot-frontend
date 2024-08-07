@@ -9,7 +9,7 @@ import { Button, Card, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
-import { EditorState, ContentState } from 'draft-js';
+import { EditorState, ContentState,  convertFromRaw, convertToRaw  } from 'draft-js';
 import { displayAlert } from '../helper/Alert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -103,6 +103,15 @@ const BidExtractor = () => {
     const navigatedFromBidsTable = localStorage.getItem('navigatedFromBidsTable');
     if (navigatedFromBidsTable === 'true' && location.state?.fromBidsTable && bidData) {
       console.log("from bids table");
+      console.log(bidData);
+  
+      const parsedDocuments = bidData?.documents?.map(doc => ({
+        name: doc.name,
+        editorState: doc.text 
+          ? EditorState.createWithContent(ContentState.createFromText(doc.text))
+          : EditorState.createEmpty()
+      })) || [{ name: 'Document 1', editorState: EditorState.createEmpty() }];
+  
       setSharedState(prevState => ({
         ...prevState,
         bidInfo: bidData?.bid_title || '',
@@ -114,11 +123,14 @@ const BidExtractor = () => {
         opportunity_owner: bidData?.opportunity_owner || '',
         submission_deadline: bidData?.submission_deadline || '',
         bid_manager: bidData?.bid_manager || '',
-        contributors: bidData?.contributors || ''
+        contributors: bidData?.contributors || '',
+        object_id: bidData?._id || '',
+        documents: parsedDocuments,
+        currentDocumentIndex: 0
       }));
 
-      console.log(sharedState);
-  
+
+      {/*
       if (bidData?.text) {
         console.log(bidData.text);
         const contentState = ContentState.createFromText(bidData.text);
@@ -128,6 +140,7 @@ const BidExtractor = () => {
           editorState: newEditorState
         }));
       }
+        */}
   
       localStorage.setItem('navigatedFromBidsTable', 'false');
     } else if (initialBidName && initialBidName !== '') {
@@ -138,6 +151,10 @@ const BidExtractor = () => {
       }));
     }
   }, [location, bidData, setSharedState, initialBidName]);
+
+  useEffect(() => {
+    console.log(sharedState);
+  }, [sharedState]);
 
   useEffect(() => {
     bidNameTempRef.current = bidInfo;
@@ -355,7 +372,7 @@ const BidExtractor = () => {
   <Row className="no-gutters mx-n2">
     <Col md={4} className="px-2">
       <Card className="mb-4 same-height-card">
-        <Card.Header>
+      <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
           <h1 className="inputbox-title mb-0 mt-1">Client Name:</h1>
         </Card.Header>
         <Card.Body className="py-0 pl-2">
@@ -370,7 +387,7 @@ const BidExtractor = () => {
 
     <Col md={4} className="px-2">
       <Card className="mb-4 same-height-card">
-        <Card.Header>
+      <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
           <h1 className="inputbox-title mb-0 mt-1">Submission Deadline:</h1>
         </Card.Header>
         <Card.Body className="py-0 pl-2">
@@ -387,7 +404,7 @@ const BidExtractor = () => {
 
     <Col md={4} className="px-2">
       <Card className="mb-4 same-height-card">
-        <Card.Header>
+      <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
           <h1 className="inputbox-title mb-0 mt-1">Bid Manager:</h1>
         </Card.Header>
         <Card.Body className="py-0 pl-2">
@@ -403,7 +420,7 @@ const BidExtractor = () => {
   <Row className="no-gutters mt-0 mx-n2">
     <Col md={4} className="px-2">
       <Card className="mb-4 same-height-card">
-        <Card.Header>
+      <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
           <h1 className="inputbox-title mb-0 mt-1">Opportunity Owner:</h1>
         </Card.Header>
         <Card.Body className="py-0 pl-2">
@@ -418,7 +435,7 @@ const BidExtractor = () => {
 
     <Col md={4} className="px-2">
       <Card className="mb-4 same-height-card">
-        <Card.Header>
+      <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
           <h1 className="inputbox-title mb-0 mt-1">Contributors:</h1>
         </Card.Header>
         <Card.Body className="py-0 pl-2">
@@ -433,7 +450,7 @@ const BidExtractor = () => {
 
     <Col md={4} className="px-2">
       <Card className="mb-4 same-height-card">
-        <Card.Header>
+      <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
           <h1 className="inputbox-title mb-0 mt-1">Bid Qualification Result:</h1>
         </Card.Header>
         <Card.Body className="py-0 pl-2">
@@ -454,15 +471,16 @@ const BidExtractor = () => {
       <Row className="mt-4 mb-4">
   <Col md={6}>
     <Card className="mb-4">
-      <Card.Header className="d-flex justify-content-between align-items-center ">
-        <h1 className="requirements-title mt-1">Opportunity Information</h1>
+    <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
+        <h1 className="requirements-title mt-2">Opportunity Information</h1>
         <div className="tooltip-container mt-1">
           <div className="tooltip-icon-container">
             <i className="fas fa-info tooltip-icon"></i>
           </div>
           <span className="tooltip-text-cd">
             <strong>
-              Provide information about the opportunity you are bidding for, including the client objectives, scope, and key details to help give the AI context to tailor the responses to.
+           Give the AI context. Summarise the client’s key challenges, objectives, scope of work, etc. 
+
             </strong>
           </span>
         </div>
@@ -479,8 +497,8 @@ const BidExtractor = () => {
   </Col>
   <Col md={6}>
     <Card className="mb-4">
-      <Card.Header className="d-flex justify-content-between align-items-center">
-        <h1 className=" requirements-title mt-1">Compliance Requirements</h1>
+    <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
+        <h1 className=" requirements-title mt-2">Compliance Requirements</h1>
         <div className="tooltip-container mt-1">
           <div className="tooltip-icon-container">
             <i className="fas fa-info tooltip-icon"></i>

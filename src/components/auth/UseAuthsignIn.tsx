@@ -36,7 +36,7 @@ const useAuthSignIn = () => {
         localStorage.removeItem('messages');
         localStorage.removeItem('chatResponseMessages');
         localStorage.removeItem('bidState');
-        navigate('/dashboard');
+        navigate('/bids');
 
         //localStorage.clear();
        

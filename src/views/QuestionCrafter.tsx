@@ -20,8 +20,8 @@ const QuestionCrafter = () => {
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const { sharedState, setSharedState, getBackgroundInfo } = useContext(BidContext);
-  const { editorState, questions } = sharedState;
+  const { sharedState, setSharedState, getBackgroundInfo, selectDocument } = useContext(BidContext);
+  const { documents, questions } = sharedState;
 
   const backgroundInfo = getBackgroundInfo();
 
@@ -70,7 +70,28 @@ const QuestionCrafter = () => {
   const [selectedDropdownOption, setSelectedDropdownOption] = useState('library-chat');
   const bidPilotRef = useRef(null);
 
+  const [selectedDocument, setSelectedDocument] = useState(documents[0].name); // Default to the first document
 
+  const DocumentSelector = () => (
+    <Dropdown onSelect={(eventKey) => handleDocumentSelect(eventKey)}>
+      <Dropdown.Toggle className="upload-button" id="document-selector" style={{marginLeft: "5px"}}>
+        {selectedDocument}
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        {documents.map((doc, index) => (
+          <Dropdown.Item key={index} eventKey={index}>
+            {doc.name}
+          </Dropdown.Item>
+        ))}
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+
+  const handleDocumentSelect = (index) => {
+    const selectedIndex = parseInt(index);
+    setSelectedDocument(sharedState.documents[selectedIndex].name);
+    selectDocument(selectedIndex);
+  };
 
   useEffect(() => {
     localStorage.setItem('response', convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n'));
@@ -91,6 +112,8 @@ const QuestionCrafter = () => {
   const handleSelect = (eventKey) => {
     handleDatasetChange({ target: { value: eventKey } });
   };
+
+  const displayText = dataset === 'default' ? 'Content Library' : dataset;
 
   const parsedQuestions = questions.trim() ? questions.split(',') : [];
 
@@ -115,32 +138,37 @@ const QuestionCrafter = () => {
   };
   
 
+
   const handleAppendResponseToEditor = () => {
     handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
     setSelectedQuestionId("-1");
-
+  
     setTimeout(() => {
-      const currentContent = editorState.getCurrentContent();
+      const currentDocIndex = sharedState.currentDocumentIndex;
+      const currentDoc = sharedState.documents[currentDocIndex];
+      const currentContent = currentDoc.editorState.getCurrentContent();
       const lastBlock = currentContent.getBlockMap().last();
       const lengthOfLastBlock = lastBlock.getLength();
       const selectionState = SelectionState.createEmpty(lastBlock.getKey()).merge({
         anchorOffset: lengthOfLastBlock,
         focusOffset: lengthOfLastBlock,
       });
-
+  
       const contentStateWithNewText = Modifier.insertText(
         currentContent,
         selectionState,
         `\nQuestion:\n${inputText}\n\nAnswer:\n${convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n')}\n\n`
       );
-
-      const newEditorState = EditorState.push(editorState, contentStateWithNewText, 'insert-characters');
-
+  
+      const newEditorState = EditorState.push(currentDoc.editorState, contentStateWithNewText, 'insert-characters');
+  
       setSharedState((prevState) => ({
         ...prevState,
-        editorState: newEditorState
+        documents: prevState.documents.map((doc, index) => 
+          index === currentDocIndex ? { ...doc, editorState: newEditorState } : doc
+        )
       }));
-
+  
       setIsAppended(true);
       setTimeout(() => setIsAppended(false), 3000);
     }, 100);
@@ -809,7 +837,7 @@ useEffect(() => {
     setResponseEditorState(EditorState.createEmpty());
     setIsLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
-    
+    console.log(dataset);
     try {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question`,
@@ -956,23 +984,23 @@ useEffect(() => {
 
           
             <Col md={12}>
-              <h1 className='heavy'>Bid Creator</h1>
+              <h1 className='heavy'>Q&A Generator</h1>
               <div className="proposal-header mb-2">
                 <h1 className="lib-title">Question</h1>
                 <div className="dropdown-container">
-                  <Dropdown onSelect={handleSelect} className="w-100 mx-auto chat-dropdown">
-                    <Dropdown.Toggle className="upload-button" style={{backgroundColor: 'orange', color: 'black'}} id="dropdown-basic">
-                      {dataset || "Select a dataset"}
-                    </Dropdown.Toggle>
+                <Dropdown onSelect={handleSelect} className="w-100 mx-auto chat-dropdown">
+                <Dropdown.Toggle className="upload-button" style={{backgroundColor: 'orange', color: 'black'}} id="dropdown-basic">
+                  {displayText}
+                </Dropdown.Toggle>
 
-                    <Dropdown.Menu className="w-100">
-                      {availableCollections.map((collection) => (
-                        <Dropdown.Item key={collection} eventKey={collection}>
-                          {collection}
-                        </Dropdown.Item>
-                      ))}
-                    </Dropdown.Menu>
-                  </Dropdown>
+                <Dropdown.Menu className="w-100">
+                  {availableCollections.map((collection) => (
+                    <Dropdown.Item key={collection} eventKey={collection}>
+                      {collection}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
                   <Dropdown onSelect={handleSelectQuestion} className="w-100 mx-auto chat-dropdown">
                     <Dropdown.Toggle className="upload-button custom-dropdown-toggle" id="dropdown-basic">
                       Select a Question
@@ -1042,7 +1070,7 @@ useEffect(() => {
 
               
           <Col md={7}>
-              <h1 className="lib-title mt-4 mb-3">Response</h1>
+              <h1 className="lib-title mt-4 mb-3">Answer</h1>
               <div className="response-box draft-editor" ref={responseBoxRef}>
               <div className="editor-container" ref={editorRef}>
             <Editor
@@ -1058,17 +1086,21 @@ useEffect(() => {
 
             
 
-              <div className="text-muted mt-2">
-                Word Count: {convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').split(/\s+/).filter(Boolean).length}
-              </div>
-              <Button
-                variant={isAppended ? 'success' : 'primary'}
-                className="upload-button mt-1 mb-4"
-                onClick={handleAppendResponseToEditor}
-                disabled={isLoading || isAppended || convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').trim() === ''}
-              >
-                {isAppended ? 'Added' : 'Add to Proposal'}
-              </Button>
+            <div className="text-muted mt-2">
+              Word Count: {convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').split(/\s+/).filter(Boolean).length}
+            </div>
+            <div className="dropdown-clear-container mt-1 mb-3">
+            
+            <Button
+              variant={isAppended ? 'success' : 'primary'}
+              className="upload-button"
+              onClick={handleAppendResponseToEditor}
+              disabled={isLoading || isAppended || convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').trim() === ''}
+            >
+              {isAppended ? 'Added' : 'Add to Proposal'}
+            </Button>
+            <DocumentSelector />
+            </div>
             </Col>
             <Col md={5}>
               <div className="input-header">

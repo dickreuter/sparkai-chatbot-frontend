@@ -28,6 +28,7 @@ const Bids = () => {
 
     const navigateToChatbot = (bid) => {
         localStorage.setItem('navigatedFromBidsTable', 'true');
+        localStorage.removeItem('bidState');
         navigate('/bid-extractor', { state: { bid: bid, fromBidsTable: true } });
         handleGAEvent('Bid Tracker', 'Navigate to Bid', 'Bid Table Link');
     };

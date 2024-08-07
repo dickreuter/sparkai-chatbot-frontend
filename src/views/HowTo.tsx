@@ -5,13 +5,13 @@ import SideBarSmall from '../routes/SidebarSmall.tsx';
 import VideoCard from "../components/VideoCard.tsx";
 import './HowTo.css';
 import './Chatbot.css';
-import BidResponseProposal from '../resources/videos/Bid Response + Proposal.mp4';
-import BidPlannerV1 from '../resources/videos/bid planner v1.mp4';
-import CompanyLibrarySecurity from '../resources/videos/Company Library Security.mp4';
-import CompanyLibraryV1 from '../resources/videos/Company Library v1.mp4';
-import DashboardBidRegistrar from '../resources/videos/Dashboard + Bid Registrar.mp4';
-import IntroBest from '../resources/videos/Intro (Best_).mp4';
-import QAChatFunction from '../resources/videos/Q&A Chat Function.mp4';
+import BidResponseProposal from '../resources/videos/BidResponseProposal.mp4';
+import BidPlannerV1 from '../resources/videos/BidPlanner.mp4';
+import CompanyLibrarySecurity from '../resources/videos/CompanyLibarySecurity.mp4';
+import CompanyLibraryV1 from '../resources/videos/CompanyLibary.mp4';
+import DashboardBidRegistrar from '../resources/videos/DashboardBidRegister.mp4';
+import IntroBest from '../resources/videos/Introduction.mp4';
+import QAChatFunction from '../resources/videos/Q&AChatFunction.mp4';
 import Spinner from 'react-bootstrap/Spinner'; // Ensure you have react-bootstrap installed
 
 const HowTo = () => {

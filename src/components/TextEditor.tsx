@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState, useCallback } from 'react';
+import React, { useContext, useEffect, useCallback } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
 import { EditorState, Modifier, SelectionState } from 'draft-js';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { BidContext } from '../views/BidWritingStateManagerView.tsx';
 
-function CustomEditor({ appendResponse }) {
-    const { sharedState, setSharedState } = useContext(BidContext);
-    
+function CustomEditor({ editorState, setEditorState, appendResponse }) {
+    const { setSharedState } = useContext(BidContext);
+
     // Function to apply bold to "Question:" and "Answer:" headings
     const applyBoldToHeadings = useCallback((editorState) => {
         const blocks = editorState.getCurrentContent().getBlocksAsArray();
@@ -25,23 +25,19 @@ function CustomEditor({ appendResponse }) {
         return EditorState.push(editorState, newContentState, 'change-inline-style');
     }, []);
 
-    // State to manage the editor state locally
-    const [editorState, setEditorState] = useState(() => applyBoldToHeadings(sharedState.editorState));
-
-    // Update local editor state when shared state updates
-    useEffect(() => {
-        setEditorState(applyBoldToHeadings(sharedState.editorState));
-    }, [sharedState.editorState, applyBoldToHeadings]);
-
     // Handle editor state changes
     const onEditorStateChange = useCallback((newEditorState) => {
         const styledState = applyBoldToHeadings(newEditorState);
         setEditorState(styledState);
         setSharedState(prevState => ({
             ...prevState,
-            editorState: styledState
+            documents: prevState.documents.map((doc, index) =>
+                index === prevState.currentDocumentIndex
+                    ? { ...doc, editorState: styledState }
+                    : doc
+            )
         }));
-    }, [setSharedState, applyBoldToHeadings]);
+    }, [setEditorState, setSharedState, applyBoldToHeadings]);
 
     // Append response and reapply styles
     useEffect(() => {
@@ -50,10 +46,14 @@ function CustomEditor({ appendResponse }) {
             setEditorState(newEditorState);
             setSharedState(prevState => ({
                 ...prevState,
-                editorState: newEditorState
+                documents: prevState.documents.map((doc, index) =>
+                    index === prevState.currentDocumentIndex
+                        ? { ...doc, editorState: newEditorState }
+                        : doc
+                )
             }));
         }
-    }, [appendResponse, editorState, setSharedState]);
+    }, [appendResponse, editorState, setEditorState, setSharedState]);
 
     // Function to append response text and apply styles
     const appendResponseAndStyle = useCallback((editorState, response) => {

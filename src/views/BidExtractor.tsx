@@ -393,7 +393,7 @@ const BidExtractor = () => {
         <Card.Body className="py-0 pl-2">
           <input
             type="date"
-            className="form-control"
+            className="form-control date-textarea"
             value={sharedState.submission_deadline}
             onChange={(e) => handleSubmissionDeadlineChange(e.target.value)}
             style={{border: "none"}}
@@ -434,7 +434,7 @@ const BidExtractor = () => {
     </Col>
 
     <Col md={4} className="px-2">
-      <Card className="mb-4 same-height-card">
+      <Card className="mb-4 same-height-card ">
       <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
           <h1 className="inputbox-title mb-0 mt-1">Contributors:</h1>
         </Card.Header>
@@ -470,10 +470,10 @@ const BidExtractor = () => {
 
       <Row className="mt-4 mb-4">
   <Col md={6}>
-    <Card className="mb-4">
+    <Card className="mb-4 custom-grey-border">
     <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
-        <h1 className="requirements-title mt-2">Opportunity Information</h1>
-        <div className="tooltip-container mt-1">
+        <h1 className="requirements-title ">Opportunity Information</h1>
+        <div className="tooltip-container ">
           <div className="tooltip-icon-container">
             <i className="fas fa-info tooltip-icon"></i>
           </div>
@@ -496,10 +496,10 @@ const BidExtractor = () => {
     </Card>
   </Col>
   <Col md={6}>
-    <Card className="mb-4">
+    <Card className="mb-4 custom-grey-border">
     <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
-        <h1 className=" requirements-title mt-2">Compliance Requirements</h1>
-        <div className="tooltip-container mt-1">
+        <h1 className=" requirements-title ">Compliance Requirements</h1>
+        <div className="tooltip-container ">
           <div className="tooltip-icon-container">
             <i className="fas fa-info tooltip-icon"></i>
           </div>

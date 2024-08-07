@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useRef } from 'react';
-import { EditorState, convertFromRaw, convertToRaw } from 'draft-js';
+import { EditorState, convertFromRaw, convertToRaw, ContentState} from 'draft-js';
 import { Outlet } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL, HTTP_PREFIX } from '../helper/Constants';
@@ -103,11 +103,13 @@ const BidManagement: React.FC = () => {
     return `${sharedState.opportunity_information}\n${sharedState.compliance_requirements}`;
   };
 
-  const addDocument = (name) => {
+
+  const addDocument = (name, type) => {
     setSharedState((prevState) => {
       const newDocument = {
         name: name || `Document ${prevState.documents.length + 1}`,
-        editorState: EditorState.createEmpty()
+        editorState: getInitialEditorState(type),
+        type: type
       };
       return {
         ...prevState,
@@ -115,6 +117,89 @@ const BidManagement: React.FC = () => {
         currentDocumentIndex: prevState.documents.length
       };
     });
+  };
+  
+  const getInitialEditorState = (type) => {
+    let template = '';
+    switch (type) {
+      case 'execSummary':
+        template = `Executive Summary
+  
+  [Company Name] is pleased to submit this proposal for [Brief description of the project or service].
+  
+  Key Highlights:
+  - [Unique selling point 1]
+  - [Unique selling point 2]
+  - [Unique selling point 3]
+  
+  Our Approach:
+  [Brief overview of your approach to the project]
+  
+  Why Choose Us:
+  - [Key strength 1]
+  - [Key strength 2]
+  - [Key strength 3]
+  
+  Project Timeline: [Brief timeline]
+  Total Cost: [Cost summary]
+  
+  We are confident that our expertise and innovative approach make us the ideal partner for this project. We look forward to the opportunity to contribute to your success.`;
+        break;
+      case 'coverLetter':
+        template = `[Your Company Letterhead]
+  
+  [Date]
+  
+  [Recipient Name]
+  [Recipient Title]
+  [Company Name]
+  [Address]
+  [City, State ZIP Code]
+  
+  Dear [Recipient Name],
+  
+  Re: [Tender Reference Number and Title]
+  
+  We are pleased to submit our proposal for [brief description of the tender]. As [Your Company Name], we are excited about the opportunity to [main objective of the tender].
+  
+  Our proposal demonstrates:
+  1. [Key strength or unique offering 1]
+  2. [Key strength or unique offering 2]
+  3. [Key strength or unique offering 3]
+  
+  We have carefully reviewed all tender documents and our proposal fully complies with your requirements. We are committed to delivering [key deliverable] on time and within budget.
+  
+  [Brief paragraph about your company's relevant experience]
+  
+  We look forward to the opportunity to further discuss our proposal and demonstrate how we can add value to [Recipient's Company Name].
+  
+  Thank you for your consideration.
+  
+  Sincerely,
+  
+  [Your Name]
+  [Your Title]
+  [Your Company Name]
+  
+  Enclosures: [List of documents included in the bid]`;
+        break;
+      case 'questionAnswer':
+      default:
+        template = `Question 1: [Copy the exact question from the tender document]
+  
+  Answer: [Provide a clear, concise, and specific answer. Use bullet points or numbered lists where appropriate. Include relevant examples or case studies if possible.]
+  
+  Question 2: [Next question from the tender document]
+  
+  Answer: [Answer to question 2. Remember to:
+  - Address all parts of the question
+  - Highlight your strengths and unique selling points
+  - Provide evidence to support your claims
+  - Use industry-specific terminology appropriately]
+  
+  [Continue with additional Question/Answer pairs as needed]`;
+    }
+    return EditorState.createWithContent(ContentState.createFromText(template));
   };
   
   const removeDocument = (index) => {

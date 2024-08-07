@@ -208,7 +208,6 @@
     cursor: pointer;
     font-size: 30px;
     margin-left: 1.2%;
-    transform: translateY(-10%);
 }
 
 .tooltip-text {
@@ -349,7 +348,34 @@
 
 .same-height-card {
     height: 80px;
+    /* Remove the border from here */
     /* Adjust the height as needed */
+}
+
+.same-height-card .card-header,
+.custom-grey-border .card-header {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid lightgray;
+    /* Keep the bottom border */
+}
+
+.same-height-card .card-body,
+.custom-grey-border .card-body {
+    border: none;
+    /* Remove any internal borders */
+}
+
+.same-height-card {
+    border: 1px solid lightgray !important;
+    overflow: hidden;
+}
+
+.custom-grey-border {
+    border: 1px solid lightgray !important;
+    /* Adjust the color code as needed */
+    overflow: hidden;
 }
 
 .single-line-textarea {
@@ -366,6 +392,26 @@
 }
 
 .single-line-textarea:focus {
+    outline: none;
+    /* Remove blue outline on focus */
+    box-shadow: none;
+    /* Remove any box-shadow */
+    border: none;
+    /* Ensure no border is applied on focus */
+}
+
+.date-textarea {
+    overflow: hidden;
+    /* Hide extra content */
+    resize: none;
+    /* Prevent resizing */
+    margin: 0;
+    outline: none;
+    border: none;
+    /* Ensure border is also removed if not needed */
+}
+
+.date-textarea:focus {
     outline: none;
     /* Remove blue outline on focus */
     box-shadow: none;
@@ -399,6 +445,7 @@
 .requirements-title {
     font-size: 18px;
     font-weight: 550 !important;
+    transform: translateY(5px)
 }
 
 .dark-grey-header {

@@ -22,6 +22,8 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingIndex, setDeletingIndex] = useState(null);
 
+  const [newDocType, setNewDocType] = useState('questionAnswer');
+
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -131,7 +133,6 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
     setRenamingIndex(index);
     setShowModal(true);
   };
-
   const handleModalSave = () => {
     if (renamingIndex !== null) {
       const updatedDocuments = [...sharedState.documents];
@@ -141,7 +142,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
         documents: updatedDocuments
       }));
     } else {
-      addDocument(newDocName);
+      addDocument(newDocName, newDocType);
     }
     setShowModal(false);
   };
@@ -199,48 +200,62 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
         <Row className="justify-content-md-center">
           <Col md={12}>
             {sharedState.documents.length > 0 && (
-              <CustomEditor
-                appendResponse={appendResponse}
-                editorState={sharedState.documents[sharedState.currentDocumentIndex].editorState}
-                setEditorState={(editorState) => {
-                  const updatedDocuments = [...sharedState.documents];
-                  updatedDocuments[sharedState.currentDocumentIndex].editorState = editorState;
-                  setSharedState(prevState => ({
-                    ...prevState,
-                    documents: updatedDocuments
-                  }));
-                }}
-              />
+             <CustomEditor
+             appendResponse={appendResponse}
+             editorState={sharedState.documents[sharedState.currentDocumentIndex].editorState}
+             setEditorState={(editorState) => {
+               const updatedDocuments = [...sharedState.documents];
+               updatedDocuments[sharedState.currentDocumentIndex].editorState = editorState;
+               setSharedState(prevState => ({
+                 ...prevState,
+                 documents: updatedDocuments
+               }));
+             }}
+           />
             )}
           </Col>
         </Row>
       </div>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>{renamingIndex !== null ? 'Rename Document' : 'New Document'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group controlId="formDocName">
-              <Form.Label>Document Name</Form.Label>
-              <Form.Control
-                type="text"
-                value={newDocName}
-                onChange={(e) => setNewDocName(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button className="upload-button"onClick={() => setShowModal(false)}>
-            Cancel
-          </Button>
-          <Button className="upload-button" style={{backgroundColor: "green"}} onClick={handleModalSave}>
-            Save
-          </Button>
-        </Modal.Footer>
-      </Modal>
+     <Modal show={showModal} onHide={() => setShowModal(false)}>
+  <Modal.Header closeButton>
+    <Modal.Title>{renamingIndex !== null ? 'Rename Document' : 'New Document'}</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Form>
+      <Form.Group controlId="formDocName">
+        <Form.Label>Document Name</Form.Label>
+        <Form.Control
+          type="text"
+          value={newDocName}
+          onChange={(e) => setNewDocName(e.target.value)}
+        />
+      </Form.Group>
+      {renamingIndex === null && (
+        <Form.Group controlId="formDocType">
+          <Form.Label>Document Type</Form.Label>
+          <Form.Control
+            as="select"
+            value={newDocType}
+            onChange={(e) => setNewDocType(e.target.value)}
+          >
+            <option value="questionAnswer">Question Answer</option>
+            <option value="execSummary">Executive Summary</option>
+            <option value="coverLetter">Cover Letter</option>
+          </Form.Control>
+        </Form.Group>
+      )}
+    </Form>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button className="upload-button" onClick={() => setShowModal(false)}>
+      Cancel
+    </Button>
+    <Button className="upload-button" style={{backgroundColor: "green"}} onClick={handleModalSave}>
+      Save
+    </Button>
+  </Modal.Footer>
+</Modal>
 
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
   <Modal.Header closeButton>

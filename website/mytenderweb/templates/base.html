@@ -25,20 +25,10 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-X8S1ZMRM3C"></script>
     <script src="https://js.stripe.com/v3/"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-      
-        gtag('config', 'G-X8S1ZMRM3C');
-      
-        // Track a custom event for visits
-        gtag('event', 'visit', {
-          'event_category': 'engagement',
-          'event_label': 'page_visit'
-        });
-      </script>
-
+    <script>function initApollo(){var n=Math.random().toString(36).substring(7),o=document.createElement("script");
+        o.src="https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache="+n,o.async=!0,o.defer=!0,
+        o.onload=function(){window.trackingFunctions.onLoad({appId:"663cc6a8b625f50573f3a97c"})},
+        document.head.appendChild(o)}initApollo();</script>
 
       <!-- Meta Pixel Code -->
         <script>
@@ -113,7 +103,7 @@
                             </li>
                             
 
-                            <li class="nav-item"><a class="nav-link" href="{% url 'calculator' %}" >ROI Calculator</a></li> 
+                            <!--<li class="nav-item"><a class="nav-link" href="{% url 'calculator' %}" >ROI Calculator</a></li> -->
                             <!-- <li class="nav-item"><a class="nav-link"  href="{% url 'home' %}#team">Team</a></li>-->
                             <a href="https://calendly.com/naeemah-mytender/30min?month=2024-07" class="button ms-lg-3">Book a Demo</a>
 

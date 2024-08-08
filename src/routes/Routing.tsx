@@ -29,7 +29,7 @@ function Routing() {
             <Routes>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/calculator" element={<Calculator />} />
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Bids />} />
                 <Route path="/chatResponse" element={<ChatbotResponse />} />
                 <Route path="/login" element={<SignInComponent />} />
                 <Route path="/logout" element={<SignOut />} />

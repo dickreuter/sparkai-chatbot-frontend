@@ -81,7 +81,7 @@ const NavBar = () => {
       >
         <span className="navbar-toggler-icon"></span>
       </button>
-      <a className="navbar-brand" href="/">
+      <a className="navbar-brand" href="/bids">
         mytender.io &nbsp;
 
       </a>

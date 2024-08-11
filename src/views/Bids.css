@@ -12,10 +12,12 @@
 
 .status-dropdown.ongoing {
     background-color: orange;
+    color: white;
 }
 
 .status-dropdown.complete {
-    background-color: black;
+    background-color: #262626;
+    color: white;
 }
 
 .bids-table {

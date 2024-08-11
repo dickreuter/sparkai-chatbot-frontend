@@ -12,6 +12,8 @@ import { displayAlert } from '../helper/Alert.tsx';
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CustomTextField from '../components/CustomTextField.tsx';
+import { Select, MenuItem, FormControl } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
 const Bids = () => {
     const [bids, setBids] = useState([]);
@@ -32,6 +34,42 @@ const Bids = () => {
         navigate('/bid-extractor', { state: { bid: bid, fromBidsTable: true } });
         handleGAEvent('Bid Tracker', 'Navigate to Bid', 'Bid Table Link');
     };
+
+    const StyledSelect = styled(Select)(({ theme, status }) => ({
+        fontFamily: '"ClashDisplay", sans-serif',
+        fontWeight: 'bold',
+        fontSize: '14px',
+        padding: '5px 10px',
+        borderRadius: '5px',
+        width: '140px',
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        backgroundColor: status === 'ongoing' ? 'orange' : 'black',
+      
+        '& .MuiSelect-select': {
+          padding: '2px 2px',
+        },
+        '& .MuiOutlinedInput-notchedOutline': {
+          border: 'none',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          border: 'none',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          border: 'none',
+        },
+        '& .MuiSvgIcon-root': {
+          color: status === 'ongoing' ? 'inherit' : '#fff',
+        },
+      }));
+      
+      const StyledMenuItem = styled(MenuItem)({
+        fontFamily: '"ClashDisplay", sans-serif',
+        fontSize: '14px',
+      });
+      
+      
 
     const fetchBids = async () => {
         try {
@@ -218,15 +256,18 @@ const Bids = () => {
                                 </td>
                                 <td>{bid.timestamp ? new Date(bid.timestamp).toLocaleDateString() : ''}</td>
                                 <td>
-                                    <select
-                                        className={`status-dropdown ${bid.status.toLowerCase()}`}
+                                    <FormControl fullWidth>
+                                        <StyledSelect
                                         value={bid.status.toLowerCase()}
                                         onChange={(e) => updateBidStatus(bid.bid_title, e.target.value)}
-                                    >
-                                        <option value="ongoing">Ongoing</option>
-                                        <option value="complete">Complete</option>
-                                    </select>
-                                </td>
+                                        className={`status-dropdown ${bid.status.toLowerCase()}`}
+                                        >
+                                        <StyledMenuItem value="ongoing">Ongoing</StyledMenuItem>
+                                        <StyledMenuItem value="complete">Complete</StyledMenuItem>
+                                        </StyledSelect>
+                                    </FormControl>
+                                    </td>
+
                                 <td>{bid.client_name}</td>
                                 <td>
                                     {bid.submission_deadline && !isNaN(new Date(bid.submission_deadline)) ? 

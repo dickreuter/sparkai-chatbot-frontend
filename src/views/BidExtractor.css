@@ -400,6 +400,12 @@
     /* Ensure no border is applied on focus */
 }
 
+.single-line-textarea:disabled,
+.date-textarea:disabled,
+.requirements-textarea:disabled {
+    background-color: white;
+}
+
 .date-textarea {
     overflow: hidden;
     /* Hide extra content */
@@ -453,4 +459,27 @@
     z-index: 1;
     /* You can adjust this color to your preferred shade of dark grey */
     /* This ensures the text is visible on the dark background */
+}
+
+.contributor-box {
+    transition: all 0.3s ease;
+}
+
+.contributor-box:hover {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.contributors-button {
+    width: 20px;
+    height: 20px;
+    margin-right: 2px;
+}
+
+.contributors-button:hover {
+    color: #696969 !important;
+}
+
+.wide-modal {
+    max-width: 800px;
+    width: 100%;
 }

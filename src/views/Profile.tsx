@@ -218,7 +218,7 @@ const ProfilePage = () => {
             <Card className="mt-4 mb-4">
               <Card.Body>
               <div className="proposal-header ">
-                <Card.Title>Admin Pannel</Card.Title>
+                <Card.Title>Admin Panel</Card.Title>
                 <Button onClick={() => setShowModal(true)} className="upload-button">Add New User</Button>
               </div>
                 <Card.Text>

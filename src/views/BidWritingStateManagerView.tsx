@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useState, useEffect, useRef, useCallback } from 'react';
 import { EditorState, convertFromRaw, convertToRaw, ContentState} from 'draft-js';
 import { Outlet } from 'react-router-dom';
 import axios from 'axios';
@@ -11,6 +11,10 @@ export interface Document {
   editorState: EditorState;
 }
 
+export interface Contributor {
+  [email: string]: string; // email: permission
+}
+
 export interface SharedState {
   bidInfo: string;
   opportunity_information: string;
@@ -21,13 +25,14 @@ export interface SharedState {
   opportunity_owner: string;
   submission_deadline: string;
   bid_manager: string;
-  contributors: string;
+  contributors: Contributor;
+  original_creator: string;
   isSaved: boolean;
   isLoading: boolean;
   saveSuccess: boolean | null;
   object_id: string | null;
-  documents: Document[]; // Add documents array
-  currentDocumentIndex: number; // Track the current document being edited
+  documents: Document[];
+  currentDocumentIndex: number;
 }
 
 
@@ -52,7 +57,8 @@ const defaultState: BidContextType = {
     opportunity_owner: '',
     submission_deadline: '',
     bid_manager: '',
-    contributors: '',
+    contributors: {},
+    original_creator: '',
     isSaved: false,
     isLoading: false,
     saveSuccess: null,
@@ -83,6 +89,8 @@ const BidManagement: React.FC = () => {
             ? EditorState.createWithContent(convertFromRaw(JSON.parse(doc.editorState)))
             : EditorState.createEmpty(),
         })),
+        contributors: parsedState.contributors || {},
+        original_creator: parsedState.original_creator || '',
         isSaved: false,
         isLoading: false,
         saveSuccess: null,
@@ -94,15 +102,16 @@ const BidManagement: React.FC = () => {
   });
 
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string>('');
 
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
+
   const getBackgroundInfo = () => {
     return `${sharedState.opportunity_information}\n${sharedState.compliance_requirements}`;
   };
-
 
   const addDocument = (name, type) => {
     setSharedState((prevState) => {
@@ -222,11 +231,21 @@ const BidManagement: React.FC = () => {
   };
   
 
+  const canUserSave = useCallback((): boolean => {
+    const userPermission = sharedState.contributors[currentUserEmail];
+    return userPermission === 'admin' || userPermission === 'editor';
+  }, [sharedState.contributors, currentUserEmail]);
+
   const saveProposal = async () => {
+    if (!canUserSave()) {
+      console.log('User does not have permission to save. Skipping save operation.');
+      return;
+    }
+
     const {
         bidInfo, compliance_requirements, opportunity_information, documents, 
         bid_qualification_result, client_name, opportunity_owner, submission_deadline, 
-        bid_manager, contributors, questions, object_id
+        bid_manager, contributors, questions, object_id, original_creator
     } = sharedState;
 
     if (!bidInfo || bidInfo.trim() === '') {
@@ -236,6 +255,7 @@ const BidManagement: React.FC = () => {
 
     setSharedState(prevState => ({ ...prevState, isLoading: true, saveSuccess: null }));
 
+
     const backgroundInfo = getBackgroundInfo();
 
     const formData = new FormData();
@@ -244,7 +264,7 @@ const BidManagement: React.FC = () => {
     };
 
     appendFormData('bid_title', bidInfo);
-    appendFormData('text', 'Sample text'); // Assuming this is a required field
+    appendFormData('text', 'Sample text');
     appendFormData('status', 'ongoing');
     appendFormData('contract_information', backgroundInfo);
     appendFormData('compliance_requirements', compliance_requirements);
@@ -253,11 +273,11 @@ const BidManagement: React.FC = () => {
     appendFormData('bid_qualification_result', bid_qualification_result);
     appendFormData('opportunity_owner', opportunity_owner);
     appendFormData('bid_manager', bid_manager);
-    appendFormData('contributors', contributors);
+    formData.append('contributors', JSON.stringify(contributors));
     appendFormData('submission_deadline', submission_deadline);
     appendFormData('questions', questions);
+    appendFormData('original_creator', original_creator);
 
-    // Prepare documents field
     const documentsFormatted = documents.map(doc => ({
         name: doc.name,
         text: doc.editorState.getCurrentContent().getPlainText()
@@ -271,7 +291,7 @@ const BidManagement: React.FC = () => {
     console.log(formData);
 
     try {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Adding a delay before starting the save
+        await new Promise(resolve => setTimeout(resolve, 1000));
         const response = await axios.post(
             `http${HTTP_PREFIX}://${API_URL}/upload_bids`,
             formData,
@@ -290,53 +310,91 @@ const BidManagement: React.FC = () => {
             isSaved: true,
             isLoading: false,
             saveSuccess: true,
-            object_id: bid_id, // Update the object_id in the shared state
+            object_id: bid_id,
         }));
-        setTimeout(() => setSharedState(prevState => ({ ...prevState, isSaved: false })), 3000); // Reset after 3 seconds
+        setTimeout(() => setSharedState(prevState => ({ ...prevState, isSaved: false })), 3000);
     } catch (error) {
         console.error("Error saving proposal:", error);
         setSharedState(prevState => ({ ...prevState, isLoading: false, saveSuccess: false }));
     }
 };
 
-
-
-  useEffect(() => {
-    const stateToSave = {
-      ...sharedState,
-      documents: sharedState.documents.map(doc => ({
-        ...doc,
-        editorState: JSON.stringify(convertToRaw(doc.editorState.getCurrentContent()))
-      }))
-    };
-    localStorage.setItem('bidState', JSON.stringify(stateToSave));
-
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
+useEffect(() => {
+  // Fetch the current user's email when the component mounts
+  const fetchUserEmail = async () => {
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_login_email`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+          },
+        }
+      );
+      setCurrentUserEmail(response.data.email);
+    } catch (error) {
+      console.error("Error fetching user email:", error);
     }
+  };
 
-    setTypingTimeout(setTimeout(() => {
+  fetchUserEmail();
+}, []);
+
+useEffect(() => {
+  const stateToSave = {
+    ...sharedState,
+    documents: sharedState.documents.map(doc => ({
+      ...doc,
+      editorState: JSON.stringify(convertToRaw(doc.editorState.getCurrentContent()))
+    }))
+  };
+  localStorage.setItem('bidState', JSON.stringify(stateToSave));
+
+  if (typingTimeout) {
+    clearTimeout(typingTimeout);
+  }
+
+  // Start the timer for all users
+  setTypingTimeout(setTimeout(() => {
+    // Only perform the save operation if the user has permission
+    if (canUserSave()) {
       saveProposal();
-    }, 2000));
-  }, [
-    sharedState.bidInfo,
-    sharedState.opportunity_information,
-    sharedState.compliance_requirements,
-    sharedState.questions,
-    sharedState.client_name,
-    sharedState.bid_qualification_result,
-    sharedState.opportunity_owner,
-    sharedState.submission_deadline,
-    sharedState.bid_manager,
-    sharedState.contributors,
-    sharedState.documents
-  ]);
+    } else {
+      console.log('Auto-save skipped: User does not have permission to save.');
+    }
+  }, 2000));
 
-  return (
-    <BidContext.Provider value={{ sharedState, setSharedState, saveProposal, getBackgroundInfo, addDocument, removeDocument, selectDocument }}>
-      <Outlet />
-    </BidContext.Provider>
-  );
+}, [
+  sharedState.bidInfo,
+  sharedState.opportunity_information,
+  sharedState.compliance_requirements,
+  sharedState.questions,
+  sharedState.client_name,
+  sharedState.bid_qualification_result,
+  sharedState.opportunity_owner,
+  sharedState.submission_deadline,
+  sharedState.bid_manager,
+  sharedState.contributors,
+  sharedState.documents,
+  sharedState.original_creator,
+  canUserSave  // Add canUserSave to the dependency array
+]);
+
+return (
+  <BidContext.Provider value={{ 
+    sharedState, 
+    setSharedState, 
+    saveProposal, 
+    getBackgroundInfo, 
+    addDocument, 
+    removeDocument, 
+    selectDocument,
+    canUserSave 
+  }}>
+    <Outlet />
+  </BidContext.Provider>
+);
 };
 
 export default BidManagement;

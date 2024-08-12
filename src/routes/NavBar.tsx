@@ -131,22 +131,27 @@ const NavBar = () => {
 
        {auth ? (
         <li className="nav-item ">
+            {/*
           <Link to="/login">
             <button onClick={signOut} className="btn btn-dark nav-link">
             Logout
           </button>
         </Link>
+         */}
         </li>
+        
       ) : (
         <>
-          <li className="nav-item">
+          {/* <li className="nav-item"> 
           <Link to="/login">
           <button className="btn btn-dark nav-link">
             Login
           </button>
         </Link>
           </li>
+           */}
         </>
+       
       )}
 
         </ul>

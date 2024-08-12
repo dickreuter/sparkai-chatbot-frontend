@@ -984,7 +984,7 @@ useEffect(() => {
 
           
             <Col md={12}>
-              <h1 className='heavy'>Q&A Generator</h1>
+              <h1 className='heavy mb-3'>Q&A Generator</h1>
               <div className="proposal-header mb-2">
                 <h1 className="lib-title">Question</h1>
                 <div className="dropdown-container">

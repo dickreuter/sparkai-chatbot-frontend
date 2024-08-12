@@ -75,10 +75,10 @@ const ContributorModal = ({
         dialogClassName="contributor-modal wide-modal"
       >
         <Modal.Header closeButton className="px-4 py-3">
-          <Modal.Title style={fontStyle}>Manage Contributors</Modal.Title>
+          <Modal.Title style={fontStyle}>Current Contributors</Modal.Title>
         </Modal.Header>
         <Modal.Body className="px-4 py-3">
-          <h5 style={fontStyle}>Current Contributors</h5>
+  
           <List>
             {Object.entries(currentContributors).map(([email, permission]) => (
               <ListItem key={email} style={{ padding: '0', marginBottom: '8px', alignItems: 'center' }}>

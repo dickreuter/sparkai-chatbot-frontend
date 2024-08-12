@@ -232,6 +232,7 @@ const BidManagement: React.FC = () => {
   
 
   const canUserSave = useCallback((): boolean => {
+    console.log(currentUserEmail);
     const userPermission = sharedState.contributors[currentUserEmail];
     return userPermission === 'admin' || userPermission === 'editor';
   }, [sharedState.contributors, currentUserEmail]);
@@ -320,26 +321,23 @@ const BidManagement: React.FC = () => {
 };
 
 useEffect(() => {
-  // Fetch the current user's email when the component mounts
-  const fetchUserEmail = async () => {
+  const fetchUserData = async () => {
     try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_login_email`,
-        {},
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
-          },
-        }
-      );
+      const response = await axios.get(`http${HTTP_PREFIX}://${API_URL}/profile`,  {
+        headers: {
+          Authorization: `Bearer ${tokenRef.current}`,
+        },
+      });
       setCurrentUserEmail(response.data.email);
-    } catch (error) {
-      console.error("Error fetching user email:", error);
+     
+    } catch (err) {
+      console.log('Failed to load profile data');
+
     }
   };
 
-  fetchUserEmail();
-}, []);
+  fetchUserData();
+}, [tokenRef]);
 
 useEffect(() => {
   const stateToSave = {

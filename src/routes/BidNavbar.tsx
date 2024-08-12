@@ -1,14 +1,79 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { NavLink } from 'react-router-dom';
-import { Spinner } from 'react-bootstrap';
+import { Button, Spinner } from 'react-bootstrap';
 import { BidContext } from "../views/BidWritingStateManagerView";
-import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faEdit, faEye, faTimesCircle, faUsers } from '@fortawesome/free-solid-svg-icons';
 import "./BidNavbar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import { useAuthUser } from "react-auth-kit";
 
 const BidNavbar = () => {
-  const { sharedState } = useContext(BidContext);
+  const { sharedState, setSharedState, getBackgroundInfo } = useContext(BidContext);
   const { isLoading, saveSuccess } = sharedState;
+  const [currentUserEmail, setCurrentUserEmail] = useState('');
+  const getAuth = useAuthUser();
+  const auth = getAuth();
+  const tokenRef = useRef(auth?.token || "default");
+  
+  const { 
+    bidInfo: contextBidInfo, 
+    opportunity_information, 
+    compliance_requirements, 
+    questions, 
+    bid_qualification_result, 
+    client_name, 
+    opportunity_owner, 
+    submission_deadline, 
+    bid_manager, 
+    contributors,
+    original_creator
+  } = sharedState;
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http${HTTP_PREFIX}://${API_URL}/profile`,  {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        });
+        setCurrentUserEmail(response.data.email);
+       
+      } catch (err) {
+        console.log('Failed to load profile data');s
+      }
+    };
+
+    fetchUserData();
+  }, [tokenRef]);
+
+  const currentUserPermission = contributors[currentUserEmail] || 'viewer'; 
+  const getPermissionDetails = (permission) => {
+    switch (permission) {
+      case 'admin':
+        return {
+          icon: faUsers,
+          text: 'Admin',
+          description: 'You have full access to edit and manage this proposal.'
+        };
+      case 'editor':
+        return {
+          icon: faEdit,
+          text: 'Editor',
+          description: 'You can edit this proposal but cannot change permissions.'
+        };
+      default:
+        return {
+          icon: faEye,
+          text: 'Viewer',
+          description: 'You can view this proposal but cannot make changes.'
+        };
+    }
+  };
+  
+  const permissionDetails = getPermissionDetails(currentUserPermission);
 
   return (
     <div className="bidnav">
@@ -34,6 +99,16 @@ const BidNavbar = () => {
           ) : null}
         </div>
       </div>
+      <Button
+            className="upload-button mt-2"
+            style={{ textTransform: 'none' }}
+            onClick={(e) => e.preventDefault()}
+            title={permissionDetails.description}  // This adds a native tooltip
+          >
+            <FontAwesomeIcon icon={permissionDetails.icon} className="me-1" />
+            {permissionDetails.text}
+          </Button>
+          
     </div>
   );
 };

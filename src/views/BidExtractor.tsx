@@ -5,7 +5,7 @@ import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import { useLocation, Link } from 'react-router-dom';
-import { Button, Card, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Form, Modal, Row, Spinner, Tooltip } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
@@ -16,6 +16,8 @@ import MenuItem from '@mui/material/MenuItem';
 import { FormControl, InputLabel, Select } from "@mui/material";
 import ContributorModal from "../components/ContributorModal.tsx";
 import { Snackbar } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faEye, faUsers } from "@fortawesome/free-solid-svg-icons";
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
@@ -59,23 +61,16 @@ const BidExtractor = () => {
 
   const [organizationUsers, setOrganizationUsers] = useState([]);
   const [showContributorModal, setShowContributorModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState('');
-  const [selectedPermission, setSelectedPermission] = useState('viewer');
 
-  const currentUserEmail = auth?.email || '';
+  const [currentUserEmail, setCurrentUserEmail] = useState('');
   const currentUserPermission = contributors[currentUserEmail] || 'viewer'; // Default to 'viewer' if not found
-  const isCurrentUserAdmin = currentUserPermission === 'admin';
-  const canUserEdit = currentUserPermission === 'admin' || currentUserPermission === 'editor';
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const canUserEdit = currentUserPermission === "admin" || currentUserPermission === "editor";
+
   const showViewOnlyMessage = () => {
-    setSnackbarOpen(true);
+    console.log(currentUserPermission);
+    displayAlert("You only have permission to view this bid.", 'danger');
   };
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
+
 
   const removeQuestion = (indexToRemove) => {
     const updatedQuestions = questions.split(',')
@@ -129,6 +124,26 @@ const BidExtractor = () => {
 
     fetchOrganizationUsers();
   }, [tokenRef]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http${HTTP_PREFIX}://${API_URL}/profile`,  {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        });
+        setCurrentUserEmail(response.data.email);
+       
+      } catch (err) {
+        console.log('Failed to load profile data');
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [tokenRef]);
+
 
 
   const handleAddContributor = (user, permission) => {
@@ -238,11 +253,12 @@ const BidExtractor = () => {
   
       setSharedState(prevState => {
         const original_creator = bidData?.original_creator || currentUserEmail;
-        const contributors = bidData?.contributors || {};
+        let contributors = bidData?.contributors || {};
         
-        // If there's no original creator, add the current user as an admin contributor
-        if (!bidData?.original_creator) {
-          contributors[currentUserEmail] = 'admin';
+        if (!bidData?.original_creator || Object.keys(contributors).length === 0) {
+          if (currentUserEmail && currentUserEmail !== '') {
+            contributors = { [currentUserEmail]: 'admin' };
+          }
         }
   
         return {
@@ -267,14 +283,12 @@ const BidExtractor = () => {
       localStorage.setItem('navigatedFromBidsTable', 'false');
     } else if (initialBidName && initialBidName !== '') {
       // Update bidInfo with the initial bid name if it's provided and not empty
+      // USER CREATES A NEW BID
       setSharedState(prevState => ({
         ...prevState,
         bidInfo: initialBidName,
         original_creator: currentUserEmail,
-        contributors: { 
-          ...prevState.contributors, 
-          [currentUserEmail]: 'admin' 
-        }
+        contributors: currentUserEmail ? { [currentUserEmail]: 'admin' } : {}
       }));
     }
   }, [location, bidData, setSharedState, initialBidName, currentUserEmail]);
@@ -481,15 +495,116 @@ const BidExtractor = () => {
     }));
   };
 
-  const wrappedHandlers = {
-    handleClientNameResultChange: handleEditAttempt(handleClientNameResultChange),
-    handleSubmissionDeadlineChange: handleEditAttempt(handleSubmissionDeadlineChange),
-    handleBidManagerChange: handleEditAttempt(handleBidManagerChange),
-    handleOpportunityOwnerChange: handleEditAttempt(handleOpportunityOwnerChange),
-    handleBidQualificationResultChange: handleEditAttempt(handleBidQualificationResultChange),
-    handleOpportunityInformationChange: handleEditAttempt(handleOpportunityInformationChange),
-    handleComplianceRequirementsChange: handleEditAttempt(handleComplianceRequirementsChange),
+ 
+
+  const clientNameRef = useRef(null);
+  const submissionDeadlineRef = useRef(null);
+  const bidManagerRef = useRef(null);
+  const opportunityOwnerRef = useRef(null);
+  const bidQualificationResultRef = useRef(null);
+  const opportunityInformationRef = useRef(null);
+  const complianceRequirementsRef = useRef(null);
+
+
+  const handleDisabledClick = (e) => {
+    if (!canUserEdit) {
+      e.preventDefault();
+      e.stopPropagation();
+      showViewOnlyMessage();
+    }
   };
+
+  const createClickHandler = (ref) => (e) => {
+    if (!canUserEdit && ref.current && ref.current.contains(e.target)) {
+      handleDisabledClick(e);
+    }
+  };
+
+  useEffect(() => {
+    const refs = [
+      clientNameRef,
+      submissionDeadlineRef,
+      bidManagerRef,
+      opportunityOwnerRef,
+      bidQualificationResultRef,
+      opportunityInformationRef,
+      complianceRequirementsRef
+    ];
+
+    const clickHandlers = refs.map(ref => createClickHandler(ref));
+
+    refs.forEach((ref, index) => {
+      if (ref.current) {
+        ref.current.addEventListener('click', clickHandlers[index]);
+      }
+    });
+
+    return () => {
+      refs.forEach((ref, index) => {
+        if (ref.current) {
+          ref.current.removeEventListener('click', clickHandlers[index]);
+        }
+      });
+    };
+  }, [canUserEdit]);
+
+  const wrappedHandlers = {
+    handleClientNameResultChange: (e) => {
+      if (canUserEdit) handleEditAttempt(handleClientNameResultChange)(e);
+      else handleDisabledClick(e);
+    },
+    handleSubmissionDeadlineChange: (e) => {
+      if (canUserEdit) handleEditAttempt(handleSubmissionDeadlineChange)(e);
+      else handleDisabledClick(e);
+    },
+    handleBidManagerChange: (e) => {
+      if (canUserEdit) handleEditAttempt(handleBidManagerChange)(e);
+      else handleDisabledClick(e);
+    },
+    handleOpportunityOwnerChange: (e) => {
+      if (canUserEdit) handleEditAttempt(handleOpportunityOwnerChange)(e);
+      else handleDisabledClick(e);
+    },
+    handleBidQualificationResultChange: (e) => {
+      if (canUserEdit) handleEditAttempt(handleBidQualificationResultChange)(e);
+      else handleDisabledClick(e);
+    },
+    handleOpportunityInformationChange: (e) => {
+      if (canUserEdit) handleEditAttempt(handleOpportunityInformationChange)(e);
+      else handleDisabledClick(e);
+    },
+    handleComplianceRequirementsChange: (e) => {
+      if (canUserEdit) handleEditAttempt(handleComplianceRequirementsChange)(e);
+      else handleDisabledClick(e);
+    },
+  };
+
+
+
+  const getPermissionDetails = (permission) => {
+    switch (permission) {
+      case 'admin':
+        return {
+          icon: faUsers,
+          text: 'Admin',
+          description: 'You have full access to edit and manage this proposal.'
+        };
+      case 'editor':
+        return {
+          icon: faEdit,
+          text: 'Editor',
+          description: 'You can edit this proposal but cannot change permissions.'
+        };
+      default:
+        return {
+          icon: faEye,
+          text: 'Viewer',
+          description: 'You can view this proposal but cannot make changes.'
+        };
+    }
+  };
+
+  const permissionDetails = getPermissionDetails(currentUserPermission);
 
   
   return (
@@ -514,41 +629,42 @@ const BidExtractor = () => {
               edit
             </button>
           </h1>
-          <div >
          
-          </div>
-        </div>
+          </div >
         <div>
-        <div className="input-container">
+        <div className="input-container mt-3">
         <Row className="no-gutters mx-n2">
-              <Col md={4} className="px-2">
-                <Card className="mb-4 same-height-card">
-                  <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
-                    <h1 className="inputbox-title mb-0 mt-1">Client Name:</h1>
-                  </Card.Header>
-                  <Card.Body className="py-0 pl-2">
-                    <textarea
-                      className="form-control single-line-textarea"
-                      value={sharedState.client_name}
-                      onChange={wrappedHandlers.handleClientNameResultChange}
-                      disabled={!canUserEdit}
-                    ></textarea>
-                  </Card.Body>
-                </Card>
-              </Col>
+        <Col md={4} className="px-2">
+            <Card className="mb-4 same-height-card">
+              <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
+                <h1 className="inputbox-title mb-0 mt-1">Client Name:</h1>
+              </Card.Header>
+              <Card.Body className="py-0 pl-2">
+                <div ref={clientNameRef} style={{ width: '100%', height: '100%' }}>
+                  <textarea
+                    className="form-control single-line-textarea"
+                    value={sharedState.client_name}
+                    onChange={wrappedHandlers.handleClientNameResultChange}
+                    disabled={!canUserEdit}
+                  ></textarea>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
 
               <Col md={4} className="px-2">
                 <Card className="mb-4 same-height-card">
                   <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
                     <h1 className="inputbox-title mb-0 mt-1">Submission Deadline:</h1>
                   </Card.Header>
-                  <Card.Body className="py-0 px-1">
+                  <Card.Body className="py-0 px-1" ref={submissionDeadlineRef}>
                     <input
                       type="date"
                       className="form-control date-textarea"
                       value={sharedState.submission_deadline}
                       onChange={wrappedHandlers.handleSubmissionDeadlineChange}
                       style={{border: "none"}}
+                      onClick={handleDisabledClick}
                       disabled={!canUserEdit}
                     />
                   </Card.Body>
@@ -560,11 +676,12 @@ const BidExtractor = () => {
                   <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
                     <h1 className="inputbox-title mb-0 mt-1">Bid Manager:</h1>
                   </Card.Header>
-                  <Card.Body className="py-0 pl-2">
+                  <Card.Body className="py-0 pl-2" ref={bidManagerRef}>
                     <textarea
                       className="form-control single-line-textarea"
                       value={sharedState.bid_manager}
                       onChange={wrappedHandlers.handleBidManagerChange}
+                      onClick={handleDisabledClick}
                       disabled={!canUserEdit}
                     ></textarea>
                   </Card.Body>
@@ -577,11 +694,12 @@ const BidExtractor = () => {
                   <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
                     <h1 className="inputbox-title mb-0 mt-1">Opportunity Owner:</h1>
                   </Card.Header>
-                  <Card.Body className="py-0 pl-2">
+                  <Card.Body className="py-0 pl-2" ref={opportunityOwnerRef}>
                     <textarea
                       className="form-control single-line-textarea"
                       value={sharedState.opportunity_owner}
                       onChange={wrappedHandlers.handleOpportunityOwnerChange}
+                      onClick={handleDisabledClick}
                       disabled={!canUserEdit}
                     ></textarea>
                   </Card.Body>
@@ -597,11 +715,12 @@ const BidExtractor = () => {
                   <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
                     <h1 className="inputbox-title mb-0 mt-1">Bid Qualification Result:</h1>
                   </Card.Header>
-                  <Card.Body className="py-0 pl-2">
+                  <Card.Body className="py-0 pl-2" ref={bidQualificationResultRef}>
                     <textarea
                       className="form-control single-line-textarea"
                       value={sharedState.bid_qualification_result}
                       onChange={wrappedHandlers.handleBidQualificationResultChange}
+                      onClick={handleDisabledClick}
                       disabled={!canUserEdit}
                     ></textarea>
                   </Card.Body>
@@ -617,7 +736,7 @@ const BidExtractor = () => {
                   <h1 className="requirements-title ">Opportunity Information</h1>
                   {/* ... (tooltip remains the same) ... */}
                 </Card.Header>
-                <Card.Body className="px-0 py-1">
+                <Card.Body className="px-0 py-1" ref={opportunityInformationRef}>
                   <textarea
                     className="form-control requirements-textarea"
                     placeholder="Enter background info here..."
@@ -634,7 +753,7 @@ const BidExtractor = () => {
                   <h1 className=" requirements-title ">Compliance Requirements</h1>
                   {/* ... (tooltip remains the same) ... */}
                 </Card.Header>
-                <Card.Body className="px-0 py-1">
+                <Card.Body className="px-0 py-1" ref={complianceRequirementsRef}>
                   <textarea
                     className="form-control requirements-textarea"
                     placeholder="Enter compliance requirements here..."
@@ -786,16 +905,7 @@ const BidExtractor = () => {
   currentUserPermission={currentUserPermission}
 />
 
-<Snackbar
-  anchorOrigin={{
-    vertical: 'bottom',
-    horizontal: 'center',
-  }}
-  open={snackbarOpen}
-  autoHideDuration={3000}
-  onClose={handleSnackbarClose}
-  message="You only have permission to view this proposal"
-/>
+
 
         </div>
       </div>

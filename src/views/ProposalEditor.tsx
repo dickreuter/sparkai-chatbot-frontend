@@ -151,6 +151,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
     <>
       <div className="proposal-header">
         <h1 className='heavy mb-3'>Bid Compiler</h1>
+         {/*
         <div className="dropdown-container">
           <Dropdown onSelect={handleSelect}>
             <Dropdown.Toggle className="upload-button custom-dropdown-toggle" id="dropdown-basic">
@@ -171,6 +172,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
             </Dropdown.Menu>
           </Dropdown>
         </div>
+         */}
       </div>
       <div className="tabs-container">
   {sharedState.documents.map((doc, index) => (

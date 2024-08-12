@@ -97,7 +97,7 @@ const Bids = () => {
             formData.append('bid_title', bidToDelete);
 
             try {
-                await axios.post(
+                const response = await axios.post(
                     `http${HTTP_PREFIX}://${API_URL}/delete_bid/`,
                     formData,
                     {
@@ -108,10 +108,27 @@ const Bids = () => {
                     }
                 );
 
-                fetchBids();
-                handleGAEvent('Bid Tracker', 'Delete Bid', 'Delete Bid Button');
+                if (response.data && response.data.status === "success") {
+                    fetchBids();
+                    handleGAEvent('Bid Tracker', 'Delete Bid', 'Delete Bid Button');
+                } else {
+                    displayAlert('Failed to delete bid', 'error');
+                }
             } catch (error) {
                 console.error("Error deleting bid:", error);
+                if (error.response) {
+                    if (error.response.status === 403) {
+                        displayAlert("Only admins can delete bids. You don't have permission to delete this bid", 'danger');
+                    } else if (error.response.status === 404) {
+                        displayAlert('Bid not found', 'error');
+                    } else {
+                        displayAlert(`Error: ${error.response.data.detail || 'Failed to delete bid'}`, 'danger');
+                    }
+                } else if (error.request) {
+                    displayAlert('No response received from server. Please try again.', 'danger');
+                } else {
+                    displayAlert('Error deleting bid. Please try again.', 'danger');
+                }
             } finally {
                 setShowDeleteModal(false);
             }
@@ -129,7 +146,7 @@ const Bids = () => {
             formData.append('bid_title', bidTitle);
             formData.append('status', newStatus);
 
-            await axios.post(`http${HTTP_PREFIX}://${API_URL}/update_bid_status/`,
+            const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/update_bid_status/`,
                 formData, {
                     headers: {
                         'Authorization': `Bearer ${tokenRef.current}`,
@@ -137,10 +154,32 @@ const Bids = () => {
                     },
                 });
 
-            handleGAEvent('Bid Tracker', 'Change Bid Status', 'Bid Status Dropdown');
-            setTimeout(fetchBids, 500);
+            if (response.data && response.data.status === "success") {
+                handleGAEvent('Bid Tracker', 'Change Bid Status', 'Bid Status Dropdown');
+                
+                setTimeout(fetchBids, 500);
+            } else {
+                displayAlert('Failed to update bid status', 'danger');
+            }
         } catch (error) {
             console.error("Error updating bid status:", error);
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                if (error.response.status === 403) {
+                    displayAlert("You are a viewer. You don't have permission to update this bid's status", 'danger');
+                } else if (error.response.status === 404) {
+                    displayAlert('Bid not found', 'error');
+                } else {
+                    displayAlert(`Error: ${error.response.data.detail || 'Failed to update bid status'}`, 'danger');
+                }
+            } else if (error.request) {
+                // The request was made but no response was received
+                displayAlert('No response received from server. Please try again.', 'danger');
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                displayAlert('Error updating bid status. Please try again.', 'danger');
+            }
         }
     };
 

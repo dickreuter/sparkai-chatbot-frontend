@@ -9,7 +9,7 @@ import UploadText from './UploadText';
 import "./Library.css";
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
-import { faEye, faTrash, faFolder, faFileAlt, faArrowUpFromBracket, faEllipsisVertical, faSearch, faQuestionCircle, faPlus, faArrowLeft, faReply } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTrash, faFolder, faFileAlt, faArrowUpFromBracket, faEllipsisVertical, faSearch, faQuestionCircle, faPlus, faArrowLeft, faReply, faTimes } from '@fortawesome/free-solid-svg-icons';
 import "./Chatbot.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UploadPDFModal, UploadTextModal, UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
@@ -556,7 +556,7 @@ const Library = () => {
           <div className="header-row mt-2">
             <div className="lib-title">Resources</div>
 
-            <InputGroup className={`search-bar-container ${showDropdown ? 'dropdown-visible' : ''}`} ref={searchBarRef} >
+            <InputGroup className={`search-bar-container ${showDropdown ? 'dropdown-visible' : ''}`} ref={searchBarRef}>
               <FontAwesomeIcon icon={faSearch} className="search-icon" />
               <FormControl
                 placeholder="Search folders and files"
@@ -566,16 +566,28 @@ const Library = () => {
                 onChange={handleSearchChange}
                 onFocus={() => {
                   setShowDropdown(true);
-                  setShowSearchResults(true); // Show results on focus
+                  setShowSearchResults(true);
                 }}
                 onBlur={() => {
                   setTimeout(() => {
                     setShowDropdown(false);
-                    setShowSearchResults(false); // Hide results on blur
-                  }, 150);
-                }} // Delay to allow click
+                    setShowSearchResults(false);
+                  }, 0);
+                }}
                 className={`search-bar-library ${showDropdown ? 'dropdown-visible' : ''}`}
               />
+              {searchQuery && (
+                <div 
+                  className="clear-search-icon" 
+                  onClick={() => {
+                    setSearchQuery('');
+                    setShowDropdown(false);
+                    setShowSearchResults(false);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faTimes} />
+                </div>
+              )}
               {renderSearchResults()}
             </InputGroup>
 

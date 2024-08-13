@@ -449,7 +449,7 @@ const submitSelections = async () => {
     setIsLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
     try {
-        const word_amounts = selectedChoices.map((choice) => wordAmounts[choice] || 100);
+        const word_amounts = selectedChoices.map((choice) => String(wordAmounts[choice] || "100")); // Convert to array of strings
         const result = await axios.post(
             `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
             {
@@ -458,12 +458,13 @@ const submitSelections = async () => {
                 input_text: inputText,
                 extra_instructions: backgroundInfo,
                 selected_choices: selectedChoices,
-                dataset,
                 word_amounts
+                // Remove dataset field if it's not expected by the server
             },
             {
                 headers: {
                     Authorization: `Bearer ${tokenRef.current}`,
+                    'Content-Type': 'application/json'
                 },
             }
         );
@@ -473,7 +474,22 @@ const submitSelections = async () => {
         setWordAmounts({}); // Clear word amounts
     } catch (error) {
         console.error("Error submitting selections:", error);
-        setResponse(error.message);
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.error("Response data:", error.response.data);
+            console.error("Response status:", error.response.status);
+            console.error("Response headers:", error.response.headers);
+            setResponse(`Error ${error.response.status}: ${JSON.stringify(error.response.data)}`);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error("Request:", error.request);
+            setResponse("No response received from server");
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error("Error message:", error.message);
+            setResponse(`Error: ${error.message}`);
+        }
     }
     setIsLoading(false);
 };

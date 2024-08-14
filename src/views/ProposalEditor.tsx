@@ -9,6 +9,8 @@ import { BidContext } from '../views/BidWritingStateManagerView.tsx';
 import './Proposal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
+import { API_URL, HTTP_PREFIX } from '../helper/Constants.tsx';
 
 function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestionId, setSelectedQuestionId }) {
   const { sharedState, setSharedState, saveProposal, addDocument, removeDocument, selectDocument } = useContext(BidContext);
@@ -28,6 +30,34 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
+  const { 
+    contributors
+
+  } = sharedState;
+
+  const [currentUserEmail, setCurrentUserEmail] = useState('');
+  const currentUserPermission = contributors[currentUserEmail] || 'viewer'; 
+  const canUserEdit = currentUserPermission === "admin" || currentUserPermission === "editor";
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http${HTTP_PREFIX}://${API_URL}/profile`,  {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        });
+        setCurrentUserEmail(response.data.email);
+       
+      } catch (err) {
+        console.log('Failed to load profile data');
+      
+      }
+    };
+
+    fetchUserData();
+  }, [tokenRef]);
+  
   const handleDeleteDocument = (index, event) => {
     if (event) {
       event.stopPropagation();
@@ -196,7 +226,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
       )}
     </div>
   ))}
-  <button className="addTab" onClick={handleAddDocument}>+</button>
+  <button className="addTab" onClick={handleAddDocument} disabled={!canUserEdit}>+</button>
 </div>
       <div className="proposal-container" ref={proposalContainerRef}>
         <Row className="justify-content-md-center">
@@ -204,6 +234,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
             {sharedState.documents.length > 0 && (
              <CustomEditor
              appendResponse={appendResponse}
+             disabled={!canUserEdit}
              editorState={sharedState.documents[sharedState.currentDocumentIndex].editorState}
              setEditorState={(editorState) => {
                const updatedDocuments = [...sharedState.documents];
@@ -253,7 +284,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
     <Button className="upload-button" onClick={() => setShowModal(false)}>
       Cancel
     </Button>
-    <Button className="upload-button" style={{backgroundColor: "green"}} onClick={handleModalSave}>
+    <Button className="upload-button" style={{backgroundColor: "green"}} onClick={handleModalSave} >
       Save
     </Button>
   </Modal.Footer>

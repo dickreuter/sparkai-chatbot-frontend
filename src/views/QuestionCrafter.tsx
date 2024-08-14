@@ -21,7 +21,7 @@ const QuestionCrafter = () => {
   const tokenRef = useRef(auth?.token || "default");
 
   const { sharedState, setSharedState, getBackgroundInfo, selectDocument } = useContext(BidContext);
-  const { documents, questions } = sharedState;
+  const { documents, questions, contributors } = sharedState;
 
   const backgroundInfo = getBackgroundInfo();
 
@@ -71,6 +71,31 @@ const QuestionCrafter = () => {
   const bidPilotRef = useRef(null);
 
   const [selectedDocument, setSelectedDocument] = useState(documents[0].name); // Default to the first document
+
+
+  const [currentUserEmail, setCurrentUserEmail] = useState('');
+  const currentUserPermission = contributors[currentUserEmail] || 'viewer'; // Default to 'viewer' if not found
+  const canUserEdit = currentUserPermission === "admin" || currentUserPermission === "editor";
+
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http${HTTP_PREFIX}://${API_URL}/profile`,  {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        });
+        setCurrentUserEmail(response.data.email);
+       
+      } catch (err) {
+        console.log('Failed to load profile data');
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [tokenRef]);
 
   const DocumentSelector = () => (
     <Dropdown onSelect={(eventKey) => handleDocumentSelect(eventKey)}>
@@ -1028,6 +1053,7 @@ useEffect(() => {
                   placeholder="Enter question here..."
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
+                  disabled={!canUserEdit}
                 ></textarea>
               </div>
               <div className="text-muted mt-2">
@@ -1078,6 +1104,7 @@ useEffect(() => {
               placeholder="Your response will be generated here..."
               onChange={handleEditorChange}
               customStyleMap={styleMap}
+              readOnly={!canUserEdit}
             />
           </div>
 </div>
@@ -1224,6 +1251,7 @@ useEffect(() => {
                         onBlur={handleCustomPromptBlur}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
+                        disabled={!canUserEdit}
                         style={{
                           color: selectedDropdownOption === 'custom-prompt' ? 'white' : 'lightgray',
                         }}

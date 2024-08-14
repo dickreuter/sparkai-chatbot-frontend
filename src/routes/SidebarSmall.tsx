@@ -55,7 +55,10 @@ const SideBarSmall = () => {
           <FontAwesomeIcon icon={faUser} />
           <span>Profile</span>
         </Link>
-     
+        <Link to="/logout" className={`sidebarsmalllink ${isActive('/logout') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faReply} />
+          <span>Logout</span>
+        </Link>
 
         
       

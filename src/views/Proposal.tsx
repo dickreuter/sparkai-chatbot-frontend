@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import withAuth from '../routes/withAuth';
@@ -20,7 +20,7 @@ const Proposal = () => {
   const tokenRef = useRef(auth?.token || "default");
 
   const { sharedState, setSharedState, saveProposal, addDocument, removeDocument, selectDocument } = useContext(BidContext);
-  const { bidInfo } = sharedState;
+  const { bidInfo, contributors } = sharedState;
 
   const [isLoading, setIsLoading] = useState(false);
   const [appendResponse, setAppendResponse] = useState(false);
@@ -28,6 +28,30 @@ const Proposal = () => {
   const [isSaved, setIsSaved] = useState(false);
 
   const typingTimeout = useRef(null);
+
+
+  const [currentUserEmail, setCurrentUserEmail] = useState('');
+  const currentUserPermission = contributors[currentUserEmail] || 'viewer'; 
+  const canUserEdit = currentUserPermission === "admin" || currentUserPermission === "editor";
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http${HTTP_PREFIX}://${API_URL}/profile`,  {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+          },
+        });
+        setCurrentUserEmail(response.data.email);
+       
+      } catch (err) {
+        console.log('Failed to load profile data');
+      
+      }
+    };
+
+    fetchUserData();
+  }, [tokenRef]);
 
   const exportToDocx = (editorState) => {
     if (!editorState) {
@@ -90,7 +114,7 @@ const Proposal = () => {
               style={{  marginLeft: '5px' }}
               onClick={handleSaveProposal}
               className="save-button"
-              disabled={isLoading}
+              disabled={isLoading || !canUserEdit}
             >
               {isSaved ? "Saved" : "Save Document"}
             </Button>

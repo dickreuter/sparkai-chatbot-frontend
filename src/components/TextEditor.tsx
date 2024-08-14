@@ -4,7 +4,7 @@ import { EditorState, Modifier, SelectionState } from 'draft-js';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { BidContext } from '../views/BidWritingStateManagerView.tsx';
 
-function CustomEditor({ editorState, setEditorState, appendResponse }) {
+function CustomEditor({ editorState, setEditorState, appendResponse, disabled }) {
     const { setSharedState } = useContext(BidContext);
 
     // Function to apply bold to "Question:" and "Answer:" headings
@@ -80,6 +80,8 @@ function CustomEditor({ editorState, setEditorState, appendResponse }) {
             onEditorStateChange={onEditorStateChange}
             toolbarClassName="toolbarClassName"
             wrapperClassName="wrapperClassName"
+            readOnly={disabled}
+            toolbarHidden={disabled}
         />
     );
 }

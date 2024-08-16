@@ -235,7 +235,7 @@ const TenderLibrary = ({ object_id }) => {
     <>
       <Row>
         <Col md={12}>
-          <Card className="mb-4 mt-2">
+          <Card className="mb-4">
             <Card.Body className="library-card-body-content">
               <div className="library-card-content-wrapper">
                 <div className="header-row mt-2">

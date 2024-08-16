@@ -98,7 +98,7 @@ const Library = () => {
   };
 
   const handleOpenPDFModal = () => {
-    setUploadFolder(activeFolder || null); // Set to activeFolder if available, otherwise null
+    setUploadFolder(activeFolder || null); // Sfet to activeFolder if available, otherwise null
     setShowPDFModal(true);
   };
   
@@ -222,8 +222,11 @@ const Library = () => {
         {},
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
-      setAvailableCollections(res.data.collections || []);
-      for (const collection of res.data.collections || []) {
+      const filteredCollections = (res.data.collections || []).filter(
+        collection => !collection.startsWith('TenderLibrary_')
+      );
+      setAvailableCollections(filteredCollections);
+      for (const collection of filteredCollections) {
         await fetchFolderFilenames(collection);
       }
     } catch (error) {
@@ -457,12 +460,15 @@ const Library = () => {
   
     if (query.length > 0) {
       const folderMatches = availableCollections.filter(folder => 
-        folder.toLowerCase().includes(query.toLowerCase())
+        !folder.startsWith('TenderLibrary_') && folder.toLowerCase().includes(query.toLowerCase())
       );
   
-      const fileMatches = Object.entries(folderContents).flatMap(([folder, files]) =>
-        files.filter(file => file.filename.toLowerCase().includes(query.toLowerCase()))
-      );
+      const fileMatches = Object.entries(folderContents)
+        .filter(([folder]) => !folder.startsWith('TenderLibrary_'))
+        .flatMap(([folder, files]) =>
+          files.filter(file => file.filename.toLowerCase().includes(query.toLowerCase()))
+            .map(file => ({ ...file, folder }))
+        );
   
       const results = [...folderMatches, ...fileMatches];
       setFilteredResults(results);
@@ -474,45 +480,49 @@ const Library = () => {
   };
   
   const handleSearchResultClick = async (result) => {
-    if (result.filename) {
-      // It's a file
-      const { filename, unique_id } = result;
-      const folder = Object.keys(folderContents).find(folderName => 
-        folderContents[folderName].some(file => file.unique_id === unique_id)
-      );
-  
-      if (folder) {
-        setActiveFolder(folder);
-        setCurrentPage(1);
-  
-        // Fetch folder contents if not already done
-        if (!folderContents[folder] || folderContents[folder].length === 0) {
-          await fetchFolderFilenames(folder);
-        }
-  
-  
-      }
-    } else {
+    if (typeof result === 'string') {
       // It's a folder
-      const folderName = result;
-      setActiveFolder(folderName);
+      setActiveFolder(result);
+      setCurrentPage(1);
+      if (!folderContents[result] || folderContents[result].length === 0) {
+        await fetchFolderFilenames(result);
+      }
+    } else if (result.filename) {
+      // It's a file
+      const { filename, unique_id, folder } = result;
+      setActiveFolder(folder);
       setCurrentPage(1);
   
-      // Fetch folder contents if not already done
-      if (!folderContents[folderName] || folderContents[folderName].length === 0) {
-        await fetchFolderFilenames(folderName);
+      if (!folderContents[folder] || folderContents[folder].length === 0) {
+        await fetchFolderFilenames(folder);
       }
+  
+      // Wait for state to update
+      setTimeout(() => {
+        const fileIndex = folderContents[folder].findIndex(file => file.unique_id === unique_id);
+        if (fileIndex !== -1) {
+          const pageNumber = Math.floor(fileIndex / rowsPerPage) + 1;
+          setCurrentPage(pageNumber);
+          viewFile(filename, folder, unique_id);
+        }
+      }, 100);
     }
   
-    console.log("Search result clicked:", result);
-  };
+    // Clear search query immediately
+    setSearchQuery('');
   
+    // Delay hiding the dropdown and search results
+    setTimeout(() => {
+      setShowSearchResults(false);
+      setShowDropdown(false);
+    }, 200); // Adjust this delay as needed
+  };
   
   const renderSearchResults = () => {
     if (!showSearchResults) return null;
   
     return (
-      <div className="search-results-dropdown" >
+      <div className="search-results-dropdown">
         {filteredResults.length === 0 ? (
           <div className="search-result-item">
             <FontAwesomeIcon icon={faQuestionCircle} className="result-icon" />
@@ -523,20 +533,19 @@ const Library = () => {
             <div
               key={index}
               className="search-result-item"
-              onClick={() => handleSearchResultClick(result)} // Attach listener here
+              onClick={() => handleSearchResultClick(result)}
             >
               <FontAwesomeIcon 
                 icon={result.filename ? faFileAlt : faFolder} 
                 className="result-icon" 
               />
-              {result.filename || result}
+              {result.filename ? `${result.filename} (in ${result.folder})` : result}
             </div>
           ))
         )}
       </div>
     );
   };
-  
   
  
   
@@ -572,7 +581,7 @@ const Library = () => {
                   setTimeout(() => {
                     setShowDropdown(false);
                     setShowSearchResults(false);
-                  }, 0);
+                  }, 200);
                 }}
                 className={`search-bar-library ${showDropdown ? 'dropdown-visible' : ''}`}
               />

@@ -4,7 +4,7 @@ import CustomTextField from './CustomTextField';
 import { displayAlert } from '../helper/Alert';
 import { Spinner } from 'react-bootstrap'; // Import Spinner component
 
-const FileUploader = ({ onFileSelect, folder, onClose }) => {
+const FileUploader = ({ onFileSelect, folder, onClose, usingTenderLibrary = false }) => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [profileName, setProfileName] = useState(folder || 'default');
@@ -70,15 +70,17 @@ const FileUploader = ({ onFileSelect, folder, onClose }) => {
 
   return (
     <div className={`file-uploader ${dragActive ? 'active' : ''}`}>
-      <CustomTextField
-        fullWidth
-        label="Folder"
-        variant="outlined"
-        value={profileName}
-        onChange={(e) => setProfileName(e.target.value)}
-        disabled={!!folder}
-        className="uploader-input mb-3"
-      />
+      {!usingTenderLibrary && (
+        <CustomTextField
+          fullWidth
+          label="Folder"
+          variant="outlined"
+          value={profileName}
+          onChange={(e) => setProfileName(e.target.value)}
+          disabled={!!folder}
+          className="uploader-input mb-3"
+        />
+      )}
       <div
         className="drop-zone"
         onDragEnter={handleDrag}

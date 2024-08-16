@@ -9,6 +9,7 @@ import { displayAlert } from '../helper/Alert';
 export interface Document {
   name: string;
   editorState: EditorState;
+  type: 'qa sheet' | 'execSummary' | 'coverLetter';
 }
 
 export interface Contributor {
@@ -63,7 +64,7 @@ const defaultState: BidContextType = {
     isLoading: false,
     saveSuccess: null,
     object_id: null,
-    documents: [{ name: 'Document 1', editorState: EditorState.createEmpty() }],
+    documents: [{ name: 'Q/A Sheet', editorState: EditorState.createEmpty(), type: 'qa sheet' }],
     currentDocumentIndex: 0,
   },
   setSharedState: () => {},
@@ -79,16 +80,22 @@ export const BidContext = createContext<BidContextType>(defaultState);
 const BidManagement: React.FC = () => {
   const [sharedState, setSharedState] = useState<SharedState>(() => {
     const savedState = localStorage.getItem('bidState');
+    console.log('Saved state from localStorage:', savedState); // Debug log
     if (savedState) {
       const parsedState = JSON.parse(savedState);
+      console.log('Parsed state:', parsedState); // Debug log
       return {
         ...parsedState,
-        documents: parsedState.documents.map(doc => ({
-          ...doc,
-          editorState: doc.editorState
-            ? EditorState.createWithContent(convertFromRaw(JSON.parse(doc.editorState)))
-            : EditorState.createEmpty(),
-        })),
+        documents: parsedState.documents.map(doc => {
+          console.log('Processing document:', doc); // Debug log
+          return {
+            ...doc,
+            editorState: doc.editorState
+              ? EditorState.createWithContent(convertFromRaw(JSON.parse(doc.editorState)))
+              : EditorState.createEmpty(),
+            type: doc.type || 'qa sheet',
+          };
+        }),
         contributors: parsedState.contributors || {},
         original_creator: parsedState.original_creator || '',
         isSaved: false,
@@ -113,13 +120,14 @@ const BidManagement: React.FC = () => {
     return `${sharedState.opportunity_information}\n${sharedState.compliance_requirements}`;
   };
 
-  const addDocument = (name, type) => {
+  const addDocument = (name: string, type: 'qa sheet' | 'execSummary' | 'coverLetter') => {
     setSharedState((prevState) => {
       const newDocument = {
         name: name || `Document ${prevState.documents.length + 1}`,
         editorState: getInitialEditorState(type),
         type: type
       };
+      console.log('Adding new document:', newDocument); // Debug log
       return {
         ...prevState,
         documents: [...prevState.documents, newDocument],
@@ -127,8 +135,9 @@ const BidManagement: React.FC = () => {
       };
     });
   };
+
   
-  const getInitialEditorState = (type) => {
+  const getInitialEditorState = (type: 'qa sheet' | 'execSummary' | 'coverLetter') => {
     let template = '';
     switch (type) {
       case 'execSummary':
@@ -279,10 +288,15 @@ const BidManagement: React.FC = () => {
     appendFormData('questions', questions);
     appendFormData('original_creator', original_creator);
 
-    const documentsFormatted = documents.map(doc => ({
+    const documentsFormatted = documents.map(doc => {
+      console.log('Formatting document for save:', doc); // Debug log
+      return {
         name: doc.name,
-        text: doc.editorState.getCurrentContent().getPlainText()
-    }));
+        text: doc.editorState.getCurrentContent().getPlainText(),
+        type: doc.type,
+      };
+    });
+    console.log('Formatted documents:', documentsFormatted); // Debug log
     formData.append('documents', JSON.stringify(documentsFormatted));
 
     if (object_id) {
@@ -342,11 +356,16 @@ useEffect(() => {
 useEffect(() => {
   const stateToSave = {
     ...sharedState,
-    documents: sharedState.documents.map(doc => ({
-      ...doc,
-      editorState: JSON.stringify(convertToRaw(doc.editorState.getCurrentContent()))
-    }))
+    documents: sharedState.documents.map(doc => {
+      console.log('Preparing document for localStorage:', doc); // Debug log
+      return {
+        ...doc,
+        editorState: JSON.stringify(convertToRaw(doc.editorState.getCurrentContent())),
+        type: doc.type,
+      };
+    })
   };
+  console.log('State being saved to localStorage:', stateToSave); // Debug log
   localStorage.setItem('bidState', JSON.stringify(stateToSave));
 
   if (typingTimeout) {

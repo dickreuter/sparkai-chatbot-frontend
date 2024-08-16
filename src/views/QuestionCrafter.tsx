@@ -14,6 +14,7 @@ import FolderLogic from "../components/Folders.tsx";
 import { Editor, EditorState, Modifier, SelectionState, convertToRaw, ContentState, RichUtils } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
+import { displayAlert } from "../helper/Alert.tsx";
 
 const QuestionCrafter = () => {
   const getAuth = useAuthUser();
@@ -72,7 +73,6 @@ const QuestionCrafter = () => {
 
   const [selectedDocument, setSelectedDocument] = useState(documents[0].name); // Default to the first document
 
-
   const [currentUserEmail, setCurrentUserEmail] = useState('');
   const currentUserPermission = contributors[currentUserEmail] || 'viewer'; // Default to 'viewer' if not found
   const canUserEdit = currentUserPermission === "admin" || currentUserPermission === "editor";
@@ -97,26 +97,51 @@ const QuestionCrafter = () => {
     fetchUserData();
   }, [tokenRef]);
 
-  const DocumentSelector = () => (
-    <Dropdown onSelect={(eventKey) => handleDocumentSelect(eventKey)}>
-      <Dropdown.Toggle className="upload-button" id="document-selector" style={{marginLeft: "5px"}}>
-        {selectedDocument}
-      </Dropdown.Toggle>
-      <Dropdown.Menu>
-        {documents.map((doc, index) => (
-          <Dropdown.Item key={index} eventKey={index}>
-            {doc.name}
-          </Dropdown.Item>
-        ))}
-      </Dropdown.Menu>
-    </Dropdown>
-  );
-
-  const handleDocumentSelect = (index) => {
-    const selectedIndex = parseInt(index);
-    setSelectedDocument(sharedState.documents[selectedIndex].name);
-    selectDocument(selectedIndex);
+  const handleDocumentSelect = (docName) => {
+    setSelectedDocument(docName);
   };
+
+  const QASheetSelector = () => {
+    const qaSheets = sharedState.documents.filter(doc => doc.type === 'qa sheet');
+  
+    return (
+      <div className="dropdown-clear-container mt-2" style={{marginBottom: '60px'}}>
+        <Dropdown onSelect={handleDocumentSelect} className="chat-dropdown" style={{marginRight: "5px"}}>
+          <Dropdown.Toggle
+            className="upload-button custom-dropdown-toggle"
+            id="qa-sheet-selector"
+          >
+            {selectedDocument || 'Select Q/A Sheet'}
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            {qaSheets.length > 0 ? (
+              qaSheets.map((doc, index) => (
+                <Dropdown.Item key={index} eventKey={doc.name}>
+                  {doc.name}
+                </Dropdown.Item>
+              ))
+            ) : (
+              <Dropdown.Item disabled>No Q/A Sheets available</Dropdown.Item>
+            )}
+          </Dropdown.Menu>
+        </Dropdown>
+  
+        <button
+          className="upload-button"
+          onClick={handleAddToQASheet}
+          disabled={
+            isLoading ||
+            !selectedDocument ||
+            convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').trim() === ''
+          }
+        >
+          {isAppended ? 'Added to Q/A Sheet' : 'Add Response'}
+        </button>
+      </div>
+    );
+  };
+  
+
 
   useEffect(() => {
     localStorage.setItem('response', convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n'));
@@ -164,12 +189,21 @@ const QuestionCrafter = () => {
   
 
 
-  const handleAppendResponseToEditor = () => {
-    handleGAEvent('Chatbot', 'Append Response', 'Add to Proposal Button');
+  const handleAddToQASheet = () => {
+    if (!selectedDocument) {
+      displayAlert('Please select a Q/A sheet first.', 'warning');
+      return;
+    }
+  
+    handleGAEvent('Chatbot', 'Append Response', 'Add to Q/A Sheet Button');
     setSelectedQuestionId("-1");
   
     setTimeout(() => {
-      const currentDocIndex = sharedState.currentDocumentIndex;
+      const currentDocIndex = sharedState.documents.findIndex(doc => doc.name === selectedDocument);
+      if (currentDocIndex === -1) {
+        console.error('Selected document not found');
+        return;
+      }
       const currentDoc = sharedState.documents[currentDocIndex];
       const currentContent = currentDoc.editorState.getCurrentContent();
       const lastBlock = currentContent.getBlockMap().last();
@@ -198,7 +232,6 @@ const QuestionCrafter = () => {
       setTimeout(() => setIsAppended(false), 3000);
     }, 100);
   };
-
   const askCopilot = async (copilotInput, instructions, copilot_mode) => {
     setQuestionAsked(true);
     localStorage.setItem('questionAsked', 'true');
@@ -955,7 +988,7 @@ useEffect(() => {
     setIsLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
     try {
-      const word_amounts = selectedChoices.map((choice) => wordAmounts[choice] || 100);
+      const word_amounts = selectedChoices.map((choice) => String(wordAmounts[choice] || "100"));
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
         {
@@ -980,12 +1013,31 @@ useEffect(() => {
       setWordAmounts({}); // Clear word amounts
     } catch (error) {
       console.error("Error submitting selections:", error);
-      const contentState = ContentState.createFromText(error.message);
+      let errorMessage = "";
+  
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+        console.error("Response headers:", error.response.headers);
+        errorMessage = `Error ${error.response.status}: ${JSON.stringify(error.response.data)}`;
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error("Request:", error.request);
+        errorMessage = "No response received from server";
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error("Error message:", error.message);
+        errorMessage = `Error: ${error.message}`;
+      }
+  
+      const contentState = ContentState.createFromText(errorMessage);
       setResponseEditorState(EditorState.createWithContent(contentState));
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
-
 
   
 
@@ -1116,18 +1168,11 @@ useEffect(() => {
             <div className="text-muted mt-2">
               Word Count: {convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').split(/\s+/).filter(Boolean).length}
             </div>
-            <div className="dropdown-clear-container mt-1 mb-3">
-            
-            <Button
-              variant={isAppended ? 'success' : 'primary'}
-              className="upload-button"
-              onClick={handleAppendResponseToEditor}
-              disabled={isLoading || isAppended || convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').trim() === ''}
-            >
-              {isAppended ? 'Added' : 'Add to Proposal'}
-            </Button>
-            <DocumentSelector />
-            </div>
+           
+            <QASheetSelector />
+          
+     
+
             </Col>
             <Col md={5}>
               <div className="input-header">

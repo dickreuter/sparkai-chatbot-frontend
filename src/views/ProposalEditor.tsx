@@ -24,7 +24,8 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingIndex, setDeletingIndex] = useState(null);
 
-  const [newDocType, setNewDocType] = useState('questionAnswer');
+  const [newDocType, setNewDocType] = useState<'qa sheet' | 'execSummary' | 'coverLetter'>('qa sheet');
+
 
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -255,31 +256,31 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
     <Modal.Title>{renamingIndex !== null ? 'Rename Document' : 'New Document'}</Modal.Title>
   </Modal.Header>
   <Modal.Body>
-    <Form>
-      <Form.Group controlId="formDocName">
-        <Form.Label>Document Name</Form.Label>
-        <Form.Control
-          type="text"
-          value={newDocName}
-          onChange={(e) => setNewDocName(e.target.value)}
-        />
-      </Form.Group>
-      {renamingIndex === null && (
-        <Form.Group controlId="formDocType">
-          <Form.Label>Document Type</Form.Label>
-          <Form.Control
-            as="select"
-            value={newDocType}
-            onChange={(e) => setNewDocType(e.target.value)}
-          >
-            <option value="questionAnswer">Question Answer</option>
-            <option value="execSummary">Executive Summary</option>
-            <option value="coverLetter">Cover Letter</option>
-          </Form.Control>
-        </Form.Group>
-      )}
-    </Form>
-  </Modal.Body>
+          <Form>
+            <Form.Group controlId="formDocName">
+              <Form.Label>Document Name</Form.Label>
+              <Form.Control
+                type="text"
+                value={newDocName}
+                onChange={(e) => setNewDocName(e.target.value)}
+              />
+            </Form.Group>
+            {renamingIndex === null && (
+              <Form.Group controlId="formDocType">
+                <Form.Label>Document Type</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={newDocType}
+                  onChange={(e) => setNewDocType(e.target.value as 'qa sheet' | 'execSummary' | 'coverLetter')}
+                >
+                  <option value="qa sheet">Question Answer</option>
+                  <option value="execSummary">Executive Summary</option>
+                  <option value="coverLetter">Cover Letter</option>
+                </Form.Control>
+              </Form.Group>
+            )}
+          </Form>
+        </Modal.Body>
   <Modal.Footer>
     <Button className="upload-button" onClick={() => setShowModal(false)}>
       Cancel

@@ -18,6 +18,7 @@ import ContributorModal from "../components/ContributorModal.tsx";
 import { Snackbar } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faEye, faUsers } from "@fortawesome/free-solid-svg-icons";
+import TenderLibrary from "../components/TenderLibrary.tsx";
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
@@ -36,7 +37,8 @@ const BidExtractor = () => {
     submission_deadline, 
     bid_manager, 
     contributors,
-    original_creator
+    original_creator,
+    object_id
   } = sharedState;
 
   const CHARACTER_LIMIT = 20;
@@ -248,8 +250,14 @@ const BidExtractor = () => {
         name: doc.name,
         editorState: doc.text
           ? EditorState.createWithContent(ContentState.createFromText(doc.text))
-          : EditorState.createEmpty()
-      })) || [{ name: 'Document 1', editorState: EditorState.createEmpty() }];
+          : EditorState.createEmpty(),
+        type: doc.type || 'qa sheet' // Use the type from the document, default to 'qa sheet' if not present
+      })) || [{ 
+        name: 'Q/A Sheet', 
+        editorState: EditorState.createEmpty(), 
+        type: 'qa sheet' 
+      }];
+      
   
       setSharedState(prevState => {
         const original_creator = bidData?.original_creator || currentUserEmail;
@@ -847,6 +855,16 @@ const BidExtractor = () => {
   </div>
 </Col>
     </Row>
+
+
+    <Row>
+         
+         <Col md={12}>
+         <TenderLibrary object_id={object_id} />
+
+         </Col>
+         </Row>
+
     <Modal show={showPasteModal} onHide={() => setShowPasteModal(false)} dialogClassName="paste-modal">
   <Modal.Header closeButton className="p-4">
     <Modal.Title>Paste Questions</Modal.Title>

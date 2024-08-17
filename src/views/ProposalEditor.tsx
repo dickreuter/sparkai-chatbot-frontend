@@ -36,28 +36,11 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
 
   } = sharedState;
 
-  const [currentUserEmail, setCurrentUserEmail] = useState('');
-  const currentUserPermission = contributors[currentUserEmail] || 'viewer'; 
+
+  const currentUserPermission = contributors[auth.email] || 'viewer'; 
   const canUserEdit = currentUserPermission === "admin" || currentUserPermission === "editor";
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(`http${HTTP_PREFIX}://${API_URL}/profile`,  {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
-        });
-        setCurrentUserEmail(response.data.email);
-       
-      } catch (err) {
-        console.log('Failed to load profile data');
-      
-      }
-    };
-
-    fetchUserData();
-  }, [tokenRef]);
+ 
   
   const handleDeleteDocument = (index, event) => {
     if (event) {

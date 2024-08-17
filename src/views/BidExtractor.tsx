@@ -65,7 +65,8 @@ const BidExtractor = () => {
   const [showContributorModal, setShowContributorModal] = useState(false);
 
   const [currentUserEmail, setCurrentUserEmail] = useState('');
-  const currentUserPermission = contributors[currentUserEmail] || 'viewer'; // Default to 'viewer' if not found
+  const currentUserPermission = contributors[auth.email] || 'viewer'; // Default to 'viewer' if not found
+  console.log("currentUserpermission"+ currentUserPermission);
   const canUserEdit = currentUserPermission === "admin" || currentUserPermission === "editor";
 
   const showViewOnlyMessage = () => {
@@ -158,20 +159,20 @@ const BidExtractor = () => {
     }));
   };
 
-  const handleRemoveContributor = (email) => {
+  const handleRemoveContributor = (login) => {
     setSharedState(prevState => {
       const updatedContributors = { ...prevState.contributors };
-      delete updatedContributors[email];
+      delete updatedContributors[login];
       return { ...prevState, contributors: updatedContributors };
     });
   };
 
-  const handleUpdateContributor = (email, newPermission) => {
+  const handleUpdateContributor = (login, newPermission) => {
     setSharedState(prevState => ({
       ...prevState,
       contributors: {
         ...prevState.contributors,
-        [email]: newPermission
+        [login]: newPermission
       }
     }));
   };
@@ -264,9 +265,12 @@ const BidExtractor = () => {
         let contributors = bidData?.contributors || {};
         
         if (!bidData?.original_creator || Object.keys(contributors).length === 0) {
-          if (currentUserEmail && currentUserEmail !== '') {
-            contributors = { [currentUserEmail]: 'admin' };
-          }
+          console.log("length 0");
+          
+            console.log(currentUserEmail);
+            //had to change to user their login
+            contributors = { [auth.email]: 'admin' };
+          
         }
   
         return {

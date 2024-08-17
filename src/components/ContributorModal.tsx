@@ -13,7 +13,6 @@ const ContributorModal = ({
     onRemoveContributor,
     organizationUsers, 
     currentContributors,
-    currentUserEmail,
     currentUserPermission
   }) => {
     const [selectedUser, setSelectedUser] = useState('');
@@ -35,18 +34,18 @@ const ContributorModal = ({
       }
     };
 
-    const handleUpdatePermission = (email, newPermission) => {
+    const handleUpdatePermission = (login, newPermission) => {
       if (isAdmin) {
-        setPermissionToChange({ email, newPermission });
+        setPermissionToChange({ login, newPermission });
       }
     };
 
     const confirmPermissionChange = () => {
       if (permissionToChange) {
         if (permissionToChange.newPermission === 'remove') {
-          onRemoveContributor(permissionToChange.email);
+          onRemoveContributor(permissionToChange.login);
         } else {
-          onUpdateContributor(permissionToChange.email, permissionToChange.newPermission);
+          onUpdateContributor(permissionToChange.login, permissionToChange.newPermission);
         }
         setPermissionToChange(null);
       }
@@ -80,16 +79,16 @@ const ContributorModal = ({
         <Modal.Body className="px-4 py-3">
   
           <List>
-            {Object.entries(currentContributors).map(([email, permission]) => (
-              <ListItem key={email} style={{ padding: '0', marginBottom: '8px', alignItems: 'center' }}>
+            {Object.entries(currentContributors).map(([login, permission]) => (
+              <ListItem key={login} style={{ padding: '0', marginBottom: '8px', alignItems: 'center' }}>
                 <ListItemText 
-                  primary={email} 
+                  primary={login} 
                   primaryTypographyProps={{ style: { ...fontStyle, flex: '1 1 auto' } }}
                 />
                 <FormControl style={{ minWidth: 120, marginLeft: 16 }}>
                   <Select
-                    value={permissionToChange && permissionToChange.email === email ? permissionToChange.newPermission : permission}
-                    onChange={(e) => handleUpdatePermission(email, e.target.value)}
+                    value={permissionToChange && permissionToChange.login === login ? permissionToChange.newPermission : permission}
+                    onChange={(e) => handleUpdatePermission(login, e.target.value)}
                     style={{ ...fontStyle, border: 'none' }}
                     variant="standard"
                     disabled={!isAdmin}
@@ -100,7 +99,7 @@ const ContributorModal = ({
                     <MenuItem value="remove" style={{...fontStyle, color: 'red'}}>Remove</MenuItem>
                   </Select>
                 </FormControl>
-                {permissionToChange && permissionToChange.email === email && (
+                {permissionToChange && permissionToChange.login === login && (
                   <>
                     <IconButton onClick={confirmPermissionChange} size="small" style={{ marginLeft: '8px' }}>
                       <CheckIcon style={{ color: 'green' }} />
@@ -132,12 +131,15 @@ const ContributorModal = ({
                     }
                   }}
                 >
-                  {organizationUsers
-                    .filter(user => !currentContributors.hasOwnProperty(user.email))
-                    .map((user, index) => (
-                      <MenuItem key={index} value={user.email} style={fontStyle}>{user.email}</MenuItem>
-                    ))
-                  }
+                  {organizationUsers.filter(user => !currentContributors.hasOwnProperty(user.username)).length > 0 ? (
+                    organizationUsers
+                      .filter(user => !currentContributors.hasOwnProperty(user.username))
+                      .map((user, index) => (
+                        <MenuItem key={index} value={user.username} style={fontStyle}>{user.username}</MenuItem>
+                      ))
+                  ) : (
+                    <MenuItem disabled value="" style={fontStyle}>No Users in Organisation</MenuItem>
+                  )}
                 </Select>
               </FormControl>
              

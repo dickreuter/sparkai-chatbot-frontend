@@ -12,7 +12,7 @@ import { useAuthUser } from "react-auth-kit";
 const BidNavbar = () => {
   const { sharedState, setSharedState, getBackgroundInfo } = useContext(BidContext);
   const { isLoading, saveSuccess } = sharedState;
-  const [currentUserEmail, setCurrentUserEmail] = useState('');
+ 
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -31,25 +31,9 @@ const BidNavbar = () => {
     original_creator
   } = sharedState;
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(`http${HTTP_PREFIX}://${API_URL}/profile`,  {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
-        });
-        setCurrentUserEmail(response.data.email);
-       
-      } catch (err) {
-        console.log('Failed to load profile data');s
-      }
-    };
 
-    fetchUserData();
-  }, [tokenRef]);
 
-  const currentUserPermission = contributors[currentUserEmail] || 'viewer'; 
+  const currentUserPermission = contributors[auth.email] || 'viewer'; 
   const getPermissionDetails = (permission) => {
     switch (permission) {
       case 'admin':

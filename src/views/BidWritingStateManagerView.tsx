@@ -13,7 +13,7 @@ export interface Document {
 }
 
 export interface Contributor {
-  [email: string]: string; // email: permission
+  [login: string]: string; // login: permission
 }
 
 export interface SharedState {
@@ -242,7 +242,8 @@ const BidManagement: React.FC = () => {
 
   const canUserSave = useCallback((): boolean => {
     console.log(currentUserEmail);
-    const userPermission = sharedState.contributors[currentUserEmail];
+    //login
+    const userPermission = sharedState.contributors[auth.email];
     return userPermission === 'admin' || userPermission === 'editor';
   }, [sharedState.contributors, currentUserEmail]);
 

@@ -73,29 +73,12 @@ const QuestionCrafter = () => {
 
   const [selectedDocument, setSelectedDocument] = useState(documents[0].name); // Default to the first document
 
-  const [currentUserEmail, setCurrentUserEmail] = useState('');
-  const currentUserPermission = contributors[currentUserEmail] || 'viewer'; // Default to 'viewer' if not found
+
+  const currentUserPermission = contributors[auth.email] || 'viewer'; // Default to 'viewer' if not found
   const canUserEdit = currentUserPermission === "admin" || currentUserPermission === "editor";
 
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(`http${HTTP_PREFIX}://${API_URL}/profile`,  {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
-        });
-        setCurrentUserEmail(response.data.email);
-       
-      } catch (err) {
-        console.log('Failed to load profile data');
-        setLoading(false);
-      }
-    };
 
-    fetchUserData();
-  }, [tokenRef]);
 
   const handleDocumentSelect = (docName) => {
     setSelectedDocument(docName);

@@ -261,7 +261,7 @@ const BidExtractor = () => {
       
   
       setSharedState(prevState => {
-        const original_creator = bidData?.original_creator || currentUserEmail;
+        const original_creator = bidData?.original_creator || auth.email;
         let contributors = bidData?.contributors || {};
         
         if (!bidData?.original_creator || Object.keys(contributors).length === 0) {
@@ -299,11 +299,11 @@ const BidExtractor = () => {
       setSharedState(prevState => ({
         ...prevState,
         bidInfo: initialBidName,
-        original_creator: currentUserEmail,
-        contributors: currentUserEmail ? { [currentUserEmail]: 'admin' } : {}
+        original_creator: auth.email,
+        contributors: auth.email ? { [auth.email]: 'admin' } : {}
       }));
     }
-  }, [location, bidData, setSharedState, initialBidName, currentUserEmail]);
+  }, [location, bidData, setSharedState, initialBidName, auth.email]);
 
   useEffect(() => {
     console.log(sharedState);

@@ -120,90 +120,77 @@ const BidManagement: React.FC = () => {
     return `${sharedState.opportunity_information}\n${sharedState.compliance_requirements}`;
   };
 
-  const addDocument = (name: string, type: 'qa sheet' | 'execSummary' | 'coverLetter') => {
-    setSharedState((prevState) => {
-      const newDocument = {
-        name: name || `Document ${prevState.documents.length + 1}`,
-        editorState: getInitialEditorState(type),
-        type: type
-      };
-      console.log('Adding new document:', newDocument); // Debug log
-      return {
+  const addDocument = async (name: string, type: 'qa sheet' | 'execSummary' | 'coverLetter') => {
+    setSharedState((prevState) => ({
+      ...prevState,
+      isLoading: true
+    }));
+
+    try {
+      const editorState = await getInitialEditorState(type);
+      setSharedState((prevState) => {
+        const newDocument = {
+          name: name || `Document ${prevState.documents.length + 1}`,
+          editorState,
+          type
+        };
+        console.log('Adding new document:', newDocument);
+        return {
+          ...prevState,
+          documents: [...prevState.documents, newDocument],
+          currentDocumentIndex: prevState.documents.length,
+          isLoading: false
+        };
+      });
+    } catch (error) {
+      console.error("Error adding document:", error);
+      setSharedState((prevState) => ({
         ...prevState,
-        documents: [...prevState.documents, newDocument],
-        currentDocumentIndex: prevState.documents.length
-      };
-    });
+        isLoading: false
+      }));
+      displayAlert("Failed to add document. Please try again.", 'error');
+    }
   };
 
+
   
-  const getInitialEditorState = (type: 'qa sheet' | 'execSummary' | 'coverLetter') => {
+  const getInitialEditorState = async (type: 'qa sheet' | 'execSummary' | 'coverLetter') => {
     let template = '';
-    switch (type) {
-      case 'execSummary':
-        template = `Executive Summary
   
-  [Company Name] is pleased to submit this proposal for [Brief description of the project or service].
+    const makeApiCall = async (endpoint: string) => {
+      const formData = new FormData();
+      formData.append("collection_name", `TenderLibrary_${sharedState.object_id}`);
+      try {
+        const result = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/${endpoint}`,
+          formData,
+          {
+            headers: {
+              'Authorization': `Bearer ${tokenRef.current}`,
+              'Content-Type': 'multipart/form-data',
+            }
+          }
+        );
+        return result.data;
+      } catch (error) {
+        console.error(`Error fetching ${endpoint}:`, error);
+        throw error;
+      }
+    };
   
-  Key Highlights:
-  - [Unique selling point 1]
-  - [Unique selling point 2]
-  - [Unique selling point 3]
-  
-  Our Approach:
-  [Brief overview of your approach to the project]
-  
-  Why Choose Us:
-  - [Key strength 1]
-  - [Key strength 2]
-  - [Key strength 3]
-  
-  Project Timeline: [Brief timeline]
-  Total Cost: [Cost summary]
-  
-  We are confident that our expertise and innovative approach make us the ideal partner for this project. We look forward to the opportunity to contribute to your success.`;
-        break;
-      case 'coverLetter':
-        template = `[Your Company Letterhead]
-  
-  [Date]
-  
-  [Recipient Name]
-  [Recipient Title]
-  [Company Name]
-  [Address]
-  [City, State ZIP Code]
-  
-  Dear [Recipient Name],
-  
-  Re: [Tender Reference Number and Title]
-  
-  We are pleased to submit our proposal for [brief description of the tender]. As [Your Company Name], we are excited about the opportunity to [main objective of the tender].
-  
-  Our proposal demonstrates:
-  1. [Key strength or unique offering 1]
-  2. [Key strength or unique offering 2]
-  3. [Key strength or unique offering 3]
-  
-  We have carefully reviewed all tender documents and our proposal fully complies with your requirements. We are committed to delivering [key deliverable] on time and within budget.
-  
-  [Brief paragraph about your company's relevant experience]
-  
-  We look forward to the opportunity to further discuss our proposal and demonstrate how we can add value to [Recipient's Company Name].
-  
-  Thank you for your consideration.
-  
-  Sincerely,
-  
-  [Your Name]
-  [Your Title]
-  [Your Company Name]
-  
-  Enclosures: [List of documents included in the bid]`;
-        break;
-      case 'questionAnswer':
-      default:
-        template = `Question 1: [Copy the exact question from the tender document]
+    try {
+      switch (type) {
+        case 'execSummary':
+          const execSummaryData = await makeApiCall('generate_exec_summary');
+          template = execSummaryData.exec_summary;
+          break;
+        case 'coverLetter':
+          const coverLetterData = await makeApiCall('generate_cover_letter');
+          template = coverLetterData.cover_letter;
+          break;
+        case 'qa sheet':
+        default:
+          template = `Question 1: [Copy the exact question from the tender document]
   
   Answer: [Provide a clear, concise, and specific answer. Use bullet points or numbered lists where appropriate. Include relevant examples or case studies if possible.]
   
@@ -216,7 +203,13 @@ const BidManagement: React.FC = () => {
   - Use industry-specific terminology appropriately]
   
   [Continue with additional Question/Answer pairs as needed]`;
+      }
+    } catch (error) {
+      const errorMessage = `Error generating ${type}. Please try again.`;
+      displayAlert(`Failed to generate ${type}. Using default template.`, 'warning');
+      template = errorMessage;
     }
+  
     return EditorState.createWithContent(ContentState.createFromText(template));
   };
   

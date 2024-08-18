@@ -280,6 +280,13 @@
             /* Space between content and pagination */
         }
         
+        .tenderlibrary-card-body-content {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            overflow: hidden;
+        }
+        
         .pagination-controls {
             flex-shrink: 0;
             /* Ensures the pagination doesn't shrink */

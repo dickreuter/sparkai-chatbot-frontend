@@ -23,7 +23,7 @@ const TenderLibrary = ({ object_id }) => {
   const [currentFileName, setCurrentFileName] = useState(null);
   const [currentFileId, setCurrentFileId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 9;
+  const rowsPerPage = 6;
   const [totalPages, setTotalPages] = useState(0);
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [showTextModal, setShowTextModal] = useState(false);
@@ -236,7 +236,7 @@ const TenderLibrary = ({ object_id }) => {
       <Row>
         <Col md={12}>
           <Card className="mb-4">
-            <Card.Body className="library-card-body-content">
+            <Card.Body className="tenderlibrary-card-body-content">
               <div className="library-card-content-wrapper">
                 <div className="header-row mt-2">
                   <div className="lib-title">Tender Library</div>

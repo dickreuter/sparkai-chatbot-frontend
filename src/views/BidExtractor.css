@@ -427,7 +427,7 @@
 }
 
 .requirements-textarea {
-    height: 250px;
+    height: 550px;
     /* Adjust to fit one line of text */
     overflow: hidden;
     /* Hide extra content */

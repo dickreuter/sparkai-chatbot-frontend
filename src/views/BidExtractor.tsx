@@ -17,7 +17,7 @@ import { FormControl, InputLabel, Select } from "@mui/material";
 import ContributorModal from "../components/ContributorModal.tsx";
 import { Snackbar } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faEye, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faEye, faHammer, faScrewdriverWrench, faUsers } from "@fortawesome/free-solid-svg-icons";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 
 const BidExtractor = () => {
@@ -109,6 +109,83 @@ const BidExtractor = () => {
     setShowPasteModal(true);
     handleClose();
   };
+
+  const [isGeneratingCompliance, setIsGeneratingCompliance] = useState(false);
+
+  const generateComplianceRequirements = async () => {
+    if (!canUserEdit) {
+      showViewOnlyMessage();
+      return;
+    }
+
+    setIsGeneratingCompliance(true);
+    const formData = new FormData();
+    formData.append("collection_name", `TenderLibrary_${object_id}`);
+    try {
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/generate_compliance_requirements`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
+
+      setSharedState(prevState => ({
+        ...prevState,
+        compliance_requirements: result.data.requirements
+      }));
+
+      displayAlert("Compliance requirements generated successfully!", 'success');
+    } catch (err) {
+      console.error('Error generating compliance requirements:', err);
+      displayAlert("Failed to generate compliance requirements. Please try again.", 'danger');
+    } finally {
+      setIsGeneratingCompliance(false);
+    }
+  };
+
+  const [isGeneratingOpportunity, setIsGeneratingOpportunity] = useState(false);
+
+  // ... existing functions remain the same
+
+  const generateOpportunityInformation = async () => {
+    if (!canUserEdit) {
+      showViewOnlyMessage();
+      return;
+    }
+
+    setIsGeneratingOpportunity(true);
+    const formData = new FormData();
+    formData.append("collection_name", `TenderLibrary_${object_id}`);
+    try {
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/generate_opportunity_information`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
+
+      setSharedState(prevState => ({
+        ...prevState,
+        opportunity_information: result.data.opportunity_information
+      }));
+
+      displayAlert("Opportunity information generated successfully!", 'success');
+    } catch (err) {
+      console.error('Error generating opportunity information:', err);
+      displayAlert("Failed to generate opportunity information. Please try again.", 'danger');
+    } finally {
+      setIsGeneratingOpportunity(false);
+    }
+  };
+
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
@@ -742,40 +819,85 @@ const BidExtractor = () => {
           </div>
 
           <Row className="mt-4 mb-4">
+          <Col md={6}>
+          <Card className="mb-4 custom-grey-border">
+            <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
+              <h1 className="requirements-title">Opportunity Information</h1>
+              <span
+                onClick={canUserEdit ? generateOpportunityInformation : showViewOnlyMessage}
+                style={{
+                  cursor: canUserEdit ? 'pointer' : 'not-allowed',
+                  opacity: canUserEdit ? 1 : 0.5,
+                  color: '#4a4a4a', // Dark grey color
+                  fontSize: '1.2rem', // Adjust size as needed
+                  marginRight: '5px' // Add some space between the title and the icon
+                }}
+              >
+                {isGeneratingOpportunity ? (
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <FontAwesomeIcon icon={faScrewdriverWrench} />
+                )}
+              </span>
+            </Card.Header>
+            <Card.Body className="px-0 py-1" ref={opportunityInformationRef}>
+              <textarea
+                className="form-control requirements-textarea"
+                placeholder="Enter background info here..."
+                value={opportunity_information || ''}
+                onChange={wrappedHandlers.handleOpportunityInformationChange}
+                disabled={!canUserEdit}
+                style={{overflowY: "auto"}}
+              ></textarea>
+            </Card.Body>
+          </Card>
+        </Col>
             <Col md={6}>
-              <Card className="mb-4 custom-grey-border">
-                <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
-                  <h1 className="requirements-title ">Opportunity Information</h1>
-                  {/* ... (tooltip remains the same) ... */}
-                </Card.Header>
-                <Card.Body className="px-0 py-1" ref={opportunityInformationRef}>
-                  <textarea
-                    className="form-control requirements-textarea"
-                    placeholder="Enter background info here..."
-                    value={opportunity_information || ''}
-                    onChange={wrappedHandlers.handleOpportunityInformationChange}
-                    disabled={!canUserEdit}
-                  ></textarea>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={6}>
-              <Card className="mb-4 custom-grey-border">
-                <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
-                  <h1 className=" requirements-title ">Compliance Requirements</h1>
-                  {/* ... (tooltip remains the same) ... */}
-                </Card.Header>
-                <Card.Body className="px-0 py-1" ref={complianceRequirementsRef}>
-                  <textarea
-                    className="form-control requirements-textarea"
-                    placeholder="Enter compliance requirements here..."
-                    value={compliance_requirements || ''}
-                    onChange={wrappedHandlers.handleComplianceRequirementsChange}
-                    disabled={!canUserEdit}
-                  ></textarea>
-                </Card.Body>
-              </Card>
-            </Col>
+            <Card className="mb-4 custom-grey-border">
+              <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
+                <h1 className="requirements-title">Compliance Requirements</h1>
+               
+            <span
+              onClick={canUserEdit ? generateComplianceRequirements : showViewOnlyMessage}
+              style={{
+                cursor: canUserEdit ? 'pointer' : 'not-allowed',
+                opacity: canUserEdit ? 1 : 0.5,
+                color: '#4a4a4a', // Dark grey color
+                fontSize: '1.2rem', // Adjust size as needed
+                marginRight: '5px' // Add some space between the title and the icon
+              }}
+            >
+              {isGeneratingCompliance ? (
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              ) : (
+                <FontAwesomeIcon icon={faScrewdriverWrench} />
+              )}
+            </span>
+              </Card.Header>
+              <Card.Body className="px-0 py-1" ref={complianceRequirementsRef}>
+                <textarea
+                  className="form-control requirements-textarea"
+                  placeholder="Enter compliance requirements here..."
+                  value={compliance_requirements || ''}
+                  onChange={wrappedHandlers.handleComplianceRequirementsChange}
+                  disabled={!canUserEdit}
+                  style={{overflowY: "auto"}}
+                ></textarea>
+              </Card.Body>
+            </Card>
+          </Col>
           </Row>
 
           <Row>

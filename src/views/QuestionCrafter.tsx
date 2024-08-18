@@ -71,7 +71,7 @@ const QuestionCrafter = () => {
   const [selectedDropdownOption, setSelectedDropdownOption] = useState('library-chat');
   const bidPilotRef = useRef(null);
 
-  const [selectedDocument, setSelectedDocument] = useState(documents[0].name); // Default to the first document
+  const [selectedDocument, setSelectedDocument] = useState(null); // Default to the first document
 
 
   const currentUserPermission = contributors[auth.email] || 'viewer'; // Default to 'viewer' if not found
@@ -118,7 +118,7 @@ const QuestionCrafter = () => {
             convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').trim() === ''
           }
         >
-          {isAppended ? 'Added to Q/A Sheet' : 'Add Response'}
+          {isAppended ? 'Added to Bid Compiler' : 'Add Response to Bid Compiler'}
         </button>
       </div>
     );

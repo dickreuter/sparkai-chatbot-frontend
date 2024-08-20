@@ -38,11 +38,48 @@ interface IAttributesConfig {
     forbidden: string;
     numbers_allowed_prefixes: string;
     selectedModelType: string;
+
+
+    generate_opportunity_information: string;
+    generate_compliance_requirements: string;
+    generate_cover_letter: string;
+    generate_exec_summary: string;
 }
 
 const defaultAttributesConfig: IAttributesConfig = {
     active: "On",
+    login: "",
+    password: "",
+    prompt1: "",
+    prompt2: "",
+    prompt3a: "",
+    prompt3b: "",
+    prompt1expand: "",
+    prompt1summarise: "",
+    prompt1improve_grammar: "",
+    prompt1translate_to_english: "",
+    prompt1change_tense: "",
+    prompt1rephrase: "",
+    prompt1incorporate: "",
+    prompt1we_will_active_voice: "",
+    prompt1list_creator: "",
+    prompt1reduce_word_character_count: "",
+    prompt1word_cutting_adverbs: "",
+    prompt1word_cutting_adjectives: "",
+    prompt1word_cutting_commas_with_dashes: "",
+    prompt1explain_how: "",
+    prompt1add_statistics: "",
+    prompt1for_example: "",
+    prompt1adding_case_study: "",
+    prompt1company_library: "",
+    question_extractor: "",
+    forbidden: "",
+    numbers_allowed_prefixes: "",
     selectedModelType: "gpt-3.5-turbo",
+    generate_opportunity_information: "",
+    generate_compliance_requirements: "",
+    generate_cover_letter: "",
+    generate_exec_summary: ""
 };
 
 const AdminPannel = () => {
@@ -443,6 +480,37 @@ const AdminPannel = () => {
                     onChange={(e) => handleChange("numbers_allowed_prefixes", e.target.value)}
                 />
             </div>
+            <div className="prompt">
+          <label>Generate Opportunity Information</label>
+          <textarea
+            value={data.generate_opportunity_information}
+            onChange={(e) => handleChange("generate_opportunity_information", e.target.value)}
+          />
+        </div>
+
+        <div className="prompt">
+          <label>Generate Compliance Requirements</label>
+          <textarea
+            value={data.generate_compliance_requirements}
+            onChange={(e) => handleChange("generate_compliance_requirements", e.target.value)}
+          />
+        </div>
+
+        <div className="prompt">
+          <label>Generate Cover Letter</label>
+          <textarea
+            value={data.generate_cover_letter}
+            onChange={(e) => handleChange("generate_cover_letter", e.target.value)}
+          />
+        </div>
+
+        <div className="prompt">
+          <label>Generate Exec Summary</label>
+          <textarea
+            value={data.generate_exec_summary}
+            onChange={(e) => handleChange("generate_exec_summary", e.target.value)}
+          />
+        </div>
             {/* Submit button */}
             <div className="submit-btn">
                 <button onClick={saveUser}>Save</button>

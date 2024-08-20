@@ -24,6 +24,8 @@ urlpatterns = [
     path('success/', success, name='success'),
     path('create-checkout-session/', create_checkout_session, name='create-checkout-session'),
     path('collect-stripe-webhook/', collect_stripe_webhook, name='collect-stripe-webhook'),
-    path('testing-enrollment', testingEnrollment, name='testing-enrollment')
+    path('testing-enrollment', testingEnrollment, name='testing-enrollment'),
+    path('terms_and_conditions', TemplateView.as_view(template_name="terms_and_conditions.html"), name='terms_and_conditions'),
+    path('data_protection_overview', TemplateView.as_view(template_name="data_protection_overview.html"), name='data_protection_overview')
 ]
 

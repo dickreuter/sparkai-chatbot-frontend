@@ -142,7 +142,7 @@ const BidExtractor = () => {
       displayAlert("Compliance requirements generated successfully!", 'success');
     } catch (err) {
       console.error('Error generating compliance requirements:', err);
-      displayAlert("Failed to generate compliance requirements. Please try again.", 'danger');
+      displayAlert("You need to upload some documents to the Tender Library to generate compliance requirements", 'danger');
     } finally {
       setIsGeneratingCompliance(false);
     }
@@ -181,7 +181,7 @@ const BidExtractor = () => {
       displayAlert("Opportunity information generated successfully!", 'success');
     } catch (err) {
       console.error('Error generating opportunity information:', err);
-      displayAlert("Failed to generate opportunity information. Please try again.", 'danger');
+      displayAlert("You need to upload some documents to the Tender Library to generate opportunity information", 'danger');
     } finally {
       setIsGeneratingOpportunity(false);
     }

@@ -94,7 +94,7 @@ const Bids = () => {
     const confirmDeleteBid = async () => {
         if (bidToDelete) {
             const formData = new FormData();
-            formData.append('bid_title', bidToDelete);
+            formData.append('bid_id', bidToDelete);
 
             try {
                 const response = await axios.post(
@@ -135,15 +135,16 @@ const Bids = () => {
         }
     };
 
-    const handleDeleteClick = (bidTitle) => {
-        setBidToDelete(bidTitle);
+    const handleDeleteClick = (bidId) => {
+        setBidToDelete(bidId);
         setShowDeleteModal(true);
     };
 
-    const updateBidStatus = async (bidTitle, newStatus) => {
+
+    const updateBidStatus = async (bidId, newStatus) => {
         try {
             const formData = new FormData();
-            formData.append('bid_title', bidTitle);
+            formData.append('bid_id', bidId);
             formData.append('status', newStatus);
 
             const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/update_bid_status/`,
@@ -298,7 +299,7 @@ const Bids = () => {
                                     <FormControl fullWidth>
                                         <StyledSelect
                                         value={bid.status.toLowerCase()}
-                                        onChange={(e) => updateBidStatus(bid.bid_title, e.target.value)}
+                                        onChange={(e) => updateBidStatus(bid._id, e.target.value)}
                                         className={`status-dropdown ${bid.status.toLowerCase()}`}
                                         >
                                         <StyledMenuItem value="ongoing">Ongoing</StyledMenuItem>
@@ -316,10 +317,10 @@ const Bids = () => {
                                 </td>
                                 <td>{bid.bid_manager}</td>
                                 <td>{bid.opportunity_owner}</td>
-                                <td style={{ textAlign: "center" }}>
+                                 <td style={{ textAlign: "center" }}>
                                     <FontAwesomeIcon
                                         icon={faTrash}
-                                        onClick={() => handleDeleteClick(bid.bid_title)}
+                                        onClick={() => handleDeleteClick(bid._id)}
                                         style={{ cursor: 'pointer', justifyContent: 'center' }}
                                     />
                                 </td>
@@ -356,7 +357,7 @@ const Bids = () => {
                     <Modal.Title>Confirm Delete</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to delete the bid "{bidToDelete}"?
+                    Are you sure you want to delete this bid?
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>

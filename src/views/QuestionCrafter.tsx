@@ -41,6 +41,7 @@ const QuestionCrafter = () => {
   const [tempText, setTempText] = useState('');
   const [copilotOptions, setCopilotOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
   const [copilotLoading, setCopilotLoading] = useState(false);
 
@@ -377,7 +378,8 @@ const QuestionCrafter = () => {
     setShowOptions(false);
     setIsCopilotVisible(false);
     setSelectedText('');
-  
+    setSelectedOptionIndex(null);
+    
     console.log("handleTick - clearedText");
   };
   
@@ -442,7 +444,7 @@ useEffect(() => {
   }, [selectedText, responseEditorState]);
 
   
-const handleOptionSelect = (option) => {
+  const handleOptionSelect = (option, index) => {
 
   const contentState = responseEditorState.getCurrentContent();
   const { anchorKey, anchorOffset, focusKey, focusOffset } = selectionRange;
@@ -512,6 +514,7 @@ const handleOptionSelect = (option) => {
 
   setTempText(option);
   setSelectedOption(option);
+  setSelectedOptionIndex(index);
   setShowOptions(true); // Ensure options remain visible
 
   // Log the final text in the editor
@@ -526,65 +529,45 @@ const handleOptionSelect = (option) => {
   // Dummy state to force re-render of the editor component
   const [dummyState, setDummyState] = useState(false);
   
-  const handleLinkClick = (linkName) => (e) => {
-    e.preventDefault();
-    const copilot_mode = linkName.toLowerCase().replace(/\s+/g, '_');
-    const instructions = '';
+// Proposed solution
+const handleLinkClick = (linkName) => (e) => {
+  e.preventDefault();
+  const copilot_mode = linkName.toLowerCase().replace(/\s+/g, '_');
+  const instructions = '';
 
-    // Store the original state before making any changes
-    setOriginalEditorState(responseEditorState);
+  // Store the original state before making any changes
+  setOriginalEditorState(responseEditorState);
 
-    
-    const contentState = responseEditorState.getCurrentContent();
-    const { anchorKey, anchorOffset, focusKey, focusOffset } = selectionRange;
+  const contentState = responseEditorState.getCurrentContent();
+  const { anchorKey, anchorOffset, focusKey, focusOffset } = selectionRange;
 
-    // Create a new selection state that covers the entire range
-    const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
-      anchorOffset: Math.min(anchorOffset, focusOffset),
-      focusKey: focusKey,
-      focusOffset: Math.max(anchorOffset, focusOffset),
-    });
+  // Create a new selection state that covers the entire range
+  const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
+    anchorOffset: Math.min(anchorOffset, focusOffset),
+    focusKey: focusKey,
+    focusOffset: Math.max(anchorOffset, focusOffset),
+  });
 
-  
-    const clearedContentState = Modifier.removeRange(contentState, newSelectionState, 'backward');
+  // Instead of removing the text, just apply the ORANGE style
+  const newContentStateWithStyle = Modifier.applyInlineStyle(
+    contentState,
+    newSelectionState,
+    'ORANGE'
+  );
 
-    // Collapse the selection to the start of the cleared range
-    const collapsedSelection = SelectionState.createEmpty(anchorKey).merge({
-      anchorOffset: newSelectionState.getStartOffset(),
-      focusOffset: newSelectionState.getStartOffset(),
-    });
+  let newEditorState = EditorState.push(responseEditorState, newContentStateWithStyle, 'change-inline-style');
 
-    // Insert new option text at the collapsed selection
-    const newContentState = Modifier.insertText(
-      clearedContentState,
-      collapsedSelection,
-      selectedText
-    );
+  // Force the selection to remain the same
+  newEditorState = EditorState.forceSelection(newEditorState, newSelectionState);
 
-    // Apply the ORANGE style to the new text
-    const finalSelectionState = collapsedSelection.merge({
-      focusOffset: collapsedSelection.getStartOffset() + selectedText.length,
-    });
+  setResponseEditorState(newEditorState);
 
-    const newContentStateWithStyle = Modifier.applyInlineStyle(
-      newContentState,
-      finalSelectionState,
-      'ORANGE'
-    );
-
-    let newEditorState = EditorState.push(responseEditorState, newContentStateWithStyle, 'change-inline-style');
-
-    // Force the selection to the end of the newly inserted text
-    newEditorState = EditorState.forceSelection(newEditorState, finalSelectionState);
-
-    setResponseEditorState(newEditorState);
-
-    setTimeout(() => {
-      askCopilot(selectedText, instructions, copilot_mode);
-      setShowOptions(true);
-      setIsCopilotVisible(false);
-    }, 0);
-  };
+  setTimeout(() => {
+    askCopilot(selectedText, instructions, copilot_mode);
+    setShowOptions(true);
+    setIsCopilotVisible(false);
+  }, 0);
+};
 
   const handleCustomPromptFocus = () => {
 
@@ -1181,26 +1164,26 @@ useEffect(() => {
                           <div key={index} className="option">
                             <div className="option-content">
                               <Button
-                                onClick={() => handleOptionSelect(option)}
-                                className={`upload-button ${selectedOption === option ? 'selected' : ''}`}
+                                onClick={() => handleOptionSelect(option, index)}
+                                className={`upload-button ${selectedOptionIndex === index ? 'selected' : ''}`}
                                 style={{
-                                  backgroundColor: selectedOption === option ? 'orange' : '#262626',
-                                  color: selectedOption === option ? 'black' : '#fff',
+                                  backgroundColor: selectedOptionIndex === index ? 'orange' : '#262626',
+                                  color: selectedOptionIndex === index ? 'black' : '#fff',
                                 }}
                               >
                                 <span>Option {index + 1}</span>
                               </Button>
-                              {selectedOption === option && (
-                                <Button 
-                                  onClick={handleTick}
-                                  className="tick-button"
-                                >
-                                  <FontAwesomeIcon 
-                                    icon={faCheck} 
-                                    className="tick-icon"
-                                  />
-                                </Button>
-                              )}
+                              {selectedOptionIndex === index && (
+                              <Button 
+                                onClick={handleTick}
+                                className="tick-button"
+                              >
+                                <FontAwesomeIcon 
+                                  icon={faCheck} 
+                                  className="tick-icon"
+                                />
+                              </Button>
+                            )}
                             </div>
                             <div className="option-item mt-2">
                               <p>{option}</p>

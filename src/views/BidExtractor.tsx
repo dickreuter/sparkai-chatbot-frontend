@@ -19,6 +19,7 @@ import { Snackbar } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faEye, faHammer, faScrewdriverWrench, faUsers } from "@fortawesome/free-solid-svg-icons";
 import TenderLibrary from "../components/TenderLibrary.tsx";
+import CustomDateInput from '../components/CustomDateInput.tsx';
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
@@ -562,11 +563,12 @@ const BidExtractor = () => {
   };
 
   const handleSubmissionDeadlineChange = (newDate) => {
-    setSharedState((prevState) => ({
-      ...prevState,
-      submission_deadline: newDate
-    }));
-  };
+  setSharedState((prevState) => ({
+    ...prevState,
+    submission_deadline: newDate
+  }));
+};
+  
   
   const handleBidManagerChange = (e) => {
     const newBidManager = e.target.value;
@@ -637,37 +639,6 @@ const BidExtractor = () => {
     };
   }, [canUserEdit]);
 
-  const wrappedHandlers = {
-    handleClientNameResultChange: (e) => {
-      if (canUserEdit) handleEditAttempt(handleClientNameResultChange)(e);
-      else handleDisabledClick(e);
-    },
-    handleSubmissionDeadlineChange: (e) => {
-      if (canUserEdit) handleEditAttempt(handleSubmissionDeadlineChange)(e);
-      else handleDisabledClick(e);
-    },
-    handleBidManagerChange: (e) => {
-      if (canUserEdit) handleEditAttempt(handleBidManagerChange)(e);
-      else handleDisabledClick(e);
-    },
-    handleOpportunityOwnerChange: (e) => {
-      if (canUserEdit) handleEditAttempt(handleOpportunityOwnerChange)(e);
-      else handleDisabledClick(e);
-    },
-    handleBidQualificationResultChange: (e) => {
-      if (canUserEdit) handleEditAttempt(handleBidQualificationResultChange)(e);
-      else handleDisabledClick(e);
-    },
-    handleOpportunityInformationChange: (e) => {
-      if (canUserEdit) handleEditAttempt(handleOpportunityInformationChange)(e);
-      else handleDisabledClick(e);
-    },
-    handleComplianceRequirementsChange: (e) => {
-      if (canUserEdit) handleEditAttempt(handleComplianceRequirementsChange)(e);
-      else handleDisabledClick(e);
-    },
-  };
-
 
 
   const getPermissionDetails = (permission) => {
@@ -733,7 +704,7 @@ const BidExtractor = () => {
                   <textarea
                     className="form-control single-line-textarea"
                     value={sharedState.client_name}
-                    onChange={wrappedHandlers.handleClientNameResultChange}
+                    onChange={handleClientNameResultChange}
                     disabled={!canUserEdit}
                   ></textarea>
                 </div>
@@ -741,24 +712,20 @@ const BidExtractor = () => {
             </Card>
           </Col>
 
-              <Col md={4} className="px-2">
-                <Card className="mb-4 same-height-card">
-                  <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
-                    <h1 className="inputbox-title mb-0 mt-1">Submission Deadline:</h1>
-                  </Card.Header>
-                  <Card.Body className="py-0 px-1" ref={submissionDeadlineRef}>
-                    <input
-                      type="date"
-                      className="form-control date-textarea"
-                      value={sharedState.submission_deadline}
-                      onChange={wrappedHandlers.handleSubmissionDeadlineChange}
-                      style={{border: "none"}}
-                      onClick={handleDisabledClick}
-                      disabled={!canUserEdit}
-                    />
-                  </Card.Body>
-                </Card>
-              </Col>
+          <Col md={4} className="px-2">
+            <Card className="mb-4 same-height-card">
+              <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
+                <h1 className="inputbox-title mb-0 mt-1">Submission Deadline:</h1>
+              </Card.Header>
+              <Card.Body className="py-0 px-1" ref={submissionDeadlineRef}>
+                <CustomDateInput
+                  value={sharedState.submission_deadline}
+                  onChange={handleSubmissionDeadlineChange}
+                  disabled={!canUserEdit}
+                />
+              </Card.Body>
+            </Card>
+          </Col>
 
               <Col md={4} className="px-2">
                 <Card className="mb-4 same-height-card">
@@ -769,7 +736,7 @@ const BidExtractor = () => {
                     <textarea
                       className="form-control single-line-textarea"
                       value={sharedState.bid_manager}
-                      onChange={wrappedHandlers.handleBidManagerChange}
+                      onChange={handleBidManagerChange}
                       onClick={handleDisabledClick}
                       disabled={!canUserEdit}
                     ></textarea>
@@ -787,7 +754,7 @@ const BidExtractor = () => {
                     <textarea
                       className="form-control single-line-textarea"
                       value={sharedState.opportunity_owner}
-                      onChange={wrappedHandlers.handleOpportunityOwnerChange}
+                      onChange={handleOpportunityOwnerChange}
                       onClick={handleDisabledClick}
                       disabled={!canUserEdit}
                     ></textarea>
@@ -808,7 +775,7 @@ const BidExtractor = () => {
                     <textarea
                       className="form-control single-line-textarea"
                       value={sharedState.bid_qualification_result}
-                      onChange={wrappedHandlers.handleBidQualificationResultChange}
+                      onChange={handleBidQualificationResultChange}
                       onClick={handleDisabledClick}
                       disabled={!canUserEdit}
                     ></textarea>
@@ -851,7 +818,7 @@ const BidExtractor = () => {
                 className="form-control requirements-textarea"
                 placeholder="Enter background info here..."
                 value={opportunity_information || ''}
-                onChange={wrappedHandlers.handleOpportunityInformationChange}
+                onChange={handleOpportunityInformationChange}
                 disabled={!canUserEdit}
                 style={{overflowY: "auto"}}
               ></textarea>
@@ -891,7 +858,7 @@ const BidExtractor = () => {
                   className="form-control requirements-textarea"
                   placeholder="Enter compliance requirements here..."
                   value={compliance_requirements || ''}
-                  onChange={wrappedHandlers.handleComplianceRequirementsChange}
+                  onChange={handleComplianceRequirementsChange}
                   disabled={!canUserEdit}
                   style={{overflowY: "auto"}}
                 ></textarea>

@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 def home(request):
 
-    stripe_publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY_TEST')
+    stripe_publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY_LIVE')
 
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -186,7 +186,7 @@ def guide(request):
 
 
 
-stripe.api_key = os.getenv('STRIPE_SECRET_KEY_TEST')
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY_LIVE')
 
 
 def cancel(request) -> HttpResponse:
@@ -203,7 +203,7 @@ def success(request) -> HttpResponse:
 
 def testingEnrollment(request):
 
-    stripe_publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY_TEST')
+    stripe_publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY_LIVE')
     
     return render(request, 'enrollmentTesting.html', {'stripe_publishable_key': stripe_publishable_key})
 
@@ -239,7 +239,7 @@ def collect_stripe_webhook(request) -> JsonResponse:
     Stripe sends webhook events to this endpoint.
     We verify the webhook signature and updates the database record.
     """
-    webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET')
+    webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET_LIVE')
     signature = request.META["HTTP_STRIPE_SIGNATURE"]
     payload = request.body
 

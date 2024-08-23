@@ -213,32 +213,26 @@ DOMAIN = os.getenv('DOMAIN')
 
 def create_checkout_session(request) -> HttpResponse:
     price_lookup_key = request.POST['price_lookup_key']
+    
     try:
         prices = stripe.Price.list(lookup_keys=[price_lookup_key], expand=['data.product'])
         price_item = prices.data[0]
-
+        
         checkout_session = stripe.checkout.Session.create(
             line_items=[
                 {'price': price_item.id, 'quantity': 1},
-                # You could add differently priced services here, e.g., standard, business, first-class.
             ],
             mode='subscription',
+            allow_promotion_codes=True,  # This enables discount code input in Stripe Checkout
             success_url=DOMAIN + reverse('success') + '?session_id={CHECKOUT_SESSION_ID}',
             cancel_url=DOMAIN + reverse('cancel')
         )
-
-        print("create checkout session")
-
-        return redirect(
-            checkout_session.url,  # Either the success or cancel url.
-            code=303
-        )
+        
+        return redirect(checkout_session.url, code=303)
     except Exception as e:
         print(e)
         return HttpResponse("Server error", status=500)
-
-
-
+    
 @csrf_exempt
 def collect_stripe_webhook(request) -> JsonResponse:
     """

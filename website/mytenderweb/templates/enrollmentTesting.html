@@ -24,7 +24,9 @@
                     <div class="card-body">
                         <h1 class="my-0 font-weight-normal">£499 <small class="text-muted">/mo</small></h1>
                         <ul class="list-unstyled mt-3 mb-4">
-                            <li><i class="fa fa-check-circle feature-check"></i> Single Admin User</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Single User</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Training Sessions</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Basic Support</li>
                 
                             
                         </ul>
@@ -45,13 +47,14 @@
                         <h1 class="my-0 font-weight-normal">£1499 <small class="text-muted">/mo</small></h1>
                         <ul class="list-unstyled mt-3 mb-4">
                             <li><i class="fa fa-check-circle feature-check"></i> Admin User</li>
-                            <li><i class="fa fa-check-circle feature-check"></i> 2-5 Contributors</li>
-                            
+                            <li><i class="fas fa-check-circle feature-check"></i> 2-5 Contributors</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Training Sessions</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Priority Support</li>
                         </ul>
                         <form class="checkout-form" action="{% url 'create-checkout-session' %}" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="price_lookup_key" value="pro_membership" />
-                            <button type="submit" class="button button-block" style="border: none; width: 100%; display: block;">Sign Up</button>
+                            <input type="hidden" name="price_lookup_key" value="pro_membership">
+                            <button type="submit" class="button" style="border: none; width: 100%; display: block;">Sign Up</button>
                         </form>
                     </div>
                 </div>
@@ -64,7 +67,8 @@
                     <div class="card-body">
                         <h1 class="my-0 font-weight-normal">Contact Us</h1>
                         <ul class="list-unstyled mt-3 mb-4">
-                            <li><i class="fas fa-check-circle feature-check"></i> Unlimited users</li>
+                            <li><i class="fas fa-check-circle feature-check"></i> Unlimited Users</li>
+                            <li><i class="fa fa-check-circle feature-check"></i> Training Sessions</li>
                             <li><i class="fas fa-check-circle feature-check"></i> 24/7 Support</li>
                         </ul>
                         <form class="checkout-form">

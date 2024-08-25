@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CustomTextField from '../components/CustomTextField.tsx';
 import { Select, MenuItem, FormControl } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import withAuth from '../routes/withAuth.tsx';
 
 const Bids = () => {
     const [bids, setBids] = useState([]);
@@ -360,10 +361,10 @@ const Bids = () => {
                     Are you sure you want to delete this bid?
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                    <Button className='upload-button' onClick={() => setShowDeleteModal(false)}>
                         Cancel
                     </Button>
-                    <Button variant="danger" onClick={confirmDeleteBid}>
+                    <Button className='upload-button' style={{backgroundColor:"red"}} onClick={confirmDeleteBid}>
                         Delete
                     </Button>
                 </Modal.Footer>
@@ -372,4 +373,4 @@ const Bids = () => {
     );
 };
 
-export default Bids;
+export default withAuth(Bids);

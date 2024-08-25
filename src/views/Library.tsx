@@ -162,10 +162,10 @@ const Library = () => {
             Are you sure you want to delete the folder "{folderTitle}"?
         </Modal.Body>
         <Modal.Footer>
-            <Button variant="secondary" onClick={onHide}>
+            <Button className='upload-button' onClick={onHide}>
                 Cancel
             </Button>
-            <Button variant="danger" onClick={() => onDelete(folderTitle)}>
+            <Button className='upload-button' style={{backgroundColor:"red"}}  onClick={() => onDelete(folderTitle)}>
                 Delete
             </Button>
         </Modal.Footer>
@@ -181,10 +181,10 @@ const Library = () => {
         Are you sure you want to delete the file "{fileName}"?
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
+        <Button className='upload-button' onClick={onHide}>
           Cancel
         </Button>
-        <Button variant="danger" onClick={() => onDelete()}>
+        <Button className='upload-button' style={{backgroundColor:"red"}}  onClick={() => onDelete()}>
           Delete
         </Button>
       </Modal.Footer>

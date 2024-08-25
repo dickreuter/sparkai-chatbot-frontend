@@ -1032,7 +1032,7 @@ useEffect(() => {
                 <h1 className="lib-title">Question</h1>
                 <div className="dropdown-container">
                 <Dropdown onSelect={handleSelect} className="w-100 mx-auto chat-dropdown">
-                <Dropdown.Toggle className="upload-button" style={{backgroundColor: 'orange', color: 'black'}} id="dropdown-basic">
+                <Dropdown.Toggle className="upload-button"  id="dropdown-basic">
                   {displayText}
                 </Dropdown.Toggle>
 
@@ -1044,24 +1044,7 @@ useEffect(() => {
                   ))}
                 </Dropdown.Menu>
               </Dropdown>
-                  <Dropdown onSelect={handleSelectQuestion} className="w-100 mx-auto chat-dropdown">
-                    <Dropdown.Toggle className="upload-button custom-dropdown-toggle" id="dropdown-basic">
-                      Select a Question
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu className="w-100">
-                      {parsedQuestions.length > 0 ? (
-                        parsedQuestions.map((question, index) => (
-                          <Dropdown.Item key={index} eventKey={index.toString()}>
-                            {question}
-                          </Dropdown.Item>
-                        ))
-                      ) : (
-                        <Dropdown.Item eventKey="none" disabled>
-                          Upload some questions to get started
-                        </Dropdown.Item>
-                      )}
-                    </Dropdown.Menu>
-                  </Dropdown>
+                
                 </div>
               </div>
 

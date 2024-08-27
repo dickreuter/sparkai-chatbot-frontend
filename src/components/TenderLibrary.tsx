@@ -4,9 +4,8 @@ import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import { Button, Col, Row, Card, Modal, FormControl, InputGroup } from "react-bootstrap";
-import UploadPDF from "../views/UploadPDF.tsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faFileAlt, faSearch, faQuestionCircle, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faFileAlt, faSearch, faQuestionCircle, faPlus, faTimes, faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 import { Menu, MenuItem } from '@mui/material';
 import FileContentModal from "../components/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
@@ -17,22 +16,21 @@ const TenderLibrary = ({ object_id }) => {
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const [folderContents, setFolderContents] = useState({});
+  const [documents, setDocuments] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState('');
   const [currentFileName, setCurrentFileName] = useState(null);
-  const [currentFileId, setCurrentFileId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 6;
   const [totalPages, setTotalPages] = useState(0);
   const [showPDFModal, setShowPDFModal] = useState(false);
-  const [showTextModal, setShowTextModal] = useState(false);
   const [showDeleteFileModal, setShowDeleteFileModal] = useState(false);
   const [fileToDelete, setFileToDelete] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const [showPdfViewerModal, setShowPdfViewerModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
+
 
   const folderName = `TenderLibrary_${object_id}`;
 
@@ -51,142 +49,122 @@ const TenderLibrary = ({ object_id }) => {
   const handleMenuItemClick = (action) => {
     handleMenuClose();
     if (action === 'pdf') setShowPDFModal(true);
-    else if (action === 'text') setShowTextModal(true);
   };
 
-  const handleDeleteFileClick = (event, unique_id, filename) => {
+  const handleDeleteFileClick = (event, filename) => {
     event.stopPropagation(); 
-    setFileToDelete({ unique_id, filename });
+    setFileToDelete({ filename });
     setShowDeleteFileModal(true);
   };
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
-        { collection_name: folderName },
-        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
-      );
-     
-      const filesWithIds = response.data.map(item => ({
-        filename: item.meta,
-        unique_id: item.unique_id
-      }));
-      setFolderContents(prevContents => ({
-        ...prevContents,
-        [folderName]: filesWithIds
-      }));
-      const pages = Math.ceil(response.data.length / rowsPerPage);
-      setTotalPages(pages);
-    } catch (error) {
-      console.error("Error fetching folder filenames:", error);
-    }
-  };
-
-
-
-  const deleteDocument = async (uniqueId) => {
-    const formData = new FormData();
-    formData.append('unique_id', uniqueId);
-
-    try {
-        await axios.post(
-            `http${HTTP_PREFIX}://${API_URL}/delete_template_entry/`,
-            formData,
-            {
-                headers: {
-                    'Authorization': `Bearer ${tokenRef.current}`,
-                    'Content-Type': 'multipart/form-data',
-                },
+      if (object_id) {
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/get_tender_library_doc_filenames`,
+          { bid_id: object_id },  // Send as JSON body
+          {
+            headers: {
+              'Authorization': `Bearer ${tokenRef.current}`,
+              'Content-Type': 'application/json',  // Changed to JSON
             }
+          }
         );
-      fetchDocuments();
-      displayAlert('Document deleted successfully', "success");
+        console.log("tender library docs", response);
+        setDocuments(response.data.filenames);
+        const pages = Math.ceil(response.data.filenames.length / rowsPerPage);
+        setTotalPages(pages);
+      }
+     
     } catch (error) {
-      console.error("Error deleting document:", error);
-      displayAlert('Error deleting document', "danger");
+      console.error("Error fetching tender library filenames:", error);
+      displayAlert('Error fetching documents', "danger");
     }
   };
-
-  const viewFile = async (fileName, uniqueId) => {
-
-    const formData = new FormData();
-    formData.append('file_name', fileName);
-    formData.append("profile_name", folderName);
-
-    try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/show_file_content`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenRef.current}`
-          },
-        }
-      );
   
-      setModalContent(response.data);
-      setCurrentFileId(uniqueId); // Set the current file ID
-      setCurrentFileName(fileName); // Set the current file name
-      setShowModal(true);
-    } catch (error) {
-      console.error('Error viewing file:', error);
-    }
-  };
 
-  const viewPdfFile = async (fileName, uniqueId) => {
+
+
+  const deleteDocument = async (filename, bidId) => {
     const formData = new FormData();
-    formData.append('file_name', fileName);
-    formData.append('profile_name', folderName);
-    console.log("viewpdf file");
-    console.log(folderName);
+    formData.append('bid_id', bidId);
+    formData.append('filename', filename);
+    console.log(formData);
     try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/show_file_content_pdf_format`,
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/delete_file_tenderlibrary`,
         formData,
         {
           headers: {
             'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+     
+      // Refresh the document list or update the state as needed
+      fetchDocuments();
+      displayAlert('Document deleted successfully', "success");
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      if (error.response) {
+        displayAlert(`Error deleting document: ${error.response.data.detail}`, "danger");
+      } else if (error.request) {
+        displayAlert('Error deleting document: No response from server', "danger");
+      } else {
+        displayAlert('Error deleting document: Request setup failed', "danger");
+      }
+    }
+  };
+ 
+
+  const viewPdfFile = async (fileName) => {
+    try {
+      const formData = new FormData();
+      formData.append('bid_id', object_id);
+      formData.append('file_name', fileName);
+  
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_pdf_format`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
           },
           responseType: 'blob',
         }
       );
-       // Create a URL for the PDF file
-       const fileURL = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
-       setPdfUrl(fileURL);
-       setShowPdfViewerModal(true);
- 
-     } catch (error) {
-       console.error('Error viewing PDF file:', error);
- 
-       if (error.response && error.response.status === 404) {
-         // Try using the viewFile function if the file was not found as a PDF
-         displayAlert('PDF file not found, try reuploading the pdf file', "danger");
-         
-       }
+  
+      const fileURL = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      setPdfUrl(fileURL);
+      setShowPdfViewerModal(true);
+    } catch (error) {
+      console.error('Error viewing PDF file:', error);
+      displayAlert('Error viewing PDF file', "danger");
     }
   };
-
+  
   useEffect(() => {
     fetchDocuments();
   }, [object_id]);
 
+
   const renderDocuments = () => {
-    const documents = folderContents[folderName] || [];
     const startIdx = (currentPage - 1) * rowsPerPage;
     const endIdx = startIdx + rowsPerPage;
     const documentsToDisplay = documents.slice(startIdx, endIdx);
 
-    return documentsToDisplay.map((doc, index) => (
+    return documentsToDisplay.map((filename, index) => (
       <tr key={index} style={{ cursor: 'pointer' }}>
-        <td onClick={() => viewPdfFile(doc.filename, doc.unique_id)}>
-          <FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {doc.filename}
+        <td onClick={() => viewPdfFile(filename)}>
+          <FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {filename}
         </td>
         <td>
           <FontAwesomeIcon
             icon={faTrash}
             className="action-icon delete-icon"
-            onClick={(event) => handleDeleteFileClick(event, doc.unique_id, doc.filename)}
+            onClick={(event) => handleDeleteFileClick(event, filename)}
             style={{ cursor: 'pointer', marginRight: '15px' }}
           />
         </td>
@@ -194,133 +172,236 @@ const TenderLibrary = ({ object_id }) => {
     ));
   };
 
-  const UploadPDFModal = ({ show, onHide, folder, get_collections }) => (
+
+  
+const UploadPDFModal = ({ show, onHide, object_id}) => {
+  const [file, setFile] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = (file) => {
+    if (file.type === 'application/pdf') {
+      setFile(file);
+    } else {
+      displayAlert('Please select a PDF file', 'warning');
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      displayAlert('Please select a file to upload', 'warning');
+      return;
+    }
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("bid_id", object_id);
+    console.log(formData);
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        displayAlert('File uploaded successfully', 'success');
+        fetchDocuments();
+        onHide();
+      } else {
+        throw new Error("Upload failed");
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      displayAlert('Error uploading file', 'danger');
+    } finally {
+      setUploading(false);
+      setFile(null);
+    }
+  };
+
+  return (
     <Modal 
-        show={show} 
-        onHide={() => { onHide(); }}
-        onClick={(e) => e.stopPropagation()}
-        size="lg"
+      show={show} 
+      onHide={onHide}
+      size="lg"
+      centered
     >
-        <Modal.Header closeButton onClick={(e) => e.stopPropagation()}>
-            <Modal.Title>PDF Uploader</Modal.Title>
-        </Modal.Header>
-        <Modal.Body onClick={(e) => e.stopPropagation()}>
-            <UploadPDF folder={folder} get_collections={get_collections} onClose={onHide} usingTenderLibrary={true} />
-        </Modal.Body>
-    </Modal>
-  );
-
-
-
-  const DeleteFileModal = ({ show, onHide, onDelete, fileName }) => (
-    <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>Delete File</Modal.Title>
+        <Modal.Title>Upload PDF to Tender Library</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Are you sure you want to delete the file "{fileName}"?
+      <p>Documents uploaded to the Tender Library will be used as context by our AI to generate compliance requirements and opportunity information for the Tender. </p>
+        <div 
+          className={`drop-zone ${dragActive ? 'active' : ''}`}
+          onDragEnter={handleDrag}
+          onDragLeave={handleDrag}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current.click()}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
+          <p>Drag & Drop your PDF here or click to select.</p>
+          {file && <p>Selected file: {file.name}</p>}
+        </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          Cancel
-        </Button>
-        <Button variant="danger" onClick={() => onDelete()}>
-          Delete
+     
+        <Button 
+          className="upload-button"
+          onClick={handleUpload}
+          disabled={uploading || !file}
+        >
+          {uploading ? 'Uploading...' : 'Upload'}
         </Button>
       </Modal.Footer>
     </Modal>
   );
+};
+
   
-  return (
-    <>
-      <Row>
-        <Col md={12}>
-          <Card className="mb-4">
-            <Card.Body className="tenderlibrary-card-body-content">
-              <div className="library-card-content-wrapper">
-                <div className="header-row mt-2">
-                  <div className="lib-title">Tender Library</div>
 
-                 
 
-                  <Button
-                    aria-controls="simple-menu"
-                    aria-haspopup="true"
-                    onClick={handleMenuClick}
-                    className="upload-button"
-                  >
-                    <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
-                    Upload Document
-                  </Button>
-                  <Menu
-                    id="long-menu"
-                    anchorEl={anchorEl}
-                    keepMounted
-                    open={open}
-                    onClose={handleMenuClose}
-                  >
-                    <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "180px" }}>
-                      <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
-                      Upload PDF
-                    </MenuItem>
-                   
-                  </Menu>
-                </div>
 
-                <table className="library-table">
-                  <thead>
-                    <tr>
-                      <th>Documents</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {renderDocuments()}
-                  </tbody>
-                </table>
+const DeleteFileModal = ({ show, onHide, onDelete, fileName }) => (
+  <Modal show={show} onHide={onHide} size="lg">
+    <Modal.Header closeButton>
+      <Modal.Title>Delete File</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      Are you sure you want to delete the file "{fileName}"?
+    </Modal.Body>
+    <Modal.Footer>
+      <Button className="upload-button" onClick={onHide}>
+        Cancel
+      </Button>
+      <Button className="upload-button" style={{backgroundColor: "red"}} onClick={() => onDelete()}>
+        Delete
+      </Button>
+    </Modal.Footer>
+  </Modal>
+);
+  
+return (
+  <>
+    <Row>
+      <Col md={12}>
+        <Card className="mb-4">
+          <Card.Body className="tenderlibrary-card-body-content">
+            <div className="library-card-content-wrapper">
+              <div className="header-row mt-2">
+                <div className="lib-title">Tender Library</div>
+                <Button
+                  aria-controls="simple-menu"
+                  aria-haspopup="true"
+                  onClick={handleMenuClick}
+                  className="upload-button"
+                >
+                  <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+                  Upload Document
+                </Button>
+                <Menu
+                  id="long-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={open}
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "180px" }}>
+                    <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
+                    Upload PDF
+                  </MenuItem>
+                </Menu>
               </div>
 
-              <div className="pagination-controls">
-                {[...Array(totalPages)].map((_, i) => (
-                  <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+              <table className="library-table">
+                <thead>
+                  <tr>
+                    <th>Documents</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {renderDocuments()}
+                </tbody>
+              </table>
+            </div>
 
-      
+            <div className="pagination-controls">
+              {[...Array(totalPages)].map((_, i) => (
+                <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
 
-      <DeleteFileModal
-          show={showDeleteFileModal}
-          onHide={() => setShowDeleteFileModal(false)}
-          onDelete={() => {
-            deleteDocument(fileToDelete.unique_id);
-            setShowDeleteFileModal(false);
-          }}
-          fileName={fileToDelete ? fileToDelete.filename : ''}
-        />
+    <DeleteFileModal
+      show={showDeleteFileModal}
+      onHide={() => setShowDeleteFileModal(false)}
+      onDelete={() => {
+        deleteDocument(fileToDelete.filename, object_id);
+        setShowDeleteFileModal(false);
+      }}
+      fileName={fileToDelete ? fileToDelete.filename : ''}
+    />
 
-      <UploadPDFModal
-          show={showPDFModal}
-          onHide={() => setShowPDFModal(false)}
-          folder={folderName}
-          get_collections={fetchDocuments}
-        />
-      
+    <UploadPDFModal
+      show={showPDFModal}
+      onHide={() => setShowPDFModal(false)}
+      object_id={object_id}
+    />
 
-      {showPdfViewerModal && (
-        <div className="pdf-viewer-modal" onClick={() => setShowPdfViewerModal(false)}>
-          <div className="pdf-viewer-modal-content" onClick={e => e.stopPropagation()}>
-            <iframe src={pdfUrl} width="100%" height="600px"></iframe>
-          </div>
+    {showPdfViewerModal && (
+      <div className="pdf-viewer-modal" onClick={() => setShowPdfViewerModal(false)}>
+        <div className="pdf-viewer-modal-content" onClick={e => e.stopPropagation()}>
+          <iframe src={pdfUrl} width="100%" height="600px"></iframe>
         </div>
-      )}
-    </>
-  );
+      </div>
+    )}
+  </>
+);
 }
 
 export default withAuth(TenderLibrary);

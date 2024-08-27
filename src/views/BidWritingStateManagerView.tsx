@@ -80,14 +80,14 @@ export const BidContext = createContext<BidContextType>(defaultState);
 const BidManagement: React.FC = () => {
   const [sharedState, setSharedState] = useState<SharedState>(() => {
     const savedState = localStorage.getItem('bidState');
-    console.log('Saved state from localStorage:', savedState); // Debug log
+    //console.log('Saved state from localStorage:', savedState); // Debug log
     if (savedState) {
       const parsedState = JSON.parse(savedState);
-      console.log('Parsed state:', parsedState); // Debug log
+      //console.log('Parsed state:', parsedState); // Debug log
       return {
         ...parsedState,
         documents: parsedState.documents.map(doc => {
-          console.log('Processing document:', doc); // Debug log
+          //console.log('Processing document:', doc); // Debug log
           return {
             ...doc,
             editorState: doc.editorState
@@ -134,7 +134,7 @@ const BidManagement: React.FC = () => {
           editorState,
           type
         };
-        console.log('Adding new document:', newDocument);
+        //console.log('Adding new document:', newDocument);
         return {
           ...prevState,
           documents: [...prevState.documents, newDocument],
@@ -143,7 +143,7 @@ const BidManagement: React.FC = () => {
         };
       });
     } catch (error) {
-      console.error("Error adding document:", error);
+      //console.error("Error adding document:", error);
       setSharedState((prevState) => ({
         ...prevState,
         isLoading: false
@@ -156,10 +156,15 @@ const BidManagement: React.FC = () => {
   
   const getInitialEditorState = async (type: 'qa sheet' | 'execSummary' | 'coverLetter') => {
     let template = '';
-  
+    console.log("get initial editor state")
     const makeApiCall = async (endpoint: string) => {
+      if (!sharedState.object_id) {
+        throw new Error("No bid ID available. Please save the bid first.");
+      }
+  
       const formData = new FormData();
-      formData.append("collection_name", `TenderLibrary_${sharedState.object_id}`);
+      formData.append('bid_id', sharedState.object_id);
+  
       try {
         const result = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/${endpoint}`,
@@ -171,13 +176,16 @@ const BidManagement: React.FC = () => {
             }
           }
         );
+        console.log(`API response for ${endpoint}:`, result.data);
         return result.data;
       } catch (error) {
         console.error(`Error fetching ${endpoint}:`, error);
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          throw new Error("No documents found in the tender library. Please upload documents before generating content.");
+        }
         throw error;
       }
     };
-  
     try {
       switch (type) {
         case 'execSummary':
@@ -283,21 +291,20 @@ const BidManagement: React.FC = () => {
     appendFormData('original_creator', original_creator);
 
     const documentsFormatted = documents.map(doc => {
-      console.log('Formatting document for save:', doc); // Debug log
       return {
         name: doc.name,
         text: doc.editorState.getCurrentContent().getPlainText(),
         type: doc.type,
       };
     });
-    console.log('Formatted documents:', documentsFormatted); // Debug log
+    //console.log('Formatted documents:', documentsFormatted); // Debug log
     formData.append('documents', JSON.stringify(documentsFormatted));
 
     if (object_id) {
         appendFormData('object_id', object_id);
     }
 
-    console.log(formData);
+   // console.log(formData);
 
     try {
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -351,7 +358,7 @@ useEffect(() => {
   const stateToSave = {
     ...sharedState,
     documents: sharedState.documents.map(doc => {
-      console.log('Preparing document for localStorage:', doc); // Debug log
+      //console.log('Preparing document for localStorage:', doc); // Debug log
       return {
         ...doc,
         editorState: JSON.stringify(convertToRaw(doc.editorState.getCurrentContent())),
@@ -359,7 +366,7 @@ useEffect(() => {
       };
     })
   };
-  console.log('State being saved to localStorage:', stateToSave); // Debug log
+  //console.log('State being saved to localStorage:', stateToSave); // Debug log
   localStorage.setItem('bidState', JSON.stringify(stateToSave));
 
   if (typingTimeout) {

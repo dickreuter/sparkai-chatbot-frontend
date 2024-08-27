@@ -9,6 +9,11 @@ function CustomEditor({ editorState, setEditorState, appendResponse, disabled })
     const { setSharedState } = useContext(BidContext);
     const [localEditorState, setLocalEditorState] = useState(editorState);
 
+
+    useEffect(() => {
+        setLocalEditorState(editorState);
+    }, [editorState]);
+
     // Function to apply bold to "Question:" and "Answer:" headings
     const applyBoldToHeadings = useCallback((editorState) => {
         const blocks = editorState.getCurrentContent().getBlocksAsArray();
@@ -53,6 +58,7 @@ function CustomEditor({ editorState, setEditorState, appendResponse, disabled })
         setEditorState(styledState);
         debouncedUpdateSharedState(styledState);
     }, [setEditorState, debouncedUpdateSharedState, applyBoldToHeadings]);
+
 
     // Append response and reapply styles
     useEffect(() => {

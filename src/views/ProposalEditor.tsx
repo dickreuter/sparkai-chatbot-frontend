@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { Row, Col, Dropdown, Modal, Button, Form } from 'react-bootstrap';
+import { Row, Col, Dropdown, Modal, Button, Form, Spinner } from 'react-bootstrap';
 import CustomEditor from "../components/TextEditor.tsx";
 import withAuth from '../routes/withAuth.tsx';
 import TemplateLoader from '../components/TemplateLoader.tsx';
@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { API_URL, HTTP_PREFIX } from '../helper/Constants.tsx';
+import { displayAlert } from '../helper/Alert.tsx';
 
 function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestionId, setSelectedQuestionId }) {
   const { sharedState, setSharedState, saveProposal, addDocument, removeDocument, selectDocument } = useContext(BidContext);
@@ -23,7 +24,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingIndex, setDeletingIndex] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [newDocType, setNewDocType] = useState<'qa sheet' | 'execSummary' | 'coverLetter'>('qa sheet');
 
 
@@ -121,6 +122,43 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
     }
   }
 
+  const [documents, setDocuments] = useState([]);
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  // ... other existing code
+
+  const showNoDocsMessage = documents.length === 0 && (newDocType === 'execSummary' || newDocType === 'coverLetter');
+
+
+  const fetchDocuments = async () => {
+    try {
+      if (sharedState.object_id) {
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/get_tender_library_doc_filenames`,
+          { bid_id: sharedState.object_id },  // Send as JSON body
+          {
+            headers: {
+              'Authorization': `Bearer ${tokenRef.current}`,
+              'Content-Type': 'application/json',  // Changed to JSON
+            }
+          }
+        );
+        console.log("tender library docs", response);
+        setDocuments(response.data.filenames);
+        
+      }
+     
+    } catch (error) {
+      console.error("Error fetching tender library filenames:", error);
+      displayAlert('Error fetching documents', "danger");
+    }
+  };
+  
+
+
   const handleSelect = (eventKey) => {
     if (eventKey !== "navigate") {
       setSelectedQuestionId(eventKey);
@@ -147,18 +185,26 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
     setRenamingIndex(index);
     setShowModal(true);
   };
-  const handleModalSave = () => {
-    if (renamingIndex !== null) {
-      const updatedDocuments = [...sharedState.documents];
-      updatedDocuments[renamingIndex].name = newDocName;
-      setSharedState(prevState => ({
-        ...prevState,
-        documents: updatedDocuments
-      }));
-    } else {
-      addDocument(newDocName, newDocType);
+  const handleModalSave = async () => {
+    setIsLoading(true);
+    try {
+      if (renamingIndex !== null) {
+        const updatedDocuments = [...sharedState.documents];
+        updatedDocuments[renamingIndex].name = newDocName;
+        setSharedState(prevState => ({
+          ...prevState,
+          documents: updatedDocuments
+        }));
+      } else {
+        await addDocument(newDocName, newDocType);
+      }
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error adding/renaming document:", error);
+      displayAlert("Failed to add document. Please try again.", 'error');
+    } finally {
+      setIsLoading(false);
     }
-    setShowModal(false);
   };
 
   return (
@@ -234,27 +280,29 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
         </Row>
       </div>
 
-     <Modal show={showModal} onHide={() => setShowModal(false)}>
-  <Modal.Header closeButton>
-    <Modal.Title>{renamingIndex !== null ? 'Rename Document' : 'New Document'}</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
+     <Modal show={showModal} onHide={() => !isLoading && setShowModal(false)}>
+        <Modal.Header className='px-4' closeButton={!isLoading}>
+          <Modal.Title>{renamingIndex !== null ? 'Rename Document' : 'New Document'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className='px-4'>
           <Form>
-            <Form.Group controlId="formDocName">
+            <Form.Group controlId="formDocName" className='mb-2'>
               <Form.Label>Document Name</Form.Label>
               <Form.Control
                 type="text"
                 value={newDocName}
                 onChange={(e) => setNewDocName(e.target.value)}
+                disabled={isLoading}
               />
             </Form.Group>
             {renamingIndex === null && (
-              <Form.Group controlId="formDocType">
+              <Form.Group controlId="formDocType" className='mb-2'>
                 <Form.Label>Document Type</Form.Label>
                 <Form.Control
                   as="select"
                   value={newDocType}
                   onChange={(e) => setNewDocType(e.target.value as 'qa sheet' | 'execSummary' | 'coverLetter')}
+                  disabled={isLoading}
                 >
                   <option value="qa sheet">Question Answer</option>
                   <option value="execSummary">Executive Summary</option>
@@ -263,16 +311,41 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
               </Form.Group>
             )}
           </Form>
+          {isLoading && (
+            <p className="mt-3">
+              Generating a template using the information from your Tender Library...
+            </p>
+          )}
+          {showNoDocsMessage && (
+            <p className="mt-3 text-danger">
+              Please upload some relevant documents to the tender library to generate a cover letter or executive summary.
+            </p>
+          )}
         </Modal.Body>
-  <Modal.Footer>
-    <Button className="upload-button" onClick={() => setShowModal(false)}>
-      Cancel
-    </Button>
-    <Button className="upload-button" style={{backgroundColor: "green"}} onClick={handleModalSave} >
-      Save
-    </Button>
-  </Modal.Footer>
-</Modal>
+        <Modal.Footer>
+          <Button className="upload-button" onClick={() => setShowModal(false)} disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button 
+            className="upload-button" 
+            style={{backgroundColor: "green"}} 
+            onClick={handleModalSave}
+            disabled={isLoading || showNoDocsMessage}
+          >
+            {isLoading ? (
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />
+            ) : (
+              'Add'
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
   <Modal.Header closeButton>

@@ -121,7 +121,8 @@ const BidExtractor = () => {
 
     setIsGeneratingCompliance(true);
     const formData = new FormData();
-    formData.append("collection_name", `TenderLibrary_${object_id}`);
+    formData.append('bid_id', object_id);
+
     try {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_compliance_requirements`,
@@ -142,7 +143,11 @@ const BidExtractor = () => {
       displayAlert("Compliance requirements generated successfully!", 'success');
     } catch (err) {
       console.error('Error generating compliance requirements:', err);
-      displayAlert("You need to upload some documents to the Tender Library to generate compliance requirements", 'danger');
+      if (err.response && err.response.status === 404) {
+        displayAlert("No documents found in the tender library. Please upload documents before generating compliance requirements.", 'warning');
+      } else {
+        displayAlert("Error generating compliance requirements. Please try again.", 'danger');
+      }
     } finally {
       setIsGeneratingCompliance(false);
     }
@@ -160,7 +165,8 @@ const BidExtractor = () => {
 
     setIsGeneratingOpportunity(true);
     const formData = new FormData();
-    formData.append("collection_name", `TenderLibrary_${object_id}`);
+    formData.append('bid_id', object_id);
+
     try {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_opportunity_information`,
@@ -181,11 +187,16 @@ const BidExtractor = () => {
       displayAlert("Opportunity information generated successfully!", 'success');
     } catch (err) {
       console.error('Error generating opportunity information:', err);
-      displayAlert("You need to upload some documents to the Tender Library to generate opportunity information", 'danger');
+      if (err.response && err.response.status === 404) {
+        displayAlert("No documents found in the tender library. Please upload documents before generating opportunity information.", 'warning');
+      } else {
+        displayAlert("Error generating opportunity information. Please try again.", 'danger');
+      }
     } finally {
       setIsGeneratingOpportunity(false);
     }
   };
+
 
 
   useEffect(() => {
@@ -383,9 +394,6 @@ const BidExtractor = () => {
     }
   }, [location, bidData, setSharedState, initialBidName, auth.email]);
 
-  useEffect(() => {
-    console.log(sharedState);
-  }, [sharedState]);
 
   useEffect(() => {
     bidNameTempRef.current = bidInfo;
@@ -473,38 +481,6 @@ const BidExtractor = () => {
     setIsEditing(false);
   };
   
-
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    setLoading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-  
-    try {
-      const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/extract_questions_from_pdf`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
-            'Content-Type': 'multipart/form-data',
-          }
-        }
-      );
-  
-      const extractedQuestions = result.data.filter((question: string) => question.trim() !== '');
-      const questionsString = extractedQuestions.join(',');
-      setSharedState(prevState => ({
-        ...prevState,
-        questions: questionsString
-      }));
-    } catch (error) {
-      console.error("Error extracting questions:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
   
 
   useEffect(() => {

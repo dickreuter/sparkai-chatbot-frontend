@@ -30,7 +30,7 @@ const Library = () => {
   const [currentFileName, setCurrentFileName] = useState(null);
   const [currentFileId, setCurrentFileId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 9;
+  const rowsPerPage = 7;
   const [totalPages, setTotalPages] = useState(0);
   const [activeFolder, setActiveFolder] = useState(null);
   const [showPDFModal, setShowPDFModal] = useState(false);

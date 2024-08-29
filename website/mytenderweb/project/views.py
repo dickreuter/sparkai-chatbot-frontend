@@ -24,6 +24,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect, reverse
+from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
@@ -211,49 +212,50 @@ def testingEnrollment(request):
 
 DOMAIN = os.getenv('DOMAIN')
 
+DISCOUNT_CODE = 'SPECIAL75'  # You can change this to your desired discount code
+
 def create_checkout_session(request) -> HttpResponse:
     price_lookup_key = request.POST['price_lookup_key']
-    
+    discount_code = request.POST.get('discount_code')
+   
     try:
         prices = stripe.Price.list(lookup_keys=[price_lookup_key], expand=['data.product'])
         price_item = prices.data[0]
-        
-        checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {'price': price_item.id, 'quantity': 1},
-            ],
-            mode='subscription',
-            allow_promotion_codes=True,  # This enables discount code input in Stripe Checkout
-            success_url=DOMAIN + reverse('success') + '?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url=DOMAIN + reverse('cancel')
-        )
-        
+       
+        line_items = [{'price': price_item.id, 'quantity': 1}]
+       
+        # Apply discount if the correct code is provided
+        if discount_code == DISCOUNT_CODE:
+            # Create a coupon for 75% off for 3 months
+            coupon = stripe.Coupon.create(
+                percent_off=75,
+                duration='repeating',
+                duration_in_months=3,
+                name='75% Off for 3 months'
+            )
+           
+            # Set up the 14-day free trial
+            trial_end = int((datetime.now() + timedelta(days=15)).timestamp())
+           
+            checkout_session = stripe.checkout.Session.create(
+                line_items=line_items,
+                mode='subscription',
+                discounts=[{'coupon': coupon.id}],
+                subscription_data={'trial_end': trial_end},
+                success_url=DOMAIN + reverse('success') + '?session_id={CHECKOUT_SESSION_ID}',
+                cancel_url=DOMAIN + reverse('cancel')
+            )
+        else:
+            # Regular checkout without discount
+            checkout_session = stripe.checkout.Session.create(
+                line_items=line_items,
+                mode='subscription',
+                allow_promotion_codes=True,
+                success_url=DOMAIN + reverse('success') + '?session_id={CHECKOUT_SESSION_ID}',
+                cancel_url=DOMAIN + reverse('cancel')
+            )
+       
         return redirect(checkout_session.url, code=303)
     except Exception as e:
         print(e)
         return HttpResponse("Server error", status=500)
-    
-@csrf_exempt
-def collect_stripe_webhook(request) -> JsonResponse:
-    """
-    Stripe sends webhook events to this endpoint.
-    We verify the webhook signature and updates the database record.
-    """
-    webhook_secret = os.environ.get('STRIPE_WEBHOOK_SECRET_LIVE')
-    signature = request.META["HTTP_STRIPE_SIGNATURE"]
-    payload = request.body
-
-    try:
-        event = stripe.Webhook.construct_event(
-            payload=payload, sig_header=signature, secret=webhook_secret
-        )
-    except ValueError as e:  # Invalid payload.
-        raise ValueError(e)
-    except stripe.error.SignatureVerificationError as e:  # Invalid signature
-        raise stripe.error.SignatureVerificationError(e)
-
-    print("update record")
-
-    return JsonResponse({'status': 'success'})
-
-

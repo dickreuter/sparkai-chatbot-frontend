@@ -10,16 +10,28 @@
                 <div class="section-title">
                     <h1 class="display-4 fw-semibold">Pricing</h1>
                     <div class="line"></div>
-                    <p>Want to try before buying? Contact us at info@mytender.io. This is to prevent spammers or fraudulent accounts from using our software.</p>
+                    <!-- Add discount code input field -->
+        <div class="row justify-content-center mb-2"  data-aos="fade-down" data-aos-delay="150">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type="text" id="discount-code" class="form-control" placeholder="Enter discount code">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" onclick="applyDiscount()">Apply</button>
+                    </div>
                 </div>
             </div>
         </div>
 
+                </div>
+            </div>
+        </div>
+
+        
         <div class="row row-cols-1 row-cols-md-3">
             <div class="col mb-4" data-aos="fade-up" data-aos-delay="300">
                 <div class="card shadow-sm">
                     <div class="card-header">
-                        <h2 class="mt-2">Basic</h2>
+                        <h2 class="mt-2">Standard</h2>
                     </div>
                     <div class="card-body">
                         <h1 class="my-0 font-weight-normal">£499 <small class="text-muted">/mo</small></h1>
@@ -27,12 +39,11 @@
                             <li><i class="fa fa-check-circle feature-check"></i> Single User</li>
                             <li><i class="fa fa-check-circle feature-check"></i> Training Sessions</li>
                             <li><i class="fa fa-check-circle feature-check"></i> Basic Support</li>
-                
-                            
                         </ul>
                         <form class="checkout-form" action="{% url 'create-checkout-session' %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="price_lookup_key" value="basic_membership" />
+                            <input type="hidden" name="discount_code" class="discount-code-input" />
                             <button type="submit" class="button" style="border: none; width: 100%; display: block;">Sign Up</button>
                         </form>
                     </div>
@@ -41,7 +52,7 @@
             <div class="col mb-4" data-aos="fade-up" data-aos-delay="400">
                 <div class="card shadow-sm bg-dark">
                     <div class="card-header">
-                        <h2 class="mt-2">Pro</h2>
+                        <h2 class="mt-2">Advanced</h2>
                     </div>
                     <div class="card-body">
                         <h1 class="my-0 font-weight-normal">£1499 <small class="text-muted">/mo</small></h1>
@@ -54,6 +65,7 @@
                         <form class="checkout-form" action="{% url 'create-checkout-session' %}" method="POST">
                             {% csrf_token %}
                             <input type="hidden" name="price_lookup_key" value="pro_membership">
+                            <input type="hidden" name="discount_code" class="discount-code-input" />
                             <button type="submit" class="button" style="border: none; width: 100%; display: block;">Sign Up</button>
                         </form>
                     </div>
@@ -72,21 +84,26 @@
                             <li><i class="fas fa-check-circle feature-check"></i> 24/7 Support</li>
                         </ul>
                         <form class="checkout-form">
-                        <a href="https://calendly.com/sam-od9g/mytender-io-training-call" class="button button-block text-center" style="border: none; width: 100%; display: block;">Sign Up</a>
-                    </form>
-                        <!--
-                        <form class="checkout-form" action="{% url 'create-checkout-session' %}" method="POST">
-                            {% csrf_token %}
-                            <input type="hidden" name="price_lookup_key" value="enterprise_membership">
-                            <button type="submit" class="btn btn-primary">Sign Up</button>
+                            <a href="https://calendly.com/sam-od9g/mytender-io-training-call" class="button button-block text-center" style="border: none; width: 100%; display: block;">Sign Up</a>
                         </form>
-                        -->
                     </div>
                 </div>
             </div>
-            
         </div>
     </div>
 </section>
+
+<script>
+    function applyDiscount() {
+        var discountCode = document.getElementById('discount-code').value;
+        var discountInputs = document.getElementsByClassName('discount-code-input');
+        
+        for (var i = 0; i < discountInputs.length; i++) {
+            discountInputs[i].value = discountCode;
+        }
+    
+        alert('Discount code applied: ' + discountCode);
+    }
+    </script>
 
 {% endblock content %}

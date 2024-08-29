@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from .views import calculator, guide, home, create_checkout_session, collect_stripe_webhook, cancel, success
+from .views import calculator, guide, home, create_checkout_session, cancel, success
 from django.views.generic import TemplateView
 
 urlpatterns = [
@@ -16,6 +16,7 @@ urlpatterns = [
     path("story", TemplateView.as_view(template_name="story.html"), name='story'),
     path("intro", TemplateView.as_view(template_name="intro.html"), name='intro'),
     path("about", TemplateView.as_view(template_name="about.html"), name='about'),
+    path("pricing", TemplateView.as_view(template_name="enrollmentTesting.html"), name='pricing'),
     path('calculator/', calculator, name='calculator'),
     path('thankyou', TemplateView.as_view(template_name="thankyou.html"), name='thankyou'),
     path('guide/', guide, name='guide'),
@@ -23,7 +24,6 @@ urlpatterns = [
     path('cancel/', cancel, name='cancel'),
     path('success/', success, name='success'),
     path('create-checkout-session/', create_checkout_session, name='create-checkout-session'),
-    path('collect-stripe-webhook/', collect_stripe_webhook, name='collect-stripe-webhook'),
     path('terms_and_conditions', TemplateView.as_view(template_name="terms_and_conditions.html"), name='terms_and_conditions'),
     path('data_protection_overview', TemplateView.as_view(template_name="data_protection_overview.html"), name='data_protection_overview')
 ]

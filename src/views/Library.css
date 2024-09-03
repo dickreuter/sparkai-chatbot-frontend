@@ -1,16 +1,17 @@
         .lib-container {
-            width: 100%;
+            width: 125vw;
             /* Adjusted to account for padding-left */
-            height: 92vh;
+            height: 125vh;
             /* Assuming 40px top margin and 30px top padding */
-            margin-top: 55px;
             background-color: #faf7f7;
             justify-content: center;
-            padding-top: 10px;
+            padding-top: 70px;
             padding-left: 205px;
             padding-right: 15px;
             overflow-x: hidden;
             overflow-y: auto;
+            margin: 0;
+            padding-bottom: 15px;
             /* Use auto instead of scroll to handle both overflow cases */
         }
         
@@ -266,17 +267,20 @@
             margin-right: 20px;
         }
         
+        .library-card-custom {
+            height: 775px;
+            margin-top: 15px;
+        }
+        
         .library-card-body-content {
             display: flex;
             flex-direction: column;
-            height: 620px;
             overflow: hidden;
         }
         
         .library-card-content-wrapper {
             flex: 1;
             overflow: hidden;
-            margin-bottom: 1rem;
             /* Space between content and pagination */
         }
         

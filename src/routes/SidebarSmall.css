@@ -1,6 +1,6 @@
 .sidebarsmall {
-    height: 95%;
-    margin-top: 55px;
+    height: 125vh;
+    margin-top: 0px;
     width: 185px;
     /* Adjust width as needed */
     position: fixed;
@@ -9,9 +9,10 @@
     left: 0;
     background-color: #262626;
     overflow-x: hidden;
-    padding-top: 10px;
+    padding-top: 65px;
     padding-left: 10px;
     padding-right: 10px;
+    margin-bottom: 0;
     /* Add some padding to the left */
 }
 

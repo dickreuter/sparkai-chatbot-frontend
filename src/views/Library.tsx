@@ -105,7 +105,7 @@ const Library = () => {
   const [currentFileName, setCurrentFileName] = useState(null);
   const [currentFileId, setCurrentFileId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 7;
+  const rowsPerPage = 10;
   const [totalPages, setTotalPages] = useState(0);
   const [activeFolder, setActiveFolder] = useState(null);
   const [showPDFModal, setShowPDFModal] = useState(false);
@@ -865,9 +865,8 @@ useEffect(() => {
       <div className="lib-container" >
         <h1 className='heavy'  >Content Library</h1>
   
-            <Row>
-  <Col md={12} >
-    <Card className="mb-4 mt-2">
+     
+    <Card className="library-card-custom">
       <Card.Body className="library-card-body-content">
         <div className="library-card-content-wrapper">
           <div className="header-row mt-2">
@@ -993,8 +992,7 @@ useEffect(() => {
       </div>
       </Card.Body>
     </Card>
-  </Col>
-</Row>
+
 
 
 

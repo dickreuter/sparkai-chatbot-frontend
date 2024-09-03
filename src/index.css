@@ -9,6 +9,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
+    overflow: none;
 }
 
 a {
@@ -27,6 +28,7 @@ body {
     display: flex;
     font-family: "ClashDisplay", sans-serif;
     font-weight: 450;
+    overflow: none !important;
 }
 
 h1 {

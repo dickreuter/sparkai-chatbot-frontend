@@ -826,6 +826,7 @@ useEffect(() => {
           input_text: question,
           extra_instructions: ' ',
           dataset,
+          bidname: sharedState.bidInfo
         },
         {
           headers: {
@@ -869,6 +870,7 @@ useEffect(() => {
           input_text: inputText,
           extra_instructions: backgroundInfo,
           dataset,
+          bidname: sharedState.bidInfo
         },
         {
           headers: {
@@ -962,7 +964,8 @@ useEffect(() => {
           extra_instructions: backgroundInfo,
           selected_choices: selectedChoices,
           dataset,
-          word_amounts
+          word_amounts,
+          bidname: sharedState.bidInfo
         },
         {
           headers: {

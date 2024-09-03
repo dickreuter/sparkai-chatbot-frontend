@@ -67,7 +67,7 @@ const DashboardWizard = () => {
           isScrollToElement={true}
         />
       )}
-      {!isShow && <div>Wizard is not shown</div>}
+      {!isShow && <div style={{ display: 'none' }}>Wizard is not shown</div>}
     </>
   );
 };

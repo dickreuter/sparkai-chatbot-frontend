@@ -1,6 +1,6 @@
 .cards-container {
-    width: 95vw;
-    height: 80vh;
+    width: 125vw;
+    height: 125vh;
     justify-content: center;
     display: flex;
     align-items: center;
@@ -9,7 +9,7 @@
 
 .cardmini {
     justify-content: center !important;
-    width: 40%;
+    width: 35%;
     height: auto;
     /* Adjust height to auto for better scaling */
     background-color: white;

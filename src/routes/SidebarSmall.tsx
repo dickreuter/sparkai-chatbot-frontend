@@ -35,11 +35,11 @@ const SideBarSmall = () => {
 
         <Link to="/bids" className={`sidebarsmalllink ${isActive('/bids') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faLayerGroup} />
-          <span>Dashboard</span>
+          <span id="bids-table">Dashboard</span>
         </Link>
         <Link to="/library" className={`sidebarsmalllink ${isActive('/library') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faBookOpen} />
-          <span>Content Library</span>
+          <span id='library-title'>Content Library</span>
         </Link>
         <Link to="/chatResponse" className={`sidebarsmalllink ${isActive('/chatResponse') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faComments} />

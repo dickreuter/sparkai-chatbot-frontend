@@ -13,6 +13,7 @@ import { EditorState, convertToRaw, convertFromRaw, ContentState } from 'draft-j
 import "./Proposal.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { TabProvider } from "../routes/TabProvider.tsx";
+import BidCompilerWizard from "../wizards/BidCompilerWizard.tsx";
 
 const Proposal = () => {
   const getAuth = useAuthUser();
@@ -104,6 +105,7 @@ const Proposal = () => {
           </div>
         </Row>
       </div>
+      <BidCompilerWizard />
     </div>
   );
 };

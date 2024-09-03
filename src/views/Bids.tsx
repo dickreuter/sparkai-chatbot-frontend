@@ -15,6 +15,7 @@ import CustomTextField from '../components/CustomTextField.tsx';
 import { Select, MenuItem, FormControl } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import withAuth from '../routes/withAuth.tsx';
+import DashboardWizard from '../wizards/DashboardWizard.tsx'; // Adjust the import path as needed
 
 const Bids = () => {
     const [bids, setBids] = useState([]);
@@ -252,10 +253,12 @@ const Bids = () => {
 
             <div className="lib-container">
                 <div className='proposal-header'>
-                    <h1 className='heavy'>Dashboard</h1>
+                <h1 id="dashboard-title" className='heavy'>Dashboard</h1>
                     <div style={{display: 'flex'}}>
-                        <div className="sort-options ">
-                            <label htmlFor="sort-select">Sort by:</label>
+                    <label id="new-bid-button"></label>
+                    <div className="sort-options">
+                            <label id="sort-options" htmlFor="sort-select">Sort by:</label>
+                            
                             <select 
                                 id="sort-select" 
                                 className="sort-select" 
@@ -265,18 +268,19 @@ const Bids = () => {
                                 <option className='sort-select-option' value="submissionDeadline">Submission Deadline</option>
                             </select>
                         </div>
-                        <Button onClick={handleWriteProposalClick} className="upload-button">
+                        <Button  onClick={handleWriteProposalClick} className="upload-button">
                             <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
                             New Bid
                         </Button>
                     </div>
 
                 </div>
-
-                <table className="bids-table mt-3">
+            
+              
+                <table  className="bids-table mt-3">
                     <thead>
-                        <tr>
-                            <th style={{ width: "18%" }}>Bid Title</th>
+                        <tr >
+                            <th  style={{ width: "18%" }}>Bid Title</th>
                             <th>Last edited</th>
                             <th>Status</th>
                             <th>Client</th>
@@ -299,6 +303,7 @@ const Bids = () => {
                                 <td>
                                     <FormControl fullWidth>
                                         <StyledSelect
+                                        id="status-dropdown"
                                         value={bid.status.toLowerCase()}
                                         onChange={(e) => updateBidStatus(bid._id, e.target.value)}
                                         className={`status-dropdown ${bid.status.toLowerCase()}`}
@@ -320,6 +325,7 @@ const Bids = () => {
                                 <td>{bid.opportunity_owner}</td>
                                  <td style={{ textAlign: "center" }}>
                                     <FontAwesomeIcon
+                                        id="delete-bid-icon"
                                         icon={faTrash}
                                         onClick={() => handleDeleteClick(bid._id)}
                                         style={{ cursor: 'pointer', justifyContent: 'center' }}
@@ -369,6 +375,7 @@ const Bids = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+            <DashboardWizard />
         </div>
     );
 };

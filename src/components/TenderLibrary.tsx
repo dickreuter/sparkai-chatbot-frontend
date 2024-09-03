@@ -328,7 +328,7 @@ return (
           <Card.Body className="tenderlibrary-card-body-content">
             <div className="library-card-content-wrapper">
               <div className="header-row mt-2">
-                <div className="lib-title">Tender Library</div>
+                <div className="lib-title"  id='tender-library'>Tender Library</div>
                 <Button
                   aria-controls="simple-menu"
                   aria-haspopup="true"

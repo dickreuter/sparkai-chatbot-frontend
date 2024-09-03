@@ -210,7 +210,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
   return (
     <>
       <div className="proposal-header">
-        <h1 className='heavy mb-3'>Bid Compiler</h1>
+        <h1 className='heavy mb-3' id='proposal-editor'>Bid Compiler</h1>
          {/*
         <div className="dropdown-container">
           <Dropdown onSelect={handleSelect}>
@@ -234,7 +234,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
         </div>
          */}
       </div>
-      <div className="tabs-container">
+      <div className="tabs-container" >
   {sharedState.documents.map((doc, index) => (
     <div
       key={index}
@@ -242,7 +242,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
       onClick={() => selectDocument(index)}
     >
       <span className="tab-content">
-        <span className="doc-name">{doc.name}</span>
+        <span className="doc-name" id='tab-container'>{doc.name}</span>
         <FontAwesomeIcon 
           icon={faPencilAlt} 
           className="rename-icon" 
@@ -256,7 +256,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
       )}
     </div>
   ))}
-  <button className="addTab" onClick={handleAddDocument} disabled={!canUserEdit}>+</button>
+  <button className="addTab" id='add-section-button' onClick={handleAddDocument} disabled={!canUserEdit}>+</button>
 </div>
       <div className="proposal-container" ref={proposalContainerRef}>
         <Row className="justify-content-md-center">
@@ -323,9 +323,7 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button className="upload-button" onClick={() => setShowModal(false)} disabled={isLoading}>
-            Cancel
-          </Button>
+          
           <Button 
             className="upload-button" 
             style={{backgroundColor: "green"}} 

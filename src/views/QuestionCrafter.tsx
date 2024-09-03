@@ -15,6 +15,7 @@ import { Editor, EditorState, Modifier, SelectionState, convertToRaw, ContentSta
 import 'draft-js/dist/Draft.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
+import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
 
 const QuestionCrafter = () => {
   const getAuth = useAuthUser();
@@ -146,17 +147,13 @@ const QuestionCrafter = () => {
   const handleSelect = (eventKey) => {
     handleDatasetChange({ target: { value: eventKey } });
   };
-
-  const displayText = dataset === 'default' ? 'Content Library' : dataset;
-
-  const parsedQuestions = questions.trim() ? questions.split(',') : [];
-
-  const handleSelectQuestion = (eventKey) => {
-    const selectedQuestion = parsedQuestions[eventKey];
-    if (selectedQuestion) {
-      setInputText(selectedQuestion);
-    }
+  const formatDisplayName = (name) => {
+    return name.replace(/_/g, ' ').replace(/FORWARDSLASH/g, '/');
   };
+  const displayText = dataset === 'default' ? 'Content Library' : formatDisplayName(dataset);
+  
+
+  
 
   const handleClearMessages = () => {
     setMessages([{ type: 'bot', text: 'Welcome to Bid Pilot! Ask questions about your company library data or search the internet for up to date information. Select text in the response box to use copilot and refine the response.' }]);
@@ -861,6 +858,7 @@ useEffect(() => {
     setResponseEditorState(EditorState.createEmpty());
     setIsLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
+    console.log("DATASET");
     console.log(dataset);
     try {
       const result = await axios.post(
@@ -1027,9 +1025,9 @@ useEffect(() => {
 
           
             <Col md={12}>
-              <h1 className='heavy mb-3'>Q&A Generator</h1>
+              <h1 className='heavy mb-3' >Q&A Generator</h1>
               <div className="proposal-header mb-2">
-                <h1 className="lib-title">Question</h1>
+                <h1 className="lib-title" id='question-section'>Question</h1>
                 <div className="dropdown-container">
                 <Dropdown onSelect={handleSelect} className="w-100 mx-auto chat-dropdown">
                 <Dropdown.Toggle className="upload-button"  id="dropdown-basic">
@@ -1037,12 +1035,12 @@ useEffect(() => {
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu className="w-100">
-                  {availableCollections.map((collection) => (
-                    <Dropdown.Item key={collection} eventKey={collection}>
-                      {collection}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
+                {availableCollections.map((collection) => (
+                  <Dropdown.Item key={collection} eventKey={collection}>
+                    {formatDisplayName(collection)}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
               </Dropdown>
                 
                 </div>
@@ -1096,8 +1094,8 @@ useEffect(() => {
           <Row className="mt-2">
 
               
-          <Col md={7}>
-              <h1 className="lib-title mt-4 mb-3">Answer</h1>
+          <Col md={7} >
+              <h1 id="answer-section" className="lib-title mt-4 mb-3" >Answer</h1>
               <div className="response-box draft-editor" ref={responseBoxRef}>
               <div className="editor-container" ref={editorRef}>
             <Editor
@@ -1126,7 +1124,7 @@ useEffect(() => {
             <Col md={5}>
               <div className="input-header">
                 <div className="proposal-header mb-2">
-                  <h1 className="lib-title" style={{ color: "white" }}>Bid Pilot</h1>
+                  <h1 className="lib-title" style={{ color: "white" }} id='bid-pilot-section'>Bid Pilot</h1>
                   <div className="dropdown-container">
                    
                   </div>
@@ -1222,9 +1220,9 @@ useEffect(() => {
                       ))}
                     </div>
                   )}
-                  <div className="input-console">
-                    <div className="dropdown-clear-container mb-3">
-                      <Dropdown onSelect={(key) => setSelectedDropdownOption(key)} className="chat-dropdown">
+                  <div className="input-console" >
+                    <div className="dropdown-clear-container mb-3" >
+                      <Dropdown onSelect={(key) => setSelectedDropdownOption(key)} className="chat-dropdown" id='bid-pilot-options'>
                         <Dropdown.Toggle className="upload-button" style={{ backgroundColor: selectedDropdownOption === 'custom-prompt' ? 'orange' : '#383838', color: selectedDropdownOption === 'custom-prompt' ? 'black' : 'white' }}>
                           {selectedDropdownOption === 'internet-search' ? 'Internet Search' : selectedDropdownOption === 'custom-prompt' ? 'Custom Prompt' : 'Library Chat'}
                         </Dropdown.Toggle>
@@ -1263,6 +1261,7 @@ useEffect(() => {
           
         </div>
       </div>
+      <QuestionCrafterWizard />
     </div>
   );
 }

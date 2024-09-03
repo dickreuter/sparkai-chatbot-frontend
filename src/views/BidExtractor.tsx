@@ -20,6 +20,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faEye, faHammer, faScrewdriverWrench, faUsers } from "@fortawesome/free-solid-svg-icons";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import CustomDateInput from '../components/CustomDateInput.tsx';
+import BidExtractorWizard from "../wizards/BidExtractorWizard.tsx";
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
@@ -649,7 +650,7 @@ const BidExtractor = () => {
       <div className="lib-container">
         <BidNavbar />
         <div className="proposal-header mt-3 mb-2">
-          <h1 className='heavy'>
+          <h1 className='heavy'  id="proposal-header">
             <span
              contentEditable={isEditing && canUserEdit}
               suppressContentEditableWarning={true}
@@ -738,7 +739,7 @@ const BidExtractor = () => {
                 </Card>
               </Col>
 
-              <Col md={4} className="px-2">
+              <Col md={4} className="px-2" id='contributors-card'>
                 <ContributorsCard />
               </Col>
 
@@ -785,7 +786,7 @@ const BidExtractor = () => {
                     aria-hidden="true"
                   />
                 ) : (
-                  <FontAwesomeIcon icon={faScrewdriverWrench} />
+                  <FontAwesomeIcon icon={faScrewdriverWrench} id='opportunity-information-card'/>
                 )}
               </span>
             </Card.Header>
@@ -825,7 +826,7 @@ const BidExtractor = () => {
                   aria-hidden="true"
                 />
               ) : (
-                <FontAwesomeIcon icon={faScrewdriverWrench} />
+                <FontAwesomeIcon icon={faScrewdriverWrench} id='compliance-requirements-card'/>
               )}
             </span>
               </Card.Header>
@@ -919,6 +920,7 @@ const BidExtractor = () => {
 
         </div>
       </div>
+      <BidExtractorWizard/>
     </div>
 
 

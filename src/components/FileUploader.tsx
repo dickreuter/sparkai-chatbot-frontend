@@ -68,15 +68,25 @@ const FileUploader = ({ onFileSelect, folder, onClose, usingTenderLibrary = fals
     }
   };
 
+  const formatDisplayName = (name) => {
+    return name.replace(/_/g, ' ').replace(/FORWARDSLASH/g, '/');
+  };
+
+  // Function to reverse the formatting
+  const reverseFormatDisplayName = (name) => {
+    return name.replace(/\s+/g, '_').replace(/\//g, 'FORWARDSLASH');
+  };
+
+
   return (
     <div className={`file-uploader ${dragActive ? 'active' : ''}`}>
-      {!usingTenderLibrary && (
+       {!usingTenderLibrary && (
         <CustomTextField
           fullWidth
           label="Folder"
           variant="outlined"
-          value={profileName}
-          onChange={(e) => setProfileName(e.target.value)}
+          value={formatDisplayName(profileName)}
+          onChange={(e) => setProfileName(reverseFormatDisplayName(e.target.value))}
           disabled={!!folder}
           className="uploader-input mb-3"
         />

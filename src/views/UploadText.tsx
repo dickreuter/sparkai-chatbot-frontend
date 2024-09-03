@@ -90,6 +90,15 @@ const UploadText = ({ folder, get_collections, onClose }) => {
     }
   };
 
+  const formatDisplayName = (name) => {
+    return name.replace(/_/g, ' ').replace(/FORWARDSLASH/g, '/');
+  };
+
+  // Updated function to reverse the formatting
+  const reverseFormatDisplayName = (name) => {
+    return name.replace(/\s+/g, '_').replace(/\//g, 'FORWARDSLASH');
+  };
+
   return (
     <div className="App" style={{ textAlign: 'left' }}>
       <div className="input-options-container">
@@ -97,12 +106,11 @@ const UploadText = ({ folder, get_collections, onClose }) => {
           fullWidth
           label="Folder"
           variant="outlined"
-          value={profileName}
-          onChange={(e) => setProfileName(e.target.value)}
-          disabled={!!folder} // Disable if folder prop is provided
-          inputProps={{ maxLength: 50 }} // Set character limit for folder name
+          value={formatDisplayName(profileName)}
+          onChange={(e) => setProfileName(reverseFormatDisplayName(e.target.value))}
+          disabled={!!folder}
+          inputProps={{ maxLength: 50 }}
         />
-
         <CustomTextField
           fullWidth
           label="File name"

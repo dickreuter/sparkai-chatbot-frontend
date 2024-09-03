@@ -1,15 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
-import { Button, Col, Row, Card, Modal, FormControl, InputGroup } from "react-bootstrap";
+import { Button, Col, Row, Card, Modal, FormControl, InputGroup, Form } from "react-bootstrap";
 import UploadPDF from './UploadPDF';
 import UploadText from './UploadText';
 import "./Library.css";
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
-import { faEye, faTrash, faFolder, faFileAlt, faArrowUpFromBracket, faEllipsisVertical, faSearch, faQuestionCircle, faPlus, faArrowLeft, faReply, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faTrash, faFolder, faFileAlt, faArrowUpFromBracket, faEllipsisVertical, faSearch, faQuestionCircle, faPlus, faArrowLeft, faReply, faTimes, faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import "./Chatbot.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UploadPDFModal, UploadTextModal, UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
@@ -17,6 +17,81 @@ import { Menu, MenuItem, IconButton } from '@mui/material';
 import { MoreVert as MoreVertIcon } from '@mui/icons-material';
 import FileContentModal from "../components/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
+import LibraryWizard from "../wizards/LibraryWizard.tsx"; // Adjust the import path as needed
+
+const NewFolderModal = React.memo(({ show, onHide, onCreateFolder, title, parentFolder }) => {
+  const [localNewFolderName, setLocalNewFolderName] = useState('');
+  const [error, setError] = useState('');
+
+  const validateFolderName = (name) => {
+    if (name.trim().length < 3 || name.trim().length > 63) {
+      return "Folder name must be between 3 and 63 characters long.";
+    }
+    if (!/^[a-zA-Z0-9].*[a-zA-Z0-9\s]$/.test(name)) {
+      return "Folder name must start and end with an alphanumeric character.";
+    }
+    if (!/^[a-zA-Z0-9_\s-]+$/.test(name)) {
+      return "Folder name can only contain alphanumeric characters, spaces, underscores, or hyphens.";
+    }
+    if (name.includes('..')) {
+      return "Folder name cannot contain two consecutive periods.";
+    }
+    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(name)) {
+      return "Folder name cannot be a valid IPv4 address.";
+    }
+    return "";
+  };
+
+  const handleInputChange = (e) => {
+    const newName = e.target.value;
+    setLocalNewFolderName(newName);
+    setError(validateFolderName(newName));
+  };
+
+  const handleCreate = () => {
+    const validationError = validateFolderName(localNewFolderName);
+    if (validationError) {
+      setError(validationError);
+    } else {
+      onCreateFolder(localNewFolderName, parentFolder);
+      setLocalNewFolderName('');
+      setError('');
+    }
+  };
+
+  return (
+    <Modal show={show} onHide={onHide}>
+      <Modal.Header closeButton>
+        <Modal.Title>{title || "Create New Folder"}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form.Group>
+          <Form.Label>{parentFolder ? "Subfolder Name" : "Folder Name"}</Form.Label>
+          <FormControl
+            type="text"
+            placeholder={`Enter ${parentFolder ? "subfolder" : "folder"} name`}
+            value={localNewFolderName}
+            onChange={handleInputChange}
+            isInvalid={!!error}
+          />
+          <Form.Control.Feedback type="invalid">
+            {error}
+          </Form.Control.Feedback>
+        </Form.Group>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button 
+          className="upload-button" 
+          onClick={handleCreate}
+          disabled={!!error || localNewFolderName.length === 0}
+        >
+          Create
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+});
+
 
 const Library = () => {
   const getAuth = useAuthUser();
@@ -40,18 +115,34 @@ const Library = () => {
   const [showDeleteFileModal, setShowDeleteFileModal] = useState(false);
   const [fileToDelete, setFileToDelete] = useState(null);
   const [uploadFolder, setUploadFolder] = useState(null);
+
   const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorElFile, setAnchorElFile] = useState(null);
+
+  const [currentFile, setCurrentFile] = useState(null);
+
   const open = Boolean(anchorEl);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [filteredResults, setFilteredResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [showNewFolderModal, setShowNewFolderModal] = useState(false);
+  const [newFolderParent, setNewFolderParent] = useState(null);
 
+  const [folderStructure, setFolderStructure] = useState({});
+  const [expandedFolders, setExpandedFolders] = useState({});
 
   const [showPdfViewerModal, setShowPdfViewerModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
 
   const searchBarRef = useRef(null);
+
+  const [updateTrigger, setUpdateTrigger] = useState(0);
+
+  const getTopLevelFolders = () => {
+    return availableCollections.filter(collection => !collection.includes('FORWARDSLASH'));
+  };
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -66,6 +157,17 @@ const Library = () => {
   };
   
 
+  const handleClick = (event, file) => {
+    setAnchorElFile(event.currentTarget);
+    setCurrentFile(file);
+  };
+
+  const handleClose = () => {
+    setAnchorElFile(null);
+  };
+
+  
+
   const handleMenuItemClick = (action) => {
     handleMenuClose();
     if (action === 'pdf') handleOpenPDFModal();
@@ -75,15 +177,30 @@ const Library = () => {
   const handleDelete = async (folderTitle) => {
     console.log('Deleting folder:', folderTitle);
     setFolderToDelete(''); 
-    deleteFolder(folderTitle);
+    deleteFolder(folderTitle, newFolderParent);
+    
     setShowDeleteFolderModal(false);
   };
 
-  const handleDeleteFileClick = (event, unique_id, filename) => {
-    event.stopPropagation(); 
-    setFileToDelete({ unique_id, filename });
-    setShowDeleteFileModal(true);
+  const handleNewFolderClick = useCallback((parentFolder = null) => {
+    setNewFolderParent(parentFolder);
+    setShowNewFolderModal(true);
+  }, []);
+
+  const handleHideNewFolderModal = useCallback(() => {
+    setShowNewFolderModal(false);
+    setNewFolderParent(null);
+  }, []);
+
+
+  const handleDeleteClick = () => {
+    if (currentFile) {
+      setFileToDelete({ unique_id: currentFile.unique_id, filename: currentFile.filename });
+      setShowDeleteFileModal(true);
+    }
+    handleClose();
   };
+
 
   const handleShowPDFModal = (event, folder) => {
     event.stopPropagation();
@@ -106,8 +223,125 @@ const Library = () => {
     setUploadFolder(activeFolder || null); // Set to activeFolder if available, otherwise null
     setShowTextModal(true);
   };
+
   
 
+  const fetchFolderStructure = async () => {
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_collections`,
+        {},
+        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
+      );
+  
+      //console.log(response.data);
+      setAvailableCollections(response.data.collections);
+      console.log(response.data.collections);
+      const structure = {};
+      response.data.collections.forEach(collectionName => {
+        const parts = collectionName.split('FORWARDSLASH');
+        let currentLevel = structure;
+        parts.forEach((part, index) => {
+          if (!currentLevel[part]) {
+            currentLevel[part] = index === parts.length - 1 ? null : {};
+          }
+          currentLevel = currentLevel[part];
+        });
+      });
+  
+      setFolderStructure(structure);
+    } catch (error) {
+      console.error("Error fetching folder structure:", error);
+    }
+  };
+  const fetchFolderContents = async (folderPath) => {
+    try {
+      
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
+        { collection_name: folderPath },
+        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
+      );
+  
+      const filesWithIds = response.data.map(item => ({
+        filename: item.meta,
+        unique_id: item.unique_id,
+        isFolder: false
+      }));
+  
+   
+      // Get subfolders
+      const subfolders = availableCollections
+        .filter(collection => collection.startsWith(folderPath + 'FORWARDSLASH'))
+        .map(collection => {
+          const parts = collection.split('FORWARDSLASH');
+          return {
+            filename: parts[parts.length - 1],
+            unique_id: collection,
+            isFolder: true
+          };
+        });
+  
+      
+  
+      const allContents = [...subfolders, ...filesWithIds];
+     
+  
+      setFolderContents(prevContents => ({
+        ...prevContents,
+        [folderPath]: allContents
+      }));
+    } catch (error) {
+      console.error("Error fetching folder contents:", error);
+    }
+  };
+
+  const handleCreateFolder = useCallback(async (folderName, parentFolder = null) => {
+    try {
+      const formattedFolderName = folderName.trim().replace(/\s+/g, '_');
+      const formData = new FormData();
+      formData.append('folder_name', formattedFolderName);
+      if (parentFolder) {
+        formData.append('parent_folder', parentFolder);
+      }
+  
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/create_upload_folder`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+  
+      if (response.data.message === "Folder created successfully") {
+        displayAlert(`${parentFolder ? 'Subfolder' : 'Folder'} created successfully`, 'success');
+        
+        // Refresh the folder structure
+        await fetchFolderStructure();
+        
+        // If we're creating a subfolder, refresh the contents of the parent folder
+        if (parentFolder) {
+          await fetchFolderContents(parentFolder);
+        } else {
+          // If we're creating a top-level folder, refresh the root folder contents
+          setActiveFolder(null);
+          await fetchFolderContents('');
+        }
+  
+        setUpdateTrigger(prev => prev + 1);
+        setShowNewFolderModal(false);
+      } else {
+        displayAlert(`Failed to create ${parentFolder ? 'subfolder' : 'folder'}`, 'danger');
+      }
+    } catch (error) {
+      console.error(`Error creating ${parentFolder ? 'subfolder' : 'folder'}:`, error);
+      displayAlert(`Error creating ${parentFolder ? 'subfolder' : 'folder'}`, 'danger');
+    }
+  }, [tokenRef, fetchFolderStructure, fetchFolderContents, setActiveFolder]);
+  
   const modalRef = useRef();
   const closeModal = (e) => {
     if (modalRef.current && !modalRef.current.contains(e.target)) {
@@ -118,20 +352,30 @@ const Library = () => {
 
   const UploadPDFModal = ({ show, onHide, folder, get_collections }) => (
     <Modal 
-        show={show} 
-        onHide={() => { onHide(); }}
-        onClick={(e) => e.stopPropagation()}
-        size="lg"
+      show={show} 
+      onHide={() => { onHide(); }}
+      onClick={(e) => e.stopPropagation()}
+      size="lg"
     >
-        <Modal.Header closeButton onClick={(e) => e.stopPropagation()}>
-            <Modal.Title>PDF Uploader</Modal.Title>
-        </Modal.Header>
-        <Modal.Body onClick={(e) => e.stopPropagation()}>
-            <UploadPDF folder={folder} get_collections={get_collections} onClose={onHide} />
-        </Modal.Body>
+      <Modal.Header closeButton onClick={(e) => e.stopPropagation()}>
+        <Modal.Title>PDF Uploader</Modal.Title>
+      </Modal.Header>
+      <Modal.Body onClick={(e) => e.stopPropagation()}>
+        <UploadPDF 
+          folder={folder} 
+          get_collections={get_collections} 
+          onClose={() => {
+            onHide();
+            setUpdateTrigger(prev => prev + 1);
+            if (folder) {
+              fetchFolderContents(folder);
+            }
+          }} 
+        />
+      </Modal.Body>
     </Modal>
   );
-
+  
   const UploadTextModal = ({ show, onHide, folder, get_collections}) => (
     <Modal
       show={show}
@@ -146,31 +390,41 @@ const Library = () => {
         <UploadText 
           folder={folder} 
           get_collections={get_collections} 
-          onClose={onHide}
-          
+          onClose={() => {
+            onHide();
+            setUpdateTrigger(prev => prev + 1);
+            if (folder) {
+              fetchFolderContents(folder);
+            }
+          }}
         />
       </Modal.Body>
     </Modal>
   );
   
-  const DeleteFolderModal = ({ show, onHide, onDelete, folderTitle }) => (
-    <Modal show={show} onHide={onHide} size="lg">
+  const DeleteFolderModal = ({ show, onHide, onDelete, folderTitle }) => {
+    const displayFolderName = folderTitle
+  .replace(/FORWARDSLASH/g, '/')
+  .replace(/_/g, ' ');
+    return (
+      <Modal show={show} onHide={onHide} size="lg">
         <Modal.Header closeButton>
-            <Modal.Title>Delete Folder</Modal.Title>
+          <Modal.Title>Delete Folder</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            Are you sure you want to delete the folder "{folderTitle}"?
+          Are you sure you want to delete the folder "{displayFolderName}"?
         </Modal.Body>
         <Modal.Footer>
-            <Button className='upload-button' onClick={onHide}>
-                Cancel
-            </Button>
-            <Button className='upload-button' style={{backgroundColor:"red"}}  onClick={() => onDelete(folderTitle)}>
-                Delete
-            </Button>
+          <Button className='upload-button' onClick={onHide}>
+            Cancel
+          </Button>
+          <Button className='upload-button' style={{backgroundColor:"red"}} onClick={() => onDelete(folderTitle)}>
+            Delete
+          </Button>
         </Modal.Footer>
-    </Modal>
-  );
+      </Modal>
+    );
+  };
 
   const DeleteFileModal = ({ show, onHide, onDelete, fileName }) => (
     <Modal show={show} onHide={onHide} size="lg">
@@ -191,48 +445,8 @@ const Library = () => {
     </Modal>
   );
 
+  
 
-  const fetchFolderFilenames = async (folderName) => {
-    try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
-        { collection_name: folderName },
-        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
-      );
-      
-
-      const filesWithIds = response.data.map(item => ({
-        filename: item.meta,
-        unique_id: item.unique_id
-      }));
-
-      setFolderContents(prevContents => ({
-        ...prevContents,
-        [folderName]: filesWithIds
-      }));
-    } catch (error) {
-      console.error("Error fetching folder filenames:", error);
-    }
-  };
-
-  const get_collections = async () => {
-    try {
-      const res = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_collections`,
-        {},
-        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
-      );
-      const filteredCollections = (res.data.collections || []).filter(
-        collection => !collection.startsWith('TenderLibrary_')
-      );
-      setAvailableCollections(filteredCollections);
-      for (const collection of filteredCollections) {
-        await fetchFolderFilenames(collection);
-      }
-    } catch (error) {
-      console.error("Error fetching collections:", error);
-    }
-  };
 
   const saveFileContent = async (id, newContent, folderName) => {
     try {
@@ -242,7 +456,7 @@ const Library = () => {
       formData.append('profile_name', folderName);
       formData.append('mode', 'plain');
   
-      console.log(formData);
+   
       await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/updatetext`,
         formData,
@@ -325,57 +539,95 @@ const Library = () => {
   const deleteDocument = async (uniqueId) => {
     const formData = new FormData();
     formData.append('unique_id', uniqueId);
-
+  
     try {
-        await axios.post(
-            `http${HTTP_PREFIX}://${API_URL}/delete_template_entry/`,
-            formData,
-            {
-                headers: {
-                    'Authorization': `Bearer ${tokenRef.current}`,
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
-        );
-
-        handleGAEvent('Library', 'Delete Document', 'Delete Document Button');
-        get_collections();
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/delete_template_entry/`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+  
+      handleGAEvent('Library', 'Delete Document', 'Delete Document Button');
+      setUpdateTrigger(prev => prev + 1);
     } catch (error) {
-        console.error("Error deleting document:", error);
+      console.error("Error deleting document:", error);
     }
   };
-
-  const deleteFolder = async (folderTitle) => {
+  
+  const deleteFolder = useCallback(async (folderTitle, parentFolder = null) => {
     const formData = new FormData();
     formData.append('profile_name', folderTitle);
-
+  
     try {
-        await axios.post(
-            `http${HTTP_PREFIX}://${API_URL}/delete_template/`,
-            formData,
-            {
-                headers: {
-                    'Authorization': `Bearer ${tokenRef.current}`,
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
-        );
-
-        handleGAEvent('Library', 'Delete Folder', 'Delete Folder Button');
-        get_collections();
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/delete_template/`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+  
+      handleGAEvent('Library', 'Delete Folder', 'Delete Folder Button');
+      setUpdateTrigger(prev => prev + 1);
+      console.log("folder deleted");
+      await fetchFolderStructure();
+        
+        // If we're creating a subfolder, refresh the contents of the parent folder
+        if (parentFolder) {
+          await fetchFolderContents(parentFolder);
+        } else {
+          // If we're creating a top-level folder, refresh the root folder contents
+          setActiveFolder(null);
+          await fetchFolderContents('');
+        }
+  
+        setUpdateTrigger(prev => prev + 1);
     } catch (error) {
-        console.error("Error deleting document:", error);
+      console.error("Error deleting folder:", error);
+    }
+  }, [tokenRef, fetchFolderStructure, fetchFolderContents, setActiveFolder]);
+
+  const handleFolderClick = (folderPath) => {
+    console.log(`Folder clicked: ${folderPath}`);
+    setActiveFolder(folderPath);
+    if (!folderContents[folderPath]) {
+      console.log(`Fetching contents for ${folderPath} as they don't exist yet`);
+      fetchFolderContents(folderPath);
+    } else {
+      console.log(`Contents for ${folderPath} already exist:`, folderContents[folderPath]);
     }
   };
 
-  const handleFolderClick = (folderName) => {
-    setActiveFolder(folderName);
-    setCurrentPage(1);
-  };
-
-  useEffect(() => {
-    get_collections();
-  }, []);
+const handleBackClick = () => {
+  if (activeFolder) {
+    const parts = activeFolder.split('FORWARDSLASH');
+    if (parts.length > 1) {
+      // Go up one level
+      const parentFolder = parts.slice(0, -1).join('FORWARDSLASH');
+      setActiveFolder(parentFolder);
+      if (!folderContents[parentFolder]) {
+        fetchFolderContents(parentFolder);
+      }
+    } else {
+      // If we're at the root level, go back to the main folder view
+      setActiveFolder(null);
+    }
+  }
+};
+useEffect(() => {
+  fetchFolderStructure();
+  if (activeFolder) {
+    fetchFolderContents(activeFolder);
+  }
+}, [updateTrigger]);
 
   useEffect(() => {
     setShowDropdown(searchQuery.length > 0);
@@ -383,128 +635,180 @@ const Library = () => {
   
 
   useEffect(() => {
+    console.log(`Active folder changed to: ${activeFolder}`);
     if (activeFolder === null) {
+      const topLevelFolders = getTopLevelFolders();
+      const itemsCount = topLevelFolders.length;
+      const pages = Math.ceil(itemsCount / rowsPerPage);
+      setTotalPages(pages);
       setCurrentPage(1);
+    } else {
+      const itemsCount = folderContents[activeFolder]?.length || 0;
+      const pages = Math.ceil(itemsCount / rowsPerPage);
+      setTotalPages(pages);
     }
-    const itemsCount = activeFolder ? (folderContents[activeFolder]?.length || 0) : availableCollections.length;
-    const pages = Math.ceil(itemsCount / rowsPerPage);
-    setTotalPages(pages);
-  }, [activeFolder, folderContents, availableCollections.length, rowsPerPage]);
+  }, [activeFolder, folderContents, availableCollections, rowsPerPage]);
 
-  const renderFolders = () => {
-    const startIdx = (currentPage - 1) * rowsPerPage;
-    const endIdx = startIdx + rowsPerPage;
-    const foldersToDisplay = availableCollections.slice(startIdx, endIdx);
-  
-    return foldersToDisplay.map((folder, index) => (
-      <tr key={index} onClick={() => handleFolderClick(folder)} style={{ cursor: 'pointer' }}>
-        <td>
-          <FontAwesomeIcon 
-            icon={faFolder} 
-            className="fa-icon"  
-            onClick={(event) => event.stopPropagation()} 
-            style={{ cursor: 'pointer', marginRight: '10px' }} 
-          /> 
-          {folder.replace(/_/g, ' ')}
-        </td>
-        <td colSpan={3}>
-          <UploadButtonWithDropdown
-            folder={folder}
-            get_collections={get_collections}
-            handleShowPDFModal={handleShowPDFModal}
-            handleShowTextModal={handleShowTextModal}
-            setShowDeleteFolderModal={setShowDeleteFolderModal}
-            setFolderToDelete={setFolderToDelete}
-          />
-        </td> 
-      </tr>
-    ));
+  const formatDisplayName = (name) => {
+    return name.replace(/_/g, ' ');
   };
+
+  const renderFolderStructure = (structure, path = '') => {
+    const topLevelFolders = getTopLevelFolders();
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const foldersToRender = topLevelFolders.slice(startIndex, endIndex);
   
-  
-  
-  const renderFolderContents = () => {
-    if (!activeFolder || !folderContents[activeFolder]) return null;
-  
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const currentFiles = folderContents[activeFolder]?.slice(start, end) || [];
-  
-    return currentFiles.map(({ filename, unique_id }, index) => {
-      const isPdf = filename.toLowerCase().endsWith('.pdf');
-  
+    return foldersToRender.map((folderName) => {
+      const displayName = formatDisplayName(folderName);
       return (
-        <tr key={index} style={{ cursor: 'pointer' }}>
-          <td onClick={() =>  viewFile(filename, activeFolder, unique_id)}>
-            <FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {filename}
+        <tr key={folderName} onClick={() => handleFolderClick(folderName)} style={{ cursor: 'pointer' }}>
+          <td>
+            <FontAwesomeIcon 
+              icon={faFolder} 
+              className="fa-icon"
+              style={{ marginRight: '10px' }}
+            />
+            {displayName}
           </td>
           <td colSpan={3}>
-            <FontAwesomeIcon
-              icon={faTrash}
-              className="action-icon delete-icon"
-              onClick={(event) => handleDeleteFileClick(event, unique_id, filename)}
-              style={{ cursor: 'pointer', marginRight: '15px' }}
+            <UploadButtonWithDropdown
+              folder={folderName}
+              get_collections={fetchFolderStructure}
+              handleShowPDFModal={handleShowPDFModal}
+              handleShowTextModal={handleShowTextModal}
+              setShowDeleteFolderModal={setShowDeleteFolderModal}
+              setFolderToDelete={setFolderToDelete}
             />
           </td>
         </tr>
       );
     });
   };
-  
-  
-  
+
+  const renderFolderContents = (folderPath) => {
+    const contents = folderContents[folderPath] || [];
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const contentsToRender = contents.slice(startIndex, endIndex);
+
+    return contentsToRender.map(({ filename, unique_id, isFolder }, index) => {
+      const fullPath = isFolder ? `${folderPath}FORWARDSLASH${filename}` : folderPath;
+      const displayName = formatDisplayName(filename);
+      return (
+        <tr key={`${folderPath}-${index}`} style={{ cursor: 'pointer' }}>
+          <td onClick={() => isFolder ? handleFolderClick(fullPath) : viewFile(filename, folderPath, unique_id)}>
+            <FontAwesomeIcon 
+              icon={isFolder ? faFolder : faFileAlt} 
+              className="fa-icon" 
+              style={{ marginRight: '10px' }} 
+            />
+            {displayName}
+          </td>
+          <td colSpan={3}>
+            {isFolder ? (
+              <UploadButtonWithDropdown
+                folder={fullPath}
+                get_collections={fetchFolderStructure}
+                handleShowPDFModal={handleShowPDFModal}
+                handleShowTextModal={handleShowTextModal}
+                setShowDeleteFolderModal={setShowDeleteFolderModal}
+                setFolderToDelete={setFolderToDelete}
+              />
+            ) : (
+              <div>
+                <Button
+                  aria-controls="simple-menu"
+                  aria-haspopup="true"
+                  onClick={(event) => handleClick(event, { filename, unique_id })}
+                  sx={{
+                    borderRadius: '50%',
+                    minWidth: 0,
+                    padding: '10px',
+                    backgroundColor: 'transparent',
+                    '&.MuiButton-root:active': {
+                      boxShadow: 'none',
+                    },
+                  }}
+                  className="ellipsis-button"
+                >
+                  <FontAwesomeIcon icon={faEllipsisVertical} className="ellipsis-icon" />
+                </Button>
+                <Menu
+                  id="simple-menu"
+                  anchorEl={anchorElFile}
+                  keepMounted
+                  open={Boolean(anchorElFile)}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={handleDeleteClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                    <i className="fas fa-trash-alt" style={{ marginRight: '12px' }}></i>
+                    Delete File
+                  </MenuItem>
+                </Menu>
+              </div>
+            )}
+          </td>
+        </tr>
+      );
+    });
+  };
+
+
 
   const handleSearchChange = (e) => {
-    const query = e.target.value;
+    const query = e.target.value.toLowerCase();
     setSearchQuery(query);
   
     if (query.length > 0) {
-      const folderMatches = availableCollections.filter(folder => 
-        !folder.startsWith('TenderLibrary_') && folder.toLowerCase().includes(query.toLowerCase())
-      );
+      const folderMatches = availableCollections.filter(collection =>
+        collection.toLowerCase().includes(query)
+      ).map(collection => ({
+        name: collection.split('FORWARDSLASH').pop(), // Get the last part of the path
+        type: 'folder',
+        path: collection,
+        fullName: collection.replace(/FORWARDSLASH/g, '/') // Full path for display
+      }));
   
       const fileMatches = Object.entries(folderContents)
-        .filter(([folder]) => !folder.startsWith('TenderLibrary_'))
-        .flatMap(([folder, files]) =>
-          files.filter(file => file.filename.toLowerCase().includes(query.toLowerCase()))
-            .map(file => ({ ...file, folder }))
+        .flatMap(([folder, contents]) =>
+          contents.filter(item => item.filename.toLowerCase().includes(query))
+            .map(item => ({
+              name: item.filename,
+              type: item.isFolder ? 'folder' : 'file',
+              path: folder,
+              fullName: `${folder.replace(/FORWARDSLASH/g, '/')}/${item.filename}`,
+              unique_id: item.unique_id
+            }))
         );
   
       const results = [...folderMatches, ...fileMatches];
       setFilteredResults(results);
-      setShowSearchResults(true);  // Show results when there's input
+      setShowSearchResults(true);
     } else {
       setFilteredResults([]);
-      setShowSearchResults(false);  // Hide results when input is cleared
+      setShowSearchResults(false);
     }
   };
   
   const handleSearchResultClick = async (result) => {
-    if (typeof result === 'string') {
-      // It's a folder
-      setActiveFolder(result);
+    if (result.type === 'folder') {
+      setActiveFolder(result.path);
       setCurrentPage(1);
-      if (!folderContents[result] || folderContents[result].length === 0) {
-        await fetchFolderFilenames(result);
+      if (!folderContents[result.path] || folderContents[result.path].length === 0) {
+        await fetchFolderContents(result.path);
       }
-    } else if (result.filename) {
-      // It's a file
-      const { filename, unique_id, folder } = result;
-      setActiveFolder(folder);
+    } else if (result.type === 'file') {
+      setActiveFolder(result.path);
       setCurrentPage(1);
-  
-      if (!folderContents[folder] || folderContents[folder].length === 0) {
-        await fetchFolderFilenames(folder);
+      
+      if (!folderContents[result.path] || folderContents[result.path].length === 0) {
+        await fetchFolderContents(result.path);
       }
   
       // Wait for state to update
       setTimeout(() => {
-        const fileIndex = folderContents[folder].findIndex(file => file.unique_id === unique_id);
-        if (fileIndex !== -1) {
-          const pageNumber = Math.floor(fileIndex / rowsPerPage) + 1;
-          setCurrentPage(pageNumber);
-          viewFile(filename, folder, unique_id);
-        }
+        viewFile(result.name, result.path, result.unique_id);
       }, 100);
     }
   
@@ -515,7 +819,7 @@ const Library = () => {
     setTimeout(() => {
       setShowSearchResults(false);
       setShowDropdown(false);
-    }, 200); // Adjust this delay as needed
+    }, 200);
   };
   
   const renderSearchResults = () => {
@@ -535,37 +839,41 @@ const Library = () => {
               className="search-result-item"
               onClick={() => handleSearchResultClick(result)}
             >
-              <FontAwesomeIcon 
-                icon={result.filename ? faFileAlt : faFolder} 
-                className="result-icon" 
+              <FontAwesomeIcon
+                icon={result.type === 'file' ? faFileAlt : faFolder}
+                className="result-icon"
               />
-              {result.filename ? `${result.filename} (in ${result.folder})` : result}
+              {result.type === 'file'
+                ? `${result.name} (in ${result.path.replace(/FORWARDSLASH/g, '/')})`
+                : result.fullName
+              }
             </div>
           ))
         )}
       </div>
     );
   };
-  
- 
-  
+
+
+
+
 
   return (
     <div className="chatpage">
       <SideBarSmall />
 
-      <div className="lib-container">
-        <h1 className='heavy'>Content Library</h1>
+      <div className="lib-container" >
+        <h1 className='heavy'  >Content Library</h1>
   
             <Row>
-  <Col md={12}>
+  <Col md={12} >
     <Card className="mb-4 mt-2">
       <Card.Body className="library-card-body-content">
         <div className="library-card-content-wrapper">
           <div className="header-row mt-2">
-            <div className="lib-title">Resources</div>
+            <div className="lib-title" id='library-table'>Resources</div>
 
-            <InputGroup className={`search-bar-container ${showDropdown ? 'dropdown-visible' : ''}`} ref={searchBarRef}>
+            <InputGroup id='search-bar-container' className={`search-bar-container ${showDropdown ? 'dropdown-visible' : ''}`} ref={searchBarRef}>
               <FontAwesomeIcon icon={faSearch} className="search-icon" />
               <FormControl
                 placeholder="Search folders and files"
@@ -588,6 +896,7 @@ const Library = () => {
               {searchQuery && (
                 <div 
                   className="clear-search-icon" 
+                  
                   onClick={() => {
                     setSearchQuery('');
                     setShowDropdown(false);
@@ -600,64 +909,88 @@ const Library = () => {
               {renderSearchResults()}
             </InputGroup>
 
-            <Button
-              aria-controls="simple-menu"
-              aria-haspopup="true"
-              onClick={handleMenuClick}
-              className="upload-button"
-            >
-              <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
-              {activeFolder ? "New File" : "New Folder"}
-            </Button>
-            <Menu
-              id="long-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={open}
-              onClose={handleMenuClose}
-            >
-              <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "180px" }}>
-                <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
-                Upload PDF
-              </MenuItem>
-              <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
-                <i className="fas fa-file-alt" style={{ marginRight: '12px' }}></i>
-                Upload Text
-              </MenuItem>
-            </Menu>
-          </div>
+            {!activeFolder && (
+                <Button
+                  onClick={() => handleNewFolderClick(null)}
+                  className="upload-button" 
+                >
+                  <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+                  New Folder
+                </Button>
+              )}
 
-          <table className="library-table">
-            <thead>
-              <tr>
-                <th>{activeFolder ? `Documents in ${activeFolder}` : 'Folders'}</th>
-                <th colSpan={3}>
-                {activeFolder && (
-  <div 
-    className="back-to-folders" 
-    onClick={() => setActiveFolder(null)} 
-    style={{ cursor: 'pointer', padding: '5px'}}
-  >
-    <FontAwesomeIcon icon={faReply}  />
-    <span style={{ marginLeft: "10px"}}>Back to Folders</span>
-  </div>
-)}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeFolder ? renderFolderContents() : renderFolders()}
-            </tbody>
-          </table>
+                    {activeFolder && (
+                      <Button
+                      aria-controls="simple-menu"
+                      aria-haspopup="true"
+                      onClick={handleMenuClick}
+                      className="upload-button"
+                    >
+                      <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+                      New
+                    </Button>
+                    )}
+
+                    <Menu
+                      id="long-menu"
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={open}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "180px" }}>
+                        <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
+                        Upload PDF
+                      </MenuItem>
+                      <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                        <i className="fas fa-file-alt" style={{ marginRight: '12px' }}></i>
+                        Upload Text
+                      </MenuItem>
+                      <MenuItem onClick={() => handleNewFolderClick(activeFolder)} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                      <FontAwesomeIcon icon={faFolder} style={{ marginRight: '12px' }} />
+                      New Subfolder
+                    </MenuItem>
+                    </Menu>
+                  </div>
+
+                  <table className="library-table">
+                  <thead>
+                    <tr>
+                    <th>
+                    {activeFolder
+                      ? `Documents in ${activeFolder.split('FORWARDSLASH').join('/').replace(/_/g, ' ')}`
+                      : 'Folders'}
+                  </th>
+                      <th colSpan={3}>
+                    {activeFolder && (
+                      <div 
+                        className="back-button" 
+                        onClick={() => handleBackClick()} 
+                        style={{ cursor: 'pointer', padding: '5px'}}
+                      >
+                        <FontAwesomeIcon icon={faReply} />
+                        <span style={{ marginLeft: "10px"}}>Back</span>
+                      </div>
+                    )}
+                  </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activeFolder 
+                      ? renderFolderContents(activeFolder)
+                      : renderFolderStructure(folderStructure)
+                    }
+                  </tbody>
+                </table>
         </div>
 
         <div className="pagination-controls">
-          {[...Array(totalPages)].map((_, i) => (
-            <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
-              {i + 1}
-            </button>
-          ))}
-        </div>
+        {totalPages > 1 && [...Array(totalPages)].map((_, i) => (
+          <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
+            {i + 1}
+          </button>
+        ))}
+      </div>
       </Card.Body>
     </Card>
   </Col>
@@ -702,13 +1035,20 @@ const Library = () => {
           show={showPDFModal}
           onHide={() => setShowPDFModal(false)}
           folder={uploadFolder}
-          get_collections={get_collections}
+          get_collections={fetchFolderStructure}
         />
         <UploadTextModal
           show={showTextModal}
           onHide={() => setShowTextModal(false)}
           folder={uploadFolder}
-          get_collections={get_collections}
+          get_collections={fetchFolderStructure}
+        />
+ <NewFolderModal
+          show={showNewFolderModal}
+          onHide={handleHideNewFolderModal}
+          onCreateFolder={handleCreateFolder}
+          title={newFolderParent ? "Create New Subfolder" : "Create New Folder"}
+          parentFolder={newFolderParent}
         />
         <>
     
@@ -722,6 +1062,7 @@ const Library = () => {
       )}
     </>
       </div>
+      <LibraryWizard/>
     </div>
   );
 }

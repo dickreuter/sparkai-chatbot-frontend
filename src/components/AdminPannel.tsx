@@ -10,6 +10,17 @@ interface IAttributesConfig {
     active: string;
     login: string;
     password: string;
+
+    email: string;
+    company: string;
+    jobRole: string;
+    stripe_customer_id: string;
+    organisation_id: string;
+    region: string;
+    product_name: string;
+    userType: string;
+    licenses: number;
+
     prompt1: string;
     prompt2: string;
     prompt3a: string;
@@ -50,6 +61,15 @@ const defaultAttributesConfig: IAttributesConfig = {
     active: "On",
     login: "",
     password: "",
+    email: "",
+    company: "",
+    jobRole: "",
+    stripe_customer_id: "",
+    organisation_id: "",
+    region: "",
+    product_name: "",
+    userType: "member",
+    licenses: 0,
     prompt1: "",
     prompt2: "",
     prompt3a: "",
@@ -303,6 +323,80 @@ const AdminPannel = () => {
                 />
             </div>
 
+            <div className="form-group">
+                <label>Email:</label>
+                <input
+                    type="email"
+                    value={data.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Company:</label>
+                <input
+                    type="text"
+                    value={data.company}
+                    onChange={(e) => handleChange("company", e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Job Role:</label>
+                <input
+                    type="text"
+                    value={data.jobRole}
+                    onChange={(e) => handleChange("jobRole", e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Stripe Customer ID:</label>
+                <input
+                    type="text"
+                    value={data.stripe_customer_id}
+                    onChange={(e) => handleChange("stripe_customer_id", e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Organisation ID:</label>
+                <input
+                    type="text"
+                    value={data.organisation_id}
+                    onChange={(e) => handleChange("organisation_id", e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Region:</label>
+                <input
+                    type="text"
+                    value={data.region}
+                    onChange={(e) => handleChange("region", e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>Product Name:</label>
+                <input
+                    type="text"
+                    value={data.product_name}
+                    onChange={(e) => handleChange("product_name", e.target.value)}
+                />
+            </div>
+            <div className="form-group">
+                <label>User Type:</label>
+                <select
+                    value={data.userType}
+                    onChange={(e) => handleChange("userType", e.target.value)}
+                >
+                    <option value="member">Member</option>
+                    <option value="owner">Owner</option>
+                </select>
+            </div>
+            <div className="form-group">
+                <label>Licenses:</label>
+                <input
+                    type="number"
+                    value={data.licenses}
+                    onChange={(e) => handleChange("licenses", parseInt(e.target.value))}
+                />
+            </div>
 
             <div className="prompt">
                 <label>Prompt2 (Q/A pairs) </label>

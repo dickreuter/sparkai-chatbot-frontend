@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Wizard from "react-onboarding";
 
 const BidExtractorWizard = () => {
-  const [isShow, setIsShow] = useState(true);
+  console.log('BidExtractorWizard component rendering');
+
+  const [isShow, setIsShow] = useState(false);
+  console.log('Initial isShow state:', isShow);
 
   const rule = [
     {
@@ -28,23 +31,40 @@ const BidExtractorWizard = () => {
   ];
 
   useEffect(() => {
-    const isFirstVisit = localStorage.getItem('bidExtractorTourCompleted') !== 'true';
-    setIsShow(isFirstVisit);
+    console.log('useEffect running');
+    const tourCompleted = localStorage.getItem('bidExtractorTourCompleted');
+    console.log('tourCompleted value from localStorage:', tourCompleted);
+
+    if (tourCompleted === null) {
+      console.log('Tour not completed, setting isShow to true');
+      setIsShow(true);
+    } else {
+      console.log('Tour already completed, isShow remains false');
+    }
   }, []);
 
   const handleClose = () => {
+    console.log('handleClose called');
     setIsShow(false);
     localStorage.setItem('bidExtractorTourCompleted', 'true');
+    console.log('bidExtractorTourCompleted set to true in localStorage');
   };
 
+  console.log('Rendering Wizard with isShow:', isShow);
+
   return (
-    <Wizard 
-      rule={rule}
-      isShow={isShow}
-      closeButtonTitle="End Tour"
-      closeButtonElement={<button onClick={handleClose}>End Tour</button>}
-      isScrollToElement={true}
-    />
+    <>
+      {isShow && (
+        <Wizard
+          rule={rule}
+          isShow={isShow}
+          closeButtonTitle="End Tour"
+          closeButtonElement={<button onClick={handleClose}>End Tour</button>}
+          isScrollToElement={true}
+        />
+      )}
+      {!isShow && <div style={{ display: 'none' }}>Wizard is not shown</div>}
+    </>
   );
 };
 

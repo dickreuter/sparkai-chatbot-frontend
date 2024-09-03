@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Wizard from "react-onboarding";
 
 const BidCompilerWizard = () => {
-  const [isShow, setIsShow] = useState(true);
+  console.log('BidCompilerWizard component rendering');
+
+  const [isShow, setIsShow] = useState(false);
+  console.log('Initial isShow state:', isShow);
 
   const rule = [
     {
@@ -15,34 +18,47 @@ const BidCompilerWizard = () => {
       title: 'Document Tabs',
       description: 'Switch between different sections or documents of your proposal using these tabs.',
     },
-    
-      {
-        elementId: 'add-section-button',
-        title: 'Add New Section',
-        description: 'Click here to add a new document to your proposal.',
-      },
-  
-    
+    {
+      elementId: 'add-section-button',
+      title: 'Add New Section',
+      description: 'Click here to add a new document to your proposal.',
+    },
   ];
 
   useEffect(() => {
-    const isFirstVisit = localStorage.getItem('bidCompilerTourCompleted') !== 'true';
-    setIsShow(isFirstVisit);
+    console.log('useEffect running');
+    const tourCompleted = localStorage.getItem('bidCompilerTourCompleted');
+    console.log('tourCompleted value from localStorage:', tourCompleted);
+    if (tourCompleted === null) {
+      console.log('Tour not completed, setting isShow to true');
+      setIsShow(true);
+    } else {
+      console.log('Tour already completed, isShow remains false');
+    }
   }, []);
 
   const handleClose = () => {
+    console.log('handleClose called, setting isShow to false');
     setIsShow(false);
     localStorage.setItem('bidCompilerTourCompleted', 'true');
+    console.log('bidCompilerTourCompleted set to true in localStorage');
   };
 
+  console.log('Rendering Wizard with isShow:', isShow);
+
   return (
-    <Wizard 
-      rule={rule}
-      isShow={isShow}
-      closeButtonTitle="End Tour"
-      closeButtonElement={<button onClick={handleClose}>End Tour</button>}
-      isScrollToElement={true}
-    />
+    <>
+      {isShow && (
+        <Wizard
+          rule={rule}
+          isShow={isShow}
+          closeButtonTitle="End Tour"
+          closeButtonElement={<button onClick={handleClose}>End Tour</button>}
+          isScrollToElement={true}
+        />
+      )}
+      {!isShow && <div style={{ display: 'none' }}>Wizard is not shown</div>}
+    </>
   );
 };
 

@@ -36,6 +36,11 @@ const useAuthSignIn = () => {
         localStorage.removeItem('messages');
         localStorage.removeItem('chatResponseMessages');
         localStorage.removeItem('bidState');
+        localStorage.removeItem('dashboardTourCompleted');
+        localStorage.removeItem('libraryTourCompleted');
+        localStorage.removeItem('bidExtractorTourCompleted');
+        localStorage.removeItem('questionCrafterTourCompleted');
+        localStorage.removeItem('bidCompilerTourCompleted');
         navigate('/bids');
 
         //localStorage.clear();

@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Wizard from "react-onboarding";
 
 const QuestionCrafterWizard = () => {
-  const [isShow, setIsShow] = useState(true);
+  console.log('QuestionCrafterWizard component rendering');
+
+  const [isShow, setIsShow] = useState(false);
+  console.log('Initial isShow state:', isShow);
 
   const rule = [
     {
@@ -30,28 +33,43 @@ const QuestionCrafterWizard = () => {
       title: 'Q/A Sheet Selector',
       description: 'Select a Q/A sheet to add the question and answer to your bid compiler.',
     },
-  
-   
   ];
 
   useEffect(() => {
-    const isFirstVisit = localStorage.getItem('questionCrafterTourCompleted') !== 'true';
-    setIsShow(isFirstVisit);
+    console.log('useEffect running');
+    const tourCompleted = localStorage.getItem('questionCrafterTourCompleted');
+    console.log('tourCompleted value from localStorage:', tourCompleted);
+
+    if (tourCompleted === null) {
+      console.log('Tour not completed, setting isShow to true');
+      setIsShow(true);
+    } else {
+      console.log('Tour already completed, isShow remains false');
+    }
   }, []);
 
   const handleClose = () => {
+    console.log('handleClose called');
     setIsShow(false);
     localStorage.setItem('questionCrafterTourCompleted', 'true');
+    console.log('questionCrafterTourCompleted set to true in localStorage');
   };
 
+  console.log('Rendering Wizard with isShow:', isShow);
+
   return (
-    <Wizard 
-      rule={rule}
-      isShow={isShow}
-      closeButtonTitle="End Tour"
-      closeButtonElement={<button onClick={handleClose}>End Tour</button>}
-      isScrollToElement={false}
-    />
+    <>
+      {isShow && (
+        <Wizard
+          rule={rule}
+          isShow={isShow}
+          closeButtonTitle="End Tour"
+          closeButtonElement={<button onClick={handleClose}>End Tour</button>}
+          isScrollToElement={false}
+        />
+      )}
+      {!isShow && <div style={{ display: 'none' }}>Wizard is not shown</div>}
+    </>
   );
 };
 

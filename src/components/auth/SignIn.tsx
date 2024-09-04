@@ -95,6 +95,14 @@ const FullScreenTwoCards = () => {
           open={snackbarOpen}
           autoHideDuration={3000}
           onClose={() => setSnackbarOpen(false)}
+         
+          style={{
+            position: 'fixed',
+            bottom: '-25%',
+            marginBottom: '15px'
+        
+            
+          }}
         >
           <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
             {snackbarMessage}

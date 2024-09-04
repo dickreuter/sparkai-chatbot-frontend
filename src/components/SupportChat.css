@@ -14,3 +14,42 @@
     background-color: #000 !important;
     color: #fff !important;
 }
+
+
+/* Position the widget container in the bottom right corner */
+
+.rcw-widget-container {
+    position: fixed !important;
+    bottom: -25% !important;
+    right: -10px !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+
+/* Adjust the launcher position */
+
+.rcw-launcher {
+    position: relative !important;
+    bottom: 0 !important;
+    right: 0 !important;
+}
+
+
+/* Ensure the widget opens above the launcher */
+
+.rcw-conversation-container {
+    bottom: 60px !important;
+    /* Adjust this value based on your launcher size */
+    right: 0 !important;
+}
+
+
+/* Optional: Add some space between the widget and the edge of the screen on smaller devices */
+
+@media (max-width: 768px) {
+    .rcw-widget-container {
+        bottom: 10px !important;
+        right: 10px !important;
+    }
+}

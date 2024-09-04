@@ -147,7 +147,7 @@ const BidExtractor = () => {
       if (err.response && err.response.status === 404) {
         displayAlert("No documents found in the tender library. Please upload documents before generating compliance requirements.", 'warning');
       } else {
-        displayAlert("Error generating compliance requirements. Please try again.", 'danger');
+        displayAlert("No documents found in the tender library. Please upload documents before generating compliance requirements.", 'danger');
       }
     } finally {
       setIsGeneratingCompliance(false);
@@ -191,7 +191,7 @@ const BidExtractor = () => {
       if (err.response && err.response.status === 404) {
         displayAlert("No documents found in the tender library. Please upload documents before generating opportunity information.", 'warning');
       } else {
-        displayAlert("Error generating opportunity information. Please try again.", 'danger');
+        displayAlert("No documents found in the tender library. Please upload documents before generating opportunity information.", 'danger');
       }
     } finally {
       setIsGeneratingOpportunity(false);

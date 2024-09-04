@@ -4,11 +4,12 @@ import 'react-chat-widget/lib/styles.css';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
-import './SupportChat.css'; // Import custom styles
+
 import sidebarIcon from '../resources/images/mytender.io_badge.png';
 
 import { faComment, faComments } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import './SupportChat.css'; // Import custom styles
 
 const SupportChat = ({ auth }) => {
   const [messages, setMessages] = useState([]);
@@ -122,7 +123,7 @@ const SupportChat = ({ auth }) => {
 
   // Conditionally render the SupportChat based on the current route
 
-  const notRenderedUrls = ['/chatResponse', '/question-crafter', '/signup', '/reset_password']
+  const notRenderedUrls = ['/chatResponse', '/question-crafter', '/signup', '/reset_password', '/login']
 
   if (notRenderedUrls.includes(location.pathname)) {
     return null;
@@ -134,6 +135,7 @@ const SupportChat = ({ auth }) => {
       title="Support"
       subtitle="Ask us anything"
       fullScreenMode={false}
+      className="bottomFixed"
       
     />
   );

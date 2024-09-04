@@ -62,7 +62,7 @@ const QuestionCrafterWizard = () => {
       {isShow && (
         <Wizard
           rule={rule}
-          isShow={isShow}
+          isShow={false}
           closeButtonTitle="End Tour"
           closeButtonElement={<button onClick={handleClose}>End Tour</button>}
           isScrollToElement={false}

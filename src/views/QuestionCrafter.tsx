@@ -1097,7 +1097,7 @@ useEffect(() => {
           <Row className="mt-2">
 
               
-          <Col md={7} >
+          <Col lg={7} md={12}>
               <h1 id="answer-section" className="lib-title mt-4 mb-3" >Answer</h1>
               <div className="response-box draft-editor" ref={responseBoxRef}>
               <div className="editor-container" ref={editorRef}>
@@ -1124,7 +1124,7 @@ useEffect(() => {
      
 
             </Col>
-            <Col md={5}>
+            <Col lg={5} md={12}>
               <div className="input-header">
                 <div className="proposal-header mb-2">
                   <h1 className="lib-title" style={{ color: "white" }} id='bid-pilot-section'>Bid Pilot</h1>

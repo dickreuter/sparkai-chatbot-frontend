@@ -1,30 +1,51 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Widget, addResponseMessage, addUserMessage } from 'react-chat-widget';
-import 'react-chat-widget/lib/styles.css';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
-
-import sidebarIcon from '../resources/images/mytender.io_badge.png';
-
-import { faComment, faComments } from '@fortawesome/free-solid-svg-icons';
+import './SupportChat.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import './SupportChat.css'; // Import custom styles
+import { faComments, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 
 const SupportChat = ({ auth }) => {
   const [messages, setMessages] = useState([]);
-  const [isFirstFetch, setIsFirstFetch] = useState(true);
-  const messagesRef = useRef(messages);
-  const lastUserMessageRef = useRef(null);
-  const location = useLocation(); // Get the current location
+  const [isOpen, setIsOpen] = useState(false);
+  const messagesEndRef = useRef(null);
+  const location = useLocation();
+  const [inputMessage, setInputMessage] = useState('');
 
-  useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
+  const processMessage = (msg) => {
+    console.log("Processing message:", JSON.stringify(msg));
+    let text = msg.text;
+    let isUserMessage = false;
+
+    console.log("Initial text:", text);
+
+    // Remove the unexpected "!" prefix if present
+    if (text.startsWith('!')) {
+      console.log("Found '!' prefix, removing...");
+      text = text.slice(1).trim();
+      console.log("Text after removing '!':", text);
+    }
+
+    // Check for "USER" prefix
+    if (text.startsWith('USER ')) {
+      console.log("Found 'USER' prefix, marking as user message...");
+      isUserMessage = true;
+      text = text.slice(5).trim();
+      console.log("Text after removing 'USER':", text);
+    }
+
+    const processedMsg = {
+      ...msg,
+      isUserMessage,
+      text,
+    };
+    
+    return processedMsg;
+  };
 
   const fetchMessages = useCallback(async () => {
     if (!auth?.token) return;
-
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/slack_get_messages`,
@@ -36,58 +57,48 @@ const SupportChat = ({ auth }) => {
         }
       );
       const { messages: fetchedMessages } = response.data;
-
-      //console.log('Fetched Messages:', fetchedMessages);
-
+    
       if (Array.isArray(fetchedMessages)) {
-        const newMessages = fetchedMessages.filter(
-          (fMsg) => !messagesRef.current.some((msg) => msg.id === fMsg.id || msg.text === fMsg.text)
-        );
-
-        //console.log('New Messages:', newMessages);
-
-        newMessages.forEach((msg) => {
-          if (typeof msg.text === 'string') {
-            if (msg.text.startsWith('!')) {
-              if (isFirstFetch) {
-                addUserMessage(msg.text.slice(1)); // Strip the "!" before adding
-              }
-            } else {
-              addResponseMessage(msg.text);
-            }
-          } else {
-            console.error('Invalid message format:', msg);
-          }
+        setMessages(prevMessages => {
+          const newMessages = fetchedMessages.filter(
+            (fMsg) => !prevMessages.some((msg) => msg.id === fMsg.id)
+          );
+          
+          const updatedMessages = [...prevMessages, ...newMessages.map(msg => {
+            const processedMsg = processMessage(msg);
+            
+            return processedMsg;
+          })];
+        
+          return updatedMessages;
         });
-
-        setMessages((prevMessages) => [...prevMessages, ...newMessages]);
-        setIsFirstFetch(false); // Mark as no longer the first fetch
-      } else {
-        console.error('Fetched messages is not an array:', fetchedMessages);
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
-  }, [auth?.token, isFirstFetch]);
+  }, [auth?.token]);
 
   useEffect(() => {
     if (auth?.token) {
       fetchMessages();
-      const intervalId = setInterval(fetchMessages, 10000);
+      const intervalId = setInterval(fetchMessages, 5000);
       return () => clearInterval(intervalId);
     }
   }, [auth?.token, fetchMessages]);
 
-  const handleNewUserMessage = async (newMessage) => {
-    // Check if the new message is the same as the last user message
-    if (lastUserMessageRef.current === newMessage) {
-      return; // Don't add the message if it's the same as the last one
-    }
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
+
+  const handleSendMessage = () => {
+    handleNewUserMessage(inputMessage);
+  };
+
+  const handleNewUserMessage = async (newMessage) => {
     try {
       const formData = new FormData();
-      formData.append('message', newMessage);
-
+      formData.append('message', `USER ${newMessage}`);
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/slack_send_message`,
         formData,
@@ -101,43 +112,73 @@ const SupportChat = ({ auth }) => {
       const { message, error } = response.data;
       if (error) {
         console.error("Error sending message:", error);
-      } else {
-        if (typeof message === 'string') {
-          addUserMessage(message);
-          const newMessageObject = {
-            id: new Date().getTime().toString(), // Use current timestamp as unique id
-            text: message // Add the message text to the object
-          };
-          setMessages((prevMessages) => {
-            const updatedMessages = [...prevMessages, newMessageObject];
-            messagesRef.current = updatedMessages; // Update the ref
-            return updatedMessages;
-          });
-          lastUserMessageRef.current = message; // Update the last user message ref
-        }
+      } else if (typeof message === 'string') {
+        console.log("Raw new user message:", message);
+        const newUserMessage = processMessage({ 
+          id: new Date().getTime().toString(), 
+          text: message,
+        });
+        console.log("Processed new user message:", JSON.stringify(newUserMessage));
+        setMessages(prevMessages => [...prevMessages, newUserMessage]);
+        fetchMessages();
+        setInputMessage('');
       }
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
-  // Conditionally render the SupportChat based on the current route
-
-  const notRenderedUrls = ['/chatResponse', '/question-crafter', '/signup', '/reset_password', '/login']
-
+  const notRenderedUrls = ['/chatResponse', '/question-crafter', '/signup', '/reset_password', '/login'];
   if (notRenderedUrls.includes(location.pathname)) {
     return null;
   }
 
   return (
-    <Widget
-      handleNewUserMessage={handleNewUserMessage}
-      title="Support"
-      subtitle="Ask us anything"
-      fullScreenMode={false}
-      className="bottomFixed"
-      
-    />
+    <div className="support-chat-container">
+      <button onClick={() => setIsOpen(!isOpen)} className="chat-toggle-button">
+        <FontAwesomeIcon icon={faComments} />
+        <span className="sr-only">{isOpen ? 'Close Chat' : 'Open Chat'}</span>
+      </button>
+      {isOpen && (
+        <div className="chat-widget">
+          <div className="chat-header">
+            <h3>Support Chat</h3>
+            <p>Ask us anything</p>
+          </div>
+          <div className="chat-messages">
+            {messages.map((msg, index) => {
+             
+              return (
+                <div key={msg.id || index} className={`message-container ${msg.isUserMessage ? 'user-message-container' : 'support-message-container'}`}>
+                  <div className={`message ${msg.isUserMessage ? 'user-message' : 'support-message'}`}>
+                    {msg.text}
+                  </div>
+                </div>
+              );
+            })}
+            <div ref={messagesEndRef} />
+          </div>
+          <div className="chat-input" >
+          <div className="bid-input-bar">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSendMessage();
+              }
+            }}
+          />
+          <button onClick={handleSendMessage}>
+            <FontAwesomeIcon icon={faPaperPlane} />
+          </button>
+          </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

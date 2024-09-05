@@ -31,8 +31,9 @@ const TenderLibrary = ({ object_id }) => {
   const [showPdfViewerModal, setShowPdfViewerModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
 
+  const [showWordModal, setShowWordModal] = useState(false);
+  const [wordFileContent, setWordFileContent] = useState(null);
 
-  const folderName = `TenderLibrary_${object_id}`;
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -118,30 +119,49 @@ const TenderLibrary = ({ object_id }) => {
   };
  
 
-  const viewPdfFile = async (fileName) => {
+  const viewFile = async (fileName) => {
     try {
       const formData = new FormData();
       formData.append('bid_id', object_id);
       formData.append('file_name', fileName);
   
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_pdf_format`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
-            'Content-Type': 'multipart/form-data',
-          },
-          responseType: 'blob',
-        }
-      );
-  
-      const fileURL = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
-      setPdfUrl(fileURL);
-      setShowPdfViewerModal(true);
+      const fileExtension = fileName.split('.').pop().toLowerCase();
+      
+      if (fileExtension === 'pdf') {
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_pdf_format`,
+          formData,
+          {
+            headers: {
+              'Authorization': `Bearer ${tokenRef.current}`,
+              'Content-Type': 'multipart/form-data',
+            },
+            responseType: 'blob',
+          }
+        );
+        const fileURL = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+        setPdfUrl(fileURL);
+        setShowPdfViewerModal(true);
+      } else if (['doc', 'docx'].includes(fileExtension)) {
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_word_format`,
+          formData,
+          {
+            headers: {
+              'Authorization': `Bearer ${tokenRef.current}`,
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+        setWordFileContent(response.data.content);
+        setCurrentFileName(fileName);
+        setShowWordModal(true);
+      } else {
+        throw new Error('Unsupported file type');
+      }
     } catch (error) {
-      console.error('Error viewing PDF file:', error);
-      displayAlert('Error viewing PDF file', "danger");
+      console.error('Error viewing file:', error);
+      displayAlert('Error viewing file', "danger");
     }
   };
   
@@ -157,7 +177,7 @@ const TenderLibrary = ({ object_id }) => {
 
     return documentsToDisplay.map((filename, index) => (
       <tr key={index} style={{ cursor: 'pointer' }}>
-        <td onClick={() => viewPdfFile(filename)}>
+        <td onClick={() => viewFile(filename)}>
           <FontAwesomeIcon icon={faFileAlt} className="fa-icon" /> {filename}
         </td>
         <td>
@@ -171,7 +191,6 @@ const TenderLibrary = ({ object_id }) => {
       </tr>
     ));
   };
-
 
   
 const UploadPDFModal = ({ show, onHide, object_id}) => {
@@ -206,7 +225,13 @@ const UploadPDFModal = ({ show, onHide, object_id}) => {
   };
 
   const handleFile = (file) => {
-    if (file.type === 'application/pdf') {
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    
+    if (allowedTypes.includes(file.type)) {
       setFile(file);
     } else {
       displayAlert('Please select a PDF file', 'warning');
@@ -275,11 +300,11 @@ const UploadPDFModal = ({ show, onHide, object_id}) => {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".pdf"
+            accept=".pdf,.doc,.docx"
             onChange={handleFileSelect}
             style={{ display: 'none' }}
           />
-          <p>Drag & Drop your PDF here or click to select.</p>
+          <p>Drag and drop your PDF or Word document here or click to select a file.</p>
           {file && <p>Selected file: {file.name}</p>}
         </div>
       </Modal.Body>
@@ -345,9 +370,9 @@ return (
                   open={open}
                   onClose={handleMenuClose}
                 >
-                  <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "180px" }}>
+                  <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "200px" }}>
                     <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
-                    Upload PDF
+                    Upload PDF/Doc
                   </MenuItem>
                 </Menu>
               </div>
@@ -393,15 +418,39 @@ return (
       object_id={object_id}
     />
 
-    {showPdfViewerModal && (
-      <div className="pdf-viewer-modal" onClick={() => setShowPdfViewerModal(false)}>
-        <div className="pdf-viewer-modal-content" onClick={e => e.stopPropagation()}>
-          <iframe src={pdfUrl} width="100%" height="600px"></iframe>
+{showPdfViewerModal && (
+        <div className="pdf-viewer-modal" onClick={() => setShowPdfViewerModal(false)}>
+          <div className="pdf-viewer-modal-content" onClick={e => e.stopPropagation()}>
+            <iframe src={pdfUrl} width="100%" height="600px"></iframe>
+          </div>
         </div>
-      </div>
-    )}
-  </>
-);
+      )}
+
+      {showWordModal && (
+        <Modal show={showWordModal} onHide={() => setShowWordModal(false)} size="lg" style={{ display: 'flex', justifyContent: 'center', textAlign: 'center' }}>
+          <Modal.Header closeButton>
+          <Modal.Title style={{ textAlign: 'center' }}>
+              File Content
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body style={{ height: '600px'}}>
+          <pre style={{
+                width: '100%',
+                height: '100%',
+                padding: '20px',
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word',
+                overflowX: 'hidden',
+                borderRadius: '4px',
+                border: '1px solid #ccc'
+            }}>
+              {wordFileContent}
+            </pre>
+          </Modal.Body>
+        </Modal>
+      )}
+    </>
+  );
 }
 
 export default withAuth(TenderLibrary);

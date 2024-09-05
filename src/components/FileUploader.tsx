@@ -101,11 +101,11 @@ const FileUploader = ({ onFileSelect, folder, onClose, usingTenderLibrary = fals
         <input
           type="file"
           onChange={handleFileSelect}
-          accept=".pdf"
+          accept=".pdf,.doc,.docx"
           id="file-upload"
         />
         <label htmlFor="file-upload" className="upload-label">
-          Drag and drop your PDF here or click to select a file.
+        Drag and drop your PDF or Word document here or click to select a file.
         </label>
       </div>
       {selectedFile && (

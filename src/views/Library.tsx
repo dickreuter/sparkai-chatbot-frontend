@@ -937,9 +937,9 @@ useEffect(() => {
                       open={open}
                       onClose={handleMenuClose}
                     >
-                      <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "180px" }}>
+                      <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "200px" }}>
                         <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
-                        Upload PDF
+                        Upload PDF/Doc
                       </MenuItem>
                       <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
                         <i className="fas fa-file-alt" style={{ marginRight: '12px' }}></i>

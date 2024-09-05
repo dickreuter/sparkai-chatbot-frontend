@@ -213,6 +213,7 @@ def testingEnrollment(request):
 DOMAIN = os.getenv('DOMAIN')
 
 DISCOUNT_CODE = 'SPECIAL75'  # You can change this to your desired discount code
+TRIAL_DISCOUNT_CODE = 'TENDERTRIAL75'  # New discount code for trial + 75% off
 
 def create_checkout_session(request) -> HttpResponse:
     price_lookup_key = request.POST['price_lookup_key']
@@ -232,6 +233,25 @@ def create_checkout_session(request) -> HttpResponse:
                 duration='repeating',
                 duration_in_months=3,
                 name='75% Off for 3 months'
+            )
+           
+            # Set up the 14-day free trial
+            trial_end = int((datetime.now() + timedelta(days=15)).timestamp())
+           
+            checkout_session = stripe.checkout.Session.create(
+                line_items=line_items,
+                mode='subscription',
+                discounts=[{'coupon': coupon.id}],
+                subscription_data={'trial_end': trial_end},
+                success_url=DOMAIN + reverse('success') + '?session_id={CHECKOUT_SESSION_ID}',
+                cancel_url=DOMAIN + reverse('cancel')
+            )
+        elif discount_code == TRIAL_DISCOUNT_CODE:
+            # New coupon: 2-week free trial + 75% off for 1 month
+            coupon = stripe.Coupon.create(
+                percent_off=75,
+                duration='once',
+                name='75% Off for 1 month after 2-week trial'
             )
            
             # Set up the 14-day free trial

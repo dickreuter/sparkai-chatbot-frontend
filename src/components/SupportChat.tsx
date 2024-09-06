@@ -92,7 +92,10 @@ const SupportChat = ({ auth }) => {
 
 
   const handleSendMessage = () => {
-    handleNewUserMessage(inputMessage);
+    if (inputMessage.trim()) {
+      handleNewUserMessage(inputMessage);
+      setInputMessage('');  // Clear input immediately after sending
+    }
   };
 
   const handleNewUserMessage = async (newMessage) => {
@@ -121,7 +124,7 @@ const SupportChat = ({ auth }) => {
         console.log("Processed new user message:", JSON.stringify(newUserMessage));
         setMessages(prevMessages => [...prevMessages, newUserMessage]);
         fetchMessages();
-        setInputMessage('');
+        
       }
     } catch (error) {
       console.error("Error sending message:", error);

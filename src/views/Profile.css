@@ -18,3 +18,9 @@
     box-shadow: none;
     /* Removes default shadow for consistency */
 }
+
+.chatpage {
+    width: 125vw;
+    /* Adjusted to account for padding-left */
+    height: 125vh;
+}

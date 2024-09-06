@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
-import { Form, Row, Col, Card, Button, Modal, Table } from 'react-bootstrap';
+import { Form, Row, Col, Card, Button, Modal, Table, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import './Profile.css';
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
@@ -78,7 +78,6 @@ const ProfilePage = () => {
     }
   }, [formData.userType]);
 
-  if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
   const handleInviteSubmit = async (e) => {
@@ -123,6 +122,20 @@ const ProfilePage = () => {
       }
     }
   };
+
+  if (loading) {
+    return (
+      <div>
+        <SideBarSmall />
+        <div className="loading-container">
+          <div style={{marginLeft: "8%"}}>
+          <Spinner animation="border" variant="primary" className="spinner" />
+          </div>
+          
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="chatpage">

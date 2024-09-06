@@ -86,7 +86,10 @@ const HowTo = () => {
       <div>
         <SideBarSmall />
         <div className="loading-container">
+          <div style={{marginLeft: "8%"}}>
           <Spinner animation="border" variant="primary" className="spinner" />
+          </div>
+          
         </div>
       </div>
     );

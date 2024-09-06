@@ -627,7 +627,7 @@ useEffect(() => {
   if (activeFolder) {
     fetchFolderContents(activeFolder);
   }
-}, [updateTrigger]);
+}, [updateTrigger, activeFolder]);
 
   useEffect(() => {
     setShowDropdown(searchQuery.length > 0);
@@ -635,7 +635,6 @@ useEffect(() => {
   
 
   useEffect(() => {
-    console.log(`Active folder changed to: ${activeFolder}`);
     if (activeFolder === null) {
       const topLevelFolders = getTopLevelFolders();
       const itemsCount = topLevelFolders.length;
@@ -646,9 +645,10 @@ useEffect(() => {
       const itemsCount = folderContents[activeFolder]?.length || 0;
       const pages = Math.ceil(itemsCount / rowsPerPage);
       setTotalPages(pages);
+      setCurrentPage(1); // Reset to first page when changing folders
     }
   }, [activeFolder, folderContents, availableCollections, rowsPerPage]);
-
+  
   const formatDisplayName = (name) => {
     return name.replace(/_/g, ' ');
   };
@@ -686,17 +686,18 @@ useEffect(() => {
     });
   };
 
-  const renderFolderContents = (folderPath) => {
-    const contents = folderContents[folderPath] || [];
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    const contentsToRender = contents.slice(startIndex, endIndex);
+  
+const renderFolderContents = (folderPath) => {
+  const contents = folderContents[folderPath] || [];
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const contentsToRender = contents.slice(startIndex, endIndex);
 
-    return contentsToRender.map(({ filename, unique_id, isFolder }, index) => {
-      const fullPath = isFolder ? `${folderPath}FORWARDSLASH${filename}` : folderPath;
-      const displayName = formatDisplayName(filename);
-      return (
-        <tr key={`${folderPath}-${index}`} style={{ cursor: 'pointer' }}>
+  return contentsToRender.map(({ filename, unique_id, isFolder }, index) => {
+    const fullPath = isFolder ? `${folderPath}FORWARDSLASH${filename}` : folderPath;
+    const displayName = formatDisplayName(filename);
+    return (
+      <tr key={`${folderPath}-${index}`} style={{ cursor: 'pointer' }}>
           <td onClick={() => isFolder ? handleFolderClick(fullPath) : viewFile(filename, folderPath, unique_id)}>
             <FontAwesomeIcon 
               icon={isFolder ? faFolder : faFileAlt} 

@@ -52,6 +52,7 @@
     overflow-x: hidden;
     overflow-y: hidden;
     overflow: none;
+    width: 125vw;
 }
 
 body {

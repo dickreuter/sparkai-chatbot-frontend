@@ -7,7 +7,7 @@ import "./Bids.css";
 import { useNavigate } from 'react-router-dom';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import handleGAEvent from '../utilities/handleGAEvent.tsx';
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Modal, Pagination } from 'react-bootstrap';
 import { displayAlert } from '../helper/Alert.tsx';
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -29,6 +29,48 @@ const Bids = () => {
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
     const navigate = useNavigate();
+
+    // Sorting bids based on the selected criteria
+    const sortedBids = [...bids].sort((a, b) => {
+        const dateA = new Date(a.submission_deadline);
+        const dateB = new Date(b.submission_deadline);
+
+        if (sortCriteria === 'lastEdited') {
+            return new Date(b.timestamp) - new Date(a.timestamp);
+        } else if (sortCriteria === 'submissionDeadline') {
+            // Handle invalid dates
+            if (isNaN(dateA) && isNaN(dateB)) {
+                return 0;
+            } else if (isNaN(dateA)) {
+                return 1;
+            } else if (isNaN(dateB)) {
+                return -1;
+            } else {
+                return dateA - dateB;
+            }
+        }
+        return 0;
+    });
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const bidsPerPage = 11;
+
+    // Calculate the current bids to display
+    const indexOfLastBid = currentPage * bidsPerPage;
+    const indexOfFirstBid = indexOfLastBid - bidsPerPage;
+    const currentBids = sortedBids.slice(indexOfFirstBid, indexOfLastBid);
+
+    // Change page
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(1);
+    };
 
     const navigateToChatbot = (bid) => {
         localStorage.setItem('navigatedFromBidsTable', 'true');
@@ -225,27 +267,7 @@ const Bids = () => {
         setShowModal(false);
     };
 
-    // Sorting bids based on the selected criteria
-    const sortedBids = [...bids].sort((a, b) => {
-        const dateA = new Date(a.submission_deadline);
-        const dateB = new Date(b.submission_deadline);
-
-        if (sortCriteria === 'lastEdited') {
-            return new Date(b.timestamp) - new Date(a.timestamp);
-        } else if (sortCriteria === 'submissionDeadline') {
-            // Handle invalid dates
-            if (isNaN(dateA) && isNaN(dateB)) {
-                return 0;
-            } else if (isNaN(dateA)) {
-                return 1;
-            } else if (isNaN(dateB)) {
-                return -1;
-            } else {
-                return dateA - dateB;
-            }
-        }
-        return 0;
-    });
+    
 
     return (
         <div >
@@ -277,7 +299,7 @@ const Bids = () => {
                 </div>
             
               
-                <table  className="bids-table mt-3">
+                <table  className="bids-table mt-2">
                     <thead>
                         <tr >
                             <th  style={{ width: "18%" }}>Bid Title</th>
@@ -292,7 +314,7 @@ const Bids = () => {
                     </thead>
 
                     <tbody>
-                        {sortedBids.map((bid, index) => (
+                       {currentBids.map((bid, index) => (
                             <tr key={index}>
                                 <td>
                                     <Link to="/bid-extractor" state={{ bid: bid, fromBidsTable: true }} onClick={() => navigateToChatbot(bid)}>
@@ -335,7 +357,23 @@ const Bids = () => {
                         ))}
                     </tbody>
                 </table>
+                <div className="pagination-container">
+                    {[...Array(Math.ceil(sortedBids.length / bidsPerPage))].map((_, index) => (
+                        <button
+                            key={index + 1}
+                            className={`pagination-button ${currentPage === index + 1 ? 'active' : ''}`}
+                            onClick={() => paginate(index + 1)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+                </div>
+                
             </div>
+           
+            
+
+            
 
             <Modal show={showModal} onHide={handleModalClose} className="custom-modal-newbid">
                 <Modal.Header closeButton className="px-4 py-3">

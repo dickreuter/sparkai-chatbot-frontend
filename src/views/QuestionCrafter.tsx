@@ -672,11 +672,11 @@ useEffect(() => {
   const [inputValue, setInputValue] = useState("");
 
   const [bidPilotchoice, setBidPilotChoice] = useState("2");
-  const [bidPilotbroadness, setBidPilotBroadness] = useState("2");
+  const [bidPilotbroadness, setBidPilotBroadness] = useState("4");
   const [isBidPilotLoading, setIsBidPilotLoading] = useState(false);
 
   const [choice, setChoice] = useState("3");
-  const [broadness, setBroadness] = useState("2");
+  const [broadness, setBroadness] = useState("4");
 
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);

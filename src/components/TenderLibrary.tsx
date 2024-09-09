@@ -194,7 +194,7 @@ const TenderLibrary = ({ object_id }) => {
 
   
 const UploadPDFModal = ({ show, onHide, object_id}) => {
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
@@ -213,68 +213,82 @@ const UploadPDFModal = ({ show, onHide, object_id}) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(Array.from(e.dataTransfer.files));
     }
   };
 
   const handleFileSelect = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0]);
+    if (e.target.files && e.target.files.length > 0) {
+      handleFiles(Array.from(e.target.files));
     }
   };
 
-  const handleFile = (file) => {
+  const handleFiles = (newFiles) => {
     const allowedTypes = [
       'application/pdf',
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     ];
     
-    if (allowedTypes.includes(file.type)) {
-      setFile(file);
-    } else {
-      displayAlert('Please select a PDF file', 'warning');
+    const validFiles = newFiles.filter(file => allowedTypes.includes(file.type));
+    setFiles(prevFiles => [...prevFiles, ...validFiles]);
+
+    if (validFiles.length !== newFiles.length) {
+      displayAlert('Some files were not added. Only PDF and Word documents are allowed.', 'warning');
     }
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      displayAlert('Please select a file to upload', 'warning');
+    if (files.length === 0) {
+      displayAlert('Please select files to upload', 'warning');
       return;
     }
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("bid_id", object_id);
-    console.log(formData);
-    try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
+    let successCount = 0;
+    let failCount = 0;
 
-      if (response.data.status === "success") {
-        displayAlert('File uploaded successfully', 'success');
-        fetchDocuments();
-        onHide();
-      } else {
-        throw new Error("Upload failed");
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("bid_id", object_id);
+
+      try {
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`,
+          formData,
+          {
+            headers: {
+              'Authorization': `Bearer ${tokenRef.current}`,
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+
+        if (response.data.status === "success") {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        failCount++;
       }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      displayAlert('Error uploading file', 'danger');
-    } finally {
-      setUploading(false);
-      setFile(null);
     }
+
+    setUploading(false);
+    setFiles([]);
+
+    if (successCount > 0) {
+      displayAlert(`Successfully uploaded ${successCount} file(s)`, 'success');
+    }
+    if (failCount > 0) {
+      displayAlert(`Failed to upload ${failCount} file(s)`, 'danger');
+    }
+
+    fetchDocuments();
+    onHide();
   };
 
   return (
@@ -285,10 +299,10 @@ const UploadPDFModal = ({ show, onHide, object_id}) => {
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title>Upload PDF to Tender Library</Modal.Title>
+        <Modal.Title>Upload Files to Tender Library</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-      <p>Documents uploaded to the Tender Library will be used as context by our AI to generate compliance requirements and opportunity information for the Tender. </p>
+        <p>Documents uploaded to the Tender Library will be used as context by our AI to generate compliance requirements and opportunity information for the Tender.</p>
         <div 
           className={`drop-zone ${dragActive ? 'active' : ''}`}
           onDragEnter={handleDrag}
@@ -303,19 +317,28 @@ const UploadPDFModal = ({ show, onHide, object_id}) => {
             accept=".pdf,.doc,.docx"
             onChange={handleFileSelect}
             style={{ display: 'none' }}
+            multiple
           />
-          <p>Drag and drop your PDF or Word document here or click to select a file.</p>
-          {file && <p>Selected file: {file.name}</p>}
+          <p>Drag and drop your PDF or Word documents here or click to select files.</p>
+          {files.length > 0 && (
+            <div>
+              <p>Selected files:</p>
+              <ul>
+                {files.map((file, index) => (
+                  <li key={index}>{file.name}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </Modal.Body>
       <Modal.Footer>
-     
         <Button 
           className="upload-button"
           onClick={handleUpload}
-          disabled={uploading || !file}
+          disabled={uploading || files.length === 0}
         >
-          {uploading ? 'Uploading...' : 'Upload'}
+          {uploading ? 'Uploading...' : `Upload ${files.length} File${files.length !== 1 ? 's' : ''}`}
         </Button>
       </Modal.Footer>
     </Modal>

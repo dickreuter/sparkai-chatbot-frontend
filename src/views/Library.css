@@ -69,9 +69,9 @@
             background-color: white;
             font-weight: 500;
             color: black;
+            width: 100%;
         }
         
-        .library-table th,
         .library-table td {
             width: 50%;
         }
@@ -333,4 +333,35 @@
         
         .pdf-viewer-modal iframe {
             border: none;
+        }
+        
+        .breadcrumb-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            /* Match the left padding of the first table cell */
+            width: 100%;
+            border-bottom: 1px solid #dee2e6;
+            box-sizing: border-box;
+            /* Ensure padding is included in the width */
+        }
+        
+        .breadcrumb-item {
+            font-weight: 500;
+            font-size: 17px;
+        }
+        
+        .breadcrumb-item.clickable {
+            cursor: pointer;
+            color: orange;
+        }
+        
+        .breadcrumb-item.clickable:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb-separator {
+            margin: 0 5px;
+            color: #6c757d;
         }

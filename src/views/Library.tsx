@@ -755,6 +755,39 @@ const renderFolderContents = (folderPath) => {
     });
   };
 
+  const renderBreadcrumbs = () => {
+    if (!activeFolder) {
+      return <span className="breadcrumb-item">Content Library</span>;
+    }
+
+    const parts = activeFolder.split('FORWARDSLASH');
+    return (
+      <>
+        <span 
+          className="breadcrumb-item clickable" 
+          onClick={() => setActiveFolder(null)}
+        >
+          Content Library
+        </span>
+        {parts.map((part, index) => (
+          <React.Fragment key={index}>
+            <span className="breadcrumb-separator">&gt;</span>
+            <span 
+              className={`breadcrumb-item ${index === parts.length - 1 ? '' : 'clickable'}`}
+              onClick={() => {
+                if (index < parts.length - 1) {
+                  setActiveFolder(parts.slice(0, index + 1).join('FORWARDSLASH'));
+                }
+              }}
+            >
+              {formatDisplayName(part)}
+            </span>
+          </React.Fragment>
+        ))}
+      </>
+    );
+  };
+
 
 
   const handleSearchChange = (e) => {
@@ -871,7 +904,7 @@ const renderFolderContents = (folderPath) => {
       <Card.Body className="library-card-body-content">
         <div className="library-card-content-wrapper">
           <div className="header-row mt-2">
-            <div className="lib-title" id='library-table'>Resources</div>
+            <div className="lib-title" id='library-table' style={{marginLeft: "15px"}}>Resources</div>
 
             <InputGroup id='search-bar-container' className={`search-bar-container ${showDropdown ? 'dropdown-visible' : ''}`} ref={searchBarRef}>
               <FontAwesomeIcon icon={faSearch} className="search-icon" />
@@ -913,8 +946,9 @@ const renderFolderContents = (folderPath) => {
                 <Button
                   onClick={() => handleNewFolderClick(null)}
                   className="upload-button" 
+                  style={{fontSize: "17px"}}
                 >
-                  <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+                  <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px',  }} />
                   New Folder
                 </Button>
               )}
@@ -925,6 +959,8 @@ const renderFolderContents = (folderPath) => {
                       aria-haspopup="true"
                       onClick={handleMenuClick}
                       className="upload-button"
+                      style={{fontSize: "17px"}}
+                     
                     >
                       <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
                       New
@@ -957,9 +993,7 @@ const renderFolderContents = (folderPath) => {
                   <thead>
                     <tr>
                     <th>
-                    {activeFolder
-                      ? `Documents in ${activeFolder.split('FORWARDSLASH').join('/').replace(/_/g, ' ')}`
-                      : 'Folders'}
+                    {renderBreadcrumbs()}
                   </th>
                       <th colSpan={3}>
                     {activeFolder && (

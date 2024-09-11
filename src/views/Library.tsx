@@ -141,7 +141,9 @@ const Library = () => {
   const [updateTrigger, setUpdateTrigger] = useState(0);
 
   const getTopLevelFolders = () => {
-    return availableCollections.filter(collection => !collection.includes('FORWARDSLASH'));
+    return availableCollections.filter(collection => 
+      !collection.includes('FORWARDSLASH') && !collection.startsWith('TenderLibrary_')
+    );
   };
 
   const handleMenuClick = (event) => {

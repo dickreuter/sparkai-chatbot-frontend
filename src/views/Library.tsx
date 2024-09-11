@@ -351,25 +351,21 @@ const Library = () => {
   };
 
   const UploadPDFModal = ({ show, onHide, folder, get_collections }) => (
-    <Modal 
-      show={show} 
-      onHide={() => { onHide(); }}
-      onClick={(e) => e.stopPropagation()}
-      size="lg"
-    >
-      <Modal.Header closeButton onClick={(e) => e.stopPropagation()}>
-        <Modal.Title>PDF Uploader</Modal.Title>
+    <Modal show={show} onHide={onHide} size="lg" centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Upload Files</Modal.Title>
       </Modal.Header>
-      <Modal.Body onClick={(e) => e.stopPropagation()}>
+      <Modal.Body>
         <UploadPDF 
           folder={folder} 
           get_collections={get_collections} 
           onClose={() => {
             onHide();
-            setUpdateTrigger(prev => prev + 1);
+            get_collections();
             if (folder) {
               fetchFolderContents(folder);
             }
+            setUpdateTrigger(prev => prev + 1);
           }} 
         />
       </Modal.Body>

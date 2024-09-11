@@ -858,50 +858,6 @@ const BidExtractor = () => {
          </Col>
          </Row>
 
-    <Modal show={showPasteModal} onHide={() => setShowPasteModal(false)} dialogClassName="paste-modal">
-  <Modal.Header closeButton className="p-4">
-    <Modal.Title>Paste Questions</Modal.Title>
-  </Modal.Header>
-  <Modal.Body className="p-4">
-    <Form>
-      <Form.Group>
-        <Form.Label>Paste in some questions, make sure each one ends with a question mark.</Form.Label>
-        <Form.Control
-          as="textarea"
-          rows={5}
-          value={pastedQuestions}
-          onChange={(e) => setPastedQuestions(e.target.value)}
-        />
-      </Form.Group>
-    </Form>
-    
-    <Button
-  className="upload-button mt-3"
-  onClick={() => {
-    const questionsArray = pastedQuestions.split('?')
-      .map(question => question.trim())
-      .filter(question => question.length > 0)
-      .map(question => question.endsWith('?') ? question : `${question}?`);
-
-    // Join all questions except the last one with a comma and then add the last question without a comma
-    const formattedQuestions = questionsArray.slice(0, -1).map(question => `${question},`).concat(questionsArray.slice(-1));
-
-    setSharedState((prevState) => ({
-      ...prevState,
-      questions: formattedQuestions.join(' ')
-    }));
-    setShowPasteModal(false);
-  }}
->
-  Save Changes
-</Button>
-  </Modal.Body>
- 
-
-
-
-  
-</Modal>
 
 
 <ContributorModal

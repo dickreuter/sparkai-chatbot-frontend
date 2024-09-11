@@ -357,7 +357,7 @@ const Bids = () => {
                         ))}
                     </tbody>
                 </table>
-                <div className="pagination-container">
+                <div className="pagination-container" style={{marginTop: '25px'}}>
                     {[...Array(Math.ceil(sortedBids.length / bidsPerPage))].map((_, index) => (
                         <button
                             key={index + 1}

@@ -4,7 +4,9 @@ import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import { displayAlert } from "../helper/Alert";
-import { Button, ProgressBar } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCloudUploadAlt, faCheck, faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 const UploadPDF = ({ folder, get_collections, onClose, usingTenderLibrary }) => {
     const getAuth = useAuthUser();
@@ -13,21 +15,48 @@ const UploadPDF = ({ folder, get_collections, onClose, usingTenderLibrary }) => 
 
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState({});
+    const [uploadedFiles, setUploadedFiles] = useState({});
+    const [dragActive, setDragActive] = useState(false);
+    const fileInputRef = useRef(null);
 
-    const handleFileSelect = (event) => {
-        const files = Array.from(event.target.files);
-        setSelectedFiles(prevFiles => [...prevFiles, ...files]);
+    const handleDrag = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === 'dragenter' || e.type === 'dragover') {
+            setDragActive(true);
+        } else if (e.type === 'dragleave') {
+            setDragActive(false);
+        }
     };
 
-    const handleDragOver = (event) => {
-        event.preventDefault();
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            handleFiles(Array.from(e.dataTransfer.files));
+        }
     };
 
-    const handleDrop = (event) => {
-        event.preventDefault();
-        const files = Array.from(event.dataTransfer.files);
-        setSelectedFiles(prevFiles => [...prevFiles, ...files]);
+    const handleFileSelect = (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            handleFiles(Array.from(e.target.files));
+        }
+    };
+
+    const handleFiles = (newFiles) => {
+        const allowedTypes = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+        
+        const validFiles = newFiles.filter(file => allowedTypes.includes(file.type));
+        setSelectedFiles(prevFiles => [...prevFiles, ...validFiles]);
+
+        if (validFiles.length !== newFiles.length) {
+            displayAlert('Some files were not added. Only PDF and Word documents are allowed.', 'warning');
+        }
     };
 
     const uploadFile = async (file) => {
@@ -40,12 +69,9 @@ const UploadPDF = ({ folder, get_collections, onClose, usingTenderLibrary }) => 
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${tokenRef.current}`
-                },
-                onUploadProgress: (progressEvent) => {
-                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    setUploadProgress(prev => ({ ...prev, [file.name]: percentCompleted }));
                 }
             });
+            setUploadedFiles(prev => ({ ...prev, [file.name]: true }));
             return response.data;
         } catch (error) {
             console.error('Error uploading file:', error);
@@ -73,8 +99,6 @@ const UploadPDF = ({ folder, get_collections, onClose, usingTenderLibrary }) => 
         }
 
         setIsUploading(false);
-        setSelectedFiles([]);
-        setUploadProgress({});
         get_collections();
 
         if (successCount > 0) {
@@ -83,45 +107,68 @@ const UploadPDF = ({ folder, get_collections, onClose, usingTenderLibrary }) => 
         if (failCount > 0) {
             displayAlert(`Failed to upload ${failCount} file(s)`, "danger");
         }
+
+        if (onClose) {
+            onClose();
+        }
     };
 
     return (
-        <div className="upload-pdf-container">
-            <div
-                className="drop-zone"
-                onDragOver={handleDragOver}
+        <div>
+            <div 
+                className={`drop-zone ${dragActive ? 'active' : ''}`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
                 onDrop={handleDrop}
+                onClick={() => fileInputRef.current.click()}
+                style={{
+                    border: '2px dashed #cccccc',
+                    borderRadius: '4px',
+                    padding: '20px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    backgroundColor: dragActive ? '#f0f0f0' : 'white',
+                    transition: 'all 0.3s ease'
+                }}
             >
-                <p>Drag and drop PDF or DOC files here, or click to select files</p>
                 <input
+                    ref={fileInputRef}
                     type="file"
-                    multiple
-                    onChange={handleFileSelect}
                     accept=".pdf,.doc,.docx"
+                    onChange={handleFileSelect}
+                    style={{ display: 'none' }}
+                    multiple
                 />
+                <FontAwesomeIcon icon={faCloudUploadAlt} size="3x" style={{ marginBottom: '10px', color: '#ff7f50' }} />
+                <p>Drag and drop your PDF or Word documents here or click to select files</p>
+                {selectedFiles.length > 0 && (
+                    <div style={{ textAlign: 'center', maxWidth: '400px', margin: '0 auto' }}>
+                        <p>Selected files:</p>
+                        <ul style={{ listStyleType: 'none', padding: 0 }}>
+                            {selectedFiles.map((file, index) => (
+                                <li key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px', justifyContent: 'center' }}>
+                                    <span style={{ marginRight: '10px' }}>{file.name}</span>
+                                    {isUploading && !uploadedFiles[file.name] ? (
+                                        <FontAwesomeIcon icon={faSpinner} spin style={{ color: '#ff7f50' }} />
+                                    ) : uploadedFiles[file.name] ? (
+                                        <FontAwesomeIcon icon={faCheck} style={{ color: 'green' }} />
+                                    ) : null}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
-            {selectedFiles.length > 0 && (
-                <div className="selected-files">
-                    <h4>Selected Files: {selectedFiles.length}</h4>
-                    <ul>
-                        {selectedFiles.map((file, index) => (
-                            <li key={index}>
-                                {file.name}
-                                {uploadProgress[file.name] && (
-                                    <ProgressBar now={uploadProgress[file.name]} label={`${uploadProgress[file.name]}%`} />
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-            <Button
-                onClick={handleUpload}
-                disabled={isUploading || selectedFiles.length === 0}
-                className="upload-button mt-3"
-            >
-                {isUploading ? 'Uploading...' : `Upload ${selectedFiles.length} File${selectedFiles.length !== 1 ? 's' : ''}`}
-            </Button>
+            <div style={{ marginTop: '20px', textAlign: 'right' }}>
+                <Button 
+                    onClick={handleUpload}
+                    disabled={isUploading || selectedFiles.length === 0}
+                    className="upload-button"
+                >
+                    {isUploading ? 'Uploading...' : `Upload ${selectedFiles.length} File${selectedFiles.length !== 1 ? 's' : ''}`}
+                </Button>
+            </div>
         </div>
     );
 };

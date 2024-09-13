@@ -904,7 +904,7 @@ const renderFolderContents = (folderPath) => {
           <div className="header-row mt-2">
             <div className="lib-title" id='library-table' style={{marginLeft: "15px"}}>Resources</div>
 
-            <InputGroup id='search-bar-container' className={`search-bar-container ${showDropdown ? 'dropdown-visible' : ''}`} ref={searchBarRef}>
+            <InputGroup  className={`search-bar-container ${showDropdown ? 'dropdown-visible' : ''}`} ref={searchBarRef}>
               <FontAwesomeIcon icon={faSearch} className="search-icon" />
               <FormControl
                 placeholder="Search folders and files"
@@ -939,8 +939,9 @@ const renderFolderContents = (folderPath) => {
               )}
               {renderSearchResults()}
             </InputGroup>
-
+          <label id='search-bar-container'></label>
             {!activeFolder && (
+              
                 <Button
                   onClick={() => handleNewFolderClick(null)}
                   className="upload-button" 

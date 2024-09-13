@@ -1,8 +1,22 @@
-{% extends "base.html" %}
-{% block title %}Guide{% endblock %}
+
 {% load static %}
 
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>mytender.io {% block head_title %}{% endblock %}</title>
+    <link rel="icon" href="{% static 'images/mytender.io_badge.png' %}" type="image/png">
+    {% block extra_head %}
+    {% endblock %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/clash-display.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  
+</head>
+<body >
 
 <section id="guide" style="margin-top: 100px; margin-bottom: 160px;">
     <div class="container">
@@ -26,4 +40,5 @@
     </div>
 </section>
 
-{% endblock %}
+</body>
+</html>

@@ -945,6 +945,7 @@ const renderFolderContents = (folderPath) => {
                   onClick={() => handleNewFolderClick(null)}
                   className="upload-button" 
                   style={{fontSize: "17px"}}
+                  id='new-folder'
                 >
                   <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px',  }} />
                   New Folder

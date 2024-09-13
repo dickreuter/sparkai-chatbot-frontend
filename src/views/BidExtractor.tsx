@@ -280,6 +280,7 @@ const BidExtractor = () => {
             <Button
               className="p-0 contributors-button"
               variant="link"
+               id='contributors-card'
               onClick={() => setShowContributorModal(true)}
               style={{
                 fontSize: '1rem',
@@ -647,10 +648,10 @@ const BidExtractor = () => {
   return (
     <div className="chatpage">
       <SideBarSmall />
-      <div className="lib-container">
-        <BidNavbar />
+      <div className="lib-container" >
+        <BidNavbar  />
         <div className="proposal-header mt-3 mb-2">
-          <h1 className='heavy'  id="proposal-header">
+          <h1 className='heavy'  id="proposal-header"  >
             <span
              contentEditable={isEditing && canUserEdit}
               suppressContentEditableWarning={true}
@@ -739,7 +740,7 @@ const BidExtractor = () => {
                 </Card>
               </Col>
 
-              <Col md={4} className="px-2" id='contributors-card'>
+              <Col md={4} className="px-2">
                 <ContributorsCard />
               </Col>
 
@@ -776,6 +777,7 @@ const BidExtractor = () => {
                   fontSize: '1.2rem', // Adjust size as needed
                   marginRight: '5px' // Add some space between the title and the icon
                 }}
+                
               >
                 {isGeneratingOpportunity ? (
                   <Spinner
@@ -786,7 +788,7 @@ const BidExtractor = () => {
                     aria-hidden="true"
                   />
                 ) : (
-                  <FontAwesomeIcon icon={faScrewdriverWrench} id='opportunity-information-card'/>
+                  <FontAwesomeIcon icon={faScrewdriverWrench} id='opportunity-information-card' />
                 )}
               </span>
             </Card.Header>

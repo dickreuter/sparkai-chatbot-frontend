@@ -25,11 +25,17 @@ const FullScreenTwoCards = () => {
       return;
     }
 
-    const { success, message } = await submitSignIn(formData);
-    setSnackbarMessage(message);
-    setSnackbarSeverity(success ? 'success' : 'error');
+    try {
+      const { success, message } = await submitSignIn(formData);
+      setSnackbarMessage(success ? message : 'Incorrect Username or Password');
+      setSnackbarSeverity(success ? 'success' : 'error');
+    } catch (error) {
+      setSnackbarMessage('Incorrect Username or Password');
+      setSnackbarSeverity('error');
+    }
     setSnackbarOpen(true);
   };
+
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {

@@ -277,7 +277,7 @@ const Bids = () => {
                 <div className='proposal-header'>
                 <h1 id="dashboard-title" className='heavy'>Dashboard</h1>
                     <div style={{display: 'flex'}}>
-                    <label id="new-bid-button"></label>
+                    
                     <div className="sort-options">
                             <label id="sort-options" htmlFor="sort-select">Sort by:</label>
                             
@@ -294,9 +294,14 @@ const Bids = () => {
                             <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
                             New Bid
                         </Button>
+                        <label id="new-bid-button"></label>
+                       
+                      
                     </div>
-
+                  
+                    
                 </div>
+                
             
               
                 <table  className="bids-table mt-2">
@@ -368,13 +373,9 @@ const Bids = () => {
                         </button>
                     ))}
                 </div>
-                
+                <DashboardWizard />
+            
             </div>
-           
-            
-
-            
-
             <Modal show={showModal} onHide={handleModalClose} className="custom-modal-newbid">
                 <Modal.Header closeButton className="px-4 py-3">
                     <Modal.Title>Enter Bid Name</Modal.Title>
@@ -413,7 +414,11 @@ const Bids = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-            <DashboardWizard />
+            
+          
+            
+
+            
         </div>
     );
 };

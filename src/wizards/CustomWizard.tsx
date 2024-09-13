@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import "./CustomWizard.css";
 import { Button } from 'react-bootstrap';
+import { Button as MuiButton } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faChevronLeft, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { ButtonGroup } from '@mui/material';
+import { ArrowBack, ArrowForward } from '@mui/icons-material';
+
 
 const CustomWizard = ({ steps, isShow, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -94,25 +98,55 @@ const CustomWizard = ({ steps, isShow, onClose }) => {
        
         <p className="step-subtext text-gray-500 mb-3">{currentStep + 1} of {steps.length}</p>
         <p className="mb-3">{currentStepData.description}</p>
-        <div className="flex justify-between items-center">
-          {currentStep > 0 ? (
-            <button
-              onClick={handlePrevious}
-              className="custom-wizard-back-button"
-              aria-label="Previous step"
-            >
-              <FontAwesomeIcon icon={faArrowLeft} className="custom-wizard-back-icon" />
-            </button>
-          ) : (
-            <div></div> // Empty div to maintain layout when there's no back button
-          )}
-          <Button
-            onClick={handleNext}
-            className="ml-auto px-4 py-2 upload-button"
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '30px' }}>
+        
+          <ButtonGroup 
+            variant="contained" 
+            aria-label="navigation button group"
+            style={{ 
+              backgroundColor: 'black', 
+              borderRadius: '4px',
+              '& .MuiButtonGroup-grouped:not(:last-of-type)': {
+                borderColor: 'white',
+              },
+            }}
           >
-            {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
-          </Button>
-        </div>
+            <MuiButton
+              onClick={handlePrevious}
+              disabled={currentStep === 0}
+              className="font-clash-display"
+              style={{ 
+                fontFamily: 'ClashDisplay, sans-serif',
+                color: 'white',
+                borderColor: 'white',
+                backgroundColor: 'black',
+                padding: '4px 12px',
+                fontSize: '0.85rem',
+                '&:hover': {
+                  backgroundColor: '#333'
+                }
+              }}
+            >
+             Back
+            </MuiButton>
+            <MuiButton
+              onClick={handleNext}
+              className="font-clash-display"
+              style={{ 
+                fontFamily: 'ClashDisplay, sans-serif',
+                color: 'white',
+                backgroundColor: 'black',
+                padding: '4px 12px',
+                fontSize: '0.85rem',
+                '&:hover': {
+                  backgroundColor: '#333'
+                }
+              }}
+            >
+              {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
+            </MuiButton>
+          </ButtonGroup>
+    </div>
       </div>
     </>
   );

@@ -7,6 +7,9 @@
     width: 100%;
     margin-bottom: 0;
     z-index: 1000;
+    border: none;
+    box-shadow: none;
+    padding: 0;
     /* Set a high z-index to ensure the navbar is above other elements */
 }
 

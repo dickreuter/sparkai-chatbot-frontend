@@ -33,6 +33,8 @@ const CustomWizard = ({ steps, isShow, onClose }) => {
             left = left - 130;
           } else if (steps[currentStep].position === 'right') {
             left = left + 50;
+          } else if (steps[currentStep].position === 'farright') {
+            left = left + 130;
           } else if (steps[currentStep].position === 'down') {
             top = top + 70;
           }
@@ -41,9 +43,7 @@ const CustomWizard = ({ steps, isShow, onClose }) => {
           if (top + tooltipElement.offsetHeight > viewportHeight) {
             top = Math.max(0, viewportHeight - tooltipElement.offsetHeight);
           }
-          if (left + tooltipElement.offsetWidth > viewportWidth) {
-            left = Math.max(0, viewportWidth - tooltipElement.offsetWidth);
-          }
+         
 
           tooltipElement.style.top = `${top}px`;
           tooltipElement.style.left = `${left}px`;

@@ -290,11 +290,11 @@ const Bids = () => {
                                 <option className='sort-select-option' value="submissionDeadline">Submission Deadline</option>
                             </select>
                         </div>
-                        <Button  onClick={handleWriteProposalClick} className="upload-button">
+                        <Button  onClick={handleWriteProposalClick} className="upload-button" id="new-bid-button">
                             <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
                             New Bid
                         </Button>
-                        <label id="new-bid-button"></label>
+                        <label ></label>
                        
                       
                     </div>
@@ -304,10 +304,10 @@ const Bids = () => {
                 
             
               
-                <table  className="bids-table mt-2">
+                <table className="bids-table mt-2">
                     <thead>
                         <tr >
-                            <th  style={{ width: "18%" }}>Bid Title</th>
+                            <th style={{ width: "18%" }}>Bid Title</th>
                             <th>Last edited</th>
                             <th>Status</th>
                             <th>Client</th>
@@ -322,11 +322,11 @@ const Bids = () => {
                        {currentBids.map((bid, index) => (
                             <tr key={index}>
                                 <td>
-                                    <Link to="/bid-extractor" state={{ bid: bid, fromBidsTable: true }} onClick={() => navigateToChatbot(bid)}>
+                                    <Link to="/bid-extractor"  state={{ bid: bid, fromBidsTable: true }} onClick={() => navigateToChatbot(bid)}>
                                         {bid.bid_title}
                                     </Link>
                                 </td>
-                                <td>{bid.timestamp ? new Date(bid.timestamp).toLocaleDateString() : ''}</td>
+                                <td id='bids_table'>{bid.timestamp ? new Date(bid.timestamp).toLocaleDateString() : ''}</td>
                                 <td>
                                     <FormControl fullWidth>
                                         <StyledSelect

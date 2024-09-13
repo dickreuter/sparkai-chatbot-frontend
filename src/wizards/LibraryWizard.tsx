@@ -17,7 +17,7 @@ const LibraryWizard = () => {
       elementId: 'search-bar-container',
       title: 'Quick Search',
       description: 'Looking for something specific? Use this search bar to find folders and files quickly 🔍',
-      position: 'down'
+      position: 'right'
     },
     {
       elementId: 'library-table',

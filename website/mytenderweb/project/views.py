@@ -154,9 +154,23 @@ def guide(request):
 
             # Send the guide email
             try:
+                subject = "Your Free Guide from mytender.io"
+                message = f"""
+                Thank you for requesting our free guide on prompt engineering for bid writing. We're excited to share these valuable insights with you!
+
+                🚀 While You Wait: Exclusive Offer! 🚀
+                Book a free 30-minute consultation with our bid writing experts before Monday, and receive a personalised walkthrough of how to apply the techniques to your specific needs.
+
+                👉 Click here to book your session: https://calendly.com/sam-od9g/mytender-io-training-call
+
+                Your guide will be sent out on Monday, but why wait? Take advantage of this limited-time offer to start winning more RFPs today!
+
+                Best regards,
+                The mytender.io Team
+                """
                 send_mail(
-                    subject="Your Free Guide",
-                    message="Thank you for requesting our free guide on prompt engineering. Please find the guide attached.",
+                    subject=subject,
+                 message=message,
                     from_email='sam@mytender.io',
                     recipient_list=[email],
                     fail_silently=False,

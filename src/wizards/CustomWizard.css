@@ -1,0 +1,69 @@
+.dashboard-wizard-wrapper {
+    z-index: 500;
+}
+
+.highz {
+    z-index: 500;
+}
+
+.custom-wizard {
+    border-radius: 10px !important;
+    /* Rounds the corners */
+}
+
+.flex {
+    display: flex;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.ml-auto {
+    margin-left: auto;
+}
+
+.step-subtext {
+    font-size: 0.875rem;
+    /* Small text */
+    color: #6c757d;
+    /* Grey color */
+}
+
+.wizard-close-button {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #333;
+    padding: 0;
+    margin-left: 10px;
+}
+
+.wizard-close-button:hover {
+    color: #6c757d;
+}
+
+.custom-wizard-back-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #777;
+    /* Light grey color */
+    transition: color 0.2s ease;
+}
+
+.custom-wizard-back-button:hover {
+    color: #444;
+    /* Darker grey on hover */
+}
+
+.custom-wizard-back-button:focus {
+    outline: none;
+}
+
+.custom-wizard-back-icon {
+    font-size: 18px;
+    /* Adjust size as needed */
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Wizard from "react-onboarding";
+import CustomWizard from './CustomWizard';
 
 const QuestionCrafterWizard = () => {
   console.log('QuestionCrafterWizard component rendering');
@@ -7,21 +8,21 @@ const QuestionCrafterWizard = () => {
   const [isShow, setIsShow] = useState(false);
   console.log('Initial isShow state:', isShow);
 
-  const rule = [
+  const steps = [
     {
       elementId: 'question-section',
       title: 'Question Section',
-      description: 'Enter your question here. Select a folder in the content library to search from.',
+      description: 'Where the magic happens🪄 Enter your question here pick and folder from your content library to narrow down the search.',
     },
     {
       elementId: 'answer-section',
       title: 'Answer Section',
-      description: 'The generated answer will appear here. You can edit the response if needed.',
+      description:'Your answer will appear here. Need to tweak it? No problem! You can edit and perfect the response to fit your needs.'
     },
     {
       elementId: 'bid-pilot-section',
       title: 'Bid Pilot',
-      description: 'Use Bid Pilot for additional assistance and to refine your answers.',
+      description: "Meet Bid Pilot, your AI sidekick! 🤖 Need help refining answers or tackling tricky questions? Highlight some text in the answer to use prompts. ",
     },
     {
       elementId: 'bid-pilot-options',
@@ -30,8 +31,9 @@ const QuestionCrafterWizard = () => {
     },
     {
       elementId: 'qa-sheet-selector',
-      title: 'Q/A Sheet Selector',
-      description: 'Select a Q/A sheet to add the question and answer to your bid compiler.',
+      title: 'Q/A Sheet',
+      description: 'Finished with the question? Select a Q/A sheet to add the question and answer to your bid compiler.',
+      position: 'down'
     },
   ];
 
@@ -40,7 +42,7 @@ const QuestionCrafterWizard = () => {
     const tourCompleted = localStorage.getItem('questionCrafterTourCompleted');
     console.log('tourCompleted value from localStorage:', tourCompleted);
 
-    if (tourCompleted === null) {
+    if (tourCompleted === 'false') {
       console.log('Tour not completed, setting isShow to true');
       setIsShow(true);
     } else {
@@ -58,18 +60,9 @@ const QuestionCrafterWizard = () => {
   console.log('Rendering Wizard with isShow:', isShow);
 
   return (
-    <>
-      {isShow && (
-        <Wizard
-          rule={rule}
-          isShow={false}
-          closeButtonTitle="End Tour"
-          closeButtonElement={<button onClick={handleClose}>End Tour</button>}
-          isScrollToElement={false}
-        />
-      )}
-      {!isShow && <div style={{ display: 'none' }}>Wizard is not shown</div>}
-    </>
+    <div className="dashboard-wizard-wrapper">
+      <CustomWizard steps={steps} isShow={isShow} onClose={handleClose} />
+    </div>
   );
 };
 

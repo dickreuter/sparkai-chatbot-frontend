@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Wizard from "react-onboarding";
+import CustomWizard from './CustomWizard';
 
 const BidCompilerWizard = () => {
   console.log('BidCompilerWizard component rendering');
@@ -7,21 +8,22 @@ const BidCompilerWizard = () => {
   const [isShow, setIsShow] = useState(false);
   console.log('Initial isShow state:', isShow);
 
-  const rule = [
+  const steps = [
     {
       elementId: 'proposal-editor',
       title: 'Proposal Editor',
-      description: 'This is the main editor where you can write and edit your proposal. It includes various formatting options.',
+      description: 'This is the main editor where you can write and edit your proposal Use the toolbar for formatting options ✍️ ',
     },
     {
       elementId: 'tab-container',
       title: 'Document Tabs',
-      description: 'Switch between different sections or documents of your proposal using these tabs.',
+      description: 'Switch between different sections or documents of your proposal using these tabs. 📚',
     },
     {
       elementId: 'add-section-button',
       title: 'Add New Section',
-      description: 'Click here to add a new document to your proposal.',
+      description: 'Click the plus button here to add a new document to your proposal. Here you can add an Executive Summary or Cover Letter. ',
+      position: 'down'
     },
   ];
 
@@ -29,7 +31,7 @@ const BidCompilerWizard = () => {
     console.log('useEffect running');
     const tourCompleted = localStorage.getItem('bidCompilerTourCompleted');
     console.log('tourCompleted value from localStorage:', tourCompleted);
-    if (tourCompleted === null) {
+    if (tourCompleted === 'false') {
       console.log('Tour not completed, setting isShow to true');
       setIsShow(true);
     } else {
@@ -47,18 +49,9 @@ const BidCompilerWizard = () => {
   console.log('Rendering Wizard with isShow:', isShow);
 
   return (
-    <>
-      {isShow && (
-        <Wizard
-          rule={rule}
-          isShow={false}
-          closeButtonTitle="End Tour"
-          closeButtonElement={<button onClick={handleClose}>End Tour</button>}
-          isScrollToElement={true}
-        />
-      )}
-      {!isShow && <div style={{ display: 'none' }}>Wizard is not shown</div>}
-    </>
+    <div className="dashboard-wizard-wrapper">
+      <CustomWizard steps={steps} isShow={isShow} onClose={handleClose} />
+    </div>
   );
 };
 

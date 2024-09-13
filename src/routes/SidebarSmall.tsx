@@ -17,7 +17,8 @@ import {
   faFileContract, // Icon for proposals or contracts
   faComments,
   faCircleQuestion,
-  faUser
+  faUser,
+  faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
 // Import the image
 import sidebarIcon from '../resources/images/mytender.io_badge.png';
@@ -29,6 +30,19 @@ const SideBarSmall = () => {
   const isActive = (path) => location.pathname === path;
   const signOut = useSignOut();
 
+
+  const handleShowTips = () => {
+    localStorage.setItem('dashboardTourCompleted', 'false');
+    localStorage.setItem('bidCompilerTourCompleted', 'false');
+    localStorage.setItem('bidExtractorTourCompleted', 'false');
+    localStorage.setItem('libraryTourCompleted', 'false');
+    localStorage.setItem('questionCrafterTourCompleted', 'false');
+    // Optionally, you might want to trigger a re-render of the dashboard
+    // or navigate to the dashboard page to show the tour immediately
+    // window.location.href = '/bids'; // Uncomment this line if you want to navigate to the dashboard
+  };
+
+  
   return (
     <div className="sidebarsmall">
       <div>
@@ -45,15 +59,20 @@ const SideBarSmall = () => {
           <FontAwesomeIcon icon={faComments} />
           <span>Quick Question</span>
         </Link>
+        <Link to="/howto" className={`sidebarsmalllink ${isActive('/howto') ? 'sidebarsmalllink-active' : ''}`}>
+          <FontAwesomeIcon icon={faCircleQuestion} />
+          <span >How To Guide</span>
+        </Link>
       </div>
       <div className="signout-container">
-      <Link to="/howto" className={`sidebarsmalllink ${isActive('/howto') ? 'sidebarsmalllink-active' : ''}`}>
-          <FontAwesomeIcon icon={faCircleQuestion} />
-          <span >How To</span>
-        </Link>
+     
         <Link to="/profile" className={`sidebarsmalllink ${isActive('/profile') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faUser} />
           <span>Profile</span>
+        </Link>
+        <Link to="#" className="sidebarsmalllink" onClick={handleShowTips} id='showtips'>
+          <FontAwesomeIcon icon={faCircleExclamation} />
+          <span>Show Tips</span>
         </Link>
         <Link to="/logout" className={`sidebarsmalllink ${isActive('/logout') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faReply} />

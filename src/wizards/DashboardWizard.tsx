@@ -1,37 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import Wizard from "react-onboarding";
+import React, { useState, useEffect, useRef } from 'react';
+import CustomWizard from './CustomWizard';
+
 
 const DashboardWizard = () => {
-  console.log('DashboardWizard component rendering');
- 
   const [isShow, setIsShow] = useState(false);
-  console.log('Initial isShow state:', isShow);
+  const [isReady, setIsReady] = useState(false);
 
-  const rule = [
+  const steps = [
     {
       elementId: 'dashboard-title',
       title: 'Dashboard',
-      description: 'Welcome to your Dashboard! Here you can manage all your bids.',
+      description: 'Welcome to your Dashboard 👋 Here you can manage all your bids.',
+      position: ''
     },
+    
     {
       elementId: 'sort-options',
       title: 'Sort Options',
       description: 'Sort your bids by last edited date or submission deadline.',
+      position: 'left',
     },
     {
       elementId: 'new-bid-button',
       title: 'Create New Bid',
-      description: 'Click here to create a new bid.',
+      description: '📝 Ready to start something new? Click here to create a new bid.',
+      position: 'left',
     },
     {
       elementId: 'bids-table',
       title: 'Bids Table',
-      description: 'This table shows all your bids. Click on a bid title to view or edit it.',
+      description: 'Here’s where all your bids live 📋 Click on a bid title to view or make changes to it.',
     },
     {
       elementId: 'status-dropdown',
       title: 'Bid Status',
       description: 'Change the status of your bid here.',
+    },
+    {
+      elementId: 'showtips',
+      title: 'Show Tips? ',
+      description: 'Forgot how something works? No problem! Click here anytime to replay this tour. 🔄',
+      position: 'down',
     }
   ];
 
@@ -39,7 +48,8 @@ const DashboardWizard = () => {
     console.log('useEffect running');
     const tourCompleted = localStorage.getItem('dashboardTourCompleted');
     console.log('tourCompleted value from localStorage:', tourCompleted);
-    if (tourCompleted === null) {
+
+    if (tourCompleted === 'false') {
       console.log('Tour not completed, setting isShow to true');
       setIsShow(true);
     } else {
@@ -48,27 +58,15 @@ const DashboardWizard = () => {
   }, []);
 
   const handleClose = () => {
-    console.log('handleClose called');
     setIsShow(false);
     localStorage.setItem('dashboardTourCompleted', 'true');
-    console.log('dashboardTourCompleted set to true in localStorage');
   };
 
-  console.log('Rendering Wizard with isShow:', isShow);
 
   return (
-    <>
-      {isShow && (
-        <Wizard
-          rule={rule}
-          isShow={false}
-          closeButtonTitle="End Tour"
-          closeButtonElement={<button onClick={handleClose}>End Tour</button>}
-          isScrollToElement={true}
-        />
-      )}
-      {!isShow && <div style={{ display: 'none' }}>Wizard is not shown</div>}
-    </>
+    <div className="dashboard-wizard-wrapper">
+      <CustomWizard steps={steps} isShow={isShow} onClose={handleClose} />
+    </div>
   );
 };
 

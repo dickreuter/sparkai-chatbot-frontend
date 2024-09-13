@@ -405,8 +405,8 @@ return (
         <Card className="mb-4">
           <Card.Body className="tenderlibrary-card-body-content">
             <div className="library-card-content-wrapper">
-              <div className="header-row mt-2">
-                <div className="lib-title"  id='tender-library'>Tender Upload</div>
+              <div className="header-row mt-2" id='tender-library'>
+                <div className="lib-title"  >Tender Upload</div>
                 <Button
                   aria-controls="simple-menu"
                   aria-haspopup="true"

@@ -28,16 +28,27 @@ const BidCompilerWizard = () => {
   ];
 
   useEffect(() => {
-    console.log('useEffect running');
-    const tourCompleted = localStorage.getItem('bidCompilerTourCompleted');
-    console.log('tourCompleted value from localStorage:', tourCompleted);
-    if (tourCompleted === 'false') {
-      console.log('Tour not completed, setting isShow to true');
-      setIsShow(true);
-    } else {
-      console.log('Tour already completed, isShow remains false');
-    }
+    const checkTourStatus = () => {
+      const tourCompleted = localStorage.getItem('bidCompilerTourCompleted');
+      setIsShow(tourCompleted === 'false');
+    };
+
+    // Check initial status
+    checkTourStatus();
+
+    // Listen for the custom event
+    const handleShowTips = () => {
+      checkTourStatus();
+    };
+
+    window.addEventListener('showTips', handleShowTips);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('showTips', handleShowTips);
+    };
   }, []);
+
 
   const handleClose = () => {
     console.log('handleClose called, setting isShow to false');

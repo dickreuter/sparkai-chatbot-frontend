@@ -37,18 +37,29 @@ const QuestionCrafterWizard = () => {
     },
   ];
 
+  
   useEffect(() => {
-    console.log('useEffect running');
-    const tourCompleted = localStorage.getItem('questionCrafterTourCompleted');
-    console.log('tourCompleted value from localStorage:', tourCompleted);
+    const checkTourStatus = () => {
+      const tourCompleted = localStorage.getItem('questionCrafterTourCompleted');
+      setIsShow(tourCompleted === 'false');
+    };
 
-    if (tourCompleted === 'false') {
-      console.log('Tour not completed, setting isShow to true');
-      setIsShow(true);
-    } else {
-      console.log('Tour already completed, isShow remains false');
-    }
+    // Check initial status
+    checkTourStatus();
+
+    // Listen for the custom event
+    const handleShowTips = () => {
+      checkTourStatus();
+    };
+
+    window.addEventListener('showTips', handleShowTips);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('showTips', handleShowTips);
+    };
   }, []);
+
 
   const handleClose = () => {
     console.log('handleClose called');

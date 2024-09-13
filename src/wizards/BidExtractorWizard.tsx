@@ -35,23 +35,34 @@ const BidExtractorWizard = () => {
     }
   ];
 
-  useEffect(() => {
-    console.log('useEffect running');
-    const tourCompleted = localStorage.getItem('bidExtractorTourCompleted');
-    console.log('tourCompleted value from localStorage:', tourCompleted);
 
-    if (tourCompleted === 'false') {
-      console.log('Tour not completed, setting isShow to true');
-      setIsShow(true);
-    } else {
-      console.log('Tour already completed, isShow remains false');
-    }
+  useEffect(() => {
+    const checkTourStatus = () => {
+      const tourCompleted = localStorage.getItem('bidExtractorTourCompleted');
+      setIsShow(tourCompleted === 'false');
+    };
+
+    // Check initial status
+    checkTourStatus();
+
+    // Listen for the custom event
+    const handleShowTips = () => {
+      checkTourStatus();
+    };
+
+    window.addEventListener('showTips', handleShowTips);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('showTips', handleShowTips);
+    };
   }, []);
+
 
   const handleClose = () => {
     console.log('handleClose called');
     setIsShow(false);
-    localStorage.setItem('bidExtractorTourCompleted', 'true');
+    localStorage.setItem('bidExtractorTourCompleted', 'true');s
     console.log('bidExtractorTourCompleted set to true in localStorage');
   };
 

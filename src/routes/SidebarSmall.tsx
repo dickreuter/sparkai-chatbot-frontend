@@ -37,9 +37,9 @@ const SideBarSmall = () => {
     localStorage.setItem('bidExtractorTourCompleted', 'false');
     localStorage.setItem('libraryTourCompleted', 'false');
     localStorage.setItem('questionCrafterTourCompleted', 'false');
-    // Optionally, you might want to trigger a re-render of the dashboard
-    // or navigate to the dashboard page to show the tour immediately
-    // window.location.href = '/bids'; // Uncomment this line if you want to navigate to the dashboard
+    
+    // Dispatch a custom event to notify other components
+    window.dispatchEvent(new Event('showTips'));
   };
 
   

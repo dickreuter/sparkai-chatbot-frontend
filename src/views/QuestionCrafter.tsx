@@ -293,6 +293,7 @@ const QuestionCrafter = () => {
   
   
   
+  
   const optionsContainerRef = useRef(null); // Ref for the options container
 
   const [originalEditorState, setOriginalEditorState] = useState(responseEditorState);
@@ -926,10 +927,22 @@ useEffect(() => {
           <div key={index} className="choice-item d-flex align-items-center">
             <Form.Check
               type="checkbox"
-              label={choice}
               checked={selectedChoices.includes(choice)}
               onChange={() => handleChoiceSelection(choice)}
             />
+            {selectedChoices.includes(choice) ? (
+              <Form.Control
+                type="text"
+                value={choice}
+                onChange={(e) => handleChoiceEdit(index, e.target.value)}
+                className="ml-2 editable-choice"
+                style={{ width: '70%', marginLeft: '10px' }}
+              />
+            ) : (
+              <span onClick={() => handleChoiceSelection(choice)} style={{ cursor: 'pointer' }}>
+                {choice}
+              </span>
+            )}
             {selectedChoices.includes(choice) && (
               <Form.Control
                 type="number"
@@ -948,6 +961,27 @@ useEffect(() => {
         ))}
       </div>
     );
+  };
+
+  const handleChoiceEdit = (index, newValue) => {
+    const updatedChoices = [...apiChoices];
+    updatedChoices[index] = newValue;
+    setApiChoices(updatedChoices);
+
+    // Update selectedChoices and wordAmounts if the edited choice was selected
+    if (selectedChoices.includes(apiChoices[index])) {
+      const updatedSelectedChoices = selectedChoices.map(choice => 
+        choice === apiChoices[index] ? newValue : choice
+      );
+      setSelectedChoices(updatedSelectedChoices);
+
+      const updatedWordAmounts = { ...wordAmounts };
+      if (updatedWordAmounts[apiChoices[index]]) {
+        updatedWordAmounts[newValue] = updatedWordAmounts[apiChoices[index]];
+        delete updatedWordAmounts[apiChoices[index]];
+      }
+      setWordAmounts(updatedWordAmounts);
+    }
   };
 
   const submitSelections = async () => {

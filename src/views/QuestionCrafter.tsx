@@ -242,20 +242,6 @@ const QuestionCrafter = () => {
               Authorization: `Bearer ${tokenRef.current}`,
             },
           }
-        ),
-        axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/copilot`,
-          {
-            input_text: copilotInput,
-            extra_instructions: instructions,
-            copilot_mode: copilot_mode,
-            dataset,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-            },
-          }
         )
       ];
 
@@ -1187,6 +1173,7 @@ useEffect(() => {
                                 style={{
                                   backgroundColor: selectedOptionIndex === index ? 'orange' : '#262626',
                                   color: selectedOptionIndex === index ? 'black' : '#fff',
+                                  fontSize: '16px'
                                 }}
                               >
                                 <span>Option {index + 1}</span>
@@ -1219,8 +1206,6 @@ useEffect(() => {
                         <Button className="prompt-button" onClick={handleLinkClick('Translate to English')}>Translate to English</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('We will Active Voice')}>We will</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Improve Grammar')}>Improve Grammar</Button>
-                        <Button className="prompt-button" onClick={handleLinkClick('Word cutting adjectives')}>Word cutting adjectives</Button>
-                        <Button className="prompt-button" onClick={handleLinkClick('Word cutting adverbs')}>Word cutting adverbs</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Add Statistics')}>Add Statistic</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('For Example')}>For Example</Button>
                       </div>

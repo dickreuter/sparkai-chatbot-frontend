@@ -123,8 +123,8 @@
     border-radius: 10px;
     margin-bottom: 10px;
     word-wrap: break-word;
-    font-size: 14px;
-    max-height: 260px;
+    font-size: 16px;
+    max-height: 540px;
     /* Set your preferred maximum height */
     overflow-y: auto;
 }
@@ -143,7 +143,7 @@
     color: #fff;
     padding: 8px 12px;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 1rem;
     position: relative;
     transition: background 0s ease-in-out;
     border: none;

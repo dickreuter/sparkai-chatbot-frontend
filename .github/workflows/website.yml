@@ -1,32 +1,91 @@
 name: Continuous Integration
-
 on:
   push:
     branches: [ main ]
-
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Cleanup disk space
-          run: |
-            # Remove all unused Docker data (images, containers, volumes, and networks)
-            sudo docker system prune -af
-          
       - uses: actions/checkout@v2
-
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      
       - name: Set Target Directory
         run: |
           echo "TARGET_DIR=/home/ec2-user/website/" >> $GITHUB_ENV
 
       - name: Run deploy
         run: |
+          set -x  # Enable command tracing
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           echo "${{ secrets.DEPLOYMENT_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 44.208.84.199 >> ~/.ssh/known_hosts
+          ssh-keyscan -v 44.208.84.199 >> ~/.ssh/known_hosts
+          ls -la ~/.ssh
+          ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 'df -h && df -i'
+          echo "Current tmpfs usage:"
+          df -h /tmp
+
+          echo "Largest files/directories in /tmp:"
+          du -sh /tmp/* | sort -rh | head -n 10
+
+          echo "Cleaning up /tmp..."
+          sudo find /tmp -type f -delete
+          sudo find /tmp -type d -empty -delete
+
+          echo "Docker cleanup..."
+          docker system prune -af
+
+          echo "Restarting Docker..."
+          sudo systemctl restart docker
+
+          echo "Updated tmpfs usage:"
+          df -h /tmp
+          # Remove unused Docker volumes
+          docker volume prune -f
+
+          # Remove unused Docker networks
+          docker network prune -f
+
+          # Remove all stopped containers
+          docker container prune -f
+
+          # Remove unused images
+          docker image prune -a -f
+
+          # Show updated disk usage
+          df -h /tmp
+          docker system df
+
+          echo "Checking all filesystems:"
+          df -h
+
+          echo "Checking inode usage:"
+          df -i
+
+          echo "Top 10 largest directories:"
+          sudo du -sh /* 2>/dev/null | sort -rh | head -n 10
+
+          echo "Checking /var/log:"
+          sudo du -sh /var/log/* 2>/dev/null | sort -rh | head -n 10
+
+          echo "Checking /var/lib/docker:"
+          sudo du -sh /var/lib/docker/* 2>/dev/null | sort -rh | head -n 10
+
+          echo "Searching for problematic .so file:"
+          sudo find / -name "*asyncio.cpython-37m-x86*64-linux-gnu.so" 2>/dev/null
+
+          echo "Checking tmpfs mounts:"
+          mount | grep tmpfs
+
+          echo "Checking swap usage:"
+          free -h
           ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 "cd $TARGET_DIR/sparkai-chatbot-frontend/website && docker-compose down"
           ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 "docker system prune -af"
-          rsync -avz -e "ssh -i ~/.ssh/id_rsa" --exclude '.git' --exclude 'node_modules' . ec2-user@44.208.84.199:$TARGET_DIR/sparkai-chatbot-frontend
+           rsync -avz --stats -e "ssh -v -i ~/.ssh/id_rsa" --exclude '.git' --exclude 'node_modules' . ec2-user@44.208.84.199:$TARGET_DIR/sparkai-chatbot-frontend
           ssh -i ~/.ssh/id_rsa ec2-user@44.208.84.199 "cd $TARGET_DIR/sparkai-chatbot-frontend/website && docker-compose build --no-cache && docker-compose up -d --force-recreate"

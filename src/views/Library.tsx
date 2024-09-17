@@ -886,127 +886,124 @@ const renderFolderContents = (folderPath) => {
     );
   };
 
-
-
-
-
-  return (
-    <div className="chatpage">
-      <SideBarSmall />
-
-      <div className="lib-container" >
-        <h1 className='heavy'  >Content Library</h1>
+    return (
+      <div className="chatpage">
+        <SideBarSmall />
   
-     
-    <Card className="library-card-custom">
-      <Card.Body className="library-card-body-content">
-        <div className="library-card-content-wrapper">
-          <div className="header-row mt-2">
-            <div className="lib-title" id='library-table' style={{marginLeft: "15px"}}>Resources</div>
-
-            <InputGroup  className={`search-bar-container ${showDropdown ? 'dropdown-visible' : ''}`} ref={searchBarRef}>
-              <FontAwesomeIcon icon={faSearch} className="search-icon" />
-              <FormControl
-                placeholder="Search folders and files"
-                aria-label="Search"
-                aria-describedby="basic-addon2"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onFocus={() => {
-                  setShowDropdown(true);
-                  setShowSearchResults(true);
-                }}
-                onBlur={() => {
-                  setTimeout(() => {
-                    setShowDropdown(false);
-                    setShowSearchResults(false);
-                  }, 200);
-                }}
-                className={`search-bar-library ${showDropdown ? 'dropdown-visible' : ''}`}
-              />
-              {searchQuery && (
-                <div 
-                  className="clear-search-icon" 
-                  
-                  onClick={() => {
-                    setSearchQuery('');
-                    setShowDropdown(false);
-                    setShowSearchResults(false);
-                  }}
-                >
-                  <FontAwesomeIcon icon={faTimes} />
-                </div>
-              )}
-              {renderSearchResults()}
-            </InputGroup>
-          <label id='search-bar-container'></label>
-            {!activeFolder && (
-              
-                <Button
-                  onClick={() => handleNewFolderClick(null)}
-                  className="upload-button" 
-                  style={{fontSize: "17px"}}
-                  id='new-folder'
-                >
-                  <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px',  }} />
-                  New Folder
-                </Button>
-              )}
-
+        <div className="lib-container">
+          <h1 className='heavy'>Content Library</h1>
+      
+          <Card className="library-card-custom">
+            <Card.Body className="library-card-body-content">
+              <div className="library-card-content-wrapper">
+                <div className="header-row mt-2">
+                  <div className="lib-title" id='library-table' style={{marginLeft: "15px"}}>Resources</div>
+  
+                  <div className="search-container" style={{display: "flex", justifyContent: "center", width: "100%"}}>
+                    <InputGroup className={`search-bar-container ${showDropdown ? 'dropdown-visible' : ''}`} ref={searchBarRef} style={{maxWidth: "900px", width: "100%"}}>
+                      <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                      <FormControl
+                        placeholder="Search folders and files"
+                        aria-label="Search"
+                        aria-describedby="basic-addon2"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onFocus={() => {
+                          setShowDropdown(true);
+                          setShowSearchResults(true);
+                        }}
+                        onBlur={() => {
+                          setTimeout(() => {
+                            setShowDropdown(false);
+                            setShowSearchResults(false);
+                          }, 200);
+                        }}
+                        className={`search-bar-library ${showDropdown ? 'dropdown-visible' : ''}`}
+                      />
+                      {searchQuery && (
+                        <div 
+                          className="clear-search-icon" 
+                          onClick={() => {
+                            setSearchQuery('');
+                            setShowDropdown(false);
+                            setShowSearchResults(false);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faTimes} />
+                        </div>
+                      )}
+                      {renderSearchResults()}
+                    </InputGroup>
+                    
+                  </div>
+                  <label id='search-bar-container'> </label>
+                  <div className="button-container" style={{display: "flex", justifyContent: "flex-end", minWidth:"200px", minHeight: "50px"}}>
+                    {!activeFolder && (
+                      <Button
+                        onClick={() => handleNewFolderClick(null)}
+                        className="upload-button" 
+                        style={{fontSize: "17px"}}
+                        id='new-folder'
+                      >
+                        <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+                        New Folder
+                      </Button>
+                    )}
+  
                     {activeFolder && (
                       <Button
-                      aria-controls="simple-menu"
-                      aria-haspopup="true"
-                      onClick={handleMenuClick}
-                      className="upload-button"
-                      style={{fontSize: "17px"}}
-                     
-                    >
-                      <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
-                      New
-                    </Button>
+                        aria-controls="simple-menu"
+                        aria-haspopup="true"
+                        onClick={handleMenuClick}
+                        className="upload-button"
+                        style={{fontSize: "17px"}}
+                      >
+                        <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+                        New
+                      </Button>
                     )}
-
-                    <Menu
-                      id="long-menu"
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={open}
-                      onClose={handleMenuClose}
-                    >
-                      <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "200px" }}>
-                        <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
-                        Upload PDF/Doc
-                      </MenuItem>
-                      <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
-                        <i className="fas fa-file-alt" style={{ marginRight: '12px' }}></i>
-                        Upload Text
-                      </MenuItem>
-                      <MenuItem onClick={() => handleNewFolderClick(activeFolder)} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
-                      <FontAwesomeIcon icon={faFolder} style={{ marginRight: '12px' }} />
-                      New Subfolder
-                    </MenuItem>
-                    </Menu>
                   </div>
-
-                  <table className="library-table">
+                </div>
+                
+                <Menu
+                  id="long-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={open}
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "200px" }}>
+                    <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
+                    Upload PDF/Doc
+                  </MenuItem>
+                  <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                    <i className="fas fa-file-alt" style={{ marginRight: '12px' }}></i>
+                    Upload Text
+                  </MenuItem>
+                  <MenuItem onClick={() => handleNewFolderClick(activeFolder)} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
+                    <FontAwesomeIcon icon={faFolder} style={{ marginRight: '12px' }} />
+                    New Subfolder
+                  </MenuItem>
+                </Menu>
+  
+                <table className="library-table">
                   <thead>
                     <tr>
-                    <th>
-                    {renderBreadcrumbs()}
-                  </th>
+                      <th>
+                        {renderBreadcrumbs()}
+                      </th>
                       <th colSpan={3}>
-                    {activeFolder && (
-                      <div 
-                        className="back-button" 
-                        onClick={() => handleBackClick()} 
-                        style={{ cursor: 'pointer', padding: '5px'}}
-                      >
-                        <FontAwesomeIcon icon={faReply} />
-                        <span style={{ marginLeft: "10px"}}>Back</span>
-                      </div>
-                    )}
-                  </th>
+                        {activeFolder && (
+                          <div 
+                            className="back-button" 
+                            onClick={() => handleBackClick()} 
+                            style={{ cursor: 'pointer', padding: '5px'}}
+                          >
+                            <FontAwesomeIcon icon={faReply} />
+                            <span style={{ marginLeft: "10px"}}>Back</span>
+                          </div>
+                        )}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1016,88 +1013,80 @@ const renderFolderContents = (folderPath) => {
                     }
                   </tbody>
                 </table>
+              </div>
+  
+              <div className="pagination-controls">
+                {totalPages > 1 && [...Array(totalPages)].map((_, i) => (
+                  <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            </Card.Body>
+          </Card>
+  
+          <FileContentModal
+            showModal={showModal}
+            setShowModal={setShowModal}
+            modalContent={modalContent}
+            onSave={(newContent) => saveFileContent(currentFileId, newContent, activeFolder)}
+            documentId={currentFileId}
+            fileName={currentFileName}
+            folderName={activeFolder}
+            onViewPdf={viewPdfFile}
+          />
+  
+          <DeleteFolderModal
+            show={showDeleteFolderModal}
+            onHide={() => setShowDeleteFolderModal(false)}
+            onDelete={() => handleDelete(folderToDelete)}
+            folderTitle={folderToDelete}
+          />
+  
+          <DeleteFileModal
+            show={showDeleteFileModal}
+            onHide={() => setShowDeleteFileModal(false)}
+            onDelete={() => {
+              deleteDocument(fileToDelete.unique_id);
+              setShowDeleteFileModal(false);
+            }}
+            fileName={fileToDelete ? fileToDelete.filename : ''}
+          />
+  
+          <UploadPDFModal
+            show={showPDFModal}
+            onHide={() => setShowPDFModal(false)}
+            folder={uploadFolder}
+            get_collections={fetchFolderStructure}
+          />
+  
+          <UploadTextModal
+            show={showTextModal}
+            onHide={() => setShowTextModal(false)}
+            folder={uploadFolder}
+            get_collections={fetchFolderStructure}
+          />
+  
+          <NewFolderModal
+            show={showNewFolderModal}
+            onHide={handleHideNewFolderModal}
+            onCreateFolder={handleCreateFolder}
+            title={newFolderParent ? "Create New Subfolder" : "Create New Folder"}
+            parentFolder={newFolderParent}
+          />
+  
+          {showPdfViewerModal && (
+            <div className="pdf-viewer-modal" onClick={closeModal}>
+              <div className="pdf-viewer-modal-content" ref={modalRef}>
+                <iframe src={pdfUrl} width="100%" height="800px"></iframe>
+              </div>
+            </div>
+          )}
+  
         </div>
-
-        <div className="pagination-controls">
-        {totalPages > 1 && [...Array(totalPages)].map((_, i) => (
-          <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
-            {i + 1}
-          </button>
-        ))}
+        <LibraryWizard />
       </div>
-      </Card.Body>
-    </Card>
-
-
-
-
-
-<FileContentModal
-  showModal={showModal}
-  setShowModal={setShowModal}
-  modalContent={modalContent}
-  onSave={(newContent) => saveFileContent(currentFileId, newContent, activeFolder)} // Pass the folder name
-  documentId={currentFileId}
-  fileName={currentFileName}
-  folderName={activeFolder}
-  onViewPdf={viewPdfFile} // Pass the viewPdfFile function
-/>
-
-
-
-
-
-        <DeleteFolderModal
-          show={showDeleteFolderModal}
-          onHide={() => setShowDeleteFolderModal(false)}
-          onDelete={() => handleDelete(folderToDelete)}
-          folderTitle={folderToDelete}
-        />
-
-        <DeleteFileModal
-          show={showDeleteFileModal}
-          onHide={() => setShowDeleteFileModal(false)}
-          onDelete={() => {
-            deleteDocument(fileToDelete.unique_id);
-            setShowDeleteFileModal(false);
-          }}
-          fileName={fileToDelete ? fileToDelete.filename : ''}
-        />
-
-        <UploadPDFModal
-          show={showPDFModal}
-          onHide={() => setShowPDFModal(false)}
-          folder={uploadFolder}
-          get_collections={fetchFolderStructure}
-        />
-        <UploadTextModal
-          show={showTextModal}
-          onHide={() => setShowTextModal(false)}
-          folder={uploadFolder}
-          get_collections={fetchFolderStructure}
-        />
- <NewFolderModal
-          show={showNewFolderModal}
-          onHide={handleHideNewFolderModal}
-          onCreateFolder={handleCreateFolder}
-          title={newFolderParent ? "Create New Subfolder" : "Create New Folder"}
-          parentFolder={newFolderParent}
-        />
-        <>
-    
-      {/* Modal Component */}
-      {showPdfViewerModal && (
-        <div className="pdf-viewer-modal" onClick={closeModal}>
-          <div className="pdf-viewer-modal-content" ref={modalRef}>
-            <iframe src={pdfUrl} width="100%" height="600px"></iframe>
-          </div>
-        </div>
-      )}
-    </>
-      </div>
-      <LibraryWizard/>
-    </div>
-  );
-}
-
-export default withAuth(Library);
+    );
+  }
+  
+  export default withAuth(Library);

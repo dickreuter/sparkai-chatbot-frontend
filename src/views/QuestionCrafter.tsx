@@ -872,11 +872,30 @@ useEffect(() => {
       if (choice === "3") {
         let choicesArray = [];
         console.log(result.data);
-        // Check if result.data contains comma-separated values
-        if (result.data && result.data.includes(";")) {
-          choicesArray = result.data.split(";").map((choice) => choice.trim());
+      
+        try {
+          // First, try splitting by semicolons
+          if (result.data && result.data.includes(";")) {
+            choicesArray = result.data.split(";").map((choice) => choice.trim());
+          }
+      
+          // If semicolon splitting didn't work, try parsing as a numbered list
+          if (choicesArray.length === 0 && typeof result.data === 'string') {
+            choicesArray = result.data.split('\n')
+              .filter(line => /^\d+\./.test(line.trim()))
+              .map(line => line.replace(/^\d+\.\s*/, '').trim());
+          }
+      
+          // If we still don't have any choices, throw an error
+          if (choicesArray.length === 0) {
+            throw new Error("Failed to parse API response into choices");
+          }
+        } catch (error) {
+          console.error("Error processing API response:", error);
+          // Optionally, you could set an error state here to display to the user
+          // setError("Failed to process the response. Please try again.");
         }
-
+      
         setApiChoices(choicesArray);
       }
     } catch (error) {

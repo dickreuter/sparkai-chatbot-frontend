@@ -3,10 +3,10 @@ import Wizard from "react-onboarding";
 import CustomWizard from './CustomWizard';
 
 const QuestionCrafterWizard = () => {
-  console.log('QuestionCrafterWizard component rendering');
+
 
   const [isShow, setIsShow] = useState(false);
-  console.log('Initial isShow state:', isShow);
+
 
   const steps = [
     {
@@ -62,13 +62,13 @@ const QuestionCrafterWizard = () => {
 
 
   const handleClose = () => {
-    console.log('handleClose called');
+
     setIsShow(false);
     localStorage.setItem('questionCrafterTourCompleted', 'true');
-    console.log('questionCrafterTourCompleted set to true in localStorage');
+   
   };
 
-  console.log('Rendering Wizard with isShow:', isShow);
+
 
   return (
     <div className="dashboard-wizard-wrapper">

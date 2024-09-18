@@ -3,10 +3,10 @@ import Wizard from "react-onboarding";
 import CustomWizard from './CustomWizard';
 
 const BidCompilerWizard = () => {
-  console.log('BidCompilerWizard component rendering');
+
 
   const [isShow, setIsShow] = useState(false);
-  console.log('Initial isShow state:', isShow);
+ 
 
   const steps = [
     {
@@ -51,13 +51,13 @@ const BidCompilerWizard = () => {
 
 
   const handleClose = () => {
-    console.log('handleClose called, setting isShow to false');
+   
     setIsShow(false);
     localStorage.setItem('bidCompilerTourCompleted', 'true');
-    console.log('bidCompilerTourCompleted set to true in localStorage');
+
   };
 
-  console.log('Rendering Wizard with isShow:', isShow);
+ 
 
   return (
     <div className="dashboard-wizard-wrapper">

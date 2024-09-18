@@ -57,13 +57,13 @@ const LibraryWizard = () => {
   }, []);
 
   const handleClose = () => {
-    console.log('handleClose called');
+ 
     setIsShow(false);
     localStorage.setItem('libraryTourCompleted', 'true');
-    console.log('libraryTourCompleted set to true in localStorage');
+    
   };
 
-  console.log('Rendering Wizard with isShow:', isShow);
+
 
   return (
     <div className="dashboard-wizard-wrapper">

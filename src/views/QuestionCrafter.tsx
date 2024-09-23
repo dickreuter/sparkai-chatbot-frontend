@@ -428,139 +428,162 @@ useEffect(() => {
   }, [selectedText, responseEditorState]);
 
   
-  const handleOptionSelect = (option, index) => {
-
-  const contentState = responseEditorState.getCurrentContent();
-  const { anchorKey, anchorOffset, focusKey, focusOffset } = selectionRange;
-
-  // Log the initial state
-  console.log("handleOptionSelect - Initial Content State:", convertToRaw(contentState));
-  console.log("handleOptionSelect - Initial Selection Range:", selectionRange);
-
-  // Create a new selection state that covers the entire range
-  const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
-    anchorOffset: Math.min(anchorOffset, focusOffset),
-    focusKey: focusKey,
-    focusOffset: Math.max(anchorOffset, focusOffset),
-  });
-
-  // Log the new selection state
-  console.log("handleOptionSelect - New Selection State:", newSelectionState.toJS());
-
-  // Remove any existing text within the selection range
-  const clearedContentState = Modifier.removeRange(contentState, newSelectionState, 'backward');
-
-  // Log the cleared content state
-  console.log("handleOptionSelect - Cleared Content State:", convertToRaw(clearedContentState));
-
-  // Collapse the selection to the start of the cleared range
-  const collapsedSelection = SelectionState.createEmpty(anchorKey).merge({
-    anchorOffset: newSelectionState.getStartOffset(),
-    focusOffset: newSelectionState.getStartOffset(),
-  });
-
-  // Log the collapsed selection state
-  console.log("handleOptionSelect - Collapsed Selection State:", collapsedSelection.toJS());
-
-  // Insert new option text at the collapsed selection
-  const newContentState = Modifier.insertText(
-    clearedContentState,
-    collapsedSelection,
-    option
-  );
-
-  // Log the new content state after insertion
-  console.log("handleOptionSelect - New Content State After Insertion:", convertToRaw(newContentState));
-
-  // Apply the ORANGE style to the new text
-  const finalSelectionState = collapsedSelection.merge({
-    focusOffset: collapsedSelection.getStartOffset() + option.length,
-  });
-
-  // Log the final selection state
-  console.log("handleOptionSelect - Final Selection State:", finalSelectionState.toJS());
-
-  const newContentStateWithStyle = Modifier.applyInlineStyle(
-    newContentState,
-    finalSelectionState,
-    'ORANGE'
-  );
-
-  let newEditorState = EditorState.push(responseEditorState, newContentStateWithStyle, 'change-inline-style');
-
-  // Force the selection to the end of the newly inserted text
-  newEditorState = EditorState.forceSelection(newEditorState, finalSelectionState);
-
-  // Log the final content state with style
-  console.log("handleOptionSelect - Final Content State With Style:", convertToRaw(newContentStateWithStyle));
-
-  setResponseEditorState(newEditorState);
-
-  setTempText(option);
-  setSelectedOption(option);
-  setSelectedOptionIndex(index);
-  setShowOptions(true); // Ensure options remain visible
-
-  // Log the final text in the editor
-  console.log("handleOptionSelect - finalText:", convertToRaw(newContentStateWithStyle).blocks.map(block => block.text).join('\n'));
-
-  // Force re-render of the editor component by updating a dummy state
-  setDummyState((prev) => !prev);
-
-  
-};
-
+ 
   // Dummy state to force re-render of the editor component
   const [dummyState, setDummyState] = useState(false);
   
-// Proposed solution
-const handleLinkClick = (linkName) => (e) => {
-  e.preventDefault();
-  const copilot_mode = linkName.toLowerCase().replace(/\s+/g, '_');
-  const instructions = '';
+  const [highlightedRange, setHighlightedRange] = useState(null);
 
-  // Store the original state before making any changes
-  setOriginalEditorState(responseEditorState);
+  const handleLinkClick = (linkName) => (e) => {
+    e.preventDefault();
+    const copilot_mode = linkName.toLowerCase().replace(/\s+/g, '_');
+    const instructions = '';
+  
+    setOriginalEditorState(responseEditorState);
+  
+    const contentState = responseEditorState.getCurrentContent();
+    const selection = responseEditorState.getSelection();
+    const startKey = selection.getStartKey();
+    const endKey = selection.getEndKey();
+    const startOffset = selection.getStartOffset();
+    const endOffset = selection.getEndOffset();
+  
+    let newContentState = contentState;
+  
+    // Store the highlighted range
+    setHighlightedRange({
+      startKey,
+      endKey,
+      startOffset,
+      endOffset
+    });
+  
+    // Apply ORANGE style (rest of the function remains the same)
+    if (startKey === endKey) {
+      const blockSelection = SelectionState.createEmpty(startKey).merge({
+        anchorOffset: startOffset,
+        focusOffset: endOffset,
+      });
+      newContentState = Modifier.applyInlineStyle(newContentState, blockSelection, 'ORANGE');
+    } else {
+      // If the selection spans multiple blocks
+      const blocks = contentState.getBlockMap();
+      let isWithinSelection = false;
+  
+      newContentState = blocks.reduce((updatedContent, block, blockKey) => {
+        if (blockKey === startKey) {
+          isWithinSelection = true;
+          const blockSelection = SelectionState.createEmpty(blockKey).merge({
+            anchorOffset: startOffset,
+            focusOffset: block.getLength(),
+          });
+          return Modifier.applyInlineStyle(updatedContent, blockSelection, 'ORANGE');
+        } else if (blockKey === endKey) {
+          isWithinSelection = false;
+          const blockSelection = SelectionState.createEmpty(blockKey).merge({
+            anchorOffset: 0,
+            focusOffset: endOffset,
+          });
+          return Modifier.applyInlineStyle(updatedContent, blockSelection, 'ORANGE');
+        } else if (isWithinSelection) {
+          const blockSelection = SelectionState.createEmpty(blockKey).merge({
+            anchorOffset: 0,
+            focusOffset: block.getLength(),
+          });
+          return Modifier.applyInlineStyle(updatedContent, blockSelection, 'ORANGE');
+        }
+        return updatedContent;
+      }, newContentState);
+    }
+  
+    let newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
+    newEditorState = EditorState.forceSelection(newEditorState, selection);
+  
+    setResponseEditorState(newEditorState);
+  
+    setTimeout(() => {
+      askCopilot(selectedText, instructions, copilot_mode);
+      setShowOptions(true);
+      setIsCopilotVisible(false);
+    }, 0);
+  };
 
-  const contentState = responseEditorState.getCurrentContent();
-  const { anchorKey, anchorOffset, focusKey, focusOffset } = selectionRange;
-
-  // Create a new selection state that covers the entire range
-  const newSelectionState = SelectionState.createEmpty(anchorKey).merge({
-    anchorOffset: Math.min(anchorOffset, focusOffset),
-    focusKey: focusKey,
-    focusOffset: Math.max(anchorOffset, focusOffset),
-  });
-
-  // Instead of removing the text, just apply the ORANGE style
-  const newContentStateWithStyle = Modifier.applyInlineStyle(
-    contentState,
-    newSelectionState,
-    'ORANGE'
-  );
-
-  let newEditorState = EditorState.push(responseEditorState, newContentStateWithStyle, 'change-inline-style');
-
-  // Force the selection to remain the same
-  newEditorState = EditorState.forceSelection(newEditorState, newSelectionState);
-
-  setResponseEditorState(newEditorState);
-
-  setTimeout(() => {
-    askCopilot(selectedText, instructions, copilot_mode);
+  const handleOptionSelect = (option, index) => {
+    if (!highlightedRange) return; // Exit if no range is highlighted
+  
+    const contentState = responseEditorState.getCurrentContent();
+    const { startKey, endKey, startOffset, endOffset } = highlightedRange;
+  
+    // Create a selection state that covers the highlighted range
+    const highlightSelection = SelectionState.createEmpty(startKey).merge({
+      anchorOffset: startOffset,
+      focusKey: endKey,
+      focusOffset: endOffset,
+    });
+  
+    // Remove the highlighted text
+    let newContentState = Modifier.removeRange(contentState, highlightSelection, 'backward');
+  
+    // Insert the new option text
+    newContentState = Modifier.insertText(
+      newContentState,
+      highlightSelection.merge({
+        focusKey: startKey,
+        focusOffset: startOffset,
+      }),
+      option
+    );
+  
+    // Apply the ORANGE style to the new text
+    const styledSelection = SelectionState.createEmpty(startKey).merge({
+      anchorOffset: startOffset,
+      focusOffset: startOffset + option.length,
+    });
+    newContentState = Modifier.applyInlineStyle(
+      newContentState,
+      styledSelection,
+      'ORANGE'
+    );
+  
+    // Create new editor state and update selection
+    let newEditorState = EditorState.push(responseEditorState, newContentState, 'insert-fragment');
+    newEditorState = EditorState.forceSelection(newEditorState, styledSelection);
+  
+    setResponseEditorState(newEditorState);
+    setTempText(option);
+    setSelectedOption(option);
+    setSelectedOptionIndex(index);
     setShowOptions(true);
-    setIsCopilotVisible(false);
-  }, 0);
-};
+  
+    // Clear the highlighted range
+    setHighlightedRange(null);
+  
+    // Force re-render of the editor component
+    setDummyState((prev) => !prev);
+  };
 
+
+  
   const handleCustomPromptFocus = () => {
-
     setOriginalEditorState(responseEditorState);
     
     const contentState = responseEditorState.getCurrentContent();
     const selectionState = responseEditorState.getSelection();
   
     if (!selectionState.isCollapsed()) {
+      const startKey = selectionState.getStartKey();
+      const endKey = selectionState.getEndKey();
+      const startOffset = selectionState.getStartOffset();
+      const endOffset = selectionState.getEndOffset();
+  
+      // Store the highlighted range
+      setHighlightedRange({
+        startKey,
+        endKey,
+        startOffset,
+        endOffset
+      });
+  
       const newContentState = Modifier.applyInlineStyle(
         contentState,
         selectionState,
@@ -571,17 +594,13 @@ const handleLinkClick = (linkName) => (e) => {
       setResponseEditorState(newEditorState);
     }
   };
-
+  
   let isSubmitButtonClicked = false;
-
-
+  
   const handleMouseDownOnSubmit = () => {
     isSubmitButtonClicked = true;
   };
-
- 
   
-  // Handle blur (loss of focus) on input field for custom prompt and remove ORANGE style
   const handleCustomPromptBlur = () => {
     if (!isSubmitButtonClicked) {
       const contentState = responseEditorState.getCurrentContent();
@@ -602,21 +621,26 @@ const handleLinkClick = (linkName) => (e) => {
   
       const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
       setResponseEditorState(newEditorState);
+  
+      // Clear the highlighted range
+      setHighlightedRange(null);
     }
     isSubmitButtonClicked = false; // Reset flag after handling
   };
   
   const handleCustomPromptSubmit = () => {
-    // Handle custom prompt submission
     if (inputValue.trim()) {
       isSubmitButtonClicked = true;
       console.log(`Custom Prompt: ${inputValue}`);
-      // Add your logic here to handle the custom prompt
+      
       const copilot_mode = inputValue.toLowerCase().replace(/\s+/g, '_');
       const instructions = '';
   
+      // Use the highlighted text if available, otherwise use the selected text
+      const textToUse = highlightedRange ? getTextFromRange(responseEditorState, highlightedRange) : selectedText;
+      console.log(textToUse);
       setTimeout(() => {
-        askCopilot(selectedText, instructions, copilot_mode);
+        askCopilot(textToUse, instructions, copilot_mode);
         setShowOptions(true);
         setSelectedDropdownOption('internet-search');
       }, 0);
@@ -624,6 +648,37 @@ const handleLinkClick = (linkName) => (e) => {
       setInputValue(''); // Clear the input field
       setIsCopilotVisible(false);
     }
+  };
+  
+  // Helper function to get text from a range
+  const getTextFromRange = (editorState, range) => {
+    const contentState = editorState.getCurrentContent();
+    const startBlock = contentState.getBlockForKey(range.startKey);
+    const endBlock = contentState.getBlockForKey(range.endKey);
+    let text = '';
+  
+    if (startBlock === endBlock) {
+      text = startBlock.getText().slice(range.startOffset, range.endOffset);
+    } else {
+      const blockMap = contentState.getBlockMap();
+      const blocksInRange = blockMap
+        .skipUntil((_, k) => k === range.startKey)
+        .takeUntil((_, k) => k === range.endKey)
+        .concat(Map([[range.endKey, endBlock]]));
+  
+      blocksInRange.forEach((block, blockKey) => {
+        let blockText = block.getText();
+        if (blockKey === range.startKey) {
+          blockText = blockText.slice(range.startOffset);
+        }
+        if (blockKey === range.endKey) {
+          blockText = blockText.slice(0, range.endOffset);
+        }
+        text += blockText + '\n';
+      });
+    }
+  
+    return text.trim();
   };
   
 

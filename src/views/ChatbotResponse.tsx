@@ -5,11 +5,11 @@ import SideBarSmall from '../routes/SidebarSmall';
 import './ChatbotResponse.css'; // Import the CSS file
 import withAuth from '../routes/withAuth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faTrash } from '@fortawesome/free-solid-svg-icons';
 import handleGAEvent from '../utilities/handleGAEvent';
 import { HTTP_PREFIX, API_URL } from '../helper/Constants';
 import axios from 'axios';
-import { Button } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 
 const ChatbotResponse = () => {
     const getAuth = useAuthUser();
@@ -44,15 +44,11 @@ const ChatbotResponse = () => {
     const [choice, setChoice] = useState("2");
     const [broadness, setBroadness] = useState("2");
     const [dataset, setDataset] = useState("default");
-    const [inputText, setInputText] = useState('');
-    const [backgroundInfo, setBackgroundInfo] = useState('');
-    const [response, setResponse] = useState('');
 
     const [isLoading, setIsLoading] = useState(false);
     const [questionAsked, setQuestionAsked] = useState(false);
     const [startTime, setStartTime] = useState(null);
-    const [elapsedTime, setElapsedTime] = useState(0);
-    const [apiChoices, setApiChoices] = useState([]);
+    const [showModal, setShowModal] = useState(false);
 
     const handleSendMessage = () => {
         if (inputValue.trim() !== "") {
@@ -68,16 +64,42 @@ const ChatbotResponse = () => {
         }
     };
 
+    const handleShowModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
+    
     const handleClearMessages = () => {
       setMessages([{ type: 'bot', text: 'Welcome to Library Chat! You ask questions here about your Company Library data.' }]);
       localStorage.removeItem('chatResponseMessages');
+      handleCloseModal();
     };
-    
 
+    const formatResponse = (response) => {
+      // Handle numbered lists
+      response = response.replace(/^\d+\.\s(.+)$/gm, '<li>$1</li>');
+      if (response.includes('<li>')) {
+        response = `<ol>${response}</ol>`;
+      }
+      
+      // Handle bullet points
+      response = response.replace(/^[-•]\s(.+)$/gm, '<li>$1</li>');
+      if (response.includes('<li>') && !response.includes('<ol>')) {
+        response = `<ul>${response}</ul>`;
+      }
+      
+      // Handle bold text
+      response = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      
+      // Handle italic text
+      response = response.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      
+      // Handle newlines for better readability
+      response = response.replace(/\n/g, '<br>');
+      
+      return response;
+    };
     const sendQuestion = async (question) => {
         handleGAEvent('Chatbot', 'Submit Question', 'Submit Button');
         setQuestionAsked(true);
-        setResponse("");
         setIsLoading(true);
         setStartTime(Date.now()); // Set start time for the timer
     
@@ -86,6 +108,9 @@ const ChatbotResponse = () => {
           ...prevMessages,
           { type: 'bot', text: 'loading' }
         ]);
+
+        const backgroundInfo = messages.map(msg => `${msg.type}: ${msg.text}`).join('\n');
+        console.log(backgroundInfo);
     
         try {
           const result = await axios.post(
@@ -105,12 +130,15 @@ const ChatbotResponse = () => {
           );
     
           // Replace the temporary loading message with the actual response
+          const formattedResponse = formatResponse(result.data);
+
           setMessages((prevMessages) => [
             ...prevMessages.slice(0, -1),
-            { type: 'bot', text: result.data }
+            { type: 'bot', text: formattedResponse }
           ]);
         } catch (error) {
           console.error("Error sending question:", error);
+         
           // Replace the temporary loading message with the error message
           setMessages((prevMessages) => [
             ...prevMessages.slice(0, -1),
@@ -124,21 +152,21 @@ const ChatbotResponse = () => {
         <div className="chatpage">
             <SideBarSmall />
             <div className="chatResponse-container">
-                <div className="messages">
-                    {messages.map((message, index) => (
-                        <div key={index} className={`message-bubble ${message.type}`}>
-                            {message.text === 'loading' ? (
-                                <div className="loading-dots">
-                                    <span>. </span>
-                                    <span>. </span>
-                                    <span>. </span>
-                                </div>
-                            ) : (
-                                message.text
-                            )}
-                        </div>
-                    ))}
-                </div>
+              <div className="messages">
+                {messages.map((message, index) => (
+                  <div key={index} className={`message-bubble ${message.type}`}>
+                    {message.text === 'loading' ? (
+                      <div className="loading-dots">
+                        <span>. </span>
+                        <span>. </span>
+                        <span>. </span>
+                      </div>
+                    ) : (
+                      <div dangerouslySetInnerHTML={{ __html: message.text }} />
+                    )}
+                  </div>
+                ))}
+              </div>
                 <div className="input-bar">
                     <input
                         type="text"
@@ -147,6 +175,9 @@ const ChatbotResponse = () => {
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
                     />
+                    <button onClick={handleShowModal} className='clear-button'>
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
                     {/* <Button className="chat-Response-Clear-Button" onClick={handleClearMessages}>Clear</Button> */}
                     <button onClick={!isLoading ? (handleSendMessage) : null} disabled={isLoading} className='bar-button'>
                         <FontAwesomeIcon icon={faPaperPlane} />
@@ -155,6 +186,19 @@ const ChatbotResponse = () => {
                 </div>
                
             </div>
+
+            <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Clear Conversation</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Are you sure you want to clear the entire conversation?</Modal.Body>
+            <Modal.Footer>
+             
+              <Button className='upload-button' style={{backgroundColor: "red"}} onClick={handleClearMessages}>
+                Clear
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
     );
     

@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    height: 125vh !important;
+    min-height: 125vh !important;
     width: 125vw !important;
     margin-bottom: 0;
     background-color: white;
@@ -22,7 +22,7 @@
     display: flex;
     flex-direction: column;
     margin-left: 185px;
-    max-height: 85vh !important;
+    max-height: 100vh !important;
 }
 
 .message-bubble {
@@ -118,4 +118,36 @@
     font-size: 0.9rem;
     border-radius: 8px;
     margin-left: 5px;
+}
+
+.message-bubble ol,
+.message-bubble ul {
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.message-bubble li {
+    margin-bottom: 5px;
+}
+
+.message-bubble br {
+    display: block;
+    margin: 5px 0;
+    content: "";
+}
+
+.clear-button {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 1.2em;
+    margin-right: 10px;
+    transition: color 0.3s ease;
+}
+
+.clear-button:hover {
+    color: white;
 }

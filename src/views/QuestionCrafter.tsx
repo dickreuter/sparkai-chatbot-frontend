@@ -5,7 +5,7 @@ import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
 import handleGAEvent from '../utilities/handleGAEvent';
-import { Button, Col, Dropdown, Form, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Dropdown, Form, Modal, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./QuestionsCrafter.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -789,7 +789,30 @@ useEffect(() => {
     }
   }, [isCopilotVisible]);
 
-  
+  const formatResponse = (response) => {
+    // Handle numbered lists
+    response = response.replace(/^\d+\.\s(.+)$/gm, '<li>$1</li>');
+    if (response.includes('<li>')) {
+      response = `<ol>${response}</ol>`;
+    }
+    
+    // Handle bullet points
+    response = response.replace(/^[-•]\s(.+)$/gm, '<li>$1</li>');
+    if (response.includes('<li>') && !response.includes('<ol>')) {
+      response = `<ul>${response}</ul>`;
+    }
+    
+    // Handle bold text
+    response = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Handle italic text
+    response = response.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Handle newlines for better readability
+    response = response.replace(/\n/g, '<br>');
+    
+    return response;
+  };
 
 
   const sendQuestion = async (question) => {
@@ -804,6 +827,11 @@ useEffect(() => {
       { type: 'bot', text: 'loading' }
     ]);
 
+    const chatHistory = messages.map(msg => `${msg.type}: ${msg.text}`).join('\n');
+    console.log(chatHistory);
+    console.log(bidPilotbroadness);
+    console.log(bidPilotchoice);
+
     try {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question`,
@@ -811,8 +839,8 @@ useEffect(() => {
           choice: bidPilotchoice,
           broadness: bidPilotbroadness,
           input_text: question,
-          extra_instructions: ' ',
-          dataset,
+          extra_instructions: chatHistory,
+          dataset: 'default',
           bid_id: sharedState.object_id
         },
         {
@@ -823,9 +851,11 @@ useEffect(() => {
       );
 
       // Replace the temporary loading message with the actual response
+      const formattedResponse = formatResponse(result.data);
+
       setMessages((prevMessages) => [
         ...prevMessages.slice(0, -1),
-        { type: 'bot', text: result.data }
+        { type: 'bot', text: formattedResponse }
       ]);
     } catch (error) {
       console.error("Error sending question:", error);
@@ -1174,7 +1204,7 @@ useEffect(() => {
               </div>
 
               <div className="bid-pilot-container">
-                <div className="chatResponse-container">
+                
                   {showOptions ? (
                    <div className="options-container" ref={optionsContainerRef}>
                    {copilotLoading ? (
@@ -1246,7 +1276,7 @@ useEffect(() => {
 
                   ) : (
                     <div className="mini-messages">
-                      {messages.map((message, index) => (
+                       {messages.map((message, index) => (
                         <div key={index} className={`message-bubble-small ${message.type}`}>
                           {message.text === 'loading' ? (
                             <div className="loading-dots">
@@ -1255,7 +1285,7 @@ useEffect(() => {
                               <span>. </span>
                             </div>
                           ) : (
-                            message.text
+                            <div dangerouslySetInnerHTML={{ __html: message.text }} />
                           )}
                         </div>
                       ))}
@@ -1277,17 +1307,17 @@ useEffect(() => {
                     </div>
                     <div className="bid-input-bar" ref={bidPilotRef}>
                       <input
-                        type="text"
-                        placeholder={selectedDropdownOption === 'internet-search' ? "Please type your question in here..." : selectedDropdownOption === 'custom-prompt' ? "Type in a custom prompt here..." : "Please type your question in here..."}
-                        value={inputValue}
-                        onFocus={selectedDropdownOption === 'custom-prompt' ? handleCustomPromptFocus : null}
-                        onBlur={handleCustomPromptBlur}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        disabled={!canUserEdit}
-                        style={{
-                          color: selectedDropdownOption === 'custom-prompt' ? 'white' : 'lightgray',
-                        }}
+                            type="text"
+                            placeholder={selectedDropdownOption === 'internet-search' ? "Please type your question in here..." : selectedDropdownOption === 'custom-prompt' ? "Type in a custom prompt here..." : "Please type your question in here..."}
+                            value={inputValue}
+                            onFocus={selectedDropdownOption === 'custom-prompt' ? handleCustomPromptFocus : null}
+                            onBlur={handleCustomPromptBlur}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            disabled={!canUserEdit}
+                            style={{
+                              color: selectedDropdownOption === 'custom-prompt' ? 'white' : 'lightgray',
+                            }}
                       />
                       <button onMouseDown={handleMouseDownOnSubmit} onClick={!isBidPilotLoading ? (selectedDropdownOption === 'internet-search' ? handleInternetSearch : selectedDropdownOption === 'custom-prompt' && isCopilotVisible ? handleCustomPromptSubmit : handleSendMessage) : null} disabled={isBidPilotLoading}>
                         <FontAwesomeIcon icon={faPaperPlane} />
@@ -1295,7 +1325,7 @@ useEffect(() => {
                     </div>
                   </div>
 
-                </div>
+                
               </div>
             </Col>
           </Row>
@@ -1303,6 +1333,7 @@ useEffect(() => {
         </div>
       </div>
       <QuestionCrafterWizard />
+      
     </div>
   );
 }

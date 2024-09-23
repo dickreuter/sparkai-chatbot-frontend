@@ -10,6 +10,7 @@ import handleGAEvent from '../utilities/handleGAEvent';
 import { HTTP_PREFIX, API_URL } from '../helper/Constants';
 import axios from 'axios';
 import { Button, Modal } from 'react-bootstrap';
+import QuickQuestionWizard from '../wizards/QuickQuestionWizard';
 
 const ChatbotResponse = () => {
     const getAuth = useAuthUser();
@@ -28,7 +29,7 @@ const ChatbotResponse = () => {
       }
     }
   
-    return [{ type: 'bot', text: 'Welcome to Library Chat! You ask questions here about your Company Library data.'}];
+    return [{ type: 'bot', text: 'Welcome to Quick Question! You can ask questions here about your Content Library data.'}];
   });
   
   
@@ -68,7 +69,7 @@ const ChatbotResponse = () => {
     const handleCloseModal = () => setShowModal(false);
     
     const handleClearMessages = () => {
-      setMessages([{ type: 'bot', text: 'Welcome to Library Chat! You ask questions here about your Company Library data.' }]);
+      setMessages([{ type: 'bot', text: 'Welcome to Quick Question! You can ask questions here about your Content Library data.' }]);
       localStorage.removeItem('chatResponseMessages');
       handleCloseModal();
     };
@@ -149,8 +150,8 @@ const ChatbotResponse = () => {
       };
     
       return (
-        <div className="chatpage">
-            <SideBarSmall />
+        <div className="chatpage" >
+            <SideBarSmall  />
             <div className="chatResponse-container">
               <div className="messages">
                 {messages.map((message, index) => (
@@ -175,7 +176,7 @@ const ChatbotResponse = () => {
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
                     />
-                    <button onClick={handleShowModal} className='clear-button'>
+                    <button onClick={handleShowModal} className='clear-button' id='clear'>
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
                     {/* <Button className="chat-Response-Clear-Button" onClick={handleClearMessages}>Clear</Button> */}
@@ -199,6 +200,7 @@ const ChatbotResponse = () => {
               </Button>
             </Modal.Footer>
           </Modal>
+          <QuickQuestionWizard />
         </div>
     );
     

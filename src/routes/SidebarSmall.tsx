@@ -37,7 +37,7 @@ const SideBarSmall = () => {
     localStorage.setItem('bidExtractorTourCompleted', 'false');
     localStorage.setItem('libraryTourCompleted', 'false');
     localStorage.setItem('questionCrafterTourCompleted', 'false');
-    
+    localStorage.setItem('quickquestionWizardTourCompleted', 'false');
     // Dispatch a custom event to notify other components
     window.dispatchEvent(new Event('showTips'));
   };
@@ -57,7 +57,7 @@ const SideBarSmall = () => {
         </Link>
         <Link to="/chatResponse" className={`sidebarsmalllink ${isActive('/chatResponse') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faComments} />
-          <span>Quick Question</span>
+          <span id="welcome">Quick Question</span>
         </Link>
         <Link to="/howto" className={`sidebarsmalllink ${isActive('/howto') ? 'sidebarsmalllink-active' : ''}`}>
           <FontAwesomeIcon icon={faCircleQuestion} />

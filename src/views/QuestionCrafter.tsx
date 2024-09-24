@@ -502,29 +502,33 @@ useEffect(() => {
     setResponseEditorState(newEditorState);
   
     setTimeout(() => {
-      askCopilot(selectedText, instructions, copilot_mode);
+      askCopilot(selectedText, instructions, "1" + copilot_mode);
       setShowOptions(true);
       setIsCopilotVisible(false);
     }, 0);
   };
 
   const handleOptionSelect = (option, index) => {
-    if (!highlightedRange) return; // Exit if no range is highlighted
+    console.log("handleOptionSelect called", { option, index, highlightedRange });
+    if (!highlightedRange) {
+      console.log("No highlighted range, exiting");
+      return;
+    }
   
     const contentState = responseEditorState.getCurrentContent();
     const { startKey, endKey, startOffset, endOffset } = highlightedRange;
   
-    // Create a selection state that covers the highlighted range
+    console.log("Creating highlight selection", { startKey, endKey, startOffset, endOffset });
     const highlightSelection = SelectionState.createEmpty(startKey).merge({
       anchorOffset: startOffset,
       focusKey: endKey,
       focusOffset: endOffset,
     });
   
-    // Remove the highlighted text
+    console.log("Removing highlighted text");
     let newContentState = Modifier.removeRange(contentState, highlightSelection, 'backward');
   
-    // Insert the new option text
+    console.log("Inserting new option text");
     newContentState = Modifier.insertText(
       newContentState,
       highlightSelection.merge({
@@ -534,7 +538,7 @@ useEffect(() => {
       option
     );
   
-    // Apply the ORANGE style to the new text
+    console.log("Applying ORANGE style to new text");
     const styledSelection = SelectionState.createEmpty(startKey).merge({
       anchorOffset: startOffset,
       focusOffset: startOffset + option.length,
@@ -545,54 +549,95 @@ useEffect(() => {
       'ORANGE'
     );
   
-    // Create new editor state and update selection
+    console.log("Creating new editor state");
     let newEditorState = EditorState.push(responseEditorState, newContentState, 'insert-fragment');
     newEditorState = EditorState.forceSelection(newEditorState, styledSelection);
   
+    console.log("Setting new editor state");
     setResponseEditorState(newEditorState);
     setTempText(option);
     setSelectedOption(option);
     setSelectedOptionIndex(index);
     setShowOptions(true);
   
-    // Clear the highlighted range
+    console.log("Clearing highlighted range");
     setHighlightedRange(null);
   
-    // Force re-render of the editor component
     setDummyState((prev) => !prev);
   };
-
-
   
   const handleCustomPromptFocus = () => {
+    console.log("handleCustomPromptFocus called");
     setOriginalEditorState(responseEditorState);
     
     const contentState = responseEditorState.getCurrentContent();
-    const selectionState = responseEditorState.getSelection();
+    const selection = responseEditorState.getSelection();
+    const startKey = selection.getStartKey();
+    const endKey = selection.getEndKey();
+    const startOffset = selection.getStartOffset();
+    const endOffset = selection.getEndOffset();
   
-    if (!selectionState.isCollapsed()) {
-      const startKey = selectionState.getStartKey();
-      const endKey = selectionState.getEndKey();
-      const startOffset = selectionState.getStartOffset();
-      const endOffset = selectionState.getEndOffset();
+    console.log("Current selection", { 
+      isCollapsed: selection.isCollapsed(),
+      startKey,
+      endKey,
+      startOffset,
+      endOffset
+    });
   
-      // Store the highlighted range
-      setHighlightedRange({
-        startKey,
-        endKey,
-        startOffset,
-        endOffset
+    // Always set the highlighted range, even if the selection is collapsed
+    setHighlightedRange({
+      startKey,
+      endKey,
+      startOffset,
+      endOffset
+    });
+  
+    let newContentState = contentState;
+  
+    // Apply ORANGE style
+    if (startKey === endKey) {
+      const blockSelection = SelectionState.createEmpty(startKey).merge({
+        anchorOffset: startOffset,
+        focusOffset: endOffset,
       });
+      newContentState = Modifier.applyInlineStyle(newContentState, blockSelection, 'ORANGE');
+    } else {
+      // If the selection spans multiple blocks
+      const blocks = contentState.getBlockMap();
+      let isWithinSelection = false;
   
-      const newContentState = Modifier.applyInlineStyle(
-        contentState,
-        selectionState,
-        'ORANGE'
-      );
-  
-      const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
-      setResponseEditorState(newEditorState);
+      newContentState = blocks.reduce((updatedContent, block, blockKey) => {
+        if (blockKey === startKey) {
+          isWithinSelection = true;
+          const blockSelection = SelectionState.createEmpty(blockKey).merge({
+            anchorOffset: startOffset,
+            focusOffset: block.getLength(),
+          });
+          return Modifier.applyInlineStyle(updatedContent, blockSelection, 'ORANGE');
+        } else if (blockKey === endKey) {
+          isWithinSelection = false;
+          const blockSelection = SelectionState.createEmpty(blockKey).merge({
+            anchorOffset: 0,
+            focusOffset: endOffset,
+          });
+          return Modifier.applyInlineStyle(updatedContent, blockSelection, 'ORANGE');
+        } else if (isWithinSelection) {
+          const blockSelection = SelectionState.createEmpty(blockKey).merge({
+            anchorOffset: 0,
+            focusOffset: block.getLength(),
+          });
+          return Modifier.applyInlineStyle(updatedContent, blockSelection, 'ORANGE');
+        }
+        return updatedContent;
+      }, newContentState);
     }
+  
+    console.log("Applying ORANGE style");
+    const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
+    setResponseEditorState(newEditorState);
+  
+    console.log("Set highlighted range", { startKey, endKey, startOffset, endOffset });
   };
   
   let isSubmitButtonClicked = false;
@@ -623,29 +668,42 @@ useEffect(() => {
       setResponseEditorState(newEditorState);
   
       // Clear the highlighted range
-      setHighlightedRange(null);
+      //setHighlightedRange(null);
     }
     isSubmitButtonClicked = false; // Reset flag after handling
   };
   
   const handleCustomPromptSubmit = () => {
+    console.log("handleCustomPromptSubmit called", { inputValue: inputValue.trim() });
     if (inputValue.trim()) {
       isSubmitButtonClicked = true;
-      console.log(`Custom Prompt: ${inputValue}`);
       
       const copilot_mode = inputValue.toLowerCase().replace(/\s+/g, '_');
       const instructions = '';
   
-      // Use the highlighted text if available, otherwise use the selected text
-      const textToUse = highlightedRange ? getTextFromRange(responseEditorState, highlightedRange) : selectedText;
-      console.log(textToUse);
+      const contentState = responseEditorState.getCurrentContent();
+  
+      let selectedText;
+      if (highlightedRange) {
+        const { startKey, endKey, startOffset, endOffset } = highlightedRange;
+        console.log("Using highlighted range", { startKey, endKey, startOffset, endOffset });
+  
+        selectedText = getTextFromRange(responseEditorState, highlightedRange);
+      } else {
+        console.log("No highlighted range, using full content");
+        selectedText = contentState.getPlainText();
+      }
+  
+      console.log("Selected text", { selectedText });
+  
       setTimeout(() => {
-        askCopilot(textToUse, instructions, copilot_mode);
+        console.log("Calling askCopilot");
+        askCopilot(selectedText, instructions, "4" + copilot_mode);
         setShowOptions(true);
         setSelectedDropdownOption('internet-search');
       }, 0);
   
-      setInputValue(''); // Clear the input field
+      setInputValue('');
       setIsCopilotVisible(false);
     }
   };

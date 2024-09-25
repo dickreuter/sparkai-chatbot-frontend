@@ -15,6 +15,11 @@ const QuestionCrafterWizard = () => {
       description: 'Where the magic happens🪄 Enter your question here pick and folder from your content library to narrow down the search.',
     },
     {
+      elementId: 'select-folder',
+      title: 'Knowledge Base Selection',
+      description: 'Click this button to select folders from your content library 📂 The AI will use these as its knowledge base when answering your questions. ',
+    },
+    {
       elementId: 'answer-section',
       title: 'Answer Section',
       description:'Your answer will appear here. Need to tweak it? No problem! You can edit and perfect the response to fit your needs.'

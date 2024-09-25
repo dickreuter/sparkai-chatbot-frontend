@@ -349,12 +349,12 @@
         
         .breadcrumb-item {
             font-weight: 500;
-            font-size: 17px;
+            font-size: 18px;
         }
         
         .breadcrumb-item.clickable {
             cursor: pointer;
-            color: orange;
+            color: #ff7f50;
         }
         
         .breadcrumb-item.clickable:hover {

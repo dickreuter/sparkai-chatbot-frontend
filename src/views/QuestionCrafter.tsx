@@ -16,6 +16,8 @@ import 'draft-js/dist/Draft.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
+import SelectFolder from "../components/SelectFolder.tsx";
+import SelectFolderModal from "../components/SelectFolderModal.tsx";
 
 const QuestionCrafter = () => {
   const getAuth = useAuthUser();
@@ -80,6 +82,18 @@ const QuestionCrafter = () => {
   const canUserEdit = currentUserPermission === "admin" || currentUserPermission === "editor";
 
 
+  
+  const [selectedFolders, setSelectedFolders] = useState([]);
+
+  const handleSaveSelectedFolders = (folders) => {
+    console.log("Received folders in parent:", folders);
+    setSelectedFolders(folders);
+    console.log("Updated selectedFolders state:", selectedFolders);
+  };
+
+  useEffect(() => {
+    console.log("selectedFolders state in QuestionCrafter updated:", selectedFolders);
+  }, [selectedFolders]);
 
 
   const handleDocumentSelect = (docName) => {
@@ -235,7 +249,7 @@ const QuestionCrafter = () => {
             input_text: copilotInput,
             extra_instructions: instructions,
             copilot_mode: copilot_mode,
-            dataset,
+            datasets: selectedFolders,
           },
           {
             headers: {
@@ -953,7 +967,7 @@ useEffect(() => {
           broadness: bidPilotbroadness,
           input_text: question,
           extra_instructions: chatHistory,
-          dataset: 'default',
+          datasets: ['default'],
           bid_id: sharedState.object_id
         },
         {
@@ -990,7 +1004,7 @@ useEffect(() => {
     setIsLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
     console.log("DATASET");
-    console.log(dataset);
+    console.log(selectedFolders);
     try {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question`,
@@ -999,7 +1013,7 @@ useEffect(() => {
           broadness: broadness,
           input_text: inputText,
           extra_instructions: backgroundInfo,
-          dataset,
+          datasets: selectedFolders,
           bid_id: sharedState.object_id
         },
         {
@@ -1136,6 +1150,7 @@ useEffect(() => {
     setIsLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
     try {
+      console.log(selectedFolders);
       const word_amounts = selectedChoices.map((choice) => String(wordAmounts[choice] || "100"));
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
@@ -1145,7 +1160,7 @@ useEffect(() => {
           input_text: inputText,
           extra_instructions: backgroundInfo,
           selected_choices: selectedChoices,
-          dataset,
+          datasets: selectedFolders,
           word_amounts,
           bid_id: sharedState.object_id
         },
@@ -1214,19 +1229,12 @@ useEffect(() => {
               <div className="proposal-header mb-2">
                 <h1 className="lib-title" id='question-section'>Question</h1>
                 <div className="dropdown-container">
-                <Dropdown onSelect={handleSelect} className="w-100 mx-auto chat-dropdown">
-                <Dropdown.Toggle className="upload-button"  id="dropdown-basic">
-                  {displayText}
-                </Dropdown.Toggle>
+               
 
-                <Dropdown.Menu className="w-100">
-                {availableCollections.map((collection) => (
-                  <Dropdown.Item key={collection} eventKey={collection}>
-                    {formatDisplayName(collection)}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Menu>
-              </Dropdown>
+                <SelectFolderModal 
+                  onSaveSelectedFolders={handleSaveSelectedFolders}
+                  initialSelectedFolders={selectedFolders}
+                />
                 
                 </div>
               </div>

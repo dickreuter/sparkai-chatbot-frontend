@@ -1,0 +1,82 @@
+        .select-folder-modal {
+            width: 200%;
+            max-width: 3000px;
+            min-width: 2000px;
+        }
+        
+        .select-library-card-custom {
+            height: 600px;
+            margin-top: 15px;
+            box-shadow: none !important;
+            margin-bottom: 0;
+        }
+        
+        .select-library-card-body-content {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 0;
+            margin-bottom: 0;
+        }
+        
+        .select-library-card-content-wrapper {
+            flex: 1;
+            overflow: hidden;
+            margin-bottom: 0;
+            /* Space between content and pagination */
+        }
+        
+        .breadcrumb-container {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-cell {
+            width: 60px;
+            text-align: right;
+            padding-right: 15px;
+        }
+        
+        .form-check-input {
+            width: 1.2em;
+            height: 1.2em;
+            border: 2px solid lightgray;
+            border-radius: 0.25em;
+            margin-top: 0.25em;
+            cursor: pointer;
+        }
+        
+        .form-check-input:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        
+        .form-check-input:hover {
+            border-color: #0056b3;
+        }
+        
+        .breadcrumb-and-back-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0px;
+        }
+        
+        .breadcrumb-container {
+            flex-grow: 1;
+            margin-left: 15px;
+        }
+        
+        .back-button {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 550px;
+        }

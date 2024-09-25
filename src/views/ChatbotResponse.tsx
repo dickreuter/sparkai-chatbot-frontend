@@ -121,7 +121,7 @@ const ChatbotResponse = () => {
               broadness: broadness,
               input_text: question,
               extra_instructions: backgroundInfo,
-              dataset,
+              datasets: ["default"],
             },
             {
               headers: {

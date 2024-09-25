@@ -3,24 +3,12 @@ import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
-import { Button, Col, Row, Card, Modal, FormControl, InputGroup, Form } from "react-bootstrap";
-import UploadPDF from './UploadPDF';
-import UploadText from './UploadText';
-import "./Library.css";
-import SideBarSmall from '../routes/SidebarSmall.tsx';
-import handleGAEvent from "../utilities/handleGAEvent.tsx";
-import { faEye, faTrash, faFolder, faFileAlt, faArrowUpFromBracket, faEllipsisVertical, faSearch, faQuestionCircle, faPlus, faArrowLeft, faReply, faTimes, faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import "./Chatbot.css";
+import { Button, Card, Form, Spinner } from "react-bootstrap";
+import { faFolder, faFileAlt, faReply } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { UploadPDFModal, UploadTextModal, UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
-import { Menu, MenuItem, IconButton } from '@mui/material';
-import { MoreVert as MoreVertIcon } from '@mui/icons-material';
-import FileContentModal from "../components/FileContentModal.tsx";
-import { displayAlert } from "../helper/Alert.tsx";
-import LibraryWizard from "../wizards/LibraryWizard.tsx"; // Adjust the import path as needed
+import { Skeleton } from '@mui/material';
 
-
-const SelectFolder = () => {
+const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -31,22 +19,10 @@ const SelectFolder = () => {
   const rowsPerPage = 10;
   const [totalPages, setTotalPages] = useState(0);
   const [activeFolder, setActiveFolder] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [anchorElFile, setAnchorElFile] = useState(null);
-
-  const [currentFile, setCurrentFile] = useState(null);
-
-  const open = Boolean(anchorEl);
-  const [searchQuery, setSearchQuery] = useState('');
-  
+  const [selectedFolders, setSelectedFolders] = useState(initialSelectedFolders);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [folderStructure, setFolderStructure] = useState({});
-  const [expandedFolders, setExpandedFolders] = useState({});
-
-  const [showPdfViewerModal, setShowPdfViewerModal] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState('');
-
-  const searchBarRef = useRef(null);
 
   const [updateTrigger, setUpdateTrigger] = useState(0);
 
@@ -56,32 +32,57 @@ const SelectFolder = () => {
     );
   };
 
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
-  
 
-  const handleClick = (event, file) => {
-    setAnchorElFile(event.currentTarget);
-    setCurrentFile(file);
+  const renderSkeletons = (count) => {
+    return Array(count).fill(0).map((_, index) => (
+      <tr key={`skeleton-${index}`}>
+        <td colSpan={2}>
+          <Skeleton variant="text" width="100%" height={30} />
+        </td>
+      </tr>
+    ));
   };
 
-  const handleClose = () => {
-    setAnchorElFile(null);
-  };
-
   
 
+  const renderBreadcrumbs = () => {
+    if (!activeFolder) {
+      return <span className="breadcrumb-item">Content Library</span>;
+    }
 
+    const parts = activeFolder.split('FORWARDSLASH');
+    return (
+      <>
+        <span 
+          className="breadcrumb-item clickable" 
+          onClick={() => setActiveFolder(null)}
+        >
+          Content Library
+        </span>
+        {parts.map((part, index) => (
+          <React.Fragment key={index}>
+            <span className="breadcrumb-separator">&gt;</span>
+            <span 
+              className={`breadcrumb-item ${index === parts.length - 1 ? '' : 'clickable'}`}
+              onClick={() => {
+                if (index < parts.length - 1) {
+                  setActiveFolder(parts.slice(0, index + 1).join('FORWARDSLASH'));
+                }
+              }}
+            >
+              {formatDisplayName(part)}
+            </span>
+          </React.Fragment>
+        ))}
+      </>
+    );
+  };
+  
   const fetchFolderStructure = async () => {
+    setIsLoading(true); // Set loading to true before fetching
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/get_collections`,
@@ -89,9 +90,7 @@ const SelectFolder = () => {
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
   
-      //console.log(response.data);
       setAvailableCollections(response.data.collections);
-      console.log(response.data.collections);
       const structure = {};
       response.data.collections.forEach(collectionName => {
         const parts = collectionName.split('FORWARDSLASH');
@@ -107,11 +106,13 @@ const SelectFolder = () => {
       setFolderStructure(structure);
     } catch (error) {
       console.error("Error fetching folder structure:", error);
+    } finally {
+      setIsLoading(false); // Set loading to false after fetching
     }
   };
+
   const fetchFolderContents = async (folderPath) => {
     try {
-      
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
         { collection_name: folderPath },
@@ -123,9 +124,7 @@ const SelectFolder = () => {
         unique_id: item.unique_id,
         isFolder: false
       }));
-  
    
-      // Get subfolders
       const subfolders = availableCollections
         .filter(collection => collection.startsWith(folderPath + 'FORWARDSLASH'))
         .map(collection => {
@@ -137,58 +136,63 @@ const SelectFolder = () => {
           };
         });
   
-      
-  
       const allContents = [...subfolders, ...filesWithIds];
-     
-  
       setFolderContents(prevContents => ({
         ...prevContents,
         [folderPath]: allContents
       }));
     } catch (error) {
       console.error("Error fetching folder contents:", error);
+    } finally {
+      setIsLoading(false); // Set loading to false after fetching
     }
   };
 
   const handleFolderClick = (folderPath) => {
-    console.log(`Folder clicked: ${folderPath}`);
     setActiveFolder(folderPath);
     if (!folderContents[folderPath]) {
-      console.log(`Fetching contents for ${folderPath} as they don't exist yet`);
       fetchFolderContents(folderPath);
-    } else {
-      console.log(`Contents for ${folderPath} already exist:`, folderContents[folderPath]);
     }
   };
 
-const handleBackClick = () => {
-  if (activeFolder) {
-    const parts = activeFolder.split('FORWARDSLASH');
-    if (parts.length > 1) {
-      // Go up one level
-      const parentFolder = parts.slice(0, -1).join('FORWARDSLASH');
-      setActiveFolder(parentFolder);
-      if (!folderContents[parentFolder]) {
-        fetchFolderContents(parentFolder);
+  const handleBackClick = () => {
+    if (activeFolder) {
+      const parts = activeFolder.split('FORWARDSLASH');
+      if (parts.length > 1) {
+        const parentFolder = parts.slice(0, -1).join('FORWARDSLASH');
+        setActiveFolder(parentFolder);
+        if (!folderContents[parentFolder]) {
+          fetchFolderContents(parentFolder);
+        }
+      } else {
+        setActiveFolder(null);
       }
-    } else {
-      // If we're at the root level, go back to the main folder view
-      setActiveFolder(null);
     }
-  }
-};
-useEffect(() => {
-  fetchFolderStructure();
-  if (activeFolder) {
-    fetchFolderContents(activeFolder);
-  }
-}, [updateTrigger, activeFolder]);
+  };
+
+  const handleFolderSelect = (folderPath) => {
+    setSelectedFolders(prev => {
+      const newSelection = prev.includes(folderPath)
+        ? prev.filter(f => f !== folderPath)
+        : [...prev, folderPath];
+      
+      // Call the onFolderSelect prop with the updated selection
+      onFolderSelect(newSelection);
+      
+      return newSelection;
+    });
+  };
 
   useEffect(() => {
-    setShowDropdown(searchQuery.length > 0);
-  }, [searchQuery]);
-  
+    setSelectedFolders(initialSelectedFolders);
+  }, [initialSelectedFolders]);
+
+  useEffect(() => {
+    fetchFolderStructure();
+    if (activeFolder) {
+      fetchFolderContents(activeFolder);
+    }
+  }, [updateTrigger, activeFolder]);
 
   useEffect(() => {
     if (activeFolder === null) {
@@ -201,7 +205,7 @@ useEffect(() => {
       const itemsCount = folderContents[activeFolder]?.length || 0;
       const pages = Math.ceil(itemsCount / rowsPerPage);
       setTotalPages(pages);
-      setCurrentPage(1); // Reset to first page when changing folders
+      setCurrentPage(1);
     }
   }, [activeFolder, folderContents, availableCollections, rowsPerPage]);
   
@@ -210,16 +214,17 @@ useEffect(() => {
   };
 
   const renderFolderStructure = (structure, path = '') => {
+
     const topLevelFolders = getTopLevelFolders();
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const foldersToRender = topLevelFolders.slice(startIndex, endIndex);
-  
+
     return foldersToRender.map((folderName) => {
       const displayName = formatDisplayName(folderName);
       return (
-        <tr key={folderName} onClick={() => handleFolderClick(folderName)} style={{ cursor: 'pointer' }}>
-          <td>
+        <tr key={folderName}>
+          <td className="folder-name" onClick={() => handleFolderClick(folderName)}>
             <FontAwesomeIcon 
               icon={faFolder} 
               className="fa-icon"
@@ -227,14 +232,11 @@ useEffect(() => {
             />
             {displayName}
           </td>
-          <td colSpan={3}>
-            <UploadButtonWithDropdown
-              folder={folderName}
-              get_collections={fetchFolderStructure}
-              handleShowPDFModal={handleShowPDFModal}
-              handleShowTextModal={handleShowTextModal}
-              setShowDeleteFolderModal={setShowDeleteFolderModal}
-              setFolderToDelete={setFolderToDelete}
+          <td className="checkbox-cell">
+            <Form.Check
+              type="checkbox"
+              checked={selectedFolders.includes(folderName)}
+              onChange={() => handleFolderSelect(folderName)}
             />
           </td>
         </tr>
@@ -242,19 +244,21 @@ useEffect(() => {
     });
   };
 
-  
-const renderFolderContents = (folderPath) => {
-  const contents = folderContents[folderPath] || [];
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const contentsToRender = contents.slice(startIndex, endIndex);
+  const renderFolderContents = (folderPath) => {
 
-  return contentsToRender.map(({ filename, unique_id, isFolder }, index) => {
-    const fullPath = isFolder ? `${folderPath}FORWARDSLASH${filename}` : folderPath;
-    const displayName = formatDisplayName(filename);
-    return (
-      <tr key={`${folderPath}-${index}`} style={{ cursor: 'pointer' }}>
-          <td onClick={() => isFolder ? handleFolderClick(fullPath) : viewFile(filename, folderPath, unique_id)}>
+    const contents = folderContents[folderPath] || [];
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const contentsToRender = contents.slice(startIndex, endIndex);
+    console.log(contentsToRender.length);
+
+    
+    return contentsToRender.map(({ filename, unique_id, isFolder }, index) => {
+      const fullPath = isFolder ? `${folderPath}FORWARDSLASH${filename}` : folderPath;
+      const displayName = formatDisplayName(filename);
+      return (
+        <tr key={`${folderPath}-${index}`}>
+          <td className="folder-name" onClick={() => isFolder && handleFolderClick(fullPath)}>
             <FontAwesomeIcon 
               icon={isFolder ? faFolder : faFileAlt} 
               className="fa-icon" 
@@ -262,106 +266,77 @@ const renderFolderContents = (folderPath) => {
             />
             {displayName}
           </td>
-          <td colSpan={3}>
-            {isFolder ? (
-              <UploadButtonWithDropdown
-                folder={fullPath}
-                get_collections={fetchFolderStructure}
-                handleShowPDFModal={handleShowPDFModal}
-                handleShowTextModal={handleShowTextModal}
-                setShowDeleteFolderModal={setShowDeleteFolderModal}
-                setFolderToDelete={setFolderToDelete}
+          {isFolder && (
+            <td className="checkbox-cell">
+              <Form.Check
+                type="checkbox"
+                checked={selectedFolders.includes(fullPath)}
+                onChange={() => handleFolderSelect(fullPath)}
               />
-            ) : (
-              <div>
-                <Button
-                  aria-controls="simple-menu"
-                  aria-haspopup="true"
-                  onClick={(event) => handleClick(event, { filename, unique_id })}
-                  sx={{
-                    borderRadius: '50%',
-                    minWidth: 0,
-                    padding: '10px',
-                    backgroundColor: 'transparent',
-                    '&.MuiButton-root:active': {
-                      boxShadow: 'none',
-                    },
-                  }}
-                  className="ellipsis-button"
-                >
-                  <FontAwesomeIcon icon={faEllipsisVertical} className="ellipsis-icon" />
-                </Button>
-                <Menu
-                  id="simple-menu"
-                  anchorEl={anchorElFile}
-                  keepMounted
-                  open={Boolean(anchorElFile)}
-                  onClose={handleClose}
-                >
-                  <MenuItem onClick={handleDeleteClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
-                    <i className="fas fa-trash-alt" style={{ marginRight: '12px' }}></i>
-                    Delete File
-                  </MenuItem>
-                </Menu>
-              </div>
-            )}
-          </td>
+            </td>
+          )}
+          {!isFolder && <td></td>}
         </tr>
       );
     });
   };
 
+  return (
+    <Card className="select-library-card-custom mt-0 mb-0">
+      <Card.Body className="select-library-card-body-content">
+        <div className="select-library-card-content-wrapper">
+        <div className="breadcrumb-and-back-container">
+            <div className="breadcrumb-container">
+              {renderBreadcrumbs()}
+            </div>
+            {activeFolder && (
+              <div 
+                className="back-button" 
+                onClick={() => handleBackClick()} 
+              >
+                <FontAwesomeIcon icon={faReply} />
+                <span style={{ marginLeft: "10px"}}>Back</span>
+              </div>
+            )}
+          </div>
+          {isLoading ? (
+            <div className="spinner-container">
+              <Spinner animation="border" role="status" style={{color: "#ff7f50"}}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+          ) : (
+            <table className="library-table mt-0">
+              <tbody>
+                {activeFolder 
+                  ? renderFolderContents(activeFolder)
+                  : renderFolderStructure(folderStructure)
+                }
+              </tbody>
+            </table>
+          )}
 
-
-    return (
-     
+          <div className="pagination-controls">
+            {totalPages > 1 && [...Array(totalPages)].map((_, i) => (
+              <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Card.Body>
+      <style jsx>{`
       
-          <Card className="library-card-custom">
-            <Card.Body className="library-card-body-content">
-              <div className="library-card-content-wrapper">
-                <div className="header-row mt-2">
-                  <div className="lib-title" id='library-table' style={{marginLeft: "15px"}}>Select Folder</div>
-                
-                <table className="library-table">
-                  <thead>
-                    <tr>
-                      <th>
-                        {renderBreadcrumbs()}
-                      </th>
-                      <th colSpan={3}>
-                        {activeFolder && (
-                          <div 
-                            className="back-button" 
-                            onClick={() => handleBackClick()} 
-                            style={{ cursor: 'pointer', padding: '5px'}}
-                          >
-                            <FontAwesomeIcon icon={faReply} />
-                            <span style={{ marginLeft: "10px"}}>Back</span>
-                          </div>
-                        )}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activeFolder 
-                      ? renderFolderContents(activeFolder)
-                      : renderFolderStructure(folderStructure)
-                    }
-                  </tbody>
-                </table>
-              </div>
-  
-              <div className="pagination-controls">
-                {totalPages > 1 && [...Array(totalPages)].map((_, i) => (
-                  <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-              </div>
-            </Card.Body>
-          </Card>
-    );
-  }
-  
-  export default withAuth(SelectFolder);
+        .library-table td {
+          padding: 13px;
+        }
+        
+
+       
+        
+      `}</style>
+    </Card>
+  );
+}
+
+export default withAuth(SelectFolder);

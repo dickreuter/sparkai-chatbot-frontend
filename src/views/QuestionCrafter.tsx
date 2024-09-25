@@ -1077,7 +1077,7 @@ useEffect(() => {
       setSelectedChoices([...selectedChoices, selectedChoice]);
       setWordAmounts((prevWordAmounts) => ({
         ...prevWordAmounts,
-        [selectedChoice]: 300 // Default word amount
+        [selectedChoice]: 250 // Default word amount
       }));
     }
   };
@@ -1108,14 +1108,14 @@ useEffect(() => {
             {selectedChoices.includes(choice) && (
               <Form.Control
                 type="number"
-                value={wordAmounts[choice] || 300}
+                value={wordAmounts[choice] || 250}
                 onChange={(e) => setWordAmounts({
                   ...wordAmounts,
                   [choice]: parseInt(e.target.value, 10)
                 })}
                 min={1}
                 className="ml-2"
-                placeholder="300"
+                placeholder="250"
                 style={{ width: '120px', marginLeft: '10px' }}
               />
             )}

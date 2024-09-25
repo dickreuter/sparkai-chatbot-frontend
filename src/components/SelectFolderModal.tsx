@@ -25,7 +25,7 @@ const SelectFolderModal = ({ onSaveSelectedFolders, initialSelectedFolders = [] 
 
     return (
         <>
-            <Button className='upload-button' onClick={handleShow}>
+            <Button className='upload-button' id='select-folder' onClick={handleShow}>
                 Select Folders
             </Button>
             <Modal

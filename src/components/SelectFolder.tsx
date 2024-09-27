@@ -16,7 +16,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const [availableCollections, setAvailableCollections] = useState([]);
   const [folderContents, setFolderContents] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+  const rowsPerPage = 9;
   const [totalPages, setTotalPages] = useState(0);
   const [activeFolder, setActiveFolder] = useState(null);
   const [selectedFolders, setSelectedFolders] = useState(initialSelectedFolders);

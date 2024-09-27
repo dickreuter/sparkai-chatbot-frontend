@@ -10,6 +10,7 @@ import { Menu, MenuItem } from '@mui/material';
 import FileContentModal from "../components/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import UploadText from "../views/UploadText.tsx";
+import InterrogateTenderModal from "./InterrogateTenderModal.tsx";
 
 const TenderLibrary = ({ object_id }) => {
   const getAuth = useAuthUser();
@@ -407,13 +408,16 @@ return (
             <div className="library-card-content-wrapper">
               <div className="header-row mt-2" id='tender-library'>
                 <div className="lib-title"  >Tender Upload</div>
+                <div>
+                <InterrogateTenderModal bid_id={object_id}  />
                 <Button
                   aria-controls="simple-menu"
                   aria-haspopup="true"
                   onClick={handleMenuClick}
                   className="upload-button"
+                  style={{ marginLeft: '5px'}}
                 >
-                  <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+                  <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px', }} />
                   Upload Document
                 </Button>
                 <Menu
@@ -428,6 +432,8 @@ return (
                     Upload PDF/Doc
                   </MenuItem>
                 </Menu>
+                </div>
+                
               </div>
 
               <table className="library-table">

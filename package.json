@@ -33,6 +33,7 @@
         "lodash": "^4.17.21",
         "moment": "^2.29.4",
         "mui": "^0.0.1",
+        "pdfjs-dist": "^4.6.82",
         "react": "^17.0.2",
         "react-auth-kit": "^2.12.7",
         "react-bootstrap": "^2.9.1",
@@ -42,6 +43,7 @@
         "react-draft-wysiwyg": "^1.15.0",
         "react-ga4": "^2.1.0",
         "react-onboarding": "^1.5.0",
+        "react-pdf": "^9.1.1",
         "react-plotly.js": "^2.6.0",
         "react-router-dom": "^6.17.0",
         "react-tooltip": "^5.25.0"
@@ -56,6 +58,7 @@
         "@types/react": "^18.2.55",
         "@types/react-dom": "^18.2.19",
         "@types/react-draft-wysiwyg": "^1.13.8",
+        "@types/react-pdf": "^7.0.0",
         "@typescript-eslint/eslint-plugin": "^6.8.0",
         "@typescript-eslint/parser": "^6.8.0",
         "@vitejs/plugin-react": "^4.1.0",

@@ -6,9 +6,10 @@ import "./SelectFolderModal.css";
 const SelectFolderModal = ({ onSaveSelectedFolders, initialSelectedFolders = [] }) => {
   const [show, setShow] = useState(false);
   const [selectedFolders, setSelectedFolders] = useState(() => {
-      const initialSelection = new Set([...initialSelectedFolders, 'default']);
-      return Array.from(initialSelection);
+    const initialSelection = new Set(initialSelectedFolders);
+    return Array.from(initialSelection);
   });
+
 
   const handleShow = () => setShow(true);
   const handleClose = () => {

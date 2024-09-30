@@ -164,15 +164,11 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const handleFolderSelect = (folderPath) => {
     setSelectedFolders(prev => {
       const newSelection = new Set(prev);
-      if (folderPath !== 'default') {
-        if (newSelection.has(folderPath)) {
-          newSelection.delete(folderPath);
-        } else {
-          newSelection.add(folderPath);
-        }
+      if (newSelection.has(folderPath)) {
+        newSelection.delete(folderPath);
+      } else {
+        newSelection.add(folderPath);
       }
-      // Always ensure 'default' is included
-      newSelection.add('default');
       const newSelectionArray = Array.from(newSelection);
       onFolderSelect(newSelectionArray);
       return newSelectionArray;
@@ -181,7 +177,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
 
   useEffect(() => {
     setSelectedFolders(prev => {
-      const newSelection = new Set([...initialSelectedFolders, 'default']);
+      const newSelection = new Set([...initialSelectedFolders]);
       return Array.from(newSelection);
     });
   }, [initialSelectedFolders]);

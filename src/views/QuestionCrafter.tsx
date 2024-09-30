@@ -29,8 +29,6 @@ const QuestionCrafter = () => {
 
   const backgroundInfo = getBackgroundInfo();
 
-  const [bids, setBids] = useState([]);
-  const [selectedBid, setSelectedBid] = useState(null);
 
   const [dataset, setDataset] = useState("default");
   const [availableCollections, setAvailableCollections] = useState([]);
@@ -87,12 +85,8 @@ const QuestionCrafter = () => {
 
   const handleSaveSelectedFolders = (folders) => {
     console.log("Received folders in parent:", folders);
-    setSelectedFolders(prevFolders => {
-      const newFolders = new Set([...folders, 'default']);
-      return Array.from(newFolders);
-    });
+    setSelectedFolders(folders);
   };
-
   useEffect(() => {
     console.log("selectedFolders state in QuestionCrafter updated:", selectedFolders);
   }, [selectedFolders]);

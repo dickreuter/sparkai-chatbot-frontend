@@ -83,12 +83,14 @@ const QuestionCrafter = () => {
 
 
   
-  const [selectedFolders, setSelectedFolders] = useState([]);
+  const [selectedFolders, setSelectedFolders] = useState(['default']);
 
   const handleSaveSelectedFolders = (folders) => {
     console.log("Received folders in parent:", folders);
-    setSelectedFolders(folders);
-    console.log("Updated selectedFolders state:", selectedFolders);
+    setSelectedFolders(prevFolders => {
+      const newFolders = new Set([...folders, 'default']);
+      return Array.from(newFolders);
+    });
   };
 
   useEffect(() => {

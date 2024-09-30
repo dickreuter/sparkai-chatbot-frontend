@@ -19,7 +19,10 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const rowsPerPage = 9;
   const [totalPages, setTotalPages] = useState(0);
   const [activeFolder, setActiveFolder] = useState(null);
-  const [selectedFolders, setSelectedFolders] = useState(initialSelectedFolders);
+  const [selectedFolders, setSelectedFolders] = useState(() => {
+    const initialSelection = new Set([...initialSelectedFolders, 'default']);
+    return Array.from(initialSelection);
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   const [folderStructure, setFolderStructure] = useState({});
@@ -35,18 +38,6 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
-
-  const renderSkeletons = (count) => {
-    return Array(count).fill(0).map((_, index) => (
-      <tr key={`skeleton-${index}`}>
-        <td colSpan={2}>
-          <Skeleton variant="text" width="100%" height={30} />
-        </td>
-      </tr>
-    ));
-  };
-
-  
 
   const renderBreadcrumbs = () => {
     if (!activeFolder) {
@@ -172,20 +163,31 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
 
   const handleFolderSelect = (folderPath) => {
     setSelectedFolders(prev => {
-      const newSelection = prev.includes(folderPath)
-        ? prev.filter(f => f !== folderPath)
-        : [...prev, folderPath];
-      
-      // Call the onFolderSelect prop with the updated selection
-      onFolderSelect(newSelection);
-      
-      return newSelection;
+      const newSelection = new Set(prev);
+      if (folderPath !== 'default') {
+        if (newSelection.has(folderPath)) {
+          newSelection.delete(folderPath);
+        } else {
+          newSelection.add(folderPath);
+        }
+      }
+      // Always ensure 'default' is included
+      newSelection.add('default');
+      const newSelectionArray = Array.from(newSelection);
+      onFolderSelect(newSelectionArray);
+      return newSelectionArray;
     });
   };
 
   useEffect(() => {
-    setSelectedFolders(initialSelectedFolders);
+    setSelectedFolders(prev => {
+      const newSelection = new Set([...initialSelectedFolders, 'default']);
+      return Array.from(newSelection);
+    });
   }, [initialSelectedFolders]);
+
+
+ 
 
   useEffect(() => {
     fetchFolderStructure();

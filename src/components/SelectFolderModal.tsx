@@ -4,53 +4,54 @@ import SelectFolder from './SelectFolder';
 import "./SelectFolderModal.css";
 
 const SelectFolderModal = ({ onSaveSelectedFolders, initialSelectedFolders = [] }) => {
-    const [show, setShow] = useState(false);
-    const [selectedFolders, setSelectedFolders] = useState(initialSelectedFolders);
- 
-    const handleShow = () => setShow(true);
-    const handleClose = () => {
-        console.log('Closing modal. Selected folders:', selectedFolders);
-        onSaveSelectedFolders(selectedFolders);
-        setShow(false);
-    };
+  const [show, setShow] = useState(false);
+  const [selectedFolders, setSelectedFolders] = useState(() => {
+      const initialSelection = new Set([...initialSelectedFolders, 'default']);
+      return Array.from(initialSelection);
+  });
 
-    const handleFolderSelection = (folders) => {
-        console.log('Folders selected in SelectFolder component:', folders);
-        setSelectedFolders(folders);
-    };
+  const handleShow = () => setShow(true);
+  const handleClose = () => {
+      console.log('Closing modal. Selected folders:', selectedFolders);
+      onSaveSelectedFolders(selectedFolders);
+      setShow(false);
+  };
+  const handleFolderSelection = (folders) => {
+      console.log('Folders selected in SelectFolder component:', folders);
+      setSelectedFolders(folders);
+  };
+  useEffect(() => {
+      console.log('selectedFolders state updated:', selectedFolders);
+  }, [selectedFolders]);
 
-    useEffect(() => {
-        console.log('selectedFolders state updated:', selectedFolders);
-    }, [selectedFolders]);
-
-    return (
-        <>
-            <Button className='upload-button' id='select-folder' onClick={handleShow}>
-                Select Folders
-            </Button>
-            <Modal
-                show={show}
-                onHide={handleClose}
-                dialogClassName="select-folder-modal-dialog"
-                contentClassName="select-folder-modal-content"
-            >
-                <Modal.Header style={{paddingLeft: "25px", paddingRight: "30px"}} closeButton>
-                    <Modal.Title style={{fontSize: "20px", fontWeight: "600"}}>Select Folders to Use as Context</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="content-scaler">
-                        <SelectFolder 
-                            onFolderSelect={handleFolderSelection} 
-                            initialSelectedFolders={selectedFolders}
-                        />
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button className='upload-button' onClick={handleClose} style={{fontSize: "12px"}}>
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+  return (
+      <>
+          <Button className='upload-button' id='select-folder' onClick={handleShow}>
+              Select Folders
+          </Button>
+          <Modal
+              show={show}
+              onHide={handleClose}
+              dialogClassName="select-folder-modal-dialog"
+              contentClassName="select-folder-modal-content"
+          >
+              <Modal.Header style={{paddingLeft: "25px", paddingRight: "30px"}} closeButton>
+                  <Modal.Title style={{fontSize: "20px", fontWeight: "600"}}>Select Folders to Use as Context</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                  <div className="content-scaler">
+                      <SelectFolder
+                          onFolderSelect={handleFolderSelection}
+                          initialSelectedFolders={selectedFolders}
+                      />
+                  </div>
+              </Modal.Body>
+              <Modal.Footer>
+                  <Button className='upload-button' onClick={handleClose} style={{fontSize: "12px"}}>
+                      Save Changes
+                  </Button>
+              </Modal.Footer>
+          </Modal>
       <style type="text/css">
         {`
           .select-folder-modal-dialog {

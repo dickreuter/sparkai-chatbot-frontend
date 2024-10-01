@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Form, Button, ListGroup, Spinner, Alert } from 'react-bootstrap';
 import { useAuthUser } from 'react-auth-kit';
 import { API_URL, HTTP_PREFIX } from '../helper/Constants';
-
+import "./InterrogateTender.css";
 const InterrogateTender = ({ bid_id, viewFile, onSearch, initialSearchTerm = '', initialSearchResults = [] }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -67,6 +67,11 @@ const InterrogateTender = ({ bid_id, viewFile, onSearch, initialSearchTerm = '',
 
   return (
     <div className="interrogate-tender">
+    <p>
+  This search feature lets you search for specific words across documents in your tender library. 
+  Enter specific terms or phrases related to the buyer's requirements, evaluation criteria, or any other 
+  relevant aspects of the tender. Clicking on a search result will take you to the approximate location of the snippet in the relevant document.
+</p>
       <Form onSubmit={handleSubmit} className="search-form">
         <div className="search-input-group">
           <Form.Control
@@ -81,9 +86,11 @@ const InterrogateTender = ({ bid_id, viewFile, onSearch, initialSearchTerm = '',
         </div>
       </Form>
       {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
+      <div className='snippets'> 
       {searchResults.length > 0 && (
         <ListGroup className="mt-3 p-0">
           {searchResults.map((result, index) => (
+           
             <ListGroup.Item 
               key={index} 
               action 
@@ -95,32 +102,11 @@ const InterrogateTender = ({ bid_id, viewFile, onSearch, initialSearchTerm = '',
               <h5>{result.document_name}</h5>
               <p>{highlightKeywords(result.snippet, searchQuery.split(' '))}</p>
             </ListGroup.Item>
+           
           ))}
         </ListGroup>
       )}
-      <style jsx>{`
-        .search-form {
-          margin-bottom: 1rem;
-        }
-        .search-input-group {
-          display: flex;
-          position: relative;
-        }
-        .search-input-group .form-control {
-          flex-grow: 1;
-          border-top-right-radius: 0;
-          border-bottom-right-radius: 0;
-          box-shadow: none;
-        }
-        .search-button {
-          position: absolute;
-          right: 0;
-          top: 0;
-          bottom: 0;
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-        }
-      `}</style>
+       </div>
     </div>
   );
 };

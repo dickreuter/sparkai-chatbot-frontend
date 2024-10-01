@@ -59,17 +59,6 @@
     /* Adjust the color as needed */
 }
 
-.upload-button.selected {
-    background-color: orange;
-    color: black;
-}
-
-.upload-button.selected:hover,
-.upload-button.selected:active {
-    background-color: orange !important;
-    color: black !important;
-}
-
 .response-box {
     position: relative;
     flex: 1;

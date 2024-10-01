@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { Modal, Button, Spinner } from 'react-bootstrap';
+import { Modal, Button, Spinner, Nav } from 'react-bootstrap';
 import InterrogateTender from './InterrogateTender';
 import { displayAlert } from '../helper/Alert';
 import { API_URL, HTTP_PREFIX } from '../helper/Constants';
@@ -7,6 +7,8 @@ import axios from 'axios';
 import { useAuthUser } from 'react-auth-kit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import TenderLibraryChat from './TenderLibraryChat';
+import './InterrogateTenderModal.css';
 
 const InterrogateTenderModal = ({ bid_id }) => {
     const [show, setShow] = useState(false);
@@ -19,12 +21,14 @@ const InterrogateTenderModal = ({ bid_id }) => {
     const [isViewingText, setIsViewingText] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [isLoadingText, setIsLoadingText] = useState(false);
+    const [activeTab, setActiveTab] = useState('search');
 
     const textContentRef = useRef(null);
 
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
+
 
     const viewFile = useCallback(async (fileName, pageNumber, searchTerm, snippet) => {
         console.log('viewFile called with:', { fileName, pageNumber, searchTerm, snippet });
@@ -165,6 +169,48 @@ const InterrogateTenderModal = ({ bid_id }) => {
         setCurrentSearchTerm(query);
     }, []);
 
+    const renderTabContent = () => {
+        switch (activeTab) {
+            case 'search':
+                return isViewingText ? (
+                    <>
+                        {isLoadingText ? (
+                            <div className="spinner-container">
+                                <Spinner animation="border" role="status" style={{color: '#ff7f50'}}>
+                                    <span className="visually-hidden">Loading...</span>
+                                </Spinner>
+                            </div>
+                        ) : (
+                            <div 
+                                ref={textContentRef}
+                                style={{ 
+                                    width: '100%', 
+                                    height: '100%', 
+                                    overflow: 'auto', 
+                                    whiteSpace: 'pre-wrap',
+                                }}
+                                dangerouslySetInnerHTML={{ 
+                                    __html: highlightContent(textContent, currentSnippet) 
+                                }} 
+                            />
+                        )}
+                    </>
+                ) : (
+                    <InterrogateTender 
+                        bid_id={bid_id} 
+                        viewFile={viewFile} 
+                        onSearch={handleSearch}
+                        initialSearchTerm={currentSearchTerm}
+                        initialSearchResults={searchResults}
+                    />
+                );
+            case 'chat':
+                return <TenderLibraryChat bid_id={bid_id} />;
+            default:
+                return null;
+        }
+    };
+
     return (
         <>
             <Button className='upload-button' id='select-folder' onClick={handleShow}>
@@ -176,100 +222,47 @@ const InterrogateTenderModal = ({ bid_id }) => {
                 dialogClassName="interrogate-modal-dialog"
                 contentClassName="interrogate-modal-content"
             >
-                <Modal.Header style={{paddingLeft: "25px", paddingRight: "30px"}} closeButton>
-                    <Modal.Title style={{fontSize: "20px", fontWeight: "600", display: 'flex', alignItems: 'center'}}>
-                    {isViewingText && (
-                            <FontAwesomeIcon 
-                                icon={faArrowLeft} 
-                                onClick={() => setIsViewingText(false)} 
-                                style={{marginRight: '10px', cursor: 'pointer', color: '#6c757d'}}
-                            />
-                        )}
-                        {isViewingText ? 'Document Viewer' : 'Search Tender Documents'}
-                    </Modal.Title>
+                <Modal.Header closeButton style={{padding: '0' , paddingTop: '10px', paddingRight: '20px'}}>
+                    <Nav variant="tabs" className="w-100">
+                    <Nav.Item>
+                            <Nav.Link 
+                                active={activeTab === 'chat'} 
+                                onClick={() => setActiveTab('chat')}
+                            >
+                                Tender Library Chat
+                            </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link 
+                                active={activeTab === 'search'} 
+                                onClick={() => setActiveTab('search')}
+                            >
+                                {isViewingText && activeTab === 'search' && (
+                                    <FontAwesomeIcon 
+                                        icon={faArrowLeft} 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setIsViewingText(false);
+                                        }} 
+                                        style={{marginRight: '10px', cursor: 'pointer', color: '#6c757d'}}
+                                    />
+                                )}
+                                {isViewingText ? 'Document Viewer' : 'Search Tender Docs'}
+                            </Nav.Link>
+                        </Nav.Item>
+                        
+                    </Nav>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="content-scaler">
                         <div className="interrogate-tender-container">
-                            {isViewingText ? (
-                                <>
-                                    {isLoadingText ? (
-                                        <div className="spinner-container">
-                                            <Spinner animation="border" role="status" style={{color: '#ff7f50'}}>
-                                                <span className="visually-hidden">Loading...</span>
-                                            </Spinner>
-                                        </div>
-                                    ) : (
-                                        <div 
-                                            ref={textContentRef}
-                                            style={{ 
-                                                width: '100%', 
-                                                height: 'calc(70vh)', 
-                                                overflow: 'auto', 
-                                                whiteSpace: 'pre-wrap',
-                                            }}
-                                            dangerouslySetInnerHTML={{ 
-                                                __html: highlightContent(textContent, currentSnippet) 
-                                            }} 
-                                        />
-                                    )}
-                                </>
-                            ) : (
-                                <InterrogateTender 
-                                    bid_id={bid_id} 
-                                    viewFile={viewFile} 
-                                    onSearch={handleSearch}
-                                    initialSearchTerm={currentSearchTerm}
-                                    initialSearchResults={searchResults}
-                                />
-                            )}
+                            {renderTabContent()}
                         </div>
                     </div>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button className='upload-button' onClick={handleClose} style={{fontSize: "12px"}}>
-                        Close
-                    </Button>
-                </Modal.Footer>
+             
             </Modal>
-            <style type="text/css">
-                {`
-                    .content-scaler {
-                        transform: scale(0.8);
-                        transform-origin: top left;
-                        width: 125%;
-                        height: 75vh;
-                        overflow: hidden;
-                    }
-                    .interrogate-tender-container {
-                        height: 100%;
-                        overflow-y: auto;
-                        padding-right: 10px;
-                        padding-left: 10px;
-                    }
-                    .interrogate-modal-dialog {
-                        min-width: 1000px;
-                        margin-bottom: 0;
-                    }
-                    .interrogate-modal-content {
-                        height: 80vh;
-                    }
-                    .modal-body {
-                        overflow: hidden;
-                    }
-                    .modal-header .btn-close {
-                        padding: 0.5rem 0.5rem;
-                        margin: -0.5rem -0.5rem -0.5rem auto;
-                        font-size: 0.8rem;
-                    }
-                    .spinner-container {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        height: calc(70vh);
-                    }
-                `}
-            </style>
+         
         </>
     );
 };

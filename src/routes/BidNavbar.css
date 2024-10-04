@@ -28,3 +28,14 @@
     background-color: orange;
     color: black;
 }
+
+.back-button {
+    background: none;
+    border: none;
+    color: #333;
+    /* Adjust color as needed */
+    padding: 0.5rem;
+    transition: color 0.3s ease;
+    cursor: pointer;
+    margin-right: 8spx;
+}

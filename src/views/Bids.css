@@ -74,11 +74,20 @@
     will-change: transform;
 }
 
+.sort-options select {
+    outline: none !important;
+    border: 1px solid #ccc;
+    /* Add a default border */
+    box-shadow: none !important;
+    transition: border-color 0.2s ease-in-out;
+}
 
-/* Add this to your CSS file */
-
-
-/* Add this to your CSS file */
+.sort-options select:focus,
+.sort-options select:active {
+    outline: none !important;
+    border-color: grey;
+    /* Change border color on focus */
+}
 
 .sort-options {
     display: flex;
@@ -87,26 +96,11 @@
     /* Ensure you have this font imported */
 }
 
-.sort-options label {
-    margin-right: 10px;
-    font-family: 'ClashDisplay', sans-serif;
-}
-
-.sort-select {
-    font-family: 'ClashDisplay', sans-serif;
-    padding: 5px 10px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    background-color: #fff;
-    color: #495057;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    /* Remove default arrow */
-}
-
 .sort-select-option {
     font-family: 'ClashDisplay', sans-serif !important;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    box-shadow: none !important;
 }
 
 .pagination-container {
@@ -130,4 +124,8 @@
 
 .pagination-button.active {
     background-color: #333;
+}
+
+.small-modal {
+    transform: scale(0.8);
 }

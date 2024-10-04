@@ -1,34 +1,55 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import "./SidebarSmall.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAuthUser, useSignOut } from "react-auth-kit";
+
 import {
-  faHome,
-  faShieldAlt,
-  faQuestionCircle,
-  faSignOutAlt,
+
   faBookOpen,
   faLayerGroup,
-  faFileAlt,  // Icon representing documents or information
-  faFileCircleQuestion, // Icon for questions
   faReply, // Icon for comments or responses
-  faTachometerAlt,
-  faFileContract, // Icon for proposals or contracts
   faComments,
   faCircleQuestion,
   faUser,
   faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
-// Import the image
-import sidebarIcon from '../resources/images/mytender.io_badge.png';
+// Import the image import sidebarIcon from '../resources/images/mytender.io_badge.png';
 
 const SideBarSmall = () => {
   const location = useLocation(); // Hook to get the current location
+  const navigate = useNavigate();
+  const [lastActiveBid, setLastActiveBid] = useState(null);
 
-  // Function to determine if the link is active based on the current path
   const isActive = (path) => location.pathname === path;
-  const signOut = useSignOut();
+
+  useEffect(() => {
+    const storedBid = localStorage.getItem('lastActiveBid');
+    if (storedBid) {
+      setLastActiveBid(JSON.parse(storedBid));
+    }
+
+    const handleBidUpdate = (event) => {
+      const updatedBid = event.detail;
+      setLastActiveBid(updatedBid);
+      localStorage.setItem('lastActiveBid', JSON.stringify(updatedBid));
+    };
+
+    window.addEventListener('bidUpdated', handleBidUpdate);
+
+    return () => {
+      window.removeEventListener('bidUpdated', handleBidUpdate);
+    };
+  }, []);
+
+  const handleDashboardClick = (e) => {
+    e.preventDefault();
+    if (lastActiveBid) {
+      const lastActiveTab = localStorage.getItem('lastActiveTab') || '/bid-extractor';
+      navigate(lastActiveTab, { state: { bid: lastActiveBid, fromBidsTable: true } });
+    } else {
+      navigate('/bids');
+    }
+  };
 
 
   const handleShowTips = () => {
@@ -47,7 +68,11 @@ const SideBarSmall = () => {
     <div className="sidebarsmall">
       <div>
 
-        <Link to="/bids" className={`sidebarsmalllink ${isActive('/bids') ? 'sidebarsmalllink-active' : ''}`}>
+      <Link 
+          to="#" 
+          className={`sidebarsmalllink ${isActive('/bids') || isActive('/bid-extractor') || isActive('/question-crafter') || isActive('/proposal') ? 'sidebarsmalllink-active' : ''}`}
+          onClick={handleDashboardClick}
+        >
           <FontAwesomeIcon icon={faLayerGroup} />
           <span id="bids-table">Dashboard</span>
         </Link>

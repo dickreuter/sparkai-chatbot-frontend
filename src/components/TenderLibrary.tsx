@@ -172,7 +172,42 @@ const TenderLibrary = ({ object_id }) => {
   }, [object_id, documentListVersion]);
 
 
+  
   const renderDocuments = () => {
+    if (documents.length === 0) {
+      return (
+        <tr>
+          <td colSpan="2" className="py-5">
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              minHeight: '250px',
+            }}>
+              <div style={{
+               
+                width: '750px', // Fixed width
+             
+              }}>
+                <p style={{
+                  fontSize: '18px',
+                  lineHeight: '1.6',
+                  textAlign: 'center',
+                  margin: 0,
+                  wordWrap: 'break-word',
+                  whiteSpace: 'normal', // Ensures text wraps
+                  marginBottom: '16px'
+                }}>
+                  Upload documents related to this specific tender here. This is different from your previous bids and company information which belong in your Content Library.  They will also be used as context in the Q&A Generator to answer questions about this tender.</p>
+                  
+              </div>
+            </div>
+          </td>
+        </tr>
+      );
+    }
+
     const startIdx = (currentPage - 1) * rowsPerPage;
     const endIdx = startIdx + rowsPerPage;
     const documentsToDisplay = documents.slice(startIdx, endIdx);

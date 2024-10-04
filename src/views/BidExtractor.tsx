@@ -27,19 +27,13 @@ const BidExtractor = () => {
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const { sharedState, setSharedState, getBackgroundInfo } = useContext(BidContext);
+  const { sharedState, setSharedState} = useContext(BidContext);
   const { 
     bidInfo: contextBidInfo, 
     opportunity_information, 
-    compliance_requirements, 
+    compliance_requirements,
     questions, 
-    bid_qualification_result, 
-    client_name, 
-    opportunity_owner, 
-    submission_deadline, 
-    bid_manager, 
     contributors,
-    original_creator,
     object_id
   } = sharedState;
 
@@ -60,9 +54,6 @@ const BidExtractor = () => {
 
   const [existingBidNames, setExistingBidNames] = useState([]);
 
-  const [showPasteModal, setShowPasteModal] = useState(false);
-  const [pastedQuestions, setPastedQuestions] = useState('');
-
   const [organizationUsers, setOrganizationUsers] = useState([]);
   const [showContributorModal, setShowContributorModal] = useState(false);
 
@@ -74,42 +65,6 @@ const BidExtractor = () => {
   const showViewOnlyMessage = () => {
     console.log(currentUserPermission);
     displayAlert("You only have permission to view this bid.", 'danger');
-  };
-
-
-  const removeQuestion = (indexToRemove) => {
-    const updatedQuestions = questions.split(',')
-      .map(question => question.trim())
-      .filter((_, index) => index !== indexToRemove);
-  
-    setSharedState(prevState => ({
-      ...prevState,
-      questions: updatedQuestions.join(', ')
-    }));
-  };
-  
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleRetrieveQuestions = () => {
-   
-    document.getElementById("fileInput").click();
-    handleClose();
-  };
-  
-
-  const handlePasteQuestions = () => {
-    setShowPasteModal(true);
-    handleClose();
   };
 
   const [isGeneratingCompliance, setIsGeneratingCompliance] = useState(false);
@@ -155,8 +110,6 @@ const BidExtractor = () => {
   };
 
   const [isGeneratingOpportunity, setIsGeneratingOpportunity] = useState(false);
-
-  // ... existing functions remain the same
 
   const generateOpportunityInformation = async () => {
     if (!canUserEdit) {
@@ -211,7 +164,7 @@ const BidExtractor = () => {
         setOrganizationUsers(response.data);
         console.log(contributors);
       } catch (err) {
-        console.error('Error fetching organization users:', err);
+        console.log('Error fetching organization users:');
       }
     };
 
@@ -334,6 +287,7 @@ const BidExtractor = () => {
 
   useEffect(() => {
     const navigatedFromBidsTable = localStorage.getItem('navigatedFromBidsTable');
+
     if (navigatedFromBidsTable === 'true' && location.state?.fromBidsTable && bidData) {
       console.log("from bids table");
       console.log(bidData);
@@ -394,6 +348,8 @@ const BidExtractor = () => {
         contributors: auth.email ? { [auth.email]: 'admin' } : {}
       }));
     }
+    const updatedBid = { bidData };
+    window.dispatchEvent(new CustomEvent('bidUpdated', { detail: updatedBid }));
   }, [location, bidData, setSharedState, initialBidName, auth.email]);
 
 
@@ -795,7 +751,7 @@ const BidExtractor = () => {
             <Card.Body className="px-0 py-1" ref={opportunityInformationRef}>
               <textarea
                 className="form-control requirements-textarea"
-                placeholder="Enter background info here..."
+                placeholder="Click the tool icon to extract opportunity information from your tender documents..."
                 value={opportunity_information || ''}
                 onChange={handleOpportunityInformationChange}
                 disabled={!canUserEdit}
@@ -835,7 +791,7 @@ const BidExtractor = () => {
               <Card.Body className="px-0 py-1" ref={complianceRequirementsRef}>
                 <textarea
                   className="form-control requirements-textarea"
-                  placeholder="Enter compliance requirements here..."
+                  placeholder="Click the tool icon to extract compliance requirements from your tender documents..."
                   value={compliance_requirements || ''}
                   onChange={handleComplianceRequirementsChange}
                   disabled={!canUserEdit}

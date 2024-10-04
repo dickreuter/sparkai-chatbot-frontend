@@ -7,11 +7,10 @@ import "./Bids.css";
 import { useNavigate } from 'react-router-dom';
 import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import handleGAEvent from '../utilities/handleGAEvent.tsx';
-import { Button, Modal, Pagination } from 'react-bootstrap';
+import { Button, Form, Modal, Pagination } from 'react-bootstrap';
 import { displayAlert } from '../helper/Alert.tsx';
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import CustomTextField from '../components/CustomTextField.tsx';
 import { Select, MenuItem, FormControl } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import withAuth from '../routes/withAuth.tsx';
@@ -62,15 +61,6 @@ const Bids = () => {
 
     // Change page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(1);
-    };
 
     const navigateToChatbot = (bid) => {
         localStorage.setItem('navigatedFromBidsTable', 'true');
@@ -133,6 +123,8 @@ const Bids = () => {
 
     useEffect(() => {
         fetchBids();
+        localStorage.removeItem('lastActiveBid');
+
     }, []);
 
     const confirmDeleteBid = async () => {
@@ -241,7 +233,8 @@ const Bids = () => {
         handleGAEvent('Sidebar Navigation', 'Ongoing Link Click', 'ongoing link nav');
     };
 
-    const handleModalSubmit = () => {
+    const handleModalSubmit = (e) => {
+        e.preventDefault();
         if (!bidName) {
             displayAlert('Bid name cannot be empty', 'danger');
             return;
@@ -279,24 +272,21 @@ const Bids = () => {
                     <div style={{display: 'flex'}}>
                     
                     <div className="sort-options">
-                            <label id="sort-options" htmlFor="sort-select">Sort by:</label>
-                            
-                            <select 
-                                id="sort-select" 
-                                className="sort-select" 
-                                onChange={(e) => setSortCriteria(e.target.value)}
-                            >
-                                <option className='sort-select-option' value="lastEdited">Last Edited</option>
-                                <option className='sort-select-option' value="submissionDeadline">Submission Deadline</option>
-                            </select>
-                        </div>
-                        <Button  onClick={handleWriteProposalClick} className="upload-button" id="new-bid-button">
-                            <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
-                            New Bid
-                        </Button>
-                        <label ></label>
-                       
-                      
+                        <Form.Select
+                            id="sort-select"
+                            value={sortCriteria}
+                            onChange={(e) => setSortCriteria(e.target.value)}
+                          
+                        >
+                            <option className='sort-select-option' value="lastEdited">Last Edited</option>
+                            <option className='sort-select-option' value="submissionDeadline">Submission Deadline</option>
+                        </Form.Select>
+                    </div>
+                    <Button onClick={handleWriteProposalClick} className="upload-button" id="new-bid-button">
+                        <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
+                        New Tender
+                    </Button>
+                    <label></label>
                     </div>
                   
                     
@@ -304,10 +294,10 @@ const Bids = () => {
                 
             
               
-                <table className="bids-table mt-2">
+                <table className="bids-table mt-1">
                     <thead>
                         <tr >
-                            <th style={{ width: "18%" }}>Bid Title</th>
+                            <th style={{ width: "18%" }}>Tender Name</th>
                             <th>Last edited</th>
                             <th>Status</th>
                             <th>Client</th>
@@ -376,45 +366,54 @@ const Bids = () => {
                 <DashboardWizard />
             
             </div>
-            <Modal show={showModal} onHide={handleModalClose} className="custom-modal-newbid">
-                <Modal.Header closeButton className="px-4 py-3">
-                    <Modal.Title>Enter Bid Name</Modal.Title>
-                </Modal.Header>
-                <Modal.Body className="px-4 py-4">
-                    <CustomTextField
-                        label="Bid Name"
-                        variant="outlined"
-                        fullWidth
+           <Modal show={showModal} onHide={handleModalClose} className="custom-modal-newbid">
+    <Modal.Header closeButton className="py-3 px-4">
+        <Modal.Title>Enter Tender Name</Modal.Title>
+    </Modal.Header>
+    <Modal.Body className="px-4 py-4" style={{height: '12vh'}}>
+        <div className="content-scaler">
+            <Form onSubmit={handleModalSubmit}>
+                <div className="search-input-group">
+                    <Form.Control
+                        type="text"
                         value={bidName}
                         onChange={(e) => setBidName(e.target.value)}
-                        placeholder="Enter bid name"
-                        inputProps={{ maxLength: 20 }}
+                        placeholder="Enter tender name"
+                        maxLength={20}
+                        className="form-control"
                     />
-                    <div className="mt-3">
-                        <Button className="upload-button" onClick={handleModalSubmit}>
-                            Submit
-                        </Button>
-                    </div>
-                </Modal.Body>
-            </Modal>
+                    <Button 
+                        type="submit" 
+                       className="search-button"
+                    >
+                        Submit
+                    </Button>
+                </div>
+            </Form>
+        </div>
+    </Modal.Body>
+</Modal>
 
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirm Delete</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Are you sure you want to delete this bid?
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button className='upload-button' onClick={() => setShowDeleteModal(false)}>
-                        Cancel
-                    </Button>
-                    <Button className='upload-button' style={{backgroundColor:"red"}} onClick={confirmDeleteBid}>
-                        Delete
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-            
+<Modal 
+    show={showDeleteModal} 
+    onHide={() => setShowDeleteModal(false)} 
+    className=""
+   
+>
+    <Modal.Header closeButton className="py-3 px-4">
+        <Modal.Title>Confirm Delete</Modal.Title>
+    </Modal.Header>
+    <Modal.Body className="px-4 py-4" style={{height: '12vh'}}>
+        Are you sure you want to delete this tender?
+    </Modal.Body>
+    <Modal.Footer>
+        <div className="">
+            <Button className='upload-button' style={{backgroundColor:"red"}} onClick={confirmDeleteBid}>
+                Delete
+            </Button>
+        </div>
+    </Modal.Footer>
+</Modal>
           
             
 

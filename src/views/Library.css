@@ -268,7 +268,7 @@
         }
         
         .library-card-custom {
-            height: 775px;
+            height: 750px;
             margin-top: 15px;
         }
         
@@ -364,4 +364,15 @@
         .breadcrumb-separator {
             margin: 0 5px;
             color: #6c757d;
+        }
+        
+        .styled-menu-item {
+            font-family: "ClashDisplay", sans-serif !important;
+            font-size: 14px !important;
+            padding: 6px 12px !important;
+        }
+        
+        .styled-menu-item-icon {
+            margin-right: 8px;
+            font-size: 14px;
         }

@@ -60,11 +60,11 @@ const NewFolderModal = React.memo(({ show, onHide, onCreateFolder, title, parent
   };
 
   return (
-    <Modal show={show} onHide={onHide}>
-      <Modal.Header closeButton>
+    <Modal show={show} onHide={onHide} >
+      <Modal.Header closeButton className="py-3 px-4">
         <Modal.Title>{title || "Create New Folder"}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className="px-4 py-4">
         <Form.Group>
           <Form.Label>{parentFolder ? "Subfolder Name" : "Folder Name"}</Form.Label>
           <FormControl
@@ -353,11 +353,11 @@ const Library = () => {
   };
 
   const UploadPDFModal = ({ show, onHide, folder, get_collections }) => (
-    <Modal show={show} onHide={onHide} size="lg" centered>
-      <Modal.Header closeButton>
+    <Modal show={show} onHide={onHide} size="lg" centered >
+      <Modal.Header closeButton lassName="py-3 px-4">
         <Modal.Title>Upload Files</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className="px-4 py-4">
         <UploadPDF 
           folder={folder} 
           get_collections={get_collections} 
@@ -413,9 +413,6 @@ const Library = () => {
           Are you sure you want to delete the folder "{displayFolderName}"?
         </Modal.Body>
         <Modal.Footer>
-          <Button className='upload-button' onClick={onHide}>
-            Cancel
-          </Button>
           <Button className='upload-button' style={{backgroundColor:"red"}} onClick={() => onDelete(folderTitle)}>
             Delete
           </Button>
@@ -433,9 +430,7 @@ const Library = () => {
         Are you sure you want to delete the file "{fileName}"?
       </Modal.Body>
       <Modal.Footer>
-        <Button className='upload-button' onClick={onHide}>
-          Cancel
-        </Button>
+    
         <Button className='upload-button' style={{backgroundColor:"red"}}  onClick={() => onDelete()}>
           Delete
         </Button>
@@ -739,9 +734,22 @@ const renderFolderContents = (folderPath) => {
                   keepMounted
                   open={Boolean(anchorElFile)}
                   onClose={handleClose}
+                  PaperProps={{
+                    elevation: 1, // Reduced elevation for lighter shadow
+                    style: {
+                      width: '120px',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)' // Custom subtle shadow
+                    },
+                  }}
                 >
-                  <MenuItem onClick={handleDeleteClick} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
-                    <i className="fas fa-trash-alt" style={{ marginRight: '12px' }}></i>
+                  <MenuItem 
+                    onClick={handleDeleteClick} 
+                    className="styled-menu-item"
+                  >
+                    <i 
+                      className="fas fa-trash-alt styled-menu-item-icon" 
+                      
+                    ></i>
                     Delete File
                   </MenuItem>
                 </Menu>
@@ -937,7 +945,7 @@ const renderFolderContents = (folderPath) => {
                     
                   </div>
                   <label id='search-bar-container'> </label>
-                  <div className="button-container" style={{display: "flex", justifyContent: "flex-end", minWidth:"200px", minHeight: "50px"}}>
+                  <div className="button-container" style={{display: "flex", justifyContent: "flex-end", minWidth:"150px", minHeight: "40px"}}>
                     {!activeFolder && (
                       <Button
                         onClick={() => handleNewFolderClick(null)}
@@ -966,26 +974,39 @@ const renderFolderContents = (folderPath) => {
                 </div>
                 
                 <Menu
-                  id="long-menu"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={open}
-                  onClose={handleMenuClose}
+                id="long-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={open}
+                onClose={handleMenuClose}
+                PaperProps={{
+                  style: {
+                    width: '160px', // Reduced width
+                  },
+                }}
+              >
+                <MenuItem 
+                  onClick={() => handleMenuItemClick('pdf')} 
+                  className="styled-menu-item"
                 >
-                  <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "200px" }}>
-                    <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
-                    Upload PDF/Doc
-                  </MenuItem>
-                  <MenuItem onClick={() => handleMenuItemClick('text')} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
-                    <i className="fas fa-file-alt" style={{ marginRight: '12px' }}></i>
-                    Upload Text
-                  </MenuItem>
-                  <MenuItem onClick={() => handleNewFolderClick(activeFolder)} style={{ fontFamily: '"ClashDisplay", sans-serif' }}>
-                    <FontAwesomeIcon icon={faFolder} style={{ marginRight: '12px' }} />
-                    New Subfolder
-                  </MenuItem>
-                </Menu>
-  
+                  <i className="fas fa-file-pdf styled-menu-item-icon" ></i>
+                  Upload PDF/Doc
+                </MenuItem>
+                <MenuItem 
+                  onClick={() => handleMenuItemClick('text')} 
+                  className="styled-menu-item"
+                >
+                  <i className="fas fa-file-alt styled-menu-item-icon" ></i>
+                  Upload Text
+                </MenuItem>
+                <MenuItem 
+                  onClick={() => handleNewFolderClick(activeFolder)} 
+                   className="styled-menu-item"
+                >
+                  <FontAwesomeIcon icon={faFolder} className="styled-menu-item-icon" />
+                  New Subfolder
+                </MenuItem>
+              </Menu>
                 <table className="library-table">
                   <thead>
                     <tr>
@@ -1078,7 +1099,7 @@ const renderFolderContents = (folderPath) => {
           {showPdfViewerModal && (
             <div className="pdf-viewer-modal" onClick={closeModal}>
               <div className="pdf-viewer-modal-content" ref={modalRef}>
-                <iframe src={pdfUrl} width="100%" height="800px"></iframe>
+                <iframe src={pdfUrl} width="100%" height="750px"></iframe>
               </div>
             </div>
           )}

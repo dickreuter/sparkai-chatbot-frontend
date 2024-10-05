@@ -6,9 +6,10 @@ import './resources/clash-display.css';
 import NavBar from './routes/NavBar';
 import Routing from './routes/Routing';
 import ReactGA4 from "react-ga4";
-import sidebarIcon from './resources/images/mytender.io_badge.png';
 import './Widget.css';
 import SupportChat from "./components/SupportChat.tsx";
+import SignOut from './components/auth/SignOutButton.tsx';
+import AutoLogout from './components/auth/AutoLogout.tsx';
 
 ReactGA4.initialize("G-X8S1ZMRM3C");
 
@@ -29,6 +30,7 @@ const Layout = () => {
 
   return (
     <>
+     {isAuthenticated && <AutoLogout />}
       {shouldShowNavBar && <NavBar />}
       <div className="main-content">
         <Routing />

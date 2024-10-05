@@ -37,7 +37,7 @@ const BidExtractor = () => {
     object_id
   } = sharedState;
 
-  const CHARACTER_LIMIT = 20;
+  const CHARACTER_LIMIT = 40;
 
   const location = useLocation();
   const bidData = location.state?.bid || '';
@@ -605,8 +605,9 @@ const BidExtractor = () => {
     <div className="chatpage">
       <SideBarSmall />
       <div className="lib-container" >
+        <div className="scroll-container">
         <BidNavbar  />
-        <div className="proposal-header mt-3 mb-2">
+        <div className="proposal-header">
           <h1 className='heavy'  id="proposal-header"  >
             <span
              contentEditable={isEditing && canUserEdit}
@@ -808,7 +809,7 @@ const BidExtractor = () => {
     </Row>
 
 
-    <Row>
+    <Row className="mb-0">
          
          <Col md={12}>
          <TenderLibrary object_id={object_id} />
@@ -829,9 +830,8 @@ const BidExtractor = () => {
   currentUserEmail={currentUserEmail}
   currentUserPermission={currentUserPermission}
 />
-
-
-
+      
+      </div>
         </div>
       </div>
       <BidExtractorWizard/>

@@ -100,9 +100,10 @@ const HowTo = () => {
       <SideBarSmall />
 
       <div className="lib-container">
+        <div className="scroll-container">
         <h1 className='heavy'>How To</h1>
 
-        <div className="howto-container mt-4">
+        <div className="howto-container mt-1">
           <div className="row">
             {videoData.map((video, index) => (
               <div className="col-lg-4 col-md-6 col-sm-12 mb-4" key={index}>
@@ -118,6 +119,7 @@ const HowTo = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

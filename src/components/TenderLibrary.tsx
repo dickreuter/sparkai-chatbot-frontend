@@ -438,7 +438,7 @@ return (
   <>
     <Row>
       <Col md={12}>
-        <Card className="mb-4">
+        <Card className="mb-2">
           <Card.Body className="tenderlibrary-card-body-content">
             <div className="library-card-content-wrapper">
               <div className="header-row mt-2" id='tender-library'>

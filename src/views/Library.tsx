@@ -899,6 +899,7 @@ const renderFolderContents = (folderPath) => {
         <SideBarSmall />
   
         <div className="lib-container">
+          <div className="scroll-container">
           <h1 className='heavy'>Content Library</h1>
       
           <Card className="library-card-custom">
@@ -1106,6 +1107,7 @@ const renderFolderContents = (folderPath) => {
   
         </div>
         <LibraryWizard />
+        </div>
       </div>
     );
   }

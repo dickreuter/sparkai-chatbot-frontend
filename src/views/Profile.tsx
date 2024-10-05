@@ -141,8 +141,9 @@ const ProfilePage = () => {
     <div className="chatpage">
       <SideBarSmall />
       <div className="lib-container">
-        <h1 className="heavy mb-3">Profile</h1>
-        <Card className="mt-4">
+        <div className="scroll-container">
+        <h1 className="heavy">Profile</h1>
+        <Card >
           <Card.Body>
             <Form>
               <Row className="profile-form-row">
@@ -290,6 +291,7 @@ const ProfilePage = () => {
           </>
         )}
       </div>
+    </div>
     </div>
   );
 }

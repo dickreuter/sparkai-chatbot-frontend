@@ -6,6 +6,8 @@ import { Form, Row, Col, Card, Button, Modal, Table, Spinner } from 'react-boots
 import axios from 'axios';
 import './Profile.css';
 import { API_URL, HTTP_PREFIX } from "../helper/Constants.tsx";
+import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ProfilePage = () => {
   const getAuth = useAuthUser();
@@ -20,7 +22,9 @@ const ProfilePage = () => {
     jobRole: '',
     userType: '',  
     licences: 0,
-    productName: '' // Added productName field
+    productName: '',
+    companyObjectives: '',
+    toneOfVoice: ''
   });
 
   const [inviteEmail, setInviteEmail] = useState('');
@@ -30,6 +34,9 @@ const ProfilePage = () => {
   const [inviteError, setInviteError] = useState(null);
   const [inviteSuccess, setInviteSuccess] = useState(null);
   const [organizationUsers, setOrganizationUsers] = useState([]);
+
+  const [saveButtonState, setSaveButtonState] = useState('normal'); // 'normal', 'loading', 'success'
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -47,7 +54,9 @@ const ProfilePage = () => {
           jobRole: response.data.jobRole || '',
           userType: response.data.userType || '', 
           licences: response.data.licenses || 0,
-          productName: response.data.product_name || '' // Fetch productName from the response
+          productName: response.data.product_name || '',
+          companyObjectives: response.data.company_objectives || '',
+          toneOfVoice: response.data.tone_of_voice || ''
         });
         setLoading(false);
       } catch (err) {
@@ -58,6 +67,50 @@ const ProfilePage = () => {
 
     fetchUserData();
   }, [tokenRef]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaveButtonState('loading');
+    try {
+      const dataToSend = {
+        company_objectives: formData.companyObjectives,
+        tone_of_voice: formData.toneOfVoice
+      };
+      
+      await axios.post(`http${HTTP_PREFIX}://${API_URL}/update_company_info`, dataToSend, {
+        headers: {
+          Authorization: `Bearer ${tokenRef.current}`,
+        },
+      });
+      setSaveButtonState('success');
+      setTimeout(() => setSaveButtonState('normal'), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setSaveButtonState('normal');
+      // Handle error (e.g., show an error message)
+    }
+  };
+
+  const renderSaveButton = () => {
+    switch (saveButtonState) {
+      case 'success':
+        return <Button type="submit" className="upload-button" style={{backgroundColor: "green", borderColor: "green"}}>
+            Saved <FontAwesomeIcon icon={faCheckCircle} style={{marginLeft: "5px"}}/>
+        </Button>;
+      default:
+        return <Button type="submit" className="upload-button">
+          Save Changes
+        </Button>;
+    }
+  };
 
   useEffect(() => {
     const fetchOrganizationUsers = async () => {
@@ -227,9 +280,42 @@ const ProfilePage = () => {
             </Form>
           </Card.Body>
         </Card>
+
+        <Card className="mt-4 mb-4">
+            <Card.Body>
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-3" controlId="formCompanyObjectives">
+                  <Form.Label>Company Objectives</Form.Label>
+                  <Form.Control 
+                    as="textarea" 
+                    rows={4}
+                    name="companyObjectives"
+                    value={formData.companyObjectives}
+                    onChange={handleInputChange}
+                    placeholder="Outline your company’s overall mission and key goals, focusing on how your products or services deliver value. Highlight your strengths, such as innovation, efficiency, or expertise, and how they align with client needs or industry challenges. Emphasise outcomes that demonstrate your ability to provide measurable impact (e.g., increased performance, cost savings, or long-term value)"
+                  />
+                </Form.Group>
+                
+                <Form.Group className="mb-3" controlId="formToneOfVoice">
+                  <Form.Label>Tone of Voice</Form.Label>
+                  <Form.Control 
+                    as="textarea" 
+                    rows={3}
+                    name="toneOfVoice"
+                    value={formData.toneOfVoice}
+                    onChange={handleInputChange}
+                    placeholder="Define the preferred tone for your bids, whether it should be professional, approachable, technical, or accessible. Ensure the tone matches the client’s level of formality and understanding. Specify whether industry-specific language should be detailed or simplified."
+                  />
+                </Form.Group>
+                
+                {renderSaveButton()}
+              </Form>
+            </Card.Body>
+          </Card>
+
         {formData.userType === 'owner' && (
           <>
-            <Card className="mt-4 mb-4">
+            <Card className="mb-3">
               <Card.Body>
               <div className="proposal-header ">
                 <Card.Title>Admin Panel</Card.Title>

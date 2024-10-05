@@ -100,7 +100,7 @@ const QuestionCrafter = () => {
     const qaSheets = sharedState.documents.filter(doc => doc.type === 'qa sheet');
   
     return (
-      <div className="dropdown-clear-container mt-2" style={{marginBottom: '60px'}}>
+      <div className="dropdown-clear-container mt-2 mb-2">
         <Dropdown onSelect={handleDocumentSelect} className="chat-dropdown" style={{marginRight: "5px"}}>
           <Dropdown.Toggle
             className="upload-button custom-dropdown-toggle"
@@ -1206,6 +1206,7 @@ useEffect(() => {
       <SideBarSmall />
 
       <div className="lib-container">
+      <div className="scroll-container">
         <BidNavbar />
         
         <div>
@@ -1375,18 +1376,6 @@ useEffect(() => {
                         <Button className="prompt-button" onClick={handleLinkClick('Add Statistics')}>Add Statistic</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('For Example')}>For Example</Button>
                       </div>
-
-                      {/*<div className="custom-prompt-container">
-                      <h2 className="lib-title" style={{ color: "white" }}>Custom Prompt</h2>
-                        <input
-                          type="text"
-                          value={customPrompt}
-                          onChange={handleCustomPromptInputChange}
-                          placeholder="Enter Custom Prompt"
-                          className="custom-prompt-input "
-                        />
-                        <Button className="custom-prompt-button" onClick={handleCustomPromptSubmit}>Submit</Button>
-                      </div>*/}
                     </div>  
 
                      
@@ -1448,6 +1437,7 @@ useEffect(() => {
           </Row>
           
         </div>
+      </div>
       </div>
       <QuestionCrafterWizard />
       

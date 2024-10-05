@@ -267,11 +267,12 @@ const Bids = () => {
             <SideBarSmall />
 
             <div className="lib-container">
+                <div className="scroll-container">
                 <div className='proposal-header'>
                 <h1 id="dashboard-title" className='heavy'>Dashboard</h1>
                     <div style={{display: 'flex'}}>
                     
-                    <div className="sort-options">
+                    <div className="sort-options" id="sort-options">
                         <Form.Select
                             id="sort-select"
                             value={sortCriteria}
@@ -352,7 +353,7 @@ const Bids = () => {
                         ))}
                     </tbody>
                 </table>
-                <div className="pagination-container" style={{marginTop: '25px'}}>
+                <div className="pagination-container" >
                     {[...Array(Math.ceil(sortedBids.length / bidsPerPage))].map((_, index) => (
                         <button
                             key={index + 1}
@@ -416,9 +417,8 @@ const Bids = () => {
 </Modal>
           
             
-
-            
         </div>
+    </div>
     );
 };
 

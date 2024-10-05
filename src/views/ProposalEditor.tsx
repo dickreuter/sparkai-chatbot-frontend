@@ -211,28 +211,6 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
     <>
       <div className="proposal-header">
         <h1 className='heavy mb-3' id='proposal-editor'>Bid Compiler</h1>
-         {/*
-        <div className="dropdown-container">
-          <Dropdown onSelect={handleSelect}>
-            <Dropdown.Toggle className="upload-button custom-dropdown-toggle" id="dropdown-basic">
-              Navigate to Question
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {responses.length > 0 ? (
-                responses.map((response, index) => (
-                  <Dropdown.Item key={index} eventKey={response.id.toString()}>
-                    {truncateText(response.question, 50)}
-                  </Dropdown.Item>
-                ))
-              ) : (
-                <Dropdown.Item eventKey="navigate" disabled>
-                  Add some Question/Answer blocks to navigate!
-                </Dropdown.Item>
-              )}
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
-         */}
       </div>
       <div className="tabs-container" >
   {sharedState.documents.map((doc, index) => (

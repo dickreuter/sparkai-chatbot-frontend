@@ -5,13 +5,26 @@
             /* Assuming 40px top margin and 30px top padding */
             background-color: #faf7f7;
             justify-content: center;
-            padding-top: 70px;
-            padding-left: 205px;
-            padding-right: 15px;
+            padding-top: 55px;
+            padding-left: 185px;
+            padding-right: 0px;
             overflow-x: hidden;
-            overflow-y: auto;
+            overflow-y: hidden;
             margin: 0;
-            padding-bottom: 15px;
+            /* Use auto instead of scroll to handle both overflow cases */
+        }
+        
+        .scroll-container {
+            /* Adjusted to account for padding-left */
+            /* Assuming 40px top margin and 30px top padding */
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 15px;
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
             /* Use auto instead of scroll to handle both overflow cases */
         }
         
@@ -269,7 +282,7 @@
         
         .library-card-custom {
             height: 750px;
-            margin-top: 15px;
+            margin-top: 5px;
         }
         
         .library-card-body-content {

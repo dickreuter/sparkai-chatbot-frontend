@@ -20,7 +20,7 @@ const Proposal = () => {
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const { sharedState, setSharedState, saveProposal, addDocument, removeDocument, selectDocument } = useContext(BidContext);
+  const { sharedState, saveProposal } = useContext(BidContext);
   const { bidInfo, contributors } = sharedState;
 
   const [isLoading, setIsLoading] = useState(false);
@@ -75,6 +75,7 @@ const Proposal = () => {
     <div className="chatpage">
       <SideBarSmall />
       <div className="lib-container">
+        <div className="scroll-container">
         <BidNavbar />
         <TabProvider>
           <ProposalEditor
@@ -85,7 +86,7 @@ const Proposal = () => {
           />
         </TabProvider>
         <Row>
-          <div className="mb-4">
+          <div className="mb-2">
             <Button
               variant={"primary"}
               onClick={() => exportToDocx(sharedState.documents[sharedState.currentDocumentIndex]?.editorState)}
@@ -104,6 +105,7 @@ const Proposal = () => {
             </Button>
           </div>
         </Row>
+        </div>
       </div>
       <BidCompilerWizard />
     </div>

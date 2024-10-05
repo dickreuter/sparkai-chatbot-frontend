@@ -11,7 +11,7 @@ import { Button, Form, Modal, Pagination } from 'react-bootstrap';
 import { displayAlert } from '../helper/Alert.tsx';
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Select, MenuItem, FormControl } from '@mui/material';
+import { Select, MenuItem, FormControl, Skeleton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import withAuth from '../routes/withAuth.tsx';
 import DashboardWizard from '../wizards/DashboardWizard.tsx'; // Adjust the import path as needed
@@ -23,7 +23,7 @@ const Bids = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [bidToDelete, setBidToDelete] = useState(null);
     const [sortCriteria, setSortCriteria] = useState('lastEdited'); // New state for sorting criteria
-
+    const [loading, setLoading] = useState(true);
     const getAuth = useAuthUser();
     const auth = getAuth();
     const tokenRef = useRef(auth?.token || "default");
@@ -106,6 +106,7 @@ const Bids = () => {
       
 
     const fetchBids = async () => {
+        setLoading(true);
         try {
             const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
                 {}, {
@@ -118,6 +119,8 @@ const Bids = () => {
             }
         } catch (error) {
             console.error("Error fetching bids:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -260,7 +263,19 @@ const Bids = () => {
         setShowModal(false);
     };
 
-    
+    const SkeletonRow = () => (
+        <tr className='py-4'>
+            <td><Skeleton variant="text" width="100%" /></td>
+            <td><Skeleton variant="text" width="100%" /></td>
+            <td><Skeleton variant="text" width="100%" /></td>
+            <td><Skeleton variant="text" width="100%" /></td>
+            <td><Skeleton variant="text" width="100%" /></td>
+            <td><Skeleton variant="text" width="100%" /></td>
+            <td><Skeleton variant="text" width="100%" /></td>
+            <td style={{ textAlign: "center" }}><Skeleton variant="rounded" width={20} height={20} style={{ marginLeft: "22px"}}/></td>
+        </tr>
+    );
+
 
     return (
         <div >
@@ -298,19 +313,25 @@ const Bids = () => {
                 <table className="bids-table mt-1">
                     <thead>
                         <tr >
-                            <th style={{ width: "18%" }}>Tender Name</th>
+                            <th style={{ width: "20%" }}>Tender Name</th>
                             <th>Last edited</th>
                             <th>Status</th>
                             <th>Client</th>
                             <th style={{ width: "10%" }}>Deadline</th>
-                            <th>Bid Manager</th>
+                            <th style={{ width: "15%" }}>Bid Manager</th>
                             <th style={{ width: "15%" }}>Opportunity Owner</th>
-                            <th style={{ textAlign: "center" }}>Delete</th>
+                            <th style={{ textAlign: "center", width: "5%" }}>Delete</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                       {currentBids.map((bid, index) => (
+                        {loading ? (
+                                // Display skeleton rows while loading
+                                [...Array(13)].map((_, index) => (
+                                    <SkeletonRow key={index} />
+                                ))
+                            ) : (
+                       currentBids.map((bid, index) => (
                             <tr key={index}>
                                 <td>
                                     <Link to="/bid-extractor"  state={{ bid: bid, fromBidsTable: true }} onClick={() => navigateToChatbot(bid)}>
@@ -350,7 +371,8 @@ const Bids = () => {
                                     />
                                 </td>
                             </tr>
-                        ))}
+                        ))
+                        )}
                     </tbody>
                 </table>
                 <div className="pagination-container" >

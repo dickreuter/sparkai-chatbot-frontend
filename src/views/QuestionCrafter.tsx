@@ -230,13 +230,7 @@ const QuestionCrafter = () => {
     setCopilotLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
 
-    console.log({
-      input_text: copilotInput,
-      extra_instructions: instructions,
-      copilot_mode: copilot_mode,
-      dataset,
-    });
-
+  
     try {
       const requests = [
         axios.post(
@@ -245,7 +239,8 @@ const QuestionCrafter = () => {
             input_text: copilotInput,
             extra_instructions: instructions,
             copilot_mode: copilot_mode,
-            datasets: selectedFolders,
+            datasets: [],
+            bid_id: sharedState.object_id
           },
           {
             headers: {

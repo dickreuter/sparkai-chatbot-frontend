@@ -333,13 +333,13 @@
 .message-bubble-small {
     display: flex;
     /* Inline block to fit content */
-    max-width: 60%;
+    max-width: 80%;
     min-width: 50px;
     padding: 10px;
     border-radius: 15px;
     margin-bottom: 10px;
     word-wrap: break-word;
-    font-size: 15px;
+    font-size: 17px;
 }
 
 .message-bubble-small.user {

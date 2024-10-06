@@ -3,7 +3,7 @@ import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
-import { Button, Col, Row, Card, Modal, FormControl, InputGroup } from "react-bootstrap";
+import { Button, Col, Row, Card, Modal, FormControl, InputGroup, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faFileAlt, faSearch, faQuestionCircle, faPlus, faTimes, faCloudUploadAlt, faCheck, faSpinner  } from '@fortawesome/free-solid-svg-icons';
 import { Menu, MenuItem } from '@mui/material';
@@ -31,6 +31,7 @@ const TenderLibrary = ({ object_id }) => {
   const open = Boolean(anchorEl);
   const [showPdfViewerModal, setShowPdfViewerModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [documentListVersion, setDocumentListVersion] = useState(0);
   const [showWordModal, setShowWordModal] = useState(false);
   const [wordFileContent, setWordFileContent] = useState(null);
@@ -130,6 +131,9 @@ const TenderLibrary = ({ object_id }) => {
       const fileExtension = fileName.split('.').pop().toLowerCase();
       
       if (fileExtension === 'pdf') {
+        setIsPdfLoading(true);
+        setShowPdfViewerModal(true);
+        
         const response = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_pdf_format`,
           formData,
@@ -143,7 +147,7 @@ const TenderLibrary = ({ object_id }) => {
         );
         const fileURL = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
         setPdfUrl(fileURL);
-        setShowPdfViewerModal(true);
+        setIsPdfLoading(false);
       } else if (['doc', 'docx'].includes(fileExtension)) {
         const response = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/show_tenderLibrary_file_content_word_format`,
@@ -164,6 +168,8 @@ const TenderLibrary = ({ object_id }) => {
     } catch (error) {
       console.error('Error viewing file:', error);
       displayAlert('Error viewing file', "danger");
+      setIsPdfLoading(false);
+      setShowPdfViewerModal(false);
     }
   };
   
@@ -515,7 +521,15 @@ return (
 {showPdfViewerModal && (
         <div className="pdf-viewer-modal" onClick={() => setShowPdfViewerModal(false)}>
           <div className="pdf-viewer-modal-content" onClick={e => e.stopPropagation()}>
-            <iframe src={pdfUrl} width="100%" height="600px"></iframe>
+            {isPdfLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '600px' }}>
+                <Spinner animation="border" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </Spinner>
+              </div>
+            ) : (
+              <iframe src={pdfUrl} width="100%" height="600px"></iframe>
+            )}
           </div>
         </div>
       )}

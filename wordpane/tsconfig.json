@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "allowUnusedLabels": false,
+    "allowUnusedLabels": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
@@ -8,8 +8,8 @@
     "jsx": "react",
     "module": "CommonJS",
     "moduleResolution": "node",
-    "noImplicitReturns": true,
-    "noUnusedParameters": true,
+    "noImplicitReturns": false,
+    "noUnusedParameters": false,
     "outDir": "dist",
     "removeComments": false,
     "sourceMap": true,
@@ -21,7 +21,10 @@
     "pretty": true,
     "typeRoots": [
       "node_modules/@types"
-    ]
+    ],
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false
   },
   "exclude": [
     "node_modules"

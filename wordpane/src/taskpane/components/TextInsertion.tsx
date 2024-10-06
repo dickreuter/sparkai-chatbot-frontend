@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Button, Field, Textarea, tokens, makeStyles } from "@fluentui/react-components";
+import { Button, Field, Textarea, tokens, makeStyles, Dropdown, Option, SelectionEvents, OptionOnSelectData } from "@fluentui/react-components";
 
 /* global HTMLTextAreaElement */
 
@@ -26,10 +26,15 @@ const useStyles = makeStyles({
     marginRight: "20px",
     maxWidth: "50%",
   },
+  dropdown: {
+    marginBottom: "20px",
+    width: "200px",
+  },
 });
 
 const TextInsertion: React.FC<TextInsertionProps> = (props: TextInsertionProps) => {
   const [text, setText] = useState<string>("Some text.");
+  const [selectedBid, setSelectedBid] = useState<string>("bid1");
 
   const handleTextInsertion = async () => {
     await props.insertText(text);
@@ -39,6 +44,12 @@ const TextInsertion: React.FC<TextInsertionProps> = (props: TextInsertionProps) 
     setText(event.target.value);
   };
 
+  const handleBidChange = (_event: SelectionEvents, data: OptionOnSelectData) => {
+    if (data.optionValue) {
+      setSelectedBid(data.optionValue);
+    }
+  };
+
   const styles = useStyles();
 
   return (
@@ -46,6 +57,16 @@ const TextInsertion: React.FC<TextInsertionProps> = (props: TextInsertionProps) 
       <Field className={styles.textAreaField} size="large" label="Enter text to be inserted into the document.">
         <Textarea size="large" value={text} onChange={handleTextChange} />
       </Field>
+      <Dropdown
+        className={styles.dropdown}
+        placeholder="Select a bid"
+        value={selectedBid}
+        onOptionSelect={handleBidChange}
+      >
+        <Option value="bid1">Bid 1</Option>
+        <Option value="bid2">Bid 2</Option>
+        <Option value="bid3">Bid 3</Option>
+      </Dropdown>
       <Field className={styles.instructions}>Click the button to insert text.</Field>
       <Button appearance="primary" disabled={false} size="large" onClick={handleTextInsertion}>
         Insert text

@@ -430,9 +430,7 @@ const DeleteFileModal = ({ show, onHide, onDelete, fileName }) => (
       Are you sure you want to delete the file "{fileName}"?
     </Modal.Body>
     <Modal.Footer>
-      <Button className="upload-button" onClick={onHide}>
-        Cancel
-      </Button>
+     
       <Button className="upload-button" style={{backgroundColor: "red"}} onClick={() => onDelete()}>
         Delete
       </Button>
@@ -462,15 +460,20 @@ return (
                   Upload Document
                 </Button>
                 <Menu
-                  id="long-menu"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={open}
-                  onClose={handleMenuClose}
-                >
-                  <MenuItem onClick={() => handleMenuItemClick('pdf')} style={{ fontFamily: '"ClashDisplay", sans-serif', width: "200px" }}>
-                    <i className="fas fa-file-pdf" style={{ marginRight: '12px' }}></i>
-                    Upload PDF/Doc
+                id="long-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={open}
+                onClose={handleMenuClose}
+                PaperProps={{
+                  style: {
+                    width: '180px', // Reduced width
+                  },
+                }}
+              >
+                  <MenuItem onClick={() => handleMenuItemClick('pdf')} className="styled-menu-item">
+                    <i className="fas fa-file-pdf styled-menu-item-icon" ></i>
+                    Upload PDF/Word
                   </MenuItem>
                 </Menu>
                 </div>

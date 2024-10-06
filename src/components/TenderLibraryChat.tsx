@@ -38,7 +38,7 @@ const TenderLibraryChat = ({bid_id}) => {
     const [inputValue, setInputValue] = useState("");
 
     const [choice, setChoice] = useState("2");
-    const [broadness, setBroadness] = useState("2");
+    const [broadness, setBroadness] = useState("4");
 
     const [isLoading, setIsLoading] = useState(false);
     const [questionAsked, setQuestionAsked] = useState(false);

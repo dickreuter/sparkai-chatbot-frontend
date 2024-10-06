@@ -982,7 +982,7 @@ const renderFolderContents = (folderPath) => {
                 onClose={handleMenuClose}
                 PaperProps={{
                   style: {
-                    width: '160px', // Reduced width
+                    width: '180px', // Reduced width
                   },
                 }}
               >
@@ -991,7 +991,7 @@ const renderFolderContents = (folderPath) => {
                   className="styled-menu-item"
                 >
                   <i className="fas fa-file-pdf styled-menu-item-icon" ></i>
-                  Upload PDF/Doc
+                  Upload PDF/Word
                 </MenuItem>
                 <MenuItem 
                   onClick={() => handleMenuItemClick('text')} 

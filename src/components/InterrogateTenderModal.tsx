@@ -21,7 +21,7 @@ const InterrogateTenderModal = ({ bid_id }) => {
     const [isViewingText, setIsViewingText] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [isLoadingText, setIsLoadingText] = useState(false);
-    const [activeTab, setActiveTab] = useState('search');
+    const [activeTab, setActiveTab] = useState('chat');
 
     const textContentRef = useRef(null);
 

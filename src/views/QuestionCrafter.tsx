@@ -1370,11 +1370,14 @@ useEffect(() => {
                         <Button className="prompt-button" style={{ borderTop: '2px solid #555555' }} onClick={handleLinkClick('Summarise')}>Summarise</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Expand')}>Expand</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Rephrase')}>Rephrase</Button>
-                        <Button className="prompt-button" onClick={handleLinkClick('Translate to English')}>Translate to English</Button>
-                        <Button className="prompt-button" onClick={handleLinkClick('We will Active Voice')}>We will</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Inject Company Voice')}>Inject Company Voice</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Inject Tender Context')}>Inject Tender Context</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Improve Grammar')}>Improve Grammar</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('Add Statistics')}>Add Statistic</Button>
                         <Button className="prompt-button" onClick={handleLinkClick('For Example')}>For Example</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('Translate to English')}>Translate to English</Button>
+                        <Button className="prompt-button" onClick={handleLinkClick('We will Active Voice')}>We will</Button>
+                        
                       </div>
                     </div>  
 

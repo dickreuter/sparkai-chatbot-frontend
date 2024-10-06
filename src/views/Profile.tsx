@@ -182,7 +182,7 @@ const ProfilePage = () => {
         <SideBarSmall />
         <div className="loading-container">
           <div style={{marginLeft: "8%"}}>
-          <Spinner animation="border" variant="primary" className="spinner" />
+          <Spinner animation="border" className="spinner" />
           </div>
           
         </div>

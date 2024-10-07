@@ -59,7 +59,7 @@ const BidExtractor = () => {
 
   const [currentUserEmail, setCurrentUserEmail] = useState('');
   const currentUserPermission = contributors[auth.email] || 'viewer'; // Default to 'viewer' if not found
-  console.log("currentUserpermission"+ currentUserPermission);
+  console.log("currentUserpermissionextract"+ currentUserPermission);
   const canUserEdit = currentUserPermission === "admin" || currentUserPermission === "editor";
 
   const showViewOnlyMessage = () => {

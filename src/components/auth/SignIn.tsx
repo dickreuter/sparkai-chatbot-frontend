@@ -57,6 +57,19 @@ const FullScreenTwoCards = () => {
     }
   };
 
+  const inputProps = {
+    style: {
+      '&:-webkit-autofill': {
+        WebkitBoxShadow: '0 0 0 1000px white inset',
+        WebkitTextFillColor: '#000',
+      },
+    },
+  };
+
+  const labelProps = {
+    shrink: true,
+  };
+
   return (
     <div className="cards-container">
       <div className="cardmini">
@@ -65,16 +78,21 @@ const FullScreenTwoCards = () => {
 
           <div className="input-field">
             <TextField
+              id="email-input"
               fullWidth
               label="Enter your username"
               variant="outlined"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               onKeyPress={handleKeyPress}
+              InputProps={inputProps}
+              InputLabelProps={labelProps}
+              autoComplete="username"
             />
           </div>
           <div className="input-field">
             <TextField
+              id="password-input"
               fullWidth
               label="Password"
               variant="outlined"
@@ -82,6 +100,9 @@ const FullScreenTwoCards = () => {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               onKeyPress={handleKeyPress}
+              InputProps={inputProps}
+              InputLabelProps={labelProps}
+              autoComplete="current-password"
             />
           </div>
           <Button
@@ -101,13 +122,10 @@ const FullScreenTwoCards = () => {
           open={snackbarOpen}
           autoHideDuration={3000}
           onClose={() => setSnackbarOpen(false)}
-         
           style={{
             position: 'fixed',
             bottom: '-25%',
             marginBottom: '15px'
-        
-            
           }}
         >
           <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>

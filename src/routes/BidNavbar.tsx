@@ -1,35 +1,53 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Spinner } from 'react-bootstrap';
 import { BidContext } from "../views/BidWritingStateManagerView";
 import { faArrowLeft, faCheckCircle, faEdit, faEye, faTimesCircle, faUsers } from '@fortawesome/free-solid-svg-icons';
 import "./BidNavbar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import { useAuthUser } from "react-auth-kit";
 
 const BidNavbar = () => {
-  const { sharedState} = useContext(BidContext);
-  const { isLoading, saveSuccess } = sharedState;
+  const { sharedState } = useContext(BidContext);
+  const { isLoading, saveSuccess, bidInfo } = sharedState;
  
   const getAuth = useAuthUser();
-  const auth = getAuth();
+  const [auth, setAuth] = useState(null);
   const navigate = useNavigate();
-  const { 
-    bidInfo:
-    contributors
-  } = sharedState;
-
   const location = useLocation();
-
+  const { 
+    contributors,
+  } = sharedState;
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem('lastActiveTab') || '/bid-extractor';
   });
 
+  const [currentUserPermission, setCurrentUserPermission] = useState('viewer');
 
+  useEffect(() => {
+    const authData = getAuth();
+    setAuth(authData);
+  }, [getAuth]);
 
-  const currentUserPermission = contributors[auth.email] || 'viewer'; 
+  useEffect(() => {
+    // Update active tab based on current location
+    setActiveTab(location.pathname);
+    localStorage.setItem('lastActiveTab', location.pathname);
+
+    // Update user permission when bidInfo and auth changes
+    if (auth && auth.email) {
+      const permission = contributors[auth.email] || 'viewer'; 
+      setCurrentUserPermission(permission);
+      console.log("currentUserpermissionnav", permission);
+    }
+  }, [location, bidInfo, auth]);
+
+  useEffect(() => {
+    if (auth) {
+      console.log("auth", auth);
+    }
+  }, [auth]);
+
   const getPermissionDetails = (permission) => {
     switch (permission) {
       case 'admin':
@@ -63,13 +81,6 @@ const BidNavbar = () => {
     setActiveTab(path);
     localStorage.setItem('lastActiveTab', path);
   };
-
-  useEffect(() => {
-    // Update active tab based on current location
-    setActiveTab(location.pathname);
-    localStorage.setItem('lastActiveTab', location.pathname);
-  }, [location]);
-
 
   return (
     <div className="bidnav">

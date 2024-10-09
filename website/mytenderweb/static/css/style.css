@@ -1278,7 +1278,7 @@ footer .line {
     max-width: 920px;
     margin: auto;
     padding-bottom: 30px;
-    transform: translateY(-30px);
+    transform: translateY(-80px);
 }
 
 .large-laptop-frame {
@@ -1322,7 +1322,8 @@ footer .line {
 @media (max-width: 768px) {
     .large-laptop-frame-container {
         padding-bottom: 20px;
-        transform: translateY(-20px);
+        transform: translateY(-60px);
+        /* Reduced upward shift for medium screens */
     }
     .laptop-stand {
         height: 10px;
@@ -1335,7 +1336,8 @@ footer .line {
 @media (max-width: 480px) {
     .large-laptop-frame-container {
         padding-bottom: 15px;
-        transform: translateY(-15px);
+        transform: translateY(-30px);
+        /* Further reduced upward shift for small screens */
     }
     .laptop-stand {
         height: 8px;

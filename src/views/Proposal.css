@@ -39,23 +39,22 @@
 .tabs-container {
     display: flex;
     align-items: center;
-    border-bottom: none;
     margin: 0;
     border-radius: 10px 10px 0 0;
     overflow: hidden;
 }
 
 .tab {
-    padding: 6px 20px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    border-right: none;
-    border-bottom: none;
+    padding: 12px 20px;
+    padding-top: 7px;
     border-radius: 10px 10px 0 0;
     background: #f1f1f1;
     margin-bottom: 0;
     display: flex;
     align-items: center;
+    border-top: 2px solid #ccc !important;
+    border-left: 2px solid #ccc !important;
+    margin-top: 8px;
 }
 
 
@@ -69,7 +68,7 @@
 /* Ensure the last tab (not the add button) has a right border */
 
 .tab:last-of-type {
-    border-right: 1px solid #ccc;
+    border-right: 2px solid #ccc;
 }
 
 .tab.active {
@@ -111,6 +110,11 @@
     border: none;
     border-radius: 30px;
     flex-shrink: 0;
+    background-color: black;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 550;
+    padding: 0;
     /* Prevent the button from shrinking */
 }
 

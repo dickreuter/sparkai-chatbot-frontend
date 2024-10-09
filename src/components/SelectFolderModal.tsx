@@ -53,43 +53,7 @@ const SelectFolderModal = ({ onSaveSelectedFolders, initialSelectedFolders = [] 
                   </Button>
               </Modal.Footer>
           </Modal>
-      <style type="text/css">
-        {`
-          .select-folder-modal-dialog {
-            max-width: 75vw;
-            width: 90vw;
-           
-            marigin-bottom: 0;
-          }
-          .select-folder-modal-content {
-            max-height: 85vh;
-            overflow-y: auto;
-             marigin-bottom: 0;
-          }
-          @media (min-width: 2000px) {
-            .select-folder-modal-dialog {
-              max-width: 2000px;
-              width: 2000px;
-            }
-          }
-          .content-scaler {
-            transform: scale(0.8);
-            transform-origin: top left;
-            width: 125%; /* 1 / 0.8 = 1.25, so 125% */
-            height: 125%;
-          }
-          .modal-body {
-            overflow: hidden;
-            padding-bottom: 0;
-          }
-
-           .modal-header .btn-close {
-            padding: 0.5rem 0.5rem;
-            margin: -0.5rem -0.5rem -0.5rem auto;
-            font-size: 0.8rem;
-          }
-        `}
-      </style>
+     
     </>
   );
 };

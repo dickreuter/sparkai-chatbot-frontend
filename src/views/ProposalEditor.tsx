@@ -331,9 +331,6 @@ function ProposalEditor({ bidData: editorState, appendResponse, selectedQuestion
     Are you sure you want to delete this document? This action cannot be undone.
   </Modal.Body>
   <Modal.Footer>
-    <Button className="upload-button" onClick={() => setShowDeleteModal(false)}>
-      Cancel
-    </Button>
     <Button className="upload-button" style={{backgroundColor: "red"}} onClick={confirmDelete}>
       Delete
     </Button>

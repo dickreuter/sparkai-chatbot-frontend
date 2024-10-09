@@ -18,6 +18,7 @@ import { displayAlert } from "../helper/Alert.tsx";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
 import SelectFolder from "../components/SelectFolder.tsx";
 import SelectFolderModal from "../components/SelectFolderModal.tsx";
+import SaveQASheet from "../modals/SaveQASheet.tsx";
 
 const QuestionCrafter = () => {
   const getAuth = useAuthUser();
@@ -46,9 +47,6 @@ const QuestionCrafter = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [copilotLoading, setCopilotLoading] = useState(false);
 
-  const [selectionStart, setSelectionStart] = useState(null);
-  const [selectionEnd, setSelectionEnd] = useState(null);
-  const [isEditorFocused, setIsEditorFocused] = useState(false);
   
   const [inputText, setInputText] = useState(localStorage.getItem('inputText') || '');
   const [responseEditorState, setResponseEditorState] = useState(
@@ -57,14 +55,7 @@ const QuestionCrafter = () => {
     )
   );
   const [selectionRange, setSelectionRange] = useState({ start: null, end: null });
-  const [isInternetSearch, setIsInternetSearch] = useState(true);
-
-  const cursorPositionRef = useRef(null);
-
-  const [showModal, setShowModal] = useState(false);
-
-  const handleCloseModal = () => setShowModal(false);
-  const handleShowModal = () => setShowModal(true);
+ 
 
   const responseBoxRef = useRef(null); // Ref for the response box
   const promptsContainerRef = useRef(null); // Ref for the prompts container
@@ -1301,9 +1292,9 @@ useEffect(() => {
               Word Count: {convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').split(/\s+/).filter(Boolean).length}
             </div>
            
-            <QASheetSelector />
           
-     
+          
+            <SaveQASheet inputText={inputText} responseEditorState={responseEditorState} /> 
 
             </Col>
             <Col lg={5} md={12}>

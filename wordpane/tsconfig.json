@@ -13,6 +13,7 @@
     "outDir": "dist",
     "removeComments": false,
     "sourceMap": true,
+    "incremental": false,
     "target": "es5",
     "lib": [
       "es7",
@@ -26,6 +27,9 @@
     "noImplicitAny": false,
     "strictNullChecks": false
   },
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
     "node_modules"
   ],

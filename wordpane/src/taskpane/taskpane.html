@@ -14,6 +14,7 @@
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
 </head>
 
+
 <body style="width: 100%; height: 100%; margin: 0; padding: 0;">
     <div id="container"></div>
 
@@ -25,8 +26,7 @@
         React container div. 
     -->
     <div id="tridentmessage" style="display: none; padding: 10;">
-        This add-in will not run in your version of Office. Please upgrade either to perpetual Office 2021 (or later) 
-        or to a Microsoft 365 account.
+        This add-in will not run in your version of Office. Please upgrade either to perpetual Office 2021 (or later) or to a Microsoft 365 account.
     </div>
     <script>
         if ((navigator.userAgent.indexOf("Trident") !== -1) || (navigator.userAgent.indexOf("Edge") !== -1)) {
@@ -34,7 +34,7 @@
             var normalContainer = document.getElementById("container");
             tridentMessage.style.display = "block";
             normalContainer.style.display = "none";
-        } 
+        }
     </script>
 </body>
 

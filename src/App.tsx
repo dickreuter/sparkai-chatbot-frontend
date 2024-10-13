@@ -8,7 +8,6 @@ import Routing from './routes/Routing';
 import ReactGA4 from "react-ga4";
 import './Widget.css';
 import SupportChat from "./components/SupportChat.tsx";
-import SignOut from './components/auth/SignOutButton.tsx';
 import AutoLogout from './components/auth/AutoLogout.tsx';
 
 ReactGA4.initialize("G-X8S1ZMRM3C");

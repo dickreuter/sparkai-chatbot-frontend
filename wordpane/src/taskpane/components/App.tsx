@@ -1,10 +1,13 @@
 import * as React from "react";
-import Header from "./Header";
-import HeroList, { HeroListItem } from "./HeroList";
-import TextInsertion from "./TextInsertion";
+import { createMemoryRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { AuthProvider } from 'react-auth-kit';
 import { makeStyles } from "@fluentui/react-components";
-import { Ribbon24Regular, LockOpen24Regular, DesignIdeas24Regular } from "@fluentui/react-icons";
-import { insertText } from "../taskpane";
+import NavBar from '../routes/NavBar';
+import SignInComponent from '../components/auth/SignIn';
+import SignOut from "../components/auth/SignOutButton";
+import WordpaneCopilot from './WordpaneCopilot';
+import '../resources/clash-display.css';
+
 
 interface AppProps {
   title: string;
@@ -16,30 +19,52 @@ const useStyles = makeStyles({
   },
 });
 
-const App: React.FC<AppProps> = (props: AppProps) => {
+const Layout: React.FC<{ title: string }> = ({ title }) => {
+  return (
+    <div className="content-scaler">
+      <div className="main-content">
+        <Outlet />
+      </div>
+    </div>
+  );
+};
+
+const App: React.FC<AppProps> = ({ title }) => {
   const styles = useStyles();
-  // The list items are static and won't change at runtime,
-  // so this should be an ordinary const, not a part of state.
-  const listItems: HeroListItem[] = [
+  
+  const router = createMemoryRouter([
     {
-      icon: <Ribbon24Regular />,
-      primaryText: "Achieve more with Office integration",
-    },
-    {
-      icon: <LockOpen24Regular />,
-      primaryText: "Unlock features and functionality",
-    },
-    {
-      icon: <DesignIdeas24Regular />,
-      primaryText: "Create and visualize like a pro",
-    },
-  ];
+      path: "/",
+      element: <Layout title={title} />,
+      children: [
+        {
+          path: "/",
+          element: <WordpaneCopilot />
+        },
+        {
+          path: "/login",
+          element: <SignInComponent />
+        },
+        {
+          path: "/logout",
+          element: <SignOut />
+        },
+        {
+          path: "*",
+          element: <WordpaneCopilot />
+        }
+      ]
+    }
+  ], {
+    initialEntries: ['/'],
+    initialIndex: 0
+  });
 
   return (
     <div className={styles.root}>
-      <Header logo="assets/mytender.png" title={props.title} message="Mytender.io" />
-      <HeroList message="Access mytender.io directly from Word!" items={listItems} />
-      <TextInsertion insertText={insertText} />
+      <AuthProvider authType={"localstorage"} authName={"sparkaichatbot"}>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </div>
   );
 };

@@ -36,4 +36,73 @@
             swiper.slideNext();
         });
     });
+    document.addEventListener('DOMContentLoaded', function() {
+        var carouselElement = document.querySelector('#testimonialCarousel');
+        var carouselInner = carouselElement.querySelector('.carousel-inner > .d-flex');
+        var reviews = carouselElement.querySelectorAll('.review');
+        var totalReviews = reviews.length;
+        var visibleReviews = 3;
+        var currentIndex = 0;
+    
+        // Clone reviews and append them to create the illusion of infinite scrolling
+        reviews.forEach(function(review) {
+            var clone = review.cloneNode(true);
+            carouselInner.appendChild(clone);
+        });
+    
+        // Clone the first three reviews and prepend them
+        for (var i = 0; i < visibleReviews; i++) {
+            var clone = reviews[i].cloneNode(true);
+            carouselInner.insertBefore(clone, carouselInner.firstChild);
+        }
+    
+        // Set initial position
+        updateCarousel(false);
+    
+        function moveCarousel(direction) {
+            currentIndex += direction;
+            updateCarousel(true);
+        }
+    
+        function updateCarousel(animate) {
+            var offset = -(currentIndex + visibleReviews) * (100 / visibleReviews);
+            
+            if (animate) {
+                carouselInner.style.transition = 'transform 0.5s ease';
+            } else {
+                carouselInner.style.transition = 'none';
+            }
+            
+            carouselInner.style.transform = `translateX(${offset}%)`;
+    
+            if (animate) {
+                // After animation, check if we need to reset position
+                setTimeout(() => {
+                    if (currentIndex >= totalReviews) {
+                        currentIndex = 0;
+                        resetPosition();
+                    } else if (currentIndex < 0) {
+                        currentIndex = totalReviews - 1;
+                        resetPosition();
+                    }
+                }, 500);
+            }
+        }
+    
+        function resetPosition() {
+            carouselInner.style.transition = 'none';
+            updateCarousel(false);
+            // Force reflow
+            carouselInner.offsetHeight;
+            carouselInner.style.transition = 'transform 0.5s ease';
+        }
+    
+        carouselElement.querySelector('.carousel-control-prev').addEventListener('click', function() {
+            moveCarousel(-1);
+        });
+    
+        carouselElement.querySelector('.carousel-control-next').addEventListener('click', function() {
+            moveCarousel(1);
+        });
+    });
 </script>

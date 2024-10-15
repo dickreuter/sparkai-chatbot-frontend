@@ -2,12 +2,11 @@ import * as React from "react";
 import { createMemoryRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { AuthProvider } from 'react-auth-kit';
 import { makeStyles } from "@fluentui/react-components";
-import NavBar from '../routes/NavBar';
+import WordpaneCopilot from './WordpaneCopilot';
 import SignInComponent from '../components/auth/SignIn';
 import SignOut from "../components/auth/SignOutButton";
-import WordpaneCopilot from './WordpaneCopilot';
 import '../resources/clash-display.css';
-
+import './App.css';
 
 interface AppProps {
   title: string;
@@ -16,6 +15,10 @@ interface AppProps {
 const useStyles = makeStyles({
   root: {
     minHeight: "100vh",
+    transform: "scale(0.8)",
+    transformOrigin: "top left",
+    width: "125%",
+    height: "125%",
   },
 });
 
@@ -31,7 +34,7 @@ const Layout: React.FC<{ title: string }> = ({ title }) => {
 
 const App: React.FC<AppProps> = ({ title }) => {
   const styles = useStyles();
-  
+ 
   const router = createMemoryRouter([
     {
       path: "/",

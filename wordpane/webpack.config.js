@@ -8,17 +8,17 @@ const dotenv = require('dotenv');
 const urlDev = "https://localhost:3000/";
 const urlProd = "https://app.mytender.io:3000"; // CHANGE THIS TO YOUR PRODUCTION DEPLOYMENT LOCATION
 const env = dotenv.config().parsed;
-const envKeys = Object.keys(env).reduce((prev, next) => {
-    prev[`process.env.${next}`] = JSON.stringify(env[next]);
-    return prev;
-}, {});
 
+// Explicitly define the environment variables we want to expose
+const envKeys = {
+    'process.env.REACT_APP_API_URL': JSON.stringify(env.REACT_APP_API_URL),
+    'process.env.REACT_APP_API_URL_PREFIX_HTTPS': JSON.stringify(env.REACT_APP_API_URL_PREFIX_HTTPS)
+};
 
 async function getHttpsOptions() {
     const httpsOptions = await devCerts.getHttpsServerOptions();
     return { ca: httpsOptions.ca, key: httpsOptions.key, cert: httpsOptions.cert };
 }
-
 module.exports = async(env, options) => {
     const dev = options.mode === "development";
     const config = {

@@ -817,22 +817,17 @@ useEffect(() => {
 
 
   return (
-    <div className="chatpage">
-
-      <div className="lib-container">
-      <div className="scroll-container">
-
-        
+  
         <div>
     
 
-          <Row className="mt-2">
+          <Row >
 
             <Col lg={5} md={12}>
               <div className="input-header">
                 <div className="proposal-header mb-2">
                   <h1 className="lib-title" style={{ color: "white" }} id='bid-pilot-section'>Bid Pilot</h1>
-                  <Button className="signout-button" onClick={() => navigate('/logout')}>Sign Out</Button>
+                  <Button className="option-button" onClick={() => navigate('/logout')}>Sign Out</Button>
                   <div className="dropdown-container">
                    
                   </div>
@@ -957,10 +952,6 @@ useEffect(() => {
           </Row>
           
         </div>
-      </div>
-      </div>
-      
-    </div>
   );
 }
 

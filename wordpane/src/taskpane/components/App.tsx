@@ -7,6 +7,9 @@ import SignInComponent from '../components/auth/SignIn';
 import SignOut from "../components/auth/SignOutButton";
 import '../resources/clash-display.css';
 import './App.css';
+import './Proposal.css';
+import './Upload.css';
+import "bootstrap/dist/css/bootstrap.css";
 
 interface AppProps {
   title: string;

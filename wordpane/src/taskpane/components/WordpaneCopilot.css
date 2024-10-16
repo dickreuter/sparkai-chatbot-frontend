@@ -3,13 +3,13 @@
     word-wrap: break-word;
     display: flex;
     flex-direction: column;
-    margin-bottom: 40px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     border: 1px solid #ced4da;
     border-top: none;
     overflow-x: hidden;
-    height: 800px;
+    height: 640px;
     overflow-y: none;
+    margin-bottom: 0px;
 }
 
 .input-header {

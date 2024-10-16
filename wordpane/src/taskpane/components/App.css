@@ -16,7 +16,7 @@
         transform-origin: top left;
         transform: scale(0.8);
         width: 125vw;
-        height: 125vh;
+        height: 100vh;
         overflow: hidden !important;
         font-family: var(--font-family) !important;
     }
@@ -28,11 +28,13 @@
         font-family: var(--font-family) !important;
         font-weight: 500;
         font-size: 14px;
+        overflow-x: hidden !important;
     }
     
     .main-content {
         padding: 0px;
         overflow-y: auto;
+        overflow-x: hidden !important;
         font-family: var(--font-family) !important;
     }
     /* Ensure all text elements use the font */

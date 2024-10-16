@@ -1,6 +1,6 @@
 .cards-container {
+    height: 100vh;
     width: 125vw;
-    height: 125vh;
     /* Use viewport height */
     display: flex;
     justify-content: center;
@@ -10,8 +10,8 @@
 }
 
 .cardmini {
-    width: 90%;
-    max-width: 400px;
+    width: 100%;
+    max-width: 500px;
     /* Adjust based on your needs */
     height: auto;
     background-color: white;

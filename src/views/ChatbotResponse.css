@@ -29,7 +29,7 @@
     display: flex;
     /* Inline block to fit content */
     max-width: 70%;
-    min-width: 150px;
+    min-width: 50px;
     padding: 10px;
     border-radius: 15px;
     margin-bottom: 10px;

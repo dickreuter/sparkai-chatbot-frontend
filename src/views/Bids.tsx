@@ -242,8 +242,8 @@ const Bids = () => {
             displayAlert('Bid name cannot be empty', 'danger');
             return;
         }
-        if (bidName.length > 20) {
-            displayAlert('Bid name cannot exceed 20 characters', 'danger');
+        if (bidName.length > 40) {
+            displayAlert('Bid name cannot exceed 40 characters', 'danger');
             return;
         }
         if (bids.some(bid => bid.bid_title === bidName)) {
@@ -402,7 +402,7 @@ const Bids = () => {
                         value={bidName}
                         onChange={(e) => setBidName(e.target.value)}
                         placeholder="Enter tender name"
-                        maxLength={20}
+                        maxLength={40}
                         className="form-control"
                     />
                     <Button 

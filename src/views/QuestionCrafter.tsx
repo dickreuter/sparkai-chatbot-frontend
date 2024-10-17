@@ -25,8 +25,8 @@ const QuestionCrafter = () => {
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const { sharedState, setSharedState, getBackgroundInfo, selectDocument } = useContext(BidContext);
-  const { documents, questions, contributors } = sharedState;
+  const { sharedState, setSharedState, getBackgroundInfo } = useContext(BidContext);
+  const { contributors } = sharedState;
 
   const backgroundInfo = getBackgroundInfo();
 
@@ -35,7 +35,6 @@ const QuestionCrafter = () => {
   const [availableCollections, setAvailableCollections] = useState([]);
   const [folderContents, setFolderContents] = useState({});
   const [isAppended, setIsAppended] = useState(false);
-  const [appendResponse, setAppendResponse] = useState(false);
   const [selectedQuestionId, setSelectedQuestionId] = useState("-1");
 
   const [isCopilotVisible, setIsCopilotVisible] = useState(false);
@@ -54,6 +53,7 @@ const QuestionCrafter = () => {
       ContentState.createFromText(localStorage.getItem('response') || '')
     )
   );
+  const [contentLoaded, setContentLoaded] = useState(true);  // Set to true initially
   const [selectionRange, setSelectionRange] = useState({ start: null, end: null });
  
 
@@ -82,53 +82,6 @@ const QuestionCrafter = () => {
     console.log("selectedFolders state in QuestionCrafter updated:", selectedFolders);
   }, [selectedFolders]);
 
-
-  const handleDocumentSelect = (docName) => {
-    setSelectedDocument(docName);
-  };
-
-  const QASheetSelector = () => {
-    const qaSheets = sharedState.documents.filter(doc => doc.type === 'qa sheet');
-  
-    return (
-      <div className="dropdown-clear-container mt-2 mb-2">
-        <Dropdown onSelect={handleDocumentSelect} className="chat-dropdown" style={{marginRight: "5px"}}>
-          <Dropdown.Toggle
-            className="upload-button custom-dropdown-toggle"
-            id="qa-sheet-selector"
-          >
-            {selectedDocument || 'Select Q/A Sheet'}
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            {qaSheets.length > 0 ? (
-              qaSheets.map((doc, index) => (
-                <Dropdown.Item key={index} eventKey={doc.name}>
-                  {doc.name}
-                </Dropdown.Item>
-              ))
-            ) : (
-              <Dropdown.Item disabled>No Q/A Sheets available</Dropdown.Item>
-            )}
-          </Dropdown.Menu>
-        </Dropdown>
-  
-        <button
-          className="upload-button"
-          onClick={handleAddToQASheet}
-          disabled={
-            isLoading ||
-            !selectedDocument ||
-            convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n').trim() === ''
-          }
-        >
-          {isAppended ? 'Added to Bid Compiler' : 'Add Response to Bid Compiler'}
-        </button>
-      </div>
-    );
-  };
-  
-
-
   useEffect(() => {
     localStorage.setItem('response', convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n'));
   }, [responseEditorState]);
@@ -138,23 +91,6 @@ const QuestionCrafter = () => {
       backgroundColor: 'orange',
     },
   };
-
-  const handleDatasetChange = (e) => {
-    const newDataset = e.target.value;
-    setDataset(newDataset);
-    handleGAEvent('Chatbot', 'Dataset Selection', 'Select Dataset Button');
-  };
-
-  const handleSelect = (eventKey) => {
-    handleDatasetChange({ target: { value: eventKey } });
-  };
-  const formatDisplayName = (name) => {
-    return name.replace(/_/g, ' ').replace(/FORWARDSLASH/g, '/');
-  };
-  const displayText = dataset === 'default' ? 'Content Library' : formatDisplayName(dataset);
-  
-
-  
 
   const handleClearMessages = () => {
     setMessages([{ type: 'bot', text: 'Welcome to Bid Pilot! Ask questions about your company library data or search the internet for up to date information. Select text in the response box to use copilot and refine the response.' }]);
@@ -169,51 +105,6 @@ const QuestionCrafter = () => {
     
   };
   
-
-
-  const handleAddToQASheet = () => {
-    if (!selectedDocument) {
-      displayAlert('Please select a Q/A sheet first.', 'warning');
-      return;
-    }
-  
-    handleGAEvent('Chatbot', 'Append Response', 'Add to Q/A Sheet Button');
-    setSelectedQuestionId("-1");
-  
-    setTimeout(() => {
-      const currentDocIndex = sharedState.documents.findIndex(doc => doc.name === selectedDocument);
-      if (currentDocIndex === -1) {
-        console.error('Selected document not found');
-        return;
-      }
-      const currentDoc = sharedState.documents[currentDocIndex];
-      const currentContent = currentDoc.editorState.getCurrentContent();
-      const lastBlock = currentContent.getBlockMap().last();
-      const lengthOfLastBlock = lastBlock.getLength();
-      const selectionState = SelectionState.createEmpty(lastBlock.getKey()).merge({
-        anchorOffset: lengthOfLastBlock,
-        focusOffset: lengthOfLastBlock,
-      });
-  
-      const contentStateWithNewText = Modifier.insertText(
-        currentContent,
-        selectionState,
-        `\nQuestion:\n${inputText}\n\nAnswer:\n${convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n')}\n\n`
-      );
-  
-      const newEditorState = EditorState.push(currentDoc.editorState, contentStateWithNewText, 'insert-characters');
-  
-      setSharedState((prevState) => ({
-        ...prevState,
-        documents: prevState.documents.map((doc, index) => 
-          index === currentDocIndex ? { ...doc, editorState: newEditorState } : doc
-        )
-      }));
-  
-      setIsAppended(true);
-      setTimeout(() => setIsAppended(false), 3000);
-    }, 100);
-  };
   const askCopilot = async (copilotInput, instructions, copilot_mode) => {
     setQuestionAsked(true);
     localStorage.setItem('questionAsked', 'true');
@@ -1157,6 +1048,7 @@ useEffect(() => {
       setApiChoices([]); // Clear choices
       setSelectedChoices([]); // Clear selected choices
       setWordAmounts({}); // Clear word amounts
+      setContentLoaded(true);
     } catch (error) {
       console.error("Error submitting selections:", error);
       let errorMessage = "";
@@ -1185,7 +1077,85 @@ useEffect(() => {
     }
   };
 
-  
+  useEffect(() => {
+    if (contentLoaded) {
+      makeReferencesBold();
+      setContentLoaded(false);
+    }
+  }, [contentLoaded, responseEditorState]);
+
+  const makeReferencesBold = () => {
+    const contentState = responseEditorState.getCurrentContent();
+    const blockMap = contentState.getBlockMap();
+    
+    let newContentState = contentState;
+    
+    blockMap.forEach((block) => {
+      const text = block.getText();
+      const key = block.getKey();
+      
+      // Pattern to match [Extracted...] sections
+      const pattern = /\[(?=.*Extracted).*?\]/g;
+      
+      let matchArray;
+      while ((matchArray = pattern.exec(text)) !== null) {
+        const start = matchArray.index;
+        const end = start + matchArray[0].length;
+        
+        const selectionState = SelectionState.createEmpty(key).merge({
+          anchorOffset: start,
+          focusOffset: end,
+        });
+        
+        newContentState = Modifier.applyInlineStyle(
+          newContentState,
+          selectionState,
+          'BOLD'
+        );
+      }
+    });
+    
+    if (newContentState !== contentState) {
+      const newEditorState = EditorState.push(responseEditorState, newContentState, 'change-inline-style');
+      setResponseEditorState(newEditorState);
+    }
+  }
+
+
+  const removeReferences = () => {
+    const contentState = responseEditorState.getCurrentContent();
+    const blockMap = contentState.getBlockMap();
+   
+    let newContentState = contentState;
+   
+    blockMap.forEach((block) => {
+      const text = block.getText();
+      const key = block.getKey();
+     
+      // Pattern to match [Extracted...] sections
+      const pattern = /\[(?=.*Extracted).*?\]/g;
+     
+      let matchArray;
+      while ((matchArray = pattern.exec(text)) !== null) {
+        const start = matchArray.index;
+        const end = start + matchArray[0].length;
+       
+        const selectionState = SelectionState.createEmpty(key).merge({
+          anchorOffset: start,
+          focusOffset: end,
+        });
+       
+        newContentState = Modifier.removeRange(
+          newContentState,
+          selectionState,
+          'backward'
+        );
+      }
+    });
+   
+    const newEditorState = EditorState.push(responseEditorState, newContentState, 'remove-range');
+    setResponseEditorState(newEditorState);
+  };
 
   return (
     <div className="chatpage">
@@ -1271,14 +1241,24 @@ useEffect(() => {
 
               
           <Col lg={7} md={12}>
-              <h1 id="answer-section" className="lib-title mt-4 mb-3" >Answer</h1>
+          <div className="proposal-header">
+          <h1 id="answer-section" className="lib-title mt-4 mb-3" >Answer</h1>
+          <Button className="upload-button" onClick={removeReferences}>
+            Remove References
+          </Button>
+          </div>
+              
+
               <div className="response-box draft-editor" ref={responseBoxRef}>
               <div className="editor-container" ref={editorRef}>
             <Editor
               editorState={responseEditorState}
               placeholder="Your response will be generated here..."
               onChange={handleEditorChange}
-              customStyleMap={styleMap}
+              customStyleMap={{
+                ...styleMap,
+                BOLD: { fontWeight: 'bold' }
+              }}
               readOnly={!canUserEdit}
             />
           </div>

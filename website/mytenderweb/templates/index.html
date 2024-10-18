@@ -5,34 +5,19 @@
 {% block content %}
 
 
-<section id="hero" class="d-flex align-items-center min-vh-100">
+<section id="hero" class="d-flex align-items-center min-vh-100 text-center">
     <div class="bg-image"></div> <!-- Added div for background image -->
-    <div class="container-fluid">
-        <div class="row mt-5">
-            <div class="col-md-6">
-                <h1 class="display-2 fw-bold text-white" data-aos="fade-up">Bidding with AI <span class="nowrap"><span class="text-brand">beats</span> bidding without it.</span></h1>
-                <h4 data-aos="fade-up" data-aos-delay="100" class="mt-3 mb-4 text-white nowrap" id="headline">Take away your bid writing frustrations with proposal-winning AI</h4>
-                <div data-aos="fade-up" data-aos-delay="200"><a href="https://calendly.com/sam-od9g/mytender-io-training-call" class="button">Book a demo</a></div>
-            </div>
-        </div>
-        
-    </div>
-</section>
-
-<section id="welcome" class="section-padding border-top">
     <div class="container">
         <div class="row">
-            <div class="col-12 text-center" data-aos="fade-down" data-aos-delay="150">
-                <div class="section-title">
-                    <h1 class="display-4 fw-semibold">Win More Bids</h1>
-                    <div class="line"></div>
-                    <p class="widep">Welcome to mytender.io where our mission is to take the frustration out of bid writing. Watch our video below to see how we can help you.</p>
-                </div>
+            <div class="col-12 text-center" >
+                <h1 class="fw-semibold display-1 mt-5" >Your <span class="text-brand">trusted</span> bid writing solution</h1>
+                <p class="mt-3 mb-3 narrow-width" >Take away your bid writing frustrations with UK's accredited solution, trusted by the best to secure you contracts.</p>
+                <div class="mb-4"><a href="https://calendly.com/sam-od9g/mytender-io-training-call" class="button">Get Access</a></div>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-12">
-                <div class="large-laptop-frame-container" data-aos="fade-down" data-aos-delay="250">
+                <div class="large-laptop-frame-container" >
                     <div class="large-laptop-frame">
                         <iframe src="https://app.colossyan.com/embed/4f65c5c6-b329-41d3-9812-0115575701b1" 
                             frameborder="0" 
@@ -48,98 +33,188 @@
     </div>
 </section>
 
+
 <section id="reviews" class="section-padding border-top">
-    
-    <div class="container">
+    <div class="container" data-aos="fade-down" data-aos-delay="50">
         <div class="row">
-            <div class="col-12 text-center" data-aos="fade-down" data-aos-delay="50">
+            <div class="col-12 text-center" >
                 <div class="section-title">
                     <h1 class="display-4 fw-semibold">Testimonials</h1>
                     <div class="line"></div>
                     <p>Hear from our clients on how we've helped them win more bids and reduce their bid writing time by up to 75%.</p>
-
-                    <div><a href="https://calendly.com/sam-od9g/mytender-io-training-call" class="button">Learn more</a></div>
+                    <div ><a href="https://calendly.com/sam-od9g/mytender-io-training-call" class="button">Learn more</a></div>
                 </div>
             </div>
         </div>
-        <div>
-            <div class="row gy-5 gx-4 "  data-aos="fade-down" data-aos-delay="100">
-                <div class="col-lg-4 col-sm-6">
-                    <div class="review">
-                        <div class="review-head p-4 bg-white theme-shadow">
-                            <div class="text-warning">
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                            </div>
-                            <div class="review-text">
-                                <p>"mytender.io is the best AI tender writing tool I've seen and used and way ahead of anything Gemini/copilot can achieve. I'm still trying to find the right analogy for it and today's one is that specific tender writing ai vs general ai is like wanting to write something in French and using a Latin tool to do it…You need a specialised tool to get the nuances and put your best foot forward."</p>
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel" style="padding-top: 10px; margin-top: -50px;">
+            <div class="carousel-inner" style="padding: 10px;">
+                <div class="carousel-item active" style="padding: 15px;">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="review">
+                                <div class="review-head p-4 bg-white theme-shadow">
+                                    <div class="text-warning">
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                    </div>
+                                    <div class="review-text">
+                                        <p>"mytender.io is the best AI tender writing tool I've seen and used and way ahead of anything Gemini/copilot can achieve. I'm still trying to find the right analogy for it and today's one is that specific tender writing ai vs general ai is like wanting to write something in French and using a Latin tool to do it…You need a specialised tool to get the nuances and put your best foot forward."</p>
+                                    </div>
+                                </div>
+                                <div class="review-person mt-4 d-flex align-items-center">
+                                    <img class="rounded-circle review-image" src="{% static 'images/robid.jpg' %}" alt="">
+                                    <div class="ms-3">
+                                        <h5 class="review-name">
+                                            <a href="https://robid.co/">Robid</a>
+                                        </h5>
+                                        <small class="review-title">Managing Director</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="review-person mt-4 d-flex align-items-center">
-                            <img class="rounded-circle review-image" src="{% static 'images/robid.jpg' %}" alt="">
-                            <div class="ms-3">
-                                <h5 class="review-name">
-                                    <a href="https://robid.co/">Robid</a>
-                                </h5>
-                                <small class="review-title">Managing Director</small>
+                        <div class="col-lg-4">
+                            <div class="review">
+                                <div class="review-head p-4 bg-white theme-shadow">
+                                    <div class="text-warning">
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                    </div>
+                                    <div class="review-text">
+                                        <p>"I have worked with Sam and the Team at mytender.io for the last year and have seen the tool develop and transform into an innovative industry leading platform. The capabilities and functionality of the mytender.io system can really accelerate and facilitate growth in the SME space and allow organisations to win their desired contracts. Aside from this, the team is wonderful to work with and has been a pleasure to join them."</p>
+                                    </div>
+                                </div>
+                                <div class="review-person mt-4 d-flex align-items-center">
+                                    <img class="rounded-circle review-image" src="{% static 'images/empro.jpg' %}" alt="">
+                                    <div class="ms-3">
+                                        <h5 class="review-name">
+                                            <a href="https://emprogroup.co.uk/">Empro</a>
+                                        </h5>
+                                        <small class="review-title">Managing Director</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="review">
+                                <div class="review-head p-4 bg-white theme-shadow">
+                                    <div class="text-warning">
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                    </div>
+                                    <div class="review-text">
+                                        <p>"mytender.io has significantly improved our bid writing process, allowing our team to produce high-quality submissions more efficiently. The AI-driven platform's ability to analyse past successful bids and incorporate winning elements into new proposals has been a game-changer for us."</p>
+                                    </div>
+                                </div>
+                                <div class="review-person mt-4 d-flex align-items-center">
+                                    <img class="rounded-circle review-image" src="{% static 'images/kier_construction_logo.jpg' %}" alt="">
+                                    <div class="ms-3">
+                                        <h5 class="review-name">
+                                            <a href="https://www.kier.co.uk/">Kier</a>
+                                        </h5>
+                                        <small class="review-title">Head of Bid Management</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="review">
-                        <div class="review-head p-4 bg-white theme-shadow">
-                            <div class="text-warning">
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                            </div>
-                            <div class="review-text">
-                                <p>"I have worked with Sam and the Team at mytender.io for the last year and have seen the tool develop and transform into an innovative industry leading platform. The capabilities and functionality of the mytender.io system can really accelerate and facilitate growth in the SME space and allow organisations to win their desired contracts. Aside from this, the team is wonderful to work with and has been a pleasure to join them."</p>
-                            </div>
-                        </div>
-                        <div class="review-person mt-4 d-flex align-items-center">
-                            <img class="rounded-circle review-image" src="{% static 'images/empro.jpg' %}" alt="">
-                            <div class="ms-3">
-                                <h5 class="review-name">
-                                    <a href="https://emprogroup.co.uk/">Empro</a>
-                                </h5>
-                                <small class="review-title">Managing Director</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="review">
-                        <div class="review-head p-4 bg-white theme-shadow">
-                            <div class="text-warning">
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                                <i class="ri-star-fill"></i>
-                            </div>
-                            <div class="review-text">
-                                <p>"mytender.io has significantly improved our bid writing process, allowing our team to produce high-quality submissions more efficiently. The AI-driven platform's ability to analyse past successful bids and incorporate winning elements into new proposals has been a game-changer for us."</p>
+                <div class="carousel-item" style="padding: 15px;">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="review">
+                                <div class="review-head p-4 bg-white theme-shadow">
+                                    <div class="text-warning">
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                    </div>
+                                    <div class="review-text">
+                                        <p>“Stadium FM have been using the brilliant mytender.io platform to save a tonne of time and headaches, whilst being able to win more work.”</p>
+                                    </div>
+                                </div>
+                                <div class="review-person mt-4 d-flex align-items-center">
+                                    <img class="rounded-circle review-image" src="{% static 'images/stadiumfm.jpg' %}" alt="">
+                                    <div class="ms-3">
+                                        <h5 class="review-name">
+                                            <a href="#">Stadium FM</a>
+                                        </h5>
+                                        <small class="review-title">Executive Chairman</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="review-person mt-4 d-flex align-items-center">
-                            <img class="rounded-circle review-image" src="{% static 'images/kier_construction_logo.jpg' %}" alt="">
-                            <div class="ms-3">
-                                <h5 class="review-name">
-                                    <a href="https://www.kier.co.uk/">Kier</a>
-                                </h5>
-                                <small class="review-title">Head of Bid Management</small>
+                        <div class="col-lg-4">
+                            <div class="review">
+                                <div class="review-head p-4 bg-white theme-shadow">
+                                    <div class="text-warning">
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                    </div>
+                                    <div class="review-text">
+                                        <p>""mytender.io has transformed our bid writing process. We've seen a 40% increase in our success rate since implementing this platform. It's not just about saving time; it's about producing higher quality, more competitive bids that actually win contracts."</p>
+                                    </div>
+                                </div>
+                                <div class="review-person mt-4 d-flex align-items-center">
+                                    <img class="rounded-circle review-image" src="{% static 'images/bidsolutions.jpg' %}" alt="">
+                                    <div class="ms-3">
+                                        <h5 class="review-name">
+                                            <a href="#">Bid Solutions</a>
+                                        </h5>
+                                        <small class="review-title">Director</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="review">
+                                <div class="review-head p-4 bg-white theme-shadow">
+                                    <div class="text-warning">
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                        <i class="ri-star-fill"></i>
+                                    </div>
+                                    <div class="review-text">
+                                        <p>"I was skeptical about AI in bid writing, but mytender.io proved me wrong. It's like having a team of expert bid writers available 24/7. The platform's ability to quickly generate high-quality, relevant content has allowed us to respond to more tenders than ever before, significantly expanding our business opportunities."</p>
+                                    </div>
+                                </div>
+                                <div class="review-person mt-4 d-flex align-items-center">
+                                    <img class="rounded-circle review-image" src="/api/placeholder/80/80" alt="">
+                                    <div class="ms-3">
+                                        <h5 class="review-name">
+                                            <a href="#">BidStats</a>
+                                        </h5>
+                                        <small class="review-title">Procurement Director</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <button class="carousel-control-button carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-button carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
     </div>
 </section>

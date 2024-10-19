@@ -5,34 +5,26 @@
 {% block content %}
 
 
-<section id="hero" class="d-flex align-items-center min-vh-100 text-center">
-    <div class="bg-image"></div> <!-- Added div for background image -->
+<section id="hero" class="d-flex align-items-center text-center">
+    <div class="bg-image"></div>
     <div class="container">
-        <div class="row">
-            <div class="col-12 text-center" >
-                <h1 class="fw-semibold display-1 mt-5" >Your <span class="text-brand">trusted</span> bid writing solution</h1>
-                <p class="mt-3 mb-3 narrow-width" >Take away your bid writing frustrations with UK's accredited solution, trusted by the best to secure you contracts.</p>
-                <div class="mb-4"><a href="https://calendly.com/sam-od9g/mytender-io-training-call" class="button">Get Access</a></div>
-            </div>
+        <div class="hero-contents">
+            <h1 class="fw-semibold display-2">Your <span class="text-brand">trusted</span> bid writing solution</h1>
+            <p class="narrow-width mx-auto">Take away your bid writing frustrations with UK's accredited solution, trusted by the best to secure you contracts.</p>
+            <a href="https://calendly.com/sam-od9g/mytender-io-training-call" class="button">Get Access</a>
         </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="large-laptop-frame-container" >
-                    <div class="large-laptop-frame">
-                        <iframe src="https://app.colossyan.com/embed/4f65c5c6-b329-41d3-9812-0115575701b1" 
-                            frameborder="0" 
-                            allow="autoplay; fullscreen; picture-in-picture" 
-                            allowfullscreen
-                            scrolling="no">
-                    </iframe>
-                    </div>
-                    <div class="laptop-stand"></div>
-                </div>
+        <div class="video-container">
+            <div class="video-frame">
+                <iframe src="https://app.colossyan.com/embed/4f65c5c6-b329-41d3-9812-0115575701b1"
+                    frameborder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowfullscreen
+                    scrolling="no">
+                </iframe>
             </div>
         </div>
     </div>
 </section>
-
 
 <section id="reviews" class="section-padding border-top">
     <div class="container" data-aos="fade-down" data-aos-delay="50">
@@ -147,7 +139,7 @@
                                     <img class="rounded-circle review-image" src="{% static 'images/stadiumfm.jpg' %}" alt="">
                                     <div class="ms-3">
                                         <h5 class="review-name">
-                                            <a href="#">Stadium FM</a>
+                                            <a href="https://www.wearestadium.com/stadium-fm/">Stadium FM</a>
                                         </h5>
                                         <small class="review-title">Executive Chairman</small>
                                     </div>
@@ -172,7 +164,7 @@
                                     <img class="rounded-circle review-image" src="{% static 'images/bidsolutions.jpg' %}" alt="">
                                     <div class="ms-3">
                                         <h5 class="review-name">
-                                            <a href="#">Bid Solutions</a>
+                                            <a href="https://www.bidsolutions.co.za/">Bid Solutions</a>
                                         </h5>
                                         <small class="review-title">Director</small>
                                     </div>
@@ -190,14 +182,14 @@
                                         <i class="ri-star-fill"></i>
                                     </div>
                                     <div class="review-text">
-                                        <p>"I was skeptical about AI in bid writing, but mytender.io proved me wrong. It's like having a team of expert bid writers available 24/7. The platform's ability to quickly generate high-quality, relevant content has allowed us to respond to more tenders than ever before, significantly expanding our business opportunities."</p>
+                                        <p>“Time was the problem for us when tendering for work, the mytender.io platform has taken our bid writing time down from 10 hours to 2 hours, genuinely”</p>
                                     </div>
                                 </div>
                                 <div class="review-person mt-4 d-flex align-items-center">
-                                    <img class="rounded-circle review-image" src="/api/placeholder/80/80" alt="">
+                                    <img class="rounded-circle review-image" src="{% static 'images/n_t_killingley_ltd_logo.jpg' %}"  alt="">
                                     <div class="ms-3">
                                         <h5 class="review-name">
-                                            <a href="#">BidStats</a>
+                                            <a href="https://www.killingley.co.uk/">Killingley</a>
                                         </h5>
                                         <small class="review-title">Procurement Director</small>
                                     </div>
@@ -354,88 +346,49 @@
             <div class="row">
                 <div class="col-12 text-center" data-aos="fade-down" data-aos-delay="150">
                     <div class="section-title">
-                        <h1 class="display-4 fw-semibold">Our Sectors</h1>
+                        <h1 class="display-4 fw-semibold">Built for <span class="text-brand">you.</span></h1>
                         <div class="line"></div>
-                        <p>Enhancing bidding efficiency across multiple sectors.</p>
+                        <p>Designed by bid writers to seamlessly fit into your way of working.</p>
                     </div>
                 </div>
             </div>
             <div class="row g-4 text-center">
 
                 <!-- Business Intelligence -->
-                <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="350">
-                    <div class="service theme-shadow p-lg-5 p-4 rounded">
+                <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="200">
+                    <div class="service theme-shadow p-lg-5 p-3 rounded">
                         <div class="iconbox">
-                            <i class="ri-building-2-fill"></i> <!-- Icon Placeholder -->
+                            <i class="ri-file-word-2-fill"></i> <!-- Icon Placeholder -->
                         </div>
-                        <h5 class="mt-4 mb-3">Construction and FM</h5>
-                        <p>Empower facility management and construction bidding with AI-driven insights and tailored responses.</p>
+                        <h5 class="mt-4 mb-3">Microsoft Compatible</h5>
+                        <p>Our Word Pane integrates with Microsoft Word to enhance your bid writing process, ensuring consistency and efficiency across your organisation.</p>
 
-                        <a href="{% url 'facilitymanagement' %}" class="button me-2">Learn More</a>
+                        <a href="https://calendly.com/sam-od9g/mytender-io-training-call" class="button me-2">Learn More</a>
                     </div>
                 </div>
                 <!-- Data-Driven Market Research -->
-                <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="150">
-                    <div class="service theme-shadow p-lg-5 p-4 rounded">
-                        <div class="iconbox">
-                            <i class="ri-cloud-fill"></i>
-                        </div>
-                        <h5 class="mt-4 mb-3">IT Services</h5>
-                        <p>Leverage advanced AI and centralised data management to streamline the IT services bidding process.</p>
-                        <a href="{% url 'ITservices' %}" class="button me-2">Learn More</a>
-
-                    </div>
-                </div>
-
-                <!-- AI Procurement Services -->
                 <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="250">
-                    <div class="service theme-shadow p-lg-5 p-4 rounded">
+                    <div class="service theme-shadow p-lg-5 p-3 rounded">
                         <div class="iconbox">
-                            <i class="ri-bank-fill"></i> <!-- Icon Placeholder -->
+                            <i class="ri-team-fill"></i>
                         </div>
-                        <h5 class="mt-4 mb-3">Financial Services</h5>
-                        <p>Enhance the financial services bidding process with secure cloud technologies and data processing.</p>
+                        <h5 class="mt-4 mb-3">Collaborative working</h5>
+                        <p>Boot your productivity. Our platform allows multiple users to contribute to and refine bids in real-time, allowing your team to work together effectively. </p>
+                        <a href="https://calendly.com/sam-od9g/mytender-io-training-call" class="button me-2">Learn More</a>
 
-                        <a href="{% url 'financialservices' %}" class="button me-2">Learn More</a>
                     </div>
                 </div>
-
-                
 
                 <!-- Language Engines -->
-                <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="450">
-                    <div class="service theme-shadow p-lg-5 p-4 rounded">
+                <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="350">
+                    <div class="service theme-shadow p-lg-5 p-3 rounded">
                         <div class="iconbox">
-                            <i class="ri-dossier-fill"></i> <!-- Icon Placeholder -->
+                            <i class="ri-list-check"></i>
                         </div>
-                        <h5 class="mt-4 mb-3">Healthcare</h5>
-                        <p>Optimise healthcare and pharmaceutical bid processes with AI powered contextual data inputs.</p>
-                        <a href="{% url 'healthcare' %}" class="button me-2">Learn More</a>
+                        <h5 class="mt-4 mb-3">Compliance and Quality Support</h5>
+                        <p>Ensure bid compliance and maintain high standards as our AI extracts requirements from your documents, reducing risks and increasing success.</p>
+                        <a href="https://calendly.com/sam-od9g/mytender-io-training-call"class="button me-2">Learn More</a>
 
-                    </div>
-                </div>
-
-                <!-- AI Recruitment Agency -->
-                <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="550">
-                    <div class="service theme-shadow p-lg-5 p-4 rounded">
-                        <div class="iconbox">
-                            <i class="ri-router-fill"></i> <!-- Icon Placeholder -->
-                        </div>
-                        <h5 class="mt-4 mb-3">Data Centres and Telecoms</h5>
-                        <p>Streamline the bid process for data centre and telecom sectors with tailored proposals. </p>
-                        <a href="{% url 'telecoms' %}" class="button me-2">Learn More</a>
-                    </div>
-                </div>
-
-                <!-- AI Consulting -->
-                <div class="col-lg-4 col-sm-6" data-aos="fade-down" data-aos-delay="650">
-                    <div class="service theme-shadow p-lg-5 p-4 rounded">
-                        <div class="iconbox">
-                            <i class="ri-building-fill"></i> <!-- Icon Placeholder -->
-                        </div>
-                        <h5 class="mt-4 mb-3">Public Sector Vendors</h5>
-                        <p>Enhance public sector bidding processes with AI powered proposals and large-scale information retrieval.</p>
-                        <a href="{% url 'publicsector' %}" class="button me-2">Learn More</a>
                     </div>
                 </div>
             </div>
@@ -447,7 +400,7 @@
             <div class="row">
                 <div class="col-12 text-center">
                     <div class="section-title">
-                        <h1 class="display-4 fw-semibold">Partners, Clients & Engineers</h1>
+                        <h1 class="display-4 fw-semibold">Partners and Sponsors</h1>
                         
                         <div class="line"></div>
                         <p>We are pleased to support or have been supported by the following organisations:

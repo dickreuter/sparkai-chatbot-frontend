@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="stylesheet" href="{% static 'css/clash-display.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/slack-chat.css' %}">
+    <link rel="stylesheet" href="{% static 'css/demo.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.2/css/boxicons.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 
@@ -206,6 +208,12 @@
 
     {% block scripts %}
     {% endblock scripts %}
-
+    <div id="slackChatButton" class="message-box">
+        <a href="#" id="slackChatTrigger">
+            <i class="fas fa-comment"></i>
+            <span class="slack-message-count badge"></span>
+        </a>
+    </div>
+    
 </body>
 </html>

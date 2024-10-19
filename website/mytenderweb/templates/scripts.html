@@ -7,6 +7,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script src="{% static 'js/main.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="{% static 'js/slack-chat.js' %}"></script>
 
 
 <script>
@@ -34,6 +36,32 @@
     document.querySelectorAll('#right-click').forEach(function(element) {
         element.addEventListener('click', function() {
             swiper.slideNext();
+        });
+    });
+
+    $(document).ready(function() {
+        $('#slackChatTrigger').slackChat({
+            apiToken: '',
+            channelId: 'C07SET7DVRS',
+            user: 'Website Visitor',
+            userLink: '',
+            userImg: '',
+            userId: '',
+            defaultSysUser: 'Support',
+            defaultSysImg: '{% static "images/mytender.io_badge3.png" %}',
+            botUser: 'Website Bot',
+            chatBoxHeader: "Live Chat",
+            slackColor: "#36a64f",
+            defaultInvitedUsers: ["U01234567", "U07654321"],
+            messageFetchCount: 100,
+            queryInterval: 3000,
+            windowColor: "#fafafa",
+            borderColor: "#d0d0d0",
+            headerBgColor: "#36a64f",
+            headerFontColor: "#ffffff",
+            boxWidth: "350px",
+            boxHeight: "500px",
+            badgeElement: '.slack-message-count'
         });
     });
 </script>

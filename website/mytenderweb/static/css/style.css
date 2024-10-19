@@ -241,27 +241,6 @@ a:hover {
 
 /* Media query for larger screens */
 
-@media (min-width: 1200px) {
-    #hero .container-fluid {
-        margin-top: -4% !important;
-    }
-}
-
-@media (max-width: 450px) {
-    h1.display-2 {
-        font-size: 1.6rem !important;
-        /* Reduced font size for small screens */
-    }
-    #hero h4 {
-        font-size: 1.2rem !important;
-        word-break: normal !important;
-        white-space: normal;
-    }
-    #hero .container-fluid {
-        margin-top: -40% !important;
-    }
-}
-
 .small-video {
     width: 100% !important;
     height: auto !important;
@@ -281,15 +260,7 @@ a:hover {
         font-size: 1.9rem !important;
         /* Reduced font size for small screens */
     }
-    #hero h4 {
-        font-size: 1.1rem !important;
-        word-break: normal !important;
-        white-space: normal;
-        /* You can also use a specific size like 16px */
-    }
 }
-
-.display-subheading {}
 
 
 /* BTN */
@@ -350,16 +321,103 @@ a:hover {
 
 /* HERO */
 
+@media (max-width: 450px) {
+    h1.display-2 {
+        font-size: 2.1rem !important;
+        /* Reduced font size for small screens */
+    }
+    #hero p {}
+    #hero {
+        max-height: 50vh !important;
+        padding-top: 200px !important;
+        padding-bottom: 0px !important;
+    }
+    .hero-contents {
+        margin-bottom: 2rem !important;
+        /* Add space between content and video */
+    }
+    .video-container {
+        margin: 0 !important;
+        /* Increase top margin */
+    }
+}
+
+#hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow: visible;
+    padding: 5rem 0;
+    /* Add padding to top and bottom */
+}
+
+.hero-contents {
+    margin-bottom: 4rem;
+    /* Add space between content and video */
+}
+
 #hero .bg-image {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    background: url('../images/orangehero.jpg');
-    background-position: center;
+    background: url('../images/orangehero.jpg') no-repeat center center;
     background-size: cover;
     z-index: -1;
+}
+
+#hero h1 {
+    font-size: 3.5rem;
+    /* Adjust base font size */
+    margin-bottom: 1rem;
+}
+
+#hero p {
+    margin-bottom: 1.5rem;
+}
+
+.video-container {
+    width: 100%;
+    max-width: 920px;
+    margin: 3rem auto 0;
+    /* Increase top margin */
+}
+
+.video-frame {
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+    /* 16:9 Aspect Ratio */
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.video-frame iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.video-frame::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    border-radius: 18px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 #heroservices .services-bg-image-it {
@@ -426,11 +484,6 @@ a:hover {
     position: relative;
     height: 250px;
     /* Adjust based on your needs */
-}
-
-#hero {
-    position: relative;
-    overflow: hidden;
 }
 
 .text-brand {
@@ -541,7 +594,7 @@ a:hover {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 350px;
+    height: 380px;
     /* Adjust this height as necessary */
 }
 
@@ -645,6 +698,7 @@ a:hover {
     display: flex;
     flex-direction: column;
     position: relative;
+    padding-bottom: 20px;
 }
 
 .review-head::after {
@@ -674,6 +728,7 @@ a:hover {
 .review-person {
     margin-top: auto;
     margin-left: 10px;
+    margin-bottom: 20px;
 }
 
 .review-image {

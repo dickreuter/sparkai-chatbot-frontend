@@ -356,7 +356,7 @@ a:hover {
 }
 
 .hero-contents {
-    margin-bottom: 4rem;
+    margin-bottom: 2rem;
     /* Add space between content and video */
 }
 
@@ -384,40 +384,20 @@ a:hover {
 .video-container {
     width: 100%;
     max-width: 920px;
-    margin: 3rem auto 0;
-    /* Increase top margin */
+    margin: 2rem auto 0;
 }
 
 .video-frame {
     width: 100%;
-    height: 0;
-    padding-bottom: 56.25%;
-    /* 16:9 Aspect Ratio */
     position: relative;
     overflow: hidden;
     border-radius: 18px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
-.video-frame iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
+.video-frame video {
+    display: block;
     width: 100%;
-    height: 100%;
-    border: none;
-}
-
-.video-frame::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    border-radius: 18px;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    height: auto;
 }
 
 #heroservices .services-bg-image-it {
@@ -1355,18 +1335,6 @@ footer .line {
 
 .card .checkout-form {
     margin-top: auto;
-}
-
-.video-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    max-width: 800px;
-    min-height: 500px;
-    /* Max width for 720p */
-    margin: 0 auto;
-    margin-top: -30px;
-    padding: 0;
 }
 
 .video-container iframe {

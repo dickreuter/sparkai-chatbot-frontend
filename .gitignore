@@ -517,3 +517,4 @@ db/
 .env.*
 .idea
 website/local/settings.dev.py
+website/mytenderweb/static/videos/landingfinal.mp4

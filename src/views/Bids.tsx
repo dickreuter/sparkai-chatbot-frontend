@@ -159,7 +159,7 @@ const Bids = () => {
                     if (error.response.status === 403) {
                         displayAlert("Only admins can delete bids. You don't have permission to delete this bid", 'danger');
                     } else if (error.response.status === 404) {
-                        displayAlert('Bid not found', 'error');
+                        displayAlert('Bid not found', 'danger');
                     } else {
                         displayAlert(`Error: ${error.response.data.detail || 'Failed to delete bid'}`, 'danger');
                     }
@@ -242,8 +242,8 @@ const Bids = () => {
             displayAlert('Bid name cannot be empty', 'danger');
             return;
         }
-        if (bidName.length > 40) {
-            displayAlert('Bid name cannot exceed 40 characters', 'danger');
+        if (bidName.length > 50) {
+            displayAlert('Bid name cannot exceed 50 characters', 'danger');
             return;
         }
         if (bids.some(bid => bid.bid_title === bidName)) {
@@ -402,11 +402,11 @@ const Bids = () => {
                         value={bidName}
                         onChange={(e) => setBidName(e.target.value)}
                         placeholder="Enter tender name"
-                        maxLength={40}
+                        maxLength={50}
                         className="form-control"
                     />
-                    <Button 
-                        type="submit" 
+                    <Button
+                        type="submit"
                        className="search-button"
                     >
                         Submit

@@ -20,6 +20,8 @@
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     box-shadow: none;
+    padding-right: 90px;
+    /* Adjust this value based on your button width */
 }
 
 .search-input-group .form-control:focus {

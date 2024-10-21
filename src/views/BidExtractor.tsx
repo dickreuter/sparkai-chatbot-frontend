@@ -37,7 +37,7 @@ const BidExtractor = () => {
     object_id
   } = sharedState;
 
-  const CHARACTER_LIMIT = 40;
+  const CHARACTER_LIMIT = 50;
 
   const location = useLocation();
   const bidData = location.state?.bid || '';

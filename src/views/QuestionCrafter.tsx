@@ -1128,18 +1128,28 @@ useEffect(() => {
    
     let newContentState = contentState;
    
+    // Pattern to match [Extracted...] sections
+    const pattern = /\[(?=.*Extracted).*?\]/g;
+   
     blockMap.forEach((block) => {
       const text = block.getText();
       const key = block.getKey();
      
-      // Pattern to match [Extracted...] sections
-      const pattern = /\[(?=.*Extracted).*?\]/g;
+      let match;
+      let lastIndex = 0;
+      const ranges = [];
      
-      let matchArray;
-      while ((matchArray = pattern.exec(text)) !== null) {
-        const start = matchArray.index;
-        const end = start + matchArray[0].length;
-       
+      // Find all matches in the current block
+      while ((match = pattern.exec(text)) !== null) {
+        ranges.push({
+          start: match.index,
+          end: pattern.lastIndex
+        });
+      }
+     
+      // Remove ranges in reverse order to maintain correct indices
+      for (let i = ranges.length - 1; i >= 0; i--) {
+        const { start, end } = ranges[i];
         const selectionState = SelectionState.createEmpty(key).merge({
           anchorOffset: start,
           focusOffset: end,

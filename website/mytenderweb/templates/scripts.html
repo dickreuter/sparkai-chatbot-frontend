@@ -1,54 +1,80 @@
 {% load static %}
 
+<!-- Third-party scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-<script src="{% static 'js/main.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Your other scripts -->
+<script src="{% static 'js/main.js' %}"></script>
 <script src="{% static 'js/slack-chat.js' %}"></script>
 
-
+<!-- Main initialization and non-module functions -->
 <script>
-    var swiper = new Swiper('.swiper-container', {
-        slidesPerView: 1,
-        spaceBetween: 30,
-        loop: true,
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        autoplay: {
-            delay: 20000,
-            disableOnInteraction: false,
-        },
-    });
-
-    // Add click event listeners for left and right navigation
-    document.querySelectorAll('#left-click').forEach(function(element) {
-        element.addEventListener('click', function() {
-            swiper.slidePrev();
+    function handleIntersection(entries, observer) {
+        console.log('Intersection Observer callback fired');
+        entries.forEach(entry => {
+            console.log('Entry intersection status:', entry.isIntersecting);
+            if (entry.isIntersecting) {
+                const counters = entry.target.querySelectorAll('.counter-value');
+                console.log('Found counter elements:', counters.length);
+                counters.forEach(counter => {
+                    console.log('Counter element:', counter);
+                    console.log('Counter data-count:', counter.getAttribute('data-count'));
+                    if (window.startCounter) {
+                        console.log('startCounter function exists');
+                        window.startCounter(counter);
+                    } else {
+                        console.error('startCounter function not found on window object');
+                    }
+                });
+                observer.unobserve(entry.target);
+            }
         });
-    });
+    }
 
-    document.querySelectorAll('#right-click').forEach(function(element) {
-        element.addEventListener('click', function() {
-            swiper.slideNext();
+    function initializeSwiper() {
+        return new Swiper('.swiper-container', {
+            slidesPerView: 1,
+            spaceBetween: 30,
+            loop: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            autoplay: {
+                delay: 20000,
+                disableOnInteraction: false,
+            },
         });
-    });
+    }
 
-    $(document).ready(function() {
+    function setupSwiperNavigation(swiper) {
+        document.querySelectorAll('#left-click').forEach(element => {
+            element.addEventListener('click', () => swiper.slidePrev());
+        });
+
+        document.querySelectorAll('#right-click').forEach(element => {
+            element.addEventListener('click', () => swiper.slideNext());
+        });
+    }
+
+    function initializeSlackChat() {
+        if (typeof $.fn.slackChat !== 'function') {
+            console.error('SlackChat plugin is not loaded');
+            return;
+        }
+
         $('#slackChatTrigger').slackChat({
-            apiToken: '',
+            apiToken: 'aaaa',
             channelId: 'C07SET7DVRS',
             user: 'Website Visitor',
-            userLink: '',
-            userImg: '',
-            userId: '',
             defaultSysUser: 'Support',
-            defaultSysImg: '{% static "images/mytender.io_badge3.png" %}',
+            defaultSysImg: '',
             botUser: 'Website Bot',
             chatBoxHeader: "Live Chat",
             slackColor: "#36a64f",
@@ -63,5 +89,68 @@
             boxHeight: "500px",
             badgeElement: '.slack-message-count'
         });
+    }
+
+    // Main initialization
+    // Main initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM Content Loaded');
+        
+        const swiper = initializeSwiper();
+        setupSwiperNavigation(swiper);
+        initializeSlackChat();
+
+        const observer = new IntersectionObserver(handleIntersection, {
+            threshold: 0.1,
+            rootMargin: '50px'
+        });
+
+        const counterSection = document.getElementById('counter');
+        console.log('Counter section found:', counterSection);
+        
+        if (counterSection) {
+            observer.observe(counterSection);
+            console.log('Observer started watching counter section');
+            
+            // Debug: Check if section is already visible
+            const rect = counterSection.getBoundingClientRect();
+            console.log('Counter section position:', rect);
+            console.log('Window height:', window.innerHeight);
+            console.log('Is counter already in viewport:', rect.top < window.innerHeight);
+        }
     });
+</script>
+
+<!-- CountUp module implementation -->
+<script type="module">
+    import { CountUp } from "{% static 'js/countUp.js' %}";
+    
+    console.log('CountUp module loaded');
+    
+    window.startCounter = function(element) {
+        console.log('startCounter called for element:', element);
+        const target = parseInt(element.getAttribute('data-count'));
+        console.log('Target value:', target);
+        
+        const options = {
+            startVal: 0,
+            duration: 2.5,
+            useEasing: true,
+            useGrouping: true,
+            separator: ",",
+            decimal: "."
+        };
+
+        console.log('Creating CountUp instance with options:', options);
+        const countUp = new CountUp(element, target, options);
+
+        if (!countUp.error) {
+            console.log('Starting counter animation');
+            countUp.start();
+        } else {
+            console.error('CountUp error:', countUp.error);
+        }
+    }
+    
+    console.log('startCounter function added to window object');
 </script>

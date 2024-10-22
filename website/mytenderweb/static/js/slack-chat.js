@@ -20,7 +20,6 @@
                         queryInterval: 3000,
                         chatBoxHeader: "Need help? Talk to our support team right here",
                         slackColor: "#36a64f",
-                        s
                         messageFetchCount: 100,
                         botUser: '',
                         sendOnEnter: true,

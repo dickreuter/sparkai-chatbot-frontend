@@ -642,8 +642,14 @@ a:hover {
 /* COUNTER */
 
 #counter {
-    background: black;
+    background: linear-gradient(rgba(var(--c-brand-rgb), 0.8), rgba(var(--c-brand-rgb), 0.8)), url('../images/itservices.jpg');
+    background-position: center;
     background-size: cover;
+}
+
+.counter-value {
+    font-weight: bold;
+    display: inline-block;
 }
 
 

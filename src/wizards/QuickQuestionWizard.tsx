@@ -12,7 +12,7 @@ const QuickQuestionWizard = () => {
     {
       elementId: 'welcome',
       title: 'Quick Question',
-      description: 'Welcome to the Q/A chat. This is your go-to spot for asking questions about your Content Library. Fire away!',
+      description: 'Welcome to the Q&A chat. This is your go-to spot for asking questions about your Content Library. Fire away!',
     },
     {
         elementId: 'clear',

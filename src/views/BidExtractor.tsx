@@ -37,7 +37,7 @@ const BidExtractor = () => {
     object_id
   } = sharedState;
 
-  const CHARACTER_LIMIT = 50;
+  const CHARACTER_LIMIT = 80;
 
   const location = useLocation();
   const bidData = location.state?.bid || '';
@@ -299,7 +299,7 @@ const BidExtractor = () => {
           : EditorState.createEmpty(),
         type: doc.type || 'qa sheet' // Use the type from the document, default to 'qa sheet' if not present
       })) || [{ 
-        name: 'Q/A Sheet', 
+        name: 'Q&A Sheet', 
         editorState: EditorState.createEmpty(), 
         type: 'qa sheet' 
       }];
@@ -359,22 +359,78 @@ const BidExtractor = () => {
       bidNameRef.current.innerText = bidInfo;
     }
   }, [bidInfo]);
-
   const handleBidNameChange = (e) => {
+    const span = bidNameRef.current;
+    const wrapper = span.parentElement;
+    
+    // Create a hidden span to measure text width
+    const measurer = document.createElement('span');
+    measurer.style.visibility = 'hidden';
+    measurer.style.position = 'absolute';
+    measurer.style.whiteSpace = 'nowrap';
+    measurer.style.font = window.getComputedStyle(span).font;
+    document.body.appendChild(measurer);
+    
+    // Get available width (container width minus padding)
+    const availableWidth = wrapper.offsetWidth ; // 20px padding on each side
+    
+    // Get the new text content
     const newText = e.target.innerText.replace(/\n/g, '');
-    if (newText.length <= CHARACTER_LIMIT) {
-      bidNameTempRef.current = newText;
+    measurer.textContent = newText;
+    
+    // Check if text would be truncated
+    if (measurer.offsetWidth > availableWidth) {
+        // Text would be truncated, prevent change
+        e.preventDefault();
+        // Restore previous text
+        e.target.innerText = bidNameTempRef.current;
+        // Set cursor to end
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(e.target);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
     } else {
-      e.target.innerText = bidNameTempRef.current;
-      displayAlert(`Bid name cannot exceed ${CHARACTER_LIMIT} characters`, 'warning');
+        // Text fits, update the ref
+        bidNameTempRef.current = newText;
     }
-  };
+    
+    document.body.removeChild(measurer);
+};
 
-  const handleKeyDown = (e) => {
+const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      e.preventDefault();
+        e.preventDefault();
+        return;
     }
-  };
+    
+    // Create a hidden span to measure what text width would be after keypress
+    const span = bidNameRef.current;
+    const wrapper = span.parentElement;
+    const measurer = document.createElement('span');
+    measurer.style.visibility = 'hidden';
+    measurer.style.position = 'absolute';
+    measurer.style.whiteSpace = 'nowrap';
+    measurer.style.font = window.getComputedStyle(span).font;
+    document.body.appendChild(measurer);
+    
+    const availableWidth = wrapper.offsetWidth ; // 20px padding on each side
+    
+    // Simulate the text after the keypress
+    let newText = span.innerText;
+    if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key) && e.key.length === 1) {
+        newText += e.key;
+    }
+    measurer.textContent = newText;
+    
+    // If text would be truncated, prevent typing
+    if (measurer.offsetWidth > availableWidth && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) {
+        e.preventDefault();
+    }
+    
+    document.body.removeChild(measurer);
+};
 
   const toggleEditing = () => {
     if (!canUserEdit) {
@@ -423,22 +479,27 @@ const BidExtractor = () => {
   const handleBlur = () => {
     const newBidName = bidNameTempRef.current.trim();
     if (!newBidName) {
-      displayAlert('Bid name cannot be empty', 'warning');
-      bidNameRef.current.innerText = bidInfo; // Revert to the previous valid bid name
-      return;
+        displayAlert('Bid name cannot be empty', 'warning');
+        bidNameRef.current.innerText = bidInfo;
+        return;
     }
     if (existingBidNames.includes(newBidName) && newBidName !== contextBidInfo) {
-      displayAlert('Bid name already exists', 'warning');
-      bidNameRef.current.innerText = bidInfo; // Revert to the previous valid bid name
-      return;
+        displayAlert('Bid name already exists', 'warning');
+        bidNameRef.current.innerText = bidInfo;
+        return;
     }
+
+    // Ensure text starts from the beginning
+    if (bidNameRef.current) {
+        bidNameRef.current.scrollLeft = 0;
+    }
+
     setSharedState(prevState => ({
-      ...prevState,
-      bidInfo: newBidName
+        ...prevState,
+        bidInfo: newBidName
     }));
     setIsEditing(false);
-  };
-  
+};
   
 
   useEffect(() => {
@@ -607,25 +668,26 @@ const BidExtractor = () => {
       <div className="lib-container" >
         <div className="scroll-container">
         <BidNavbar  />
-        <div className="proposal-header">
-          <h1 className='heavy'  id="proposal-header"  >
-            <span
-             contentEditable={isEditing && canUserEdit}
+        <div className="bidname-header">
+    <h1>
+        <div className="bidname-wrapper" onClick={canUserEdit ? () => setIsEditing(true) : showViewOnlyMessage}>
+        <span
+              contentEditable={isEditing && canUserEdit}
               suppressContentEditableWarning={true}
               onBlur={handleBlur}
               onInput={handleBidNameChange}
               onKeyDown={handleKeyDown}
               className={isEditing ? 'editable' : ''}
               ref={bidNameRef}
-            >
+              spellCheck="false"
+              style={{ WebkitTextFillColor: 'currentColor' }}
+          >
               {bidInfo}
-            </span>
-            <button className="edit-tag" onClick={toggleEditing}>
-              edit
-            </button>
-          </h1>
-         
-          </div >
+          </span>
+        </div>
+    </h1>
+</div>
+
         <div>
         <div className="input-container mt-3">
         <Row className="no-gutters mx-n2">

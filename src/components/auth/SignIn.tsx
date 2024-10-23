@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import './Signin.css';
-import { Alert, Button, Snackbar, TextField, Modal } from '@mui/material';
+import { Alert, Button, Snackbar, TextField, Modal, Tooltip, IconButton } from '@mui/material';
 import useAuthSignIn from './UseAuthsignIn';
 import AuthState from './AuthState';
 import axios from 'axios';
+import InfoIcon from '@mui/icons-material/Info';
 import { API_URL, HTTP_PREFIX } from '../../helper/Constants';
 
 const FullScreenTwoCards = () => {
@@ -73,8 +74,29 @@ const FullScreenTwoCards = () => {
   return (
     <div className="cards-container">
       <div className="cardmini">
-        <div className="cardmini-text">
-          <h2>Login</h2>
+      <div className="cardmini-text">
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '8px',
+        marginBottom: '20px' // Add spacing below the header + icon
+      }}>
+        <h2 style={{ margin: 0 }}>Login</h2> {/* Remove default margin from h2 */}
+        <Tooltip title="Disclaimer: Answers generated with AI should always be checked for accuracy, we view our platform as a tool to create amazing proposals, but with the guidance of a human!" arrow>
+          <IconButton 
+            size="small" 
+            style={{ 
+              padding: 0,
+               // Fine-tune vertical alignment with the header
+            }}
+          >
+            <InfoIcon 
+              fontSize="small" 
+              color="action"
+            />
+          </IconButton>
+        </Tooltip>
+      </div>
 
           <div className="input-field">
             <TextField

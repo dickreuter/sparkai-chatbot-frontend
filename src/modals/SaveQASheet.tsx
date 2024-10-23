@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import SheetSelector from '../components/SheetSelector';
 import { BidContext } from "../views/BidWritingStateManagerView.tsx";
 import "./SaveQASheet.css";
@@ -12,11 +12,30 @@ const SaveQASheet = ({ inputText, responseEditorState }: { inputText: string, re
   const [selectedSheet, setSelectedSheet] = useState(null);
   const { sharedState, setSharedState } = useContext(BidContext);
   const [saveButtonState, setSaveButtonState] = useState('default');
+  const [isCreatingNewSheet, setIsCreatingNewSheet] = useState(false);
 
   const handleShow = () => setShow(true);
   const handleClose = () => {
     setShow(false);
     setSelectedSheet(null);
+    setIsCreatingNewSheet(false);
+  };
+
+  const createNewSheet = (sheetName: string) => {
+    const newEditorState = EditorState.createEmpty();
+    const newDoc = {
+      name: sheetName,
+      editorState: newEditorState,
+      type: 'qa sheet'
+    };
+
+    setSharedState(prevState => ({
+      ...prevState,
+      documents: [...prevState.documents, newDoc]
+    }));
+    
+    setSelectedSheet(sheetName);
+    setIsCreatingNewSheet(false);
   };
 
   const handleSave = () => {
@@ -82,7 +101,6 @@ const SaveQASheet = ({ inputText, responseEditorState }: { inputText: string, re
           <Button 
             className="upload-button mt-2" 
             style={{backgroundColor: "green", borderColor: "green"}}
-  
           >
             Saved <FontAwesomeIcon icon={faCheckCircle} style={{marginLeft: "5px"}}/>
           </Button>
@@ -118,10 +136,27 @@ const SaveQASheet = ({ inputText, responseEditorState }: { inputText: string, re
               inputText={inputText}
               responseEditorState={responseEditorState}
               onSelectSheet={handleSelectSheet}
+              isCreatingNewSheet={isCreatingNewSheet}
+              onCreateNewSheet={createNewSheet}
+              onCancelNewSheet={() => setIsCreatingNewSheet(false)}
             />
           </div>
         </Modal.Body>
         <Modal.Footer>
+          <Button
+            variant="outline-primary"
+            onClick={() => setIsCreatingNewSheet(true)}
+            style={{
+              fontSize: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px"
+            }}
+            disabled={isCreatingNewSheet}
+          >
+            <FontAwesomeIcon icon={faCirclePlus} />
+            New Sheet
+          </Button>
           <Button
             className='upload-button'
             onClick={handleSave}

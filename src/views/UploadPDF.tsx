@@ -115,7 +115,7 @@ const UploadPDF = ({ folder, get_collections, onClose, usingTenderLibrary }) => 
 
     return (
         <div>
-            <p>Upload previous bids here for the AI to use as context in the Q&A Generator.</p>
+            <p>Upload previous bids here for the AI to use as context in the Q&A Generator. This might take a while for large documents because we need to convert the documents into a format the AI can understand so sit tight!</p>
             <div 
                 className={`drop-zone ${dragActive ? 'active' : ''}`}
                 onDragEnter={handleDrag}

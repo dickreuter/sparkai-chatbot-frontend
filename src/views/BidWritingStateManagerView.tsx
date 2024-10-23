@@ -64,7 +64,7 @@ const defaultState: BidContextType = {
     isLoading: false,
     saveSuccess: null,
     object_id: null,
-    documents: [{ name: 'Q/A Sheet', editorState: EditorState.createEmpty(), type: 'qa sheet' }],
+    documents: [{ name: 'Q&A Sheet', editorState: EditorState.createEmpty(), type: 'qa sheet' }],
     currentDocumentIndex: 0,
   },
   setSharedState: () => {},

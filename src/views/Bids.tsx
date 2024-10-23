@@ -9,7 +9,7 @@ import SideBarSmall from '../routes/SidebarSmall.tsx' ;
 import handleGAEvent from '../utilities/handleGAEvent.tsx';
 import { Button, Form, Modal, Pagination } from 'react-bootstrap';
 import { displayAlert } from '../helper/Alert.tsx';
-import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSort, faSortDown, faSortUp, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Select, MenuItem, FormControl, Skeleton } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -22,7 +22,6 @@ const Bids = () => {
     const [bidName, setBidName] = useState('');
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [bidToDelete, setBidToDelete] = useState(null);
-    const [sortCriteria, setSortCriteria] = useState('lastEdited'); // New state for sorting criteria
     const [loading, setLoading] = useState(true);
     const getAuth = useAuthUser();
     const auth = getAuth();
@@ -30,26 +29,65 @@ const Bids = () => {
     const navigate = useNavigate();
 
     // Sorting bids based on the selected criteria
-    const sortedBids = [...bids].sort((a, b) => {
-        const dateA = new Date(a.submission_deadline);
-        const dateB = new Date(b.submission_deadline);
-
-        if (sortCriteria === 'lastEdited') {
-            return new Date(b.timestamp) - new Date(a.timestamp);
-        } else if (sortCriteria === 'submissionDeadline') {
-            // Handle invalid dates
-            if (isNaN(dateA) && isNaN(dateB)) {
-                return 0;
-            } else if (isNaN(dateA)) {
-                return 1;
-            } else if (isNaN(dateB)) {
-                return -1;
-            } else {
-                return dateA - dateB;
-            }
-        }
-        return 0;
+    const [sortConfig, setSortConfig] = useState({
+        key: 'timestamp',
+        direction: 'desc'
     });
+
+    // Sorting function for all columns
+    const sortData = (data, sortConfig) => {
+        const sortedData = [...data].sort((a, b) => {
+            if (!a[sortConfig.key] && !b[sortConfig.key]) return 0;
+            if (!a[sortConfig.key]) return 1;
+            if (!b[sortConfig.key]) return -1;
+
+            let comparison = 0;
+            switch (sortConfig.key) {
+                case 'timestamp':
+                case 'submission_deadline':
+                    comparison = new Date(a[sortConfig.key]) - new Date(b[sortConfig.key]);
+                    break;
+                case 'status':
+                    comparison = a[sortConfig.key].toLowerCase().localeCompare(b[sortConfig.key].toLowerCase());
+                    break;
+                default:
+                    comparison = String(a[sortConfig.key]).toLowerCase().localeCompare(String(b[sortConfig.key]).toLowerCase());
+            }
+            return sortConfig.direction === 'asc' ? comparison : -comparison;
+        });
+        return sortedData;
+    };
+
+    const requestSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIcon = (columnKey) => {
+        if (sortConfig.key !== columnKey) {
+            return <FontAwesomeIcon icon={faSort}  />;
+        }
+        return sortConfig.direction === 'asc' 
+            ? <FontAwesomeIcon icon={faSortUp}  />
+            : <FontAwesomeIcon icon={faSortDown} />;
+    };
+
+    // Update the table header to include sorting
+    const headers = [
+        { key: 'bid_title', label: 'Tender Name', width: '20%' },
+        { key: 'timestamp', label: 'Last edited' },
+        { key: 'status', label: 'Status' },
+        { key: 'client_name', label: 'Client' },
+        { key: 'submission_deadline', label: 'Deadline', width: '10%' },
+        { key: 'bid_manager', label: 'Bid Manager', width: '15%' },
+        { key: 'opportunity_owner', label: 'Opportunity Owner', width: '15%' }
+    ];
+
+    // Sort the bids before pagination
+    const sortedBids = sortData(bids, sortConfig);
 
     const [currentPage, setCurrentPage] = useState(1);
     const bidsPerPage = 11;
@@ -242,8 +280,8 @@ const Bids = () => {
             displayAlert('Bid name cannot be empty', 'danger');
             return;
         }
-        if (bidName.length > 50) {
-            displayAlert('Bid name cannot exceed 50 characters', 'danger');
+        if (bidName.length > 80) {
+            displayAlert('Bid name cannot exceed 80 characters', 'danger');
             return;
         }
         if (bids.some(bid => bid.bid_title === bidName)) {
@@ -287,17 +325,7 @@ const Bids = () => {
                 <h1 id="dashboard-title" className='heavy'>Dashboard</h1>
                     <div style={{display: 'flex'}}>
                     
-                    <div className="sort-options" id="sort-options">
-                        <Form.Select
-                            id="sort-select"
-                            value={sortCriteria}
-                            onChange={(e) => setSortCriteria(e.target.value)}
-                          
-                        >
-                            <option className='sort-select-option' value="lastEdited">Last Edited</option>
-                            <option className='sort-select-option' value="submissionDeadline">Submission Deadline</option>
-                        </Form.Select>
-                    </div>
+                   
                     <Button onClick={handleWriteProposalClick} className="upload-button" id="new-bid-button">
                         <FontAwesomeIcon icon={faPlus} style={{ marginRight: '8px' }} />
                         New Tender
@@ -311,70 +339,72 @@ const Bids = () => {
             
               
                 <table className="bids-table mt-1">
-                    <thead>
-                        <tr >
-                            <th style={{ width: "20%" }}>Tender Name</th>
-                            <th>Last edited</th>
-                            <th>Status</th>
-                            <th>Client</th>
-                            <th style={{ width: "10%" }}>Deadline</th>
-                            <th style={{ width: "15%" }}>Bid Manager</th>
-                            <th style={{ width: "15%" }}>Opportunity Owner</th>
-                            <th style={{ textAlign: "center", width: "5%" }}>Delete</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {loading ? (
-                                // Display skeleton rows while loading
-                                [...Array(13)].map((_, index) => (
-                                    <SkeletonRow key={index} />
-                                ))
-                            ) : (
-                       currentBids.map((bid, index) => (
+                <thead>
+                    <tr>
+                        {headers.map(header => (
+                            <th 
+                                key={header.key}
+                                style={{ width: header.width, cursor: 'pointer' }}
+                                onClick={() => requestSort(header.key)}
+                                className="sortable-header"
+                            >
+                                {header.label}
+                                {getSortIcon(header.key)}
+                            </th>
+                        ))}
+                        <th style={{ textAlign: "center", width: "5%" }}>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {loading ? (
+                        [...Array(13)].map((_, index) => (
+                            <SkeletonRow key={index} />
+                        ))
+                    ) : (
+                        currentBids.map((bid, index) => (
                             <tr key={index}>
                                 <td>
-                                    <Link to="/bid-extractor"  state={{ bid: bid, fromBidsTable: true }} onClick={() => navigateToChatbot(bid)}>
+                                    <Link 
+                                        to="/bid-extractor" 
+                                        state={{ bid: bid, fromBidsTable: true }}
+                                        onClick={() => navigateToChatbot(bid)}
+                                    >
                                         {bid.bid_title}
                                     </Link>
                                 </td>
-                                <td id='bids_table'>{bid.timestamp ? new Date(bid.timestamp).toLocaleDateString() : ''}</td>
+                                <td>{bid.timestamp ? new Date(bid.timestamp).toLocaleDateString() : ''}</td>
                                 <td>
                                     <FormControl fullWidth>
                                         <StyledSelect
-                                        id="status-dropdown"
-                                        value={bid.status.toLowerCase()}
-                                        onChange={(e) => updateBidStatus(bid._id, e.target.value)}
-                                        className={`status-dropdown ${bid.status.toLowerCase()}`}
+                                            value={bid.status.toLowerCase()}
+                                            onChange={(e) => updateBidStatus(bid._id, e.target.value)}
+                                            className={`status-dropdown ${bid.status.toLowerCase()}`}
                                         >
-                                        <StyledMenuItem value="ongoing">Ongoing</StyledMenuItem>
-                                        <StyledMenuItem value="complete">Complete</StyledMenuItem>
+                                            <StyledMenuItem value="ongoing">Ongoing</StyledMenuItem>
+                                            <StyledMenuItem value="complete">Complete</StyledMenuItem>
                                         </StyledSelect>
                                     </FormControl>
-                                    </td>
-
+                                </td>
                                 <td>{bid.client_name}</td>
                                 <td>
-                                    {bid.submission_deadline && !isNaN(new Date(bid.submission_deadline)) ? 
-                                        new Date(bid.submission_deadline).toLocaleDateString() : 
-                                        ''
-                                    }
+                                    {bid.submission_deadline && !isNaN(new Date(bid.submission_deadline)) 
+                                        ? new Date(bid.submission_deadline).toLocaleDateString() 
+                                        : ''}
                                 </td>
                                 <td>{bid.bid_manager}</td>
                                 <td>{bid.opportunity_owner}</td>
-                                 <td style={{ textAlign: "center" }}>
+                                <td style={{ textAlign: "center" }}>
                                     <FontAwesomeIcon
-                                        id="delete-bid-icon"
                                         icon={faTrash}
                                         onClick={() => handleDeleteClick(bid._id)}
-                                        style={{ cursor: 'pointer', justifyContent: 'center' }}
+                                        style={{ cursor: 'pointer' }}
                                     />
                                 </td>
                             </tr>
                         ))
-                        )}
-                    </tbody>
-                </table>
+                    )}
+                </tbody>
+            </table>
                 <div className="pagination-container" >
                     {[...Array(Math.ceil(sortedBids.length / bidsPerPage))].map((_, index) => (
                         <button
@@ -402,7 +432,7 @@ const Bids = () => {
                         value={bidName}
                         onChange={(e) => setBidName(e.target.value)}
                         placeholder="Enter tender name"
-                        maxLength={50}
+                        maxLength={80}
                         className="form-control"
                     />
                     <Button

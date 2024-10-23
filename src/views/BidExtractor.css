@@ -1,16 +1,58 @@
-/* BidExtractor.css */
+.bidname-header {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+    overflow: visible;
+}
 
-.editable:focus {
+.bidname-header h1 {
+    margin: 0;
+    padding: 0;
+    font-weight: 600;
+    position: relative;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+.bidname-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    cursor: pointer;
+}
+
+.bidname-header span {
+    display: block;
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+    direction: ltr;
+    color: #000;
+}
+
+.bidname-header .editable {
     outline: none;
 }
 
 .edit-tag {
+    position: relative;
     font-size: 14px;
     background: none;
     border: none;
-    color: blue;
+    color: #007bff;
     cursor: pointer;
-    transform: translate(-20%);
+    font-weight: 600;
+    padding: 4px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    /* Prevents button from shrinking */
+    margin-left: 8px;
 }
 
 .edit-tag:hover {

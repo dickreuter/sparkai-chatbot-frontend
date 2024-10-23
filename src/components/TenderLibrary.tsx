@@ -355,7 +355,7 @@ const TenderLibrary = ({ object_id }) => {
           <Modal.Title>Upload Files to Tender Library</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Documents uploaded to the Tender Library will be used as context by our AI to generate compliance requirements and opportunity information for the Tender.</p>
+          <p>Documents uploaded to the Tender Library will be used as context by our AI to generate compliance requirements and opportunity information for the Tender. </p>
           <div 
                     className={`drop-zone ${dragActive ? 'active' : ''}`}
                     onDragEnter={handleDrag}

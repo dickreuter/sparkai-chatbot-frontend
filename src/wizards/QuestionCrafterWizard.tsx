@@ -36,8 +36,8 @@ const QuestionCrafterWizard = () => {
     },
     {
       elementId: 'qa-sheet-selector',
-      title: 'Q/A Sheet',
-      description: 'Finished with the question? Select a Q/A sheet to add the question and answer to your bid compiler.',
+      title: 'Q&A Sheet',
+      description: 'Finished with the question? Select a Q&A sheet to add the question and answer to your bid compiler.',
       position: 'down'
     },
   ];

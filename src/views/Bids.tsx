@@ -106,9 +106,9 @@ const Bids = () => {
         { key: 'client_name', label: 'Client' },
         { key: 'submission_deadline', label: 'Deadline', width: '10%' },
         { key: 'bid_manager', label: 'Bid Manager', width: '15%' },
-        { key: 'opportunity_owner', label: 'Opportunity Owner', width: '15%' }
+        { key: 'opportunity_owner', label: 'Opportunity Owner', width: '15%' },
+        { key: 'bid_qualification_result', label: 'Result' }
     ];
-
     // Sort the bids before pagination
     const sortedBids = sortData(bids, sortConfig);
 
@@ -333,6 +333,7 @@ const Bids = () => {
             <td><Skeleton variant="text" width="100%" /></td>
             <td><Skeleton variant="text" width="100%" /></td>
             <td><Skeleton variant="text" width="100%" /></td>
+            <td><Skeleton variant="text" width="100%" /></td>
             <td style={{ textAlign: "center" }}><Skeleton variant="rounded" width={20} height={20} style={{ marginLeft: "22px"}}/></td>
         </tr>
     );
@@ -416,6 +417,7 @@ const Bids = () => {
                                 </td>
                                 <td>{bid.bid_manager}</td>
                                 <td>{bid.opportunity_owner}</td>
+                                <td>{bid.bid_qualification_result || ''}</td>
                                 <td style={{ textAlign: "center" }}>
                                     <FontAwesomeIcon
                                         icon={faTrash}

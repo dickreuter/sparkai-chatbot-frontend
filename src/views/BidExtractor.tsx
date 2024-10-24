@@ -13,7 +13,7 @@ import { EditorState, ContentState,  convertFromRaw, convertToRaw  } from 'draft
 import { displayAlert } from '../helper/Alert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { FormControl, InputLabel, Select } from "@mui/material";
+import { FormControl, InputLabel, Select, styled } from "@mui/material";
 import ContributorModal from "../components/ContributorModal.tsx";
 import { Snackbar } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -636,32 +636,67 @@ const handleKeyDown = (e) => {
 
 
 
-  const getPermissionDetails = (permission) => {
-    switch (permission) {
-      case 'admin':
-        return {
-          icon: faUsers,
-          text: 'Admin',
-          description: 'You have full access to edit and manage this proposal.'
-        };
-      case 'editor':
-        return {
-          icon: faEdit,
-          text: 'Editor',
-          description: 'You can edit this proposal but cannot change permissions.'
-        };
-      default:
-        return {
-          icon: faEye,
-          text: 'Viewer',
-          description: 'You can view this proposal but cannot make changes.'
-        };
+  const StyledSelect = styled(Select)(({ theme }) => ({
+    height: '38px',
+    padding: '0 8px',
+    backgroundColor: 'white',
+    border: 'none',
+    outline: 'none',
+    boxShadow: 'none',
+    fontFamily: '"ClashDisplay", sans-serif',
+    fontSize: '14px',
+    '& .MuiOutlinedInput-notchedOutline': {
+      border: 'none'
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      border: 'none'
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      border: 'none'
+    },
+    '&.MuiOutlinedInput-root': {
+      border: 'none',
+      backgroundColor: 'white'
+    },
+    '& .MuiSelect-select': {
+      fontFamily: '"ClashDisplay", sans-serif',
+      fontSize: '14px',
+      backgroundColor: 'white'
+    },
+    '&:hover': {
+      backgroundColor: 'white'
+    },
+    '&.Mui-focused': {
+      backgroundColor: 'white'
+    },
+    '& .MuiInputBase-input': {
+      backgroundColor: 'white'
+    },
+    // Remove underline
+    '&:before': {
+      borderBottom: 'none !important'
+    },
+    '&:after': {
+      borderBottom: 'none !important'
+    },
+    '&:hover:not(.Mui-disabled):before': {
+      borderBottom: 'none !important'
+    },
+    '& .MuiInput-underline:before': {
+      borderBottom: 'none !important'
+    },
+    '& .MuiInput-underline:after': {
+      borderBottom: 'none !important'
+    },
+    '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+      borderBottom: 'none !important'
     }
-  };
-
-  const permissionDetails = getPermissionDetails(currentUserPermission);
-
+  }));
   
+  const StyledMenuItem = styled(MenuItem)({
+    fontFamily: '"ClashDisplay", sans-serif',
+    fontSize: '14px'
+  });
   return (
     <div className="chatpage">
       <SideBarSmall />
@@ -766,16 +801,24 @@ const handleKeyDown = (e) => {
               <Col md={4} className="px-2">
                 <Card className="mb-4 same-height-card">
                   <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
-                    <h1 className="inputbox-title mb-0 mt-1">Bid Qualification Result:</h1>
+                    <h1 className="inputbox-title mb-0 mt-1">Bid Result:</h1>
                   </Card.Header>
                   <Card.Body className="py-0 pl-2" ref={bidQualificationResultRef}>
-                    <textarea
-                      className="form-control single-line-textarea"
-                      value={sharedState.bid_qualification_result}
-                      onChange={handleBidQualificationResultChange}
-                      onClick={handleDisabledClick}
-                      disabled={!canUserEdit}
-                    ></textarea>
+                    <FormControl fullWidth variant="standard">
+                      <StyledSelect
+                        value={sharedState.bid_qualification_result || ''}
+                        onChange={handleBidQualificationResultChange}
+                        onClick={handleDisabledClick}
+                        disabled={!canUserEdit}
+                        displayEmpty
+                      >
+                        <StyledMenuItem value="" disabled>
+                          <em>Select result...</em>
+                        </StyledMenuItem>
+                        <StyledMenuItem value="Win">Win</StyledMenuItem>
+                        <StyledMenuItem value="Lose">Lose</StyledMenuItem>
+                      </StyledSelect>
+                    </FormControl>
                   </Card.Body>
                 </Card>
               </Col>

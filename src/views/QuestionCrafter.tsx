@@ -958,42 +958,44 @@ useEffect(() => {
   const renderChoices = () => {
     return (
       <div className="choices-container">
-        {apiChoices.map((choice, index) => (
-          <div key={index} className="choice-item d-flex align-items-center">
-            <Form.Check
-              type="checkbox"
-              checked={selectedChoices.includes(choice)}
-              onChange={() => handleChoiceSelection(choice)}
-            />
-            {selectedChoices.includes(choice) ? (
-              <Form.Control
-                type="text"
-                value={choice}
-                onChange={(e) => handleChoiceEdit(index, e.target.value)}
-                className="ml-2 editable-choice"
-                style={{ width: '70%', marginLeft: '10px' }}
+        {apiChoices
+          .filter(choice => choice && choice.trim() !== '') // Filter out empty or whitespace-only choices
+          .map((choice, index) => (
+            <div key={index} className="choice-item d-flex align-items-center">
+              <Form.Check
+                type="checkbox"
+                checked={selectedChoices.includes(choice)}
+                onChange={() => handleChoiceSelection(choice)}
               />
-            ) : (
-              <span onClick={() => handleChoiceSelection(choice)} style={{ cursor: 'pointer' }}>
-                {choice}
-              </span>
-            )}
-            {selectedChoices.includes(choice) && (
-              <Form.Control
-                type="number"
-                value={wordAmounts[choice] || 250}
-                onChange={(e) => setWordAmounts({
-                  ...wordAmounts,
-                  [choice]: parseInt(e.target.value, 10)
-                })}
-                min={1}
-                className="ml-2"
-                placeholder="250"
-                style={{ width: '120px', marginLeft: '10px' }}
-              />
-            )}
-          </div>
-        ))}
+              {selectedChoices.includes(choice) ? (
+                <Form.Control
+                  type="text"
+                  value={choice}
+                  onChange={(e) => handleChoiceEdit(index, e.target.value)}
+                  className="ml-2 editable-choice"
+                  style={{ width: '70%', marginLeft: '10px' }}
+                />
+              ) : (
+                <span onClick={() => handleChoiceSelection(choice)} style={{ cursor: 'pointer' }}>
+                  {choice}
+                </span>
+              )}
+              {selectedChoices.includes(choice) && (
+                <Form.Control
+                  type="number"
+                  value={wordAmounts[choice] || 250}
+                  onChange={(e) => setWordAmounts({
+                    ...wordAmounts,
+                    [choice]: parseInt(e.target.value, 10)
+                  })}
+                  min={1}
+                  className="ml-2"
+                  placeholder="250"
+                  style={{ width: '120px', marginLeft: '10px' }}
+                />
+              )}
+            </div>
+          ))}
       </div>
     );
   };

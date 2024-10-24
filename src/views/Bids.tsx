@@ -34,30 +34,53 @@ const Bids = () => {
         direction: 'desc'
     });
 
-    // Sorting function for all columns
     const sortData = (data, sortConfig) => {
         const sortedData = [...data].sort((a, b) => {
-            if (!a[sortConfig.key] && !b[sortConfig.key]) return 0;
-            if (!a[sortConfig.key]) return 1;
-            if (!b[sortConfig.key]) return -1;
-
+            const aValue = a[sortConfig.key];
+            const bValue = b[sortConfig.key];
+            
+            // Helper function to check if value is empty (null, undefined, or empty string)
+            const isEmpty = (value) => {
+                return value === null || value === undefined || value === '' || String(value).trim() === '';
+            };
+            
+            // Always put empty values at the end
+            if (isEmpty(aValue) && !isEmpty(bValue)) return 1;  // a is empty, b has value -> a goes to end
+            if (!isEmpty(aValue) && isEmpty(bValue)) return -1; // a has value, b is empty -> b goes to end
+            if (isEmpty(aValue) && isEmpty(bValue)) return 0;   // both empty -> keep original order
+            
             let comparison = 0;
             switch (sortConfig.key) {
                 case 'timestamp':
                 case 'submission_deadline':
-                    comparison = new Date(a[sortConfig.key]) - new Date(b[sortConfig.key]);
+                    const dateA = new Date(aValue);
+                    const dateB = new Date(bValue);
+                    const isValidDateA = !isNaN(dateA);
+                    const isValidDateB = !isNaN(dateB);
+                    
+                    // Handle invalid dates
+                    if (!isValidDateA && isValidDateB) return 1;  // Invalid date goes to end
+                    if (isValidDateA && !isValidDateB) return -1; // Invalid date goes to end
+                    if (!isValidDateA && !isValidDateB) return 0; // Both invalid, keep order
+                    
+                    comparison = dateA - dateB;
                     break;
+                    
                 case 'status':
-                    comparison = a[sortConfig.key].toLowerCase().localeCompare(b[sortConfig.key].toLowerCase());
+                    comparison = aValue.toLowerCase().localeCompare(bValue.toLowerCase());
                     break;
+                    
                 default:
-                    comparison = String(a[sortConfig.key]).toLowerCase().localeCompare(String(b[sortConfig.key]).toLowerCase());
+                    comparison = String(aValue).toLowerCase().localeCompare(String(bValue).toLowerCase());
             }
+            
+            // Apply sort direction for non-empty values
             return sortConfig.direction === 'asc' ? comparison : -comparison;
         });
+        
         return sortedData;
     };
-
+    
     const requestSort = (key) => {
         let direction = 'asc';
         if (sortConfig.key === key && sortConfig.direction === 'asc') {

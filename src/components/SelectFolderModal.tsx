@@ -14,12 +14,13 @@ const SelectFolderModal = ({ onSaveSelectedFolders, initialSelectedFolders = [] 
   const handleShow = () => setShow(true);
   const handleClose = () => {
       console.log('Closing modal. Selected folders:', selectedFolders);
-      onSaveSelectedFolders(selectedFolders);
+      
       setShow(false);
   };
   const handleFolderSelection = (folders) => {
       console.log('Folders selected in SelectFolder component:', folders);
       setSelectedFolders(folders);
+      onSaveSelectedFolders(selectedFolders);
   };
   useEffect(() => {
       console.log('selectedFolders state updated:', selectedFolders);
@@ -47,11 +48,6 @@ const SelectFolderModal = ({ onSaveSelectedFolders, initialSelectedFolders = [] 
                       />
                   </div>
               </Modal.Body>
-              <Modal.Footer>
-                  <Button className='upload-button' onClick={handleClose} style={{fontSize: "12px"}}>
-                      Save Changes
-                  </Button>
-              </Modal.Footer>
           </Modal>
      
     </>

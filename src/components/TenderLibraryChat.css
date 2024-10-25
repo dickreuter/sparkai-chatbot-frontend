@@ -1,146 +1,146 @@
 .tenderchat-container {
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    height: 100%;
-    width: 100%;
-    margin-bottom: 0;
-    background-color: white;
-    overflow: hidden;
-    position: relative;
-    padding: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  margin-bottom: 0;
+  background-color: white;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
 }
 
 .tenderchat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0px;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 65px;
-    padding-right: 10px;
-    /* Add space for the input bar */
+  flex: 1;
+  overflow-y: auto;
+  padding: 0px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 65px;
+  padding-right: 10px;
+  /* Add space for the input bar */
 }
 
 .tender-message-bubble {
-    display: flex;
-    max-width: 70%;
-    min-width: 60px;
-    padding: 10px;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    word-wrap: break-word;
+  display: flex;
+  max-width: 70%;
+  min-width: 60px;
+  padding: 10px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
 }
 
 .tender-message-bubble.user {
-    background-color: #ff9900;
-    align-self: flex-end;
-    border-top-right-radius: 0;
-    color: white;
+  background-color: #ff9900;
+  align-self: flex-end;
+  border-top-right-radius: 0;
+  color: white;
 }
 
 .tender-message-bubble.bot {
-    background-color: #f0f0f0;
-    align-self: flex-start;
-    border-top-left-radius: 0;
-    color: black;
+  background-color: #f0f0f0;
+  align-self: flex-start;
+  border-top-left-radius: 0;
+  color: black;
 }
 
 .tender-input-bar {
-    position: absolute;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 30px);
-    max-width: 800px;
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    background-color: #383838;
-    box-sizing: border-box;
-    z-index: 1000;
-    border-radius: 25px;
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 30px);
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  background-color: #383838;
+  box-sizing: border-box;
+  z-index: 1000;
+  border-radius: 25px;
 }
 
 .tender-input-bar input {
-    flex: 1;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 25px;
-    margin-right: 10px;
-    box-sizing: border-box;
-    outline: none;
-    background-color: #383838;
-    /* Light shade of black for input */
-    color: #ffffff;
-    /* White text for better contrast */
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  margin-right: 10px;
+  box-sizing: border-box;
+  outline: none;
+  background-color: #383838;
+  /* Light shade of black for input */
+  color: #ffffff;
+  /* White text for better contrast */
 }
 
 .bar-button {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    background-color: #ffa500;
-    color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background-color: #ffa500;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bar-button:hover {
-    background-color: #ed9a02;
+  background-color: #ed9a02;
 }
 
 .bar-button svg {
-    width: 16px;
-    /* Adjust the size of the icon */
-    height: 16px;
-    /* Adjust the size of the icon */
+  width: 16px;
+  /* Adjust the size of the icon */
+  height: 16px;
+  /* Adjust the size of the icon */
 }
 
 .chat-Response-Clear-Button {
-    transform: translateX(180%);
-    background-color: #383838;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    margin-left: 5px;
+  transform: translateX(180%);
+  background-color: #383838;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  margin-left: 5px;
 }
 
 .tender-message-bubble ol,
 .tender-message-bubble ul {
-    padding-left: 20px;
-    padding-right: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .tender-message-bubble li {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .tender-message-bubble br {
-    display: block;
-    margin: 5px 0;
-    content: "";
+  display: block;
+  margin: 5px 0;
+  content: "";
 }
 
 .clear-button {
-    background: none;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    font-size: 1.2em;
-    margin-right: 10px;
-    transition: color 0.3s ease;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 1.2em;
+  margin-right: 10px;
+  transition: color 0.3s ease;
 }
 
 .clear-button:hover {
-    color: white;
+  color: white;
 }

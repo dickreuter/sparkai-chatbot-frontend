@@ -1,14 +1,14 @@
 import * as React from "react";
-import { createMemoryRouter, RouterProvider, Outlet } from 'react-router-dom';
-import { AuthProvider } from 'react-auth-kit';
+import { createMemoryRouter, RouterProvider, Outlet } from "react-router-dom";
+import { AuthProvider } from "react-auth-kit";
 import { makeStyles } from "@fluentui/react-components";
-import WordpaneCopilot from './WordpaneCopilot';
-import SignInComponent from '../components/auth/SignIn';
+import WordpaneCopilot from "./WordpaneCopilot";
+import SignInComponent from "../components/auth/SignIn";
 import SignOut from "../components/auth/SignOutButton";
-import '../resources/clash-display.css';
-import './App.css';
-import './Proposal.css';
-import './Upload.css';
+import "../resources/clash-display.css";
+import "./App.css";
+import "./Proposal.css";
+import "./Upload.css";
 import "bootstrap/dist/css/bootstrap.css";
 
 interface AppProps {
@@ -37,34 +37,37 @@ const Layout: React.FC<{ title: string }> = ({ title }) => {
 
 const App: React.FC<AppProps> = ({ title }) => {
   const styles = useStyles();
- 
-  const router = createMemoryRouter([
+
+  const router = createMemoryRouter(
+    [
+      {
+        path: "/",
+        element: <Layout title={title} />,
+        children: [
+          {
+            path: "/",
+            element: <WordpaneCopilot />,
+          },
+          {
+            path: "/login",
+            element: <SignInComponent />,
+          },
+          {
+            path: "/logout",
+            element: <SignOut />,
+          },
+          {
+            path: "*",
+            element: <WordpaneCopilot />,
+          },
+        ],
+      },
+    ],
     {
-      path: "/",
-      element: <Layout title={title} />,
-      children: [
-        {
-          path: "/",
-          element: <WordpaneCopilot />
-        },
-        {
-          path: "/login",
-          element: <SignInComponent />
-        },
-        {
-          path: "/logout",
-          element: <SignOut />
-        },
-        {
-          path: "*",
-          element: <WordpaneCopilot />
-        }
-      ]
+      initialEntries: ["/"],
+      initialIndex: 0,
     }
-  ], {
-    initialEntries: ['/'],
-    initialIndex: 0
-  });
+  );
 
   return (
     <div className={styles.root}>

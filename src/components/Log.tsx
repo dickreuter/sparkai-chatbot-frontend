@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
-import { useAuthUser } from 'react-auth-kit';
-import './Log.css';
+import { useAuthUser } from "react-auth-kit";
+import "./Log.css";
 
 const Log = () => {
   const [logs, setLogs] = useState([]);
@@ -16,19 +16,22 @@ const Log = () => {
     const fetchLogs = async () => {
       try {
         setIsLoading(true); // Start loading
-        const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_log/`,
-        {}, {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
-        });
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/get_log/`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${tokenRef.current}`
+            }
+          }
+        );
 
         if (response.data && response.data.length > 0) {
           setLogs(response.data);
           setColumns(Object.keys(response.data[0]));
         }
       } catch (error) {
-        console.error('Error fetching logs:', error);
+        console.error("Error fetching logs:", error);
       } finally {
         setIsLoading(false); // Stop loading whether success or error
       }

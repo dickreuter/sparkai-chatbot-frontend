@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./SidebarSmall.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
-
   faBookOpen,
   faLayerGroup,
   faReply, // Icon for comments or responses
   faComments,
   faCircleQuestion,
   faUser,
-  faCircleExclamation
-} from '@fortawesome/free-solid-svg-icons';
+  faCircleExclamation,
+} from "@fortawesome/free-solid-svg-icons";
 // Import the image import sidebarIcon from '../resources/images/mytender.io_badge.png';
 
 const SideBarSmall = () => {
@@ -23,7 +22,7 @@ const SideBarSmall = () => {
   const isActive = (path) => location.pathname === path;
 
   useEffect(() => {
-    const storedBid = localStorage.getItem('lastActiveBid');
+    const storedBid = localStorage.getItem("lastActiveBid");
     if (storedBid) {
       setLastActiveBid(JSON.parse(storedBid));
     }
@@ -31,81 +30,77 @@ const SideBarSmall = () => {
     const handleBidUpdate = (event) => {
       const updatedBid = event.detail;
       setLastActiveBid(updatedBid);
-      localStorage.setItem('lastActiveBid', JSON.stringify(updatedBid));
+      localStorage.setItem("lastActiveBid", JSON.stringify(updatedBid));
     };
 
-    window.addEventListener('bidUpdated', handleBidUpdate);
+    window.addEventListener("bidUpdated", handleBidUpdate);
 
     return () => {
-      window.removeEventListener('bidUpdated', handleBidUpdate);
+      window.removeEventListener("bidUpdated", handleBidUpdate);
     };
   }, []);
 
   const handleDashboardClick = (e) => {
     e.preventDefault();
     if (lastActiveBid) {
-      const lastActiveTab = localStorage.getItem('lastActiveTab') || '/bid-extractor';
+      const lastActiveTab = localStorage.getItem("lastActiveTab") || "/bid-extractor";
       navigate(lastActiveTab, { state: { bid: lastActiveBid, fromBidsTable: true } });
     } else {
-      navigate('/bids');
+      navigate("/bids");
     }
   };
 
-
   const handleShowTips = () => {
-    localStorage.setItem('dashboardTourCompleted', 'false');
-    localStorage.setItem('bidCompilerTourCompleted', 'false');
-    localStorage.setItem('bidExtractorTourCompleted', 'false');
-    localStorage.setItem('libraryTourCompleted', 'false');
-    localStorage.setItem('questionCrafterTourCompleted', 'false');
-    localStorage.setItem('quickquestionWizardTourCompleted', 'false');
+    localStorage.setItem("dashboardTourCompleted", "false");
+    localStorage.setItem("bidCompilerTourCompleted", "false");
+    localStorage.setItem("bidExtractorTourCompleted", "false");
+    localStorage.setItem("libraryTourCompleted", "false");
+    localStorage.setItem("questionCrafterTourCompleted", "false");
+    localStorage.setItem("quickquestionWizardTourCompleted", "false");
     // Dispatch a custom event to notify other components
-    window.dispatchEvent(new Event('showTips'));
+    window.dispatchEvent(new Event("showTips"));
   };
 
-  
   return (
     <div className="sidebarsmall">
       <div>
-
-      <Link 
-          to="#" 
-          className={`sidebarsmalllink ${isActive('/bids') || isActive('/bid-extractor') || isActive('/question-crafter') || isActive('/proposal') ? 'sidebarsmalllink-active' : ''}`}
+        <Link
+          to="#"
+          className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor") || isActive("/question-crafter") || isActive("/proposal") ? "sidebarsmalllink-active" : ""}`}
           onClick={handleDashboardClick}
         >
           <FontAwesomeIcon icon={faLayerGroup} />
           <span id="bids-table">Dashboard</span>
         </Link>
-        <Link to="/library" className={`sidebarsmalllink ${isActive('/library') ? 'sidebarsmalllink-active' : ''}`}>
+        <Link to="/library" className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}>
           <FontAwesomeIcon icon={faBookOpen} />
-          <span id='library-title'>Content Library</span>
+          <span id="library-title">Content Library</span>
         </Link>
-        <Link to="/chatResponse" className={`sidebarsmalllink ${isActive('/chatResponse') ? 'sidebarsmalllink-active' : ''}`}>
+        <Link
+          to="/chatResponse"
+          className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
+        >
           <FontAwesomeIcon icon={faComments} />
           <span id="welcome">Quick Question</span>
         </Link>
-        <Link to="/howto" className={`sidebarsmalllink ${isActive('/howto') ? 'sidebarsmalllink-active' : ''}`}>
+        <Link to="/howto" className={`sidebarsmalllink ${isActive("/howto") ? "sidebarsmalllink-active" : ""}`}>
           <FontAwesomeIcon icon={faCircleQuestion} />
-          <span >How To Guide</span>
+          <span>How To Guide</span>
         </Link>
       </div>
       <div className="signout-container">
-     
-        <Link to="/profile" className={`sidebarsmalllink ${isActive('/profile') ? 'sidebarsmalllink-active' : ''}`}>
+        <Link to="/profile" className={`sidebarsmalllink ${isActive("/profile") ? "sidebarsmalllink-active" : ""}`}>
           <FontAwesomeIcon icon={faUser} />
           <span>Profile</span>
         </Link>
-        <Link to="#" className="sidebarsmalllink" onClick={handleShowTips} id='showtips'>
+        <Link to="#" className="sidebarsmalllink" onClick={handleShowTips} id="showtips">
           <FontAwesomeIcon icon={faCircleExclamation} />
           <span>Show Tips</span>
         </Link>
-        <Link to="/logout" className={`sidebarsmalllink ${isActive('/logout') ? 'sidebarsmalllink-active' : ''}`}>
+        <Link to="/logout" className={`sidebarsmalllink ${isActive("/logout") ? "sidebarsmalllink-active" : ""}`}>
           <FontAwesomeIcon icon={faReply} />
           <span>Logout</span>
         </Link>
-
-        
-      
       </div>
     </div>
   );

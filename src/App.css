@@ -1,65 +1,65 @@
 #root {
-    margin: 0;
-    background-color: white;
-    padding: 0;
-    transform: scale(0.8);
-    transform-origin: top left;
-    width: 125vw;
-    /* 100vw / 0.8 */
-    height: 100vh;
-    /* 100vh / 0.8 */
-    overflow: none !important;
+  margin: 0;
+  background-color: white;
+  padding: 0;
+  transform: scale(0.8);
+  transform-origin: top left;
+  width: 125vw;
+  /* 100vw / 0.8 */
+  height: 100vh;
+  /* 100vh / 0.8 */
+  overflow: none !important;
 }
 
 @keyframes logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    a:nth-of-type(2) .logo {
-        animation: logo-spin infinite 20s linear;
-    }
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
 }
 
 .dropdowns-container {
-    display: flex;
-    justify-content: center;
-    /* centers the dropdowns horizontally */
-    gap: 10px;
-    /* provides spacing between dropdowns */
+  display: flex;
+  justify-content: center;
+  /* centers the dropdowns horizontally */
+  gap: 10px;
+  /* provides spacing between dropdowns */
 }
 
 @keyframes spin {
-    from {
-        transform: rotate(0deg) scale(.7);
-    }
-    to {
-        transform: rotate(360deg) scale(.7);
-    }
+  from {
+    transform: rotate(0deg) scale(0.7);
+  }
+  to {
+    transform: rotate(360deg) scale(0.7);
+  }
 }
 
 .rotating {
-    animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
 }
 
 .main-content {
-    padding: 0px;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    overflow: none;
-    width: 125vw;
+  padding: 0px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overflow: none;
+  width: 125vw;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    font-family: "ClashDisplay", sans-serif;
-    font-weight: 500;
-    overflow: none !important;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  font-family: "ClashDisplay", sans-serif;
+  font-weight: 500;
+  overflow: none !important;
 }

@@ -1,95 +1,93 @@
 .cards-container {
-    height: 100vh;
-    width: 125vw;
-    /* Use viewport height */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    padding: 0;
+  height: 100vh;
+  width: 125vw;
+  /* Use viewport height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
 }
 
 .cardmini {
-    width: 100%;
-    max-width: 500px;
-    /* Adjust based on your needs */
-    height: auto;
-    background-color: white;
-    padding: 30px;
-    border-radius: 4px;
+  width: 100%;
+  max-width: 500px;
+  /* Adjust based on your needs */
+  height: auto;
+  background-color: white;
+  padding: 30px;
+  border-radius: 4px;
 }
 
 .cardmini-text h2 {
-    font-size: 1.4em;
-    font-weight: bold;
-    text-align: left;
-    margin-top: 0;
-    margin-bottom: 20px;
+  font-size: 1.4em;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 0;
+  margin-bottom: 20px;
 }
 
 .cardmini-text p {
-    text-align: left;
-    margin-top: 8px;
-    margin-bottom: 20px;
-    font-size: 0.9em;
+  text-align: left;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9em;
 }
 
 .input-field {
-    margin-bottom: 12px;
-    width: 100%;
+  margin-bottom: 12px;
+  width: 100%;
 }
 
 .login-button {
-    width: 100%;
-    padding: 8px 0;
-    margin-top: 12px;
-    margin-bottom: 8px;
-    background-color: #262626 !important;
-    color: white;
+  width: 100%;
+  padding: 8px 0;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  background-color: #262626 !important;
+  color: white;
 }
 
 .login-button:hover {
-    background-color: #707070;
+  background-color: #707070;
 }
-
 
 /* Modal styles */
 
 .modal-container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 400px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .modal-container h2 {
-    margin-top: 0;
-    font-size: 1.2em;
-    font-weight: 600;
+  margin-top: 0;
+  font-size: 1.2em;
+  font-weight: 600;
 }
 
 .modal-container p {
-    margin-top: 8px;
-    margin-bottom: 16px;
-    color: #666;
-    font-size: 0.9em;
+  margin-top: 8px;
+  margin-bottom: 16px;
+  color: #666;
+  font-size: 0.9em;
 }
 
 .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
 }
 
 .modal-actions button {
-    margin-left: 8px;
+  margin-left: 8px;
 }
-
 
 /* Remove media queries as the App.css scaling should handle responsiveness */

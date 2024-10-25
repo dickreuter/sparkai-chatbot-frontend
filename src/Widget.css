@@ -1,18 +1,18 @@
-.rcw-conversation-container>.rcw-header {
-    background-color: #ffa500;
-    /* Orange */
+.rcw-conversation-container > .rcw-header {
+  background-color: #ffa500;
+  /* Orange */
 }
 
 .rcw-launcher {
-    background-color: black;
-    /* Black background for the launcher button */
+  background-color: black;
+  /* Black background for the launcher button */
 }
 
 .rcw-launcher-button {
-    fill: white;
-    /* White icon in the launcher button */
+  fill: white;
+  /* White icon in the launcher button */
 }
 
 .rcw-picker-icon {
-    display: none;
+  display: none;
 }

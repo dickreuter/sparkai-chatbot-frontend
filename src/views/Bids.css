@@ -1,144 +1,142 @@
 .status-dropdown {
-    padding: 5px 10px;
-    border-radius: 5px;
-    color: #fff;
-    font-family: inherit;
-    font-weight: 600;
-    font-size: 0.9rem;
-    border: none;
-    cursor: pointer;
-    position: relative;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: #fff;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  position: relative;
 }
 
 .status-dropdown.ongoing {
-    background-color: orange;
-    color: white;
+  background-color: orange;
+  color: white;
 }
 
 .status-dropdown.complete {
-    background-color: #262626;
-    color: white;
+  background-color: #262626;
+  color: white;
 }
 
 .bids-table {
-    width: 100%;
-    table-layout: fixed;
-    margin: 0;
-    border-collapse: collapse;
-    border-spacing: 0;
-    overflow: hidden;
-    margin-bottom: 20px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #ced4da;
+  width: 100%;
+  table-layout: fixed;
+  margin: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ced4da;
 }
 
 .bids-table th,
 .bids-table td {
-    white-space: nowrap;
-    overflow: hidden;
-    padding: 12px;
-    text-overflow: ellipsis;
-    border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 12px;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid #ddd;
 }
-
 
 /* Add left margin to the first column */
 
 .bids-table td:first-child,
 .bids-table th:first-child {
-    padding-left: 20px;
+  padding-left: 20px;
 }
 
 .bids-table th {
-    background-color: #f2f2f2;
-    font-weight: 500;
-    color: black;
+  background-color: #f2f2f2;
+  font-weight: 500;
+  color: black;
 }
-
 
 /* Specifically target the Action column to make it narrower */
 
 .bids-table th:last-child,
 .bids-table td:last-child {
-    width: 8%;
-    justify-content: center;
+  width: 8%;
+  justify-content: center;
 }
 
 .bids-table tr:last-child td {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .dropdown-menu-f {
-    z-index: 1050;
-    position: absolute;
-    will-change: transform;
+  z-index: 1050;
+  position: absolute;
+  will-change: transform;
 }
 
 .sort-options select {
-    outline: none !important;
-    border: 1px solid #ccc;
-    /* Add a default border */
-    box-shadow: none !important;
-    transition: border-color 0.2s ease-in-out;
+  outline: none !important;
+  border: 1px solid #ccc;
+  /* Add a default border */
+  box-shadow: none !important;
+  transition: border-color 0.2s ease-in-out;
 }
 
 .sort-options select:focus,
 .sort-options select:active {
-    outline: none !important;
-    border-color: grey;
-    /* Change border color on focus */
+  outline: none !important;
+  border-color: grey;
+  /* Change border color on focus */
 }
 
 .sort-options {
-    display: flex;
-    align-items: center;
-    font-family: 'ClashDisplay', sans-serif;
-    /* Ensure you have this font imported */
+  display: flex;
+  align-items: center;
+  font-family: "ClashDisplay", sans-serif;
+  /* Ensure you have this font imported */
 }
 
 .sort-select-option {
-    font-family: 'ClashDisplay', sans-serif !important;
-    font-size: 0.8rem;
-    padding: 5px 10px;
-    box-shadow: none !important;
+  font-family: "ClashDisplay", sans-serif !important;
+  font-size: 0.8rem;
+  padding: 5px 10px;
+  box-shadow: none !important;
 }
 
 .pagination-container {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .pagination-button {
-    color: #fff;
-    background-color: #000;
-    border: 1px solid #000;
-    padding: 5px 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-radius: 8px;
+  color: #fff;
+  background-color: #000;
+  border: 1px solid #000;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
 }
 
 .pagination-button:hover {
-    background-color: #333;
+  background-color: #333;
 }
 
 .pagination-button.active {
-    background-color: #333;
+  background-color: #333;
 }
 
 .small-modal {
-    transform: scale(0.8);
+  transform: scale(0.8);
 }
 
 .sortable-header {
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.2s;
-    padding-right: 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+  padding-right: 20px;
 }
 
 .sortable-header svg {
-    opacity: 0.5;
-    margin-left: 10px;
-    vertical-align: middle;
+  opacity: 0.5;
+  margin-left: 10px;
+  vertical-align: middle;
 }

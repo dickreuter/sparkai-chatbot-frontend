@@ -1,42 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import axios from 'axios';
-import { Form, Button, Row, Col, Card, Alert } from 'react-bootstrap';
-import { API_URL, HTTP_PREFIX } from '../helper/Constants';
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
+import { Form, Button, Row, Col, Card, Alert } from "react-bootstrap";
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import "./Signup.css";
 
 const Signup = () => {
   const [tokenValid, setTokenValid] = useState(null);
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    company: '',
-    jobRole: '',
-    email: '',
-    region: '',
-    subscriptionType: '',
+    username: "",
+    password: "",
+    company: "",
+    jobRole: "",
+    email: "",
+    region: "",
+    subscriptionType: ""
   });
   const [error, setError] = useState(null);
   const location = useLocation();
-  const token = new URLSearchParams(location.search).get('token');
+  const token = new URLSearchParams(location.search).get("token");
 
   useEffect(() => {
     const validateToken = async () => {
       try {
-        const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/validate_signup_token`, { token });
+        const response = await axios.post(
+          `http${HTTP_PREFIX}://${API_URL}/validate_signup_token`,
+          { token }
+        );
         if (response.data.valid) {
           setTokenValid(true);
-          setFormData(prevFormData => ({
+          setFormData((prevFormData) => ({
             ...prevFormData,
-            email: response.data.email || '',
-            region: response.data.region || '',
-            subscriptionType: response.data.product_name || '',
+            email: response.data.email || "",
+            region: response.data.region || "",
+            subscriptionType: response.data.product_name || ""
           }));
         } else {
           setTokenValid(false);
         }
       } catch (error) {
-        console.error('Error validating token:', error);
+        console.error("Error validating token:", error);
         setTokenValid(false);
       }
     };
@@ -53,19 +56,24 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);  // Clear previous errors
+    setError(null); // Clear previous errors
     if (!tokenValid) return;
 
     try {
-      const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/update_user_details`, { ...formData, token });
-      console.log('Signup successful:', response.data);
-      window.location.href = '/login';  // Redirect to the login page
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/update_user_details`,
+        { ...formData, token }
+      );
+      console.log("Signup successful:", response.data);
+      window.location.href = "/login"; // Redirect to the login page
     } catch (error) {
-      console.error('Error during signup:', error);
+      console.error("Error during signup:", error);
       if (error.response && error.response.data) {
-        setError(error.response.data.detail);  // Show the error message returned by the backend
+        setError(error.response.data.detail); // Show the error message returned by the backend
       } else {
-        setError('An error occurred during signup. Please try again or contact support.');  // Set generic error message
+        setError(
+          "An error occurred during signup. Please try again or contact support."
+        ); // Set generic error message
       }
     }
   };
@@ -75,7 +83,9 @@ const Signup = () => {
   }
 
   if (!tokenValid) {
-    return <p>Invalid or expired token. Please contact support or try again.</p>;
+    return (
+      <p>Invalid or expired token. Please contact support or try again.</p>
+    );
   }
 
   return (
@@ -83,7 +93,9 @@ const Signup = () => {
       <div className="mt-5 create-account-container">
         <Card className="p-4">
           <Card.Body>
-            <Card.Title className="text-center mb-4 create-account-title">Create Account</Card.Title>
+            <Card.Title className="text-center mb-4 create-account-title">
+              Create Account
+            </Card.Title>
             {error && <Alert variant="danger">{error}</Alert>}
             <Form onSubmit={handleSubmit}>
               <Row className="mb-3">
@@ -152,8 +164,8 @@ const Signup = () => {
                     placeholder="Enter your email"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}  // Allow user to modify email if needed
-                    defaultValue={formData.email}  // Display the default email from the token validation response
+                    onChange={handleChange} // Allow user to modify email if needed
+                    defaultValue={formData.email} // Display the default email from the token validation response
                     className="custom-input"
                   />
                 </Form.Group>

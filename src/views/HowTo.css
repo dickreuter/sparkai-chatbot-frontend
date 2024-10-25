@@ -1,22 +1,22 @@
 /* HowTo.css */
 
 .howto-container {
-    padding: 0;
+  padding: 0;
 }
 
 .howto-container .row {
-    margin-left: -15px;
-    margin-right: -15px;
+  margin-left: -15px;
+  margin-right: -15px;
 }
 
 .howto-container .col-lg-4,
 .howto-container .col-md-6,
 .howto-container .col-sm-12 {
-    padding-left: 15px;
-    padding-right: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 .MuiCard-root {
-    flex: 1 1 100%;
-    box-sizing: border-box;
+  flex: 1 1 100%;
+  box-sizing: border-box;
 }

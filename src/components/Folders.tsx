@@ -1,12 +1,16 @@
-import React from 'react';
+import React from "react";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import Tooltip from "@mui/material/Tooltip";
 import axios from "axios";
-import {API_URL, HTTP_PREFIX} from "../helper/Constants";
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 
-const FolderLogic = ({tokenRef, setAvailableCollections, setFolderContents,
-                       availableCollections, folderContents}) => {
-
+const FolderLogic = ({
+  tokenRef,
+  setAvailableCollections,
+  setFolderContents,
+  availableCollections,
+  folderContents
+}) => {
   const get_collections = () => {
     axios
       .post(
@@ -14,8 +18,8 @@ const FolderLogic = ({tokenRef, setAvailableCollections, setFolderContents,
         {},
         {
           headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
+            Authorization: `Bearer ${tokenRef.current}`
+          }
         }
       )
       .then((res) => {
@@ -37,8 +41,8 @@ const FolderLogic = ({tokenRef, setAvailableCollections, setFolderContents,
         { folder_name: folderName },
         {
           headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
+            Authorization: `Bearer ${tokenRef.current}`
+          }
         }
       );
       get_collections(); // Refresh the list of collections
@@ -54,20 +58,19 @@ const FolderLogic = ({tokenRef, setAvailableCollections, setFolderContents,
     }
   };
 
-const fetchFolderFilenames = async (folderName) => {
-  try {
-    const response = await axios.post(
-      `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
-      { collection_name: folderName },
-      { headers: { Authorization: `Bearer ${tokenRef.current}` } }
-    );
+  const fetchFolderFilenames = async (folderName) => {
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_folder_filenames`,
+        { collection_name: folderName },
+        { headers: { Authorization: `Bearer ${tokenRef.current}` } }
+      );
 
-    setFolderContents({ ...folderContents, [folderName]: response.data });
-  } catch (error) {
-    console.error("Error fetching folder filenames:", error);
-  }
-};
-
+      setFolderContents({ ...folderContents, [folderName]: response.data });
+    } catch (error) {
+      console.error("Error fetching folder filenames:", error);
+    }
+  };
 
   return (
     <div className="dataset-folders">
@@ -87,7 +90,10 @@ const fetchFolderFilenames = async (folderName) => {
           </div>
         </Tooltip>
       ))}
-      <div className="dataset-folder add-new-folder" onClick={handleAddNewFolderClick}>
+      <div
+        className="dataset-folder add-new-folder"
+        onClick={handleAddNewFolderClick}
+      >
         <span>Add Folder</span>
       </div>
     </div>

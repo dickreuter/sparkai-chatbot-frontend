@@ -1,610 +1,611 @@
 .bid-pilot-container {
-    margin: 0;
-    word-wrap: break-word;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 40px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #ced4da;
-    border-top: none;
-    overflow-x: hidden;
-    height: 800px;
-    overflow-y: none;
+  margin: 0;
+  word-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 40px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ced4da;
+  border-top: none;
+  overflow-x: hidden;
+  height: 800px;
+  overflow-y: none;
 }
 
 .input-header {
-    flex: 1;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    height: 66px;
-    background-color: #262626;
-    border-top: 1px solid #ced4da;
-    border-right: 1px solid #ced4da;
-    border-left: 1px solid #ced4da;
-    /* Change this color to the desired border-bottom color */
+  flex: 1;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  height: 66px;
+  background-color: #262626;
+  border-top: 1px solid #ced4da;
+  border-right: 1px solid #ced4da;
+  border-left: 1px solid #ced4da;
+  /* Change this color to the desired border-bottom color */
 }
 
 .input-console {
-    flex: 1;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    max-height: 140px;
-    background-color: #262626;
+  flex: 1;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  max-height: 140px;
+  background-color: #262626;
 }
 
 .options-container {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-    padding: 10px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding: 10px;
 }
 
 .spinner-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    /* Ensure the spinner is centered within the container */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  /* Ensure the spinner is centered within the container */
 }
 
 .spinner-container p {
-    margin-top: 10px;
-    font-size: 1rem;
-    color: #333;
-    /* Adjust the color as needed */
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #333;
+  /* Adjust the color as needed */
 }
 
 .response-box {
-    position: relative;
-    flex: 1;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #ced4da;
-    background-color: #fff;
-    padding: 20px;
-    transition: all 0.35s ease;
-    margin: 0;
-    word-wrap: break-word;
-    height: 800px;
-    overflow-y: auto;
-    padding-top: 10px;
-    /* Show scrollbar only when necessary */
+  position: relative;
+  flex: 1;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ced4da;
+  background-color: #fff;
+  padding: 20px;
+  transition: all 0.35s ease;
+  margin: 0;
+  word-wrap: break-word;
+  height: 800px;
+  overflow-y: auto;
+  padding-top: 10px;
+  /* Show scrollbar only when necessary */
 }
-
 
 /* In your CSS file (e.g., Signin.css or a new CSS file) */
 
 .editor-container {
-    font-weight: 450;
-    /* Set desired font weight */
+  font-weight: 450;
+  /* Set desired font weight */
 }
 
 .response-contenteditable {
-    width: 100%;
-    height: 100%;
-    padding: 10px;
-    font-size: 16px;
-    line-height: 1.5;
-    outline: none;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow: auto;
-    /* Ensure the content is scrollable */
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  font-size: 16px;
+  line-height: 1.5;
+  outline: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: auto;
+  /* Ensure the content is scrollable */
 }
 
 .highlight {
-    background-color: orange;
+  background-color: orange;
 }
 
 .option-item {
-    background-color: #e3e4e6;
-    align-self: flex-start;
-    border-top-left-radius: 0;
-    color: black;
-    display: flex;
-    /* Inline block to fit content */
-    max-width: 100%;
-    min-width: 60px;
-    padding: 14px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    word-wrap: break-word;
-    font-size: 16px;
-    max-height: 540px;
-    /* Set your preferred maximum height */
-    overflow-y: auto;
+  background-color: #e3e4e6;
+  align-self: flex-start;
+  border-top-left-radius: 0;
+  color: black;
+  display: flex;
+  /* Inline block to fit content */
+  max-width: 100%;
+  min-width: 60px;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+  font-size: 16px;
+  max-height: 540px;
+  /* Set your preferred maximum height */
+  overflow-y: auto;
 }
 
 .option-item::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
-    border: 3px solid;
-    border-color: #e3e4e6;
-    max-height: 10px;
+  background: #888;
+  border-radius: 10px;
+  border: 3px solid;
+  border-color: #e3e4e6;
+  max-height: 10px;
 }
 
 .options-button {
-    cursor: pointer;
-    background-color: #262626;
-    color: #fff;
-    padding: 8px 12px;
-    font-weight: 600;
-    font-size: 1rem;
-    position: relative;
-    transition: background 0s ease-in-out;
-    border: none;
-    border-radius: 12px;
-    /* Add rounded corners */
+  cursor: pointer;
+  background-color: #262626;
+  color: #fff;
+  padding: 8px 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  position: relative;
+  transition: background 0s ease-in-out;
+  border: none;
+  border-radius: 12px;
+  /* Add rounded corners */
 }
 
 .options-button svg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    fill: none;
-    stroke: #fff;
-    stroke-width: 4;
-    stroke-dasharray: 480;
-    stroke-dashoffset: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 4;
+  stroke-dasharray: 480;
+  stroke-dashoffset: 0;
 }
 
 .options-button svg rect {
-    rx: 12;
-    ry: 12;
+  rx: 12;
+  ry: 12;
 }
 
 .options-button span {
-    color: white;
-    position: relative;
-    z-index: 1;
+  color: white;
+  position: relative;
+  z-index: 1;
 }
 
 .options-button.selected svg {
-    animation: dashAnimation 2s linear infinite;
+  animation: dashAnimation 2s linear infinite;
 }
 
 @keyframes dashAnimation {
-    0% {
-        stroke-dashoffset: 150;
-    }
-    25% {
-        stroke-dashoffset: 240;
-    }
-    50% {
-        stroke-dashoffset: 300;
-    }
-    75% {
-        stroke-dashoffset: 360;
-    }
-    100% {
-        stroke-dashoffset: 480;
-    }
+  0% {
+    stroke-dashoffset: 150;
+  }
+  25% {
+    stroke-dashoffset: 240;
+  }
+  50% {
+    stroke-dashoffset: 300;
+  }
+  75% {
+    stroke-dashoffset: 360;
+  }
+  100% {
+    stroke-dashoffset: 480;
+  }
 }
 
 .option {
-    padding: 10px;
+  padding: 10px;
 }
 
 .option-content {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .tick-icon {
-    cursor: pointer;
-    width: 10px;
-    height: 10px;
+  cursor: pointer;
+  width: 10px;
+  height: 10px;
 }
 
 @keyframes pulse {
-    0% {
-        transform: scale(0.9);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(0.9);
-    }
+  0% {
+    transform: scale(0.9);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(0.9);
+  }
 }
 
 .tick-button {
-    background-color: green;
-    color: #fff;
-    border: none;
-    margin-left: 10px;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: pulse 2s ease-in-out infinite;
+  background-color: green;
+  color: #fff;
+  border: none;
+  margin-left: 10px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .tick-button:hover,
 .tick-button:focus,
 .tick-button:active {
-    background-color: darkgreen;
-    color: #fff;
-    outline: none;
-    box-shadow: none;
+  background-color: darkgreen;
+  color: #fff;
+  outline: none;
+  box-shadow: none;
 }
 
 .tick-button.clicked {
-    background-color: darkgreen;
-    /* Optional: Stop animation on click */
+  background-color: darkgreen;
+  /* Optional: Stop animation on click */
 }
 
 .prompts-container {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-    opacity: 1;
-    transition: opacity 0.5s ease;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  opacity: 1;
+  transition: opacity 0.5s ease;
 }
 
 .prompts::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
-    border: 3px solid;
-    border-color: #262626 !important;
-    max-height: 10px;
+  background: #888;
+  border-radius: 10px;
+  border: 3px solid;
+  border-color: #262626 !important;
+  max-height: 10px;
 }
 
 .prompts-container.fade-out {
-    opacity: 0;
+  opacity: 0;
 }
 
 .prompts {
-    background-color: #262626;
-    /* Assuming each button is around 40px tall */
-    overflow-y: auto;
+  background-color: #262626;
+  /* Assuming each button is around 40px tall */
+  overflow-y: auto;
 }
 
 .prompt-button {
-    padding: 10px;
-    border-radius: 0;
-    background-color: #262626;
-    color: white;
-    text-align: left;
-    border: 2px solid #555555;
-    border-top: none;
-    width: 100%;
-    font-weight: 500;
-    font-size: 14px;
-    transition: font-size 0.3s ease, opacity 0.5s ease;
-    opacity: 0;
-    animation: slideIn 0.5s forwards;
+  padding: 10px;
+  border-radius: 0;
+  background-color: #262626;
+  color: white;
+  text-align: left;
+  border: 2px solid #555555;
+  border-top: none;
+  width: 100%;
+  font-weight: 500;
+  font-size: 14px;
+  transition:
+    font-size 0.3s ease,
+    opacity 0.5s ease;
+  opacity: 0;
+  animation: slideIn 0.5s forwards;
 }
 
 .prompts-container.fade-out .prompt-button {
-    animation: slideOut 0.5s forwards;
+  animation: slideOut 0.5s forwards;
 }
 
 @keyframes slideIn {
-    0% {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slideOut {
-    0% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
 }
 
 .prompt-button:hover {
-    background-color: #262626;
-    border: 2px solid #555555;
-    border-top: none;
+  background-color: #262626;
+  border: 2px solid #555555;
+  border-top: none;
 }
 
 .mini-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    background-color: white;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    overflow-x: hidden;
-    width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .message-bubble-small {
-    display: flex;
-    /* Inline block to fit content */
-    max-width: 80%;
-    min-width: 50px;
-    padding: 10px;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    word-wrap: break-word;
-    font-size: 17px;
+  display: flex;
+  /* Inline block to fit content */
+  max-width: 80%;
+  min-width: 50px;
+  padding: 10px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+  font-size: 17px;
 }
 
 .message-bubble-small.user {
-    background-color: orange;
-    align-self: flex-end;
-    border-top-right-radius: 0;
-    color: white;
-    opacity: 1;
+  background-color: orange;
+  align-self: flex-end;
+  border-top-right-radius: 0;
+  color: white;
+  opacity: 1;
 }
 
 .message-bubble-small.bot {
-    background-color: #f5f5f5;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ced4da;
-    align-self: flex-start;
-    border-top-left-radius: 0;
-    color: black;
+  background-color: #f5f5f5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ced4da;
+  align-self: flex-start;
+  border-top-left-radius: 0;
+  color: black;
 }
 
 .message-bubble-small ol,
 .message-bubble-small ul {
-    padding-left: 20px;
-    padding-right: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .message-bubble-small li {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .message-bubble-small br {
-    display: block;
-    margin: 5px 0;
-    content: "";
+  display: block;
+  margin: 5px 0;
+  content: "";
 }
 
 .bid-input-bar {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    background-color: #383838;
-    box-sizing: border-box;
-    border-radius: 25px;
-    height: 50px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  background-color: #383838;
+  box-sizing: border-box;
+  border-radius: 25px;
+  height: 50px;
 }
 
 .bid-input-bar input {
-    flex: 1;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 25px;
-    margin-right: 10px;
-    box-sizing: border-box;
-    outline: none;
-    background-color: #383838;
-    color: #ffffff;
-    width: 100%
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  margin-right: 10px;
+  box-sizing: border-box;
+  outline: none;
+  background-color: #383838;
+  color: #ffffff;
+  width: 100%;
 }
 
 .bid-input-bar button {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    background-color: orange;
-    color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background-color: orange;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bid-input-bar button:hover {
-    background-color: #ed9a02;
+  background-color: #ed9a02;
 }
 
 .bid-input-bar button svg {
-    width: 16px;
-    /* Adjust the size of the icon */
-    height: 16px;
-    /* Adjust the size of the icon */
+  width: 16px;
+  /* Adjust the size of the icon */
+  height: 16px;
+  /* Adjust the size of the icon */
 }
 
 .arrow-button {
-    background-color: #383838;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.7rem;
-    border-radius: 8px;
+  background-color: #383838;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.7rem;
+  border-radius: 8px;
 }
 
 .dropdown-container {
-    display: flex;
-    align-items: center;
-    /* Center align items vertically */
+  display: flex;
+  align-items: center;
+  /* Center align items vertically */
 }
 
-.dropdown-container .arrow-button+.arrow-button {
-    margin-left: 4px;
-    /* Adjust this value to reduce the distance */
+.dropdown-container .arrow-button + .arrow-button {
+  margin-left: 4px;
+  /* Adjust this value to reduce the distance */
 }
 
-.dropdown-container .option-button+.option-button {
-    margin-left: 6px;
-    /* Adjust this value to reduce the distance */
+.dropdown-container .option-button + .option-button {
+  margin-left: 6px;
+  /* Adjust this value to reduce the distance */
 }
 
 .checkbox-container {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .checkbox-label {
-    margin-bottom: 4px;
-    color: white;
-    font-size: 14px;
-    font-weight: 500;
+  margin-bottom: 4px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .checkbox {
-    margin-right: 8px;
+  margin-right: 8px;
 }
 
 .option-button {
-    background-color: #383838;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    margin-left: 5px;
+  background-color: #383838;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  margin-left: 5px;
 }
 
 .option-button:hover {
-    background-color: #505050;
-    /* Replace with a more appropriate color */
+  background-color: #505050;
+  /* Replace with a more appropriate color */
 }
 
 .question-answer-box {
-    flex: 1;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #ced4da;
-    background-color: #fff;
-    padding: 10px;
-    transition: all 0.35s ease;
-    margin: 0;
-    word-wrap: break-word;
-    height: 200px;
-    /* Ensure children start at the top */
+  flex: 1;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ced4da;
+  background-color: #fff;
+  padding: 10px;
+  transition: all 0.35s ease;
+  margin: 0;
+  word-wrap: break-word;
+  height: 200px;
+  /* Ensure children start at the top */
 }
 
 .loading-dots {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    font-size: 24px;
-    color: #000;
-    font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 24px;
+  color: #000;
+  font-weight: 600;
 }
 
 .loading-dots span {
-    animation: blink 1.4s infinite both;
+  animation: blink 1.4s infinite both;
 }
 
 .loading-dots span:nth-child(2) {
-    animation-delay: 0.2s;
+  animation-delay: 0.2s;
 }
 
 .loading-dots span:nth-child(3) {
-    animation-delay: 0.4s;
+  animation-delay: 0.4s;
 }
 
 @keyframes blink {
-    0% {
-        opacity: 0.2;
-    }
-    20% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0.2;
-    }
+  0% {
+    opacity: 0.2;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.2;
+  }
 }
 
 .chat-dropdown .dropdown-menu {
-    min-width: 350px;
-    /* Adjust as necessary */
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  min-width: 350px;
+  /* Adjust as necessary */
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .chat-dropdown .dropdown-menu .dropdown-item {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .custom-dropdown-toggle {
-    background-color: #262626 !important;
-    /* Ensure the background color stays the same */
-    color: white !important;
-    /* Ensure the text color stays the same */
-    border: none !important;
+  background-color: #262626 !important;
+  /* Ensure the background color stays the same */
+  color: white !important;
+  /* Ensure the text color stays the same */
+  border: none !important;
 }
 
 .custom-dropdown-toggle:focus,
 .custom-dropdown-toggle:active {
-    background-color: #262626 !important;
-    /* Override the focus and active background color */
-    box-shadow: none !important;
-    /* Remove the blue outline */
-    color: white !important;
-    /* Ensure the text color stays the same */
+  background-color: #262626 !important;
+  /* Override the focus and active background color */
+  box-shadow: none !important;
+  /* Remove the blue outline */
+  color: white !important;
+  /* Ensure the text color stays the same */
 }
 
 .dropdown-clear-container {
-    display: flex;
+  display: flex;
 }
 
 .custom-prompt-button {
-    background-color: #383838;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    margin-left: 5px;
-    transition: background-color 0.3s ease;
+  background-color: #383838;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  margin-left: 5px;
+  transition: background-color 0.3s ease;
 }
 
 .custom-prompt-button:hover {
-    background-color: #505050;
-    /* Replace with a more appropriate color */
+  background-color: #505050;
+  /* Replace with a more appropriate color */
 }
 
 .custom-prompt-container {
-    background-color: #262626;
-    margin-top: 20px;
-    margin-right: 10px;
-    margin-left: 10px;
-    max-height: 100px;
-    padding: 20px;
-    animation: slideIn 0.5s forwards;
-    border-radius: 8px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    padding-bottom: 85px;
+  background-color: #262626;
+  margin-top: 20px;
+  margin-right: 10px;
+  margin-left: 10px;
+  max-height: 100px;
+  padding: 20px;
+  animation: slideIn 0.5s forwards;
+  border-radius: 8px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  padding-bottom: 85px;
 }
 
 .custom-prompt-input {
-    max-width: 80%;
-    padding: 2px;
+  max-width: 80%;
+  padding: 2px;
 }
 
 .custom-prompt-input:focus {
-    outline: 1px solid white;
-    /* Replace 'yourColor' with the desired color */
+  outline: 1px solid white;
+  /* Replace 'yourColor' with the desired color */
 }

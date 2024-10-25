@@ -1,8 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from "react";
 
 const CustomDateInput = ({ value, onChange, disabled }) => {
   const dateInputRef = useRef(null);
-  const [displayValue, setDisplayValue] = useState('');
+  const [displayValue, setDisplayValue] = useState("");
 
   useEffect(() => {
     if (value) {
@@ -14,8 +14,8 @@ const CustomDateInput = ({ value, onChange, disabled }) => {
   }, [value]);
 
   const formatDate = (date) => {
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
@@ -47,13 +47,16 @@ const CustomDateInput = ({ value, onChange, disabled }) => {
       <input
         ref={dateInputRef}
         type="date"
-        value={value || ''}
+        value={value || ""}
         onChange={handleDateChange}
         disabled={disabled}
         className="hidden-date-input"
       />
-      <i className="fas fa-calendar-alt calendar-icon" onClick={handleIconClick}></i>
-     
+      <i
+        className="fas fa-calendar-alt calendar-icon"
+        onClick={handleIconClick}
+      ></i>
+
       <style jsx>{`
         .custom-date-input {
           position: relative;

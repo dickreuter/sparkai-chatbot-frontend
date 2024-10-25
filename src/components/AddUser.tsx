@@ -2,10 +2,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 import { useRef, useState } from "react";
 import { useAuthHeader, useAuthUser } from "react-auth-kit";
-import {
-  API_URL,
-  HTTP_PREFIX,
-} from "../helper/Constants";
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import withAuthAdmin from "../routes/withAuthAdmin";
 import "./AdminPannel.css";
 
@@ -16,7 +13,7 @@ interface IAttributesConfig {
 
 const defaultAttributesConfig: IAttributesConfig = {
   login: "",
-  password: "",
+  password: ""
 };
 
 const AddUser = () => {
@@ -67,8 +64,8 @@ const AddUser = () => {
         { generic_dict: data },
         {
           headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
+            Authorization: `Bearer ${tokenRef.current}`
+          }
         }
       )
 

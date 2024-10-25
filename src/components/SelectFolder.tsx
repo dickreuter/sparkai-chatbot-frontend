@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { API_URL, HTTP_PREFIX } from '../helper/Constants';
-import axios from 'axios';
-import withAuth from '../routes/withAuth';
-import { useAuthUser } from 'react-auth-kit';
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import axios from "axios";
+import withAuth from "../routes/withAuth";
+import { useAuthUser } from "react-auth-kit";
 import { Button, Card, Form, Spinner } from "react-bootstrap";
-import { faFolder, faFileAlt, faReply } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Skeleton } from '@mui/material';
+import {
+  faFolder,
+  faFileAlt,
+  faReply
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Skeleton } from "@mui/material";
 
 const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const getAuth = useAuthUser();
@@ -20,7 +24,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [activeFolder, setActiveFolder] = useState(null);
   const [selectedFolders, setSelectedFolders] = useState(() => {
-    const initialSelection = new Set([...initialSelectedFolders, 'default']);
+    const initialSelection = new Set([...initialSelectedFolders, "default"]);
     return Array.from(initialSelection);
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -30,8 +34,10 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const [updateTrigger, setUpdateTrigger] = useState(0);
 
   const getTopLevelFolders = () => {
-    return availableCollections.filter(collection => 
-      !collection.includes('FORWARDSLASH') && !collection.startsWith('TenderLibrary_')
+    return availableCollections.filter(
+      (collection) =>
+        !collection.includes("FORWARDSLASH") &&
+        !collection.startsWith("TenderLibrary_")
     );
   };
 
@@ -44,11 +50,11 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
       return <span className="breadcrumb-item">Content Library</span>;
     }
 
-    const parts = activeFolder.split('FORWARDSLASH');
+    const parts = activeFolder.split("FORWARDSLASH");
     return (
       <>
-        <span 
-          className="breadcrumb-item clickable" 
+        <span
+          className="breadcrumb-item clickable"
           onClick={() => setActiveFolder(null)}
         >
           Content Library
@@ -56,11 +62,13 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
         {parts.map((part, index) => (
           <React.Fragment key={index}>
             <span className="breadcrumb-separator">&gt;</span>
-            <span 
-              className={`breadcrumb-item ${index === parts.length - 1 ? '' : 'clickable'}`}
+            <span
+              className={`breadcrumb-item ${index === parts.length - 1 ? "" : "clickable"}`}
               onClick={() => {
                 if (index < parts.length - 1) {
-                  setActiveFolder(parts.slice(0, index + 1).join('FORWARDSLASH'));
+                  setActiveFolder(
+                    parts.slice(0, index + 1).join("FORWARDSLASH")
+                  );
                 }
               }}
             >
@@ -71,7 +79,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
       </>
     );
   };
-  
+
   const fetchFolderStructure = async () => {
     setIsLoading(true); // Set loading to true before fetching
     try {
@@ -80,11 +88,11 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
         {},
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
-  
+
       setAvailableCollections(response.data.collections);
       const structure = {};
-      response.data.collections.forEach(collectionName => {
-        const parts = collectionName.split('FORWARDSLASH');
+      response.data.collections.forEach((collectionName) => {
+        const parts = collectionName.split("FORWARDSLASH");
         let currentLevel = structure;
         parts.forEach((part, index) => {
           if (!currentLevel[part]) {
@@ -93,7 +101,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
           currentLevel = currentLevel[part];
         });
       });
-  
+
       setFolderStructure(structure);
     } catch (error) {
       console.error("Error fetching folder structure:", error);
@@ -109,26 +117,28 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
         { collection_name: folderPath },
         { headers: { Authorization: `Bearer ${tokenRef.current}` } }
       );
-  
-      const filesWithIds = response.data.map(item => ({
+
+      const filesWithIds = response.data.map((item) => ({
         filename: item.meta,
         unique_id: item.unique_id,
         isFolder: false
       }));
-   
+
       const subfolders = availableCollections
-        .filter(collection => collection.startsWith(folderPath + 'FORWARDSLASH'))
-        .map(collection => {
-          const parts = collection.split('FORWARDSLASH');
+        .filter((collection) =>
+          collection.startsWith(folderPath + "FORWARDSLASH")
+        )
+        .map((collection) => {
+          const parts = collection.split("FORWARDSLASH");
           return {
             filename: parts[parts.length - 1],
             unique_id: collection,
             isFolder: true
           };
         });
-  
+
       const allContents = [...subfolders, ...filesWithIds];
-      setFolderContents(prevContents => ({
+      setFolderContents((prevContents) => ({
         ...prevContents,
         [folderPath]: allContents
       }));
@@ -148,9 +158,9 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
 
   const handleBackClick = () => {
     if (activeFolder) {
-      const parts = activeFolder.split('FORWARDSLASH');
+      const parts = activeFolder.split("FORWARDSLASH");
       if (parts.length > 1) {
-        const parentFolder = parts.slice(0, -1).join('FORWARDSLASH');
+        const parentFolder = parts.slice(0, -1).join("FORWARDSLASH");
         setActiveFolder(parentFolder);
         if (!folderContents[parentFolder]) {
           fetchFolderContents(parentFolder);
@@ -162,7 +172,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   };
 
   const handleFolderSelect = (folderPath) => {
-    setSelectedFolders(prev => {
+    setSelectedFolders((prev) => {
       const newSelection = new Set(prev);
       if (newSelection.has(folderPath)) {
         newSelection.delete(folderPath);
@@ -176,14 +186,11 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   };
 
   useEffect(() => {
-    setSelectedFolders(prev => {
+    setSelectedFolders((prev) => {
       const newSelection = new Set([...initialSelectedFolders]);
       return Array.from(newSelection);
     });
   }, [initialSelectedFolders]);
-
-
- 
 
   useEffect(() => {
     fetchFolderStructure();
@@ -206,13 +213,12 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
       setCurrentPage(1);
     }
   }, [activeFolder, folderContents, availableCollections, rowsPerPage]);
-  
+
   const formatDisplayName = (name) => {
-    return name.replace(/_/g, ' ');
+    return name.replace(/_/g, " ");
   };
 
-  const renderFolderStructure = (structure, path = '') => {
-
+  const renderFolderStructure = (structure, path = "") => {
     const topLevelFolders = getTopLevelFolders();
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
@@ -222,11 +228,14 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
       const displayName = formatDisplayName(folderName);
       return (
         <tr key={folderName}>
-          <td className="folder-name" onClick={() => handleFolderClick(folderName)}>
-            <FontAwesomeIcon 
-              icon={faFolder} 
+          <td
+            className="folder-name"
+            onClick={() => handleFolderClick(folderName)}
+          >
+            <FontAwesomeIcon
+              icon={faFolder}
               className="fa-icon"
-              style={{ marginRight: '10px' }}
+              style={{ marginRight: "10px" }}
             />
             {displayName}
           </td>
@@ -243,24 +252,27 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   };
 
   const renderFolderContents = (folderPath) => {
-
     const contents = folderContents[folderPath] || [];
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const contentsToRender = contents.slice(startIndex, endIndex);
     console.log(contentsToRender.length);
 
-    
     return contentsToRender.map(({ filename, unique_id, isFolder }, index) => {
-      const fullPath = isFolder ? `${folderPath}FORWARDSLASH${filename}` : folderPath;
+      const fullPath = isFolder
+        ? `${folderPath}FORWARDSLASH${filename}`
+        : folderPath;
       const displayName = formatDisplayName(filename);
       return (
         <tr key={`${folderPath}-${index}`}>
-          <td className="folder-name" onClick={() => isFolder && handleFolderClick(fullPath)}>
-            <FontAwesomeIcon 
-              icon={isFolder ? faFolder : faFileAlt} 
-              className="fa-icon" 
-              style={{ marginRight: '10px' }} 
+          <td
+            className="folder-name"
+            onClick={() => isFolder && handleFolderClick(fullPath)}
+          >
+            <FontAwesomeIcon
+              icon={isFolder ? faFolder : faFileAlt}
+              className="fa-icon"
+              style={{ marginRight: "10px" }}
             />
             {displayName}
           </td>
@@ -283,58 +295,57 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
     <Card className="select-library-card-custom mt-0 mb-0">
       <Card.Body className="select-library-card-body-content">
         <div className="select-library-card-content-wrapper">
-        <div className="breadcrumb-and-back-container">
-            <div className="breadcrumb-container">
-              {renderBreadcrumbs()}
-            </div>
+          <div className="breadcrumb-and-back-container">
+            <div className="breadcrumb-container">{renderBreadcrumbs()}</div>
             {activeFolder && (
-              <div 
-                className="back-button" 
-                onClick={() => handleBackClick()} 
-              >
+              <div className="back-button" onClick={() => handleBackClick()}>
                 <FontAwesomeIcon icon={faReply} />
-                <span style={{ marginLeft: "10px"}}>Back</span>
+                <span style={{ marginLeft: "10px" }}>Back</span>
               </div>
             )}
           </div>
           {isLoading ? (
             <div className="spinner-container">
-              <Spinner animation="border" role="status" style={{color: "#ff7f50"}}>
+              <Spinner
+                animation="border"
+                role="status"
+                style={{ color: "#ff7f50" }}
+              >
                 <span className="visually-hidden">Loading...</span>
               </Spinner>
             </div>
           ) : (
             <table className="library-table mt-0">
               <tbody>
-                {activeFolder 
+                {activeFolder
                   ? renderFolderContents(activeFolder)
-                  : renderFolderStructure(folderStructure)
-                }
+                  : renderFolderStructure(folderStructure)}
               </tbody>
             </table>
           )}
 
           <div className="pagination-controls">
-            {totalPages > 1 && [...Array(totalPages)].map((_, i) => (
-              <button key={i} onClick={() => paginate(i + 1)} disabled={currentPage === i + 1} className="pagination-button">
-                {i + 1}
-              </button>
-            ))}
+            {totalPages > 1 &&
+              [...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => paginate(i + 1)}
+                  disabled={currentPage === i + 1}
+                  className="pagination-button"
+                >
+                  {i + 1}
+                </button>
+              ))}
           </div>
         </div>
       </Card.Body>
       <style jsx>{`
-      
         .library-table td {
           padding: 13px;
         }
-        
-
-       
-        
       `}</style>
     </Card>
   );
-}
+};
 
 export default withAuth(SelectFolder);

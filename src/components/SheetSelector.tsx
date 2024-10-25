@@ -1,24 +1,24 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Card, Form, Spinner } from "react-bootstrap";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { BidContext } from "../views/BidWritingStateManagerView.tsx";
 import { EditorState } from "draft-js";
 
-const SheetSelector = ({ 
-  inputText, 
-  responseEditorState, 
+const SheetSelector = ({
+  inputText,
+  responseEditorState,
   onSelectSheet,
   isCreatingNewSheet,
   onCreateNewSheet,
   onCancelNewSheet
-}: { 
-  inputText: string, 
-  responseEditorState: EditorState, 
-  onSelectSheet: (sheetName: string) => void,
-  isCreatingNewSheet: boolean,
-  onCreateNewSheet: (sheetName: string) => void,
-  onCancelNewSheet: () => void
+}: {
+  inputText: string;
+  responseEditorState: EditorState;
+  onSelectSheet: (sheetName: string) => void;
+  isCreatingNewSheet: boolean;
+  onCreateNewSheet: (sheetName: string) => void;
+  onCancelNewSheet: () => void;
 }) => {
   const { sharedState } = useContext(BidContext);
   const [selectedSheet, setSelectedSheet] = useState<string | null>(null);
@@ -27,7 +27,9 @@ const SheetSelector = ({
   const [newSheetName, setNewSheetName] = useState("");
   const rowsPerPage = 5;
   const [totalPages, setTotalPages] = useState(0);
-  const qaSheets = sharedState.documents.filter(doc => doc.type === 'qa sheet');
+  const qaSheets = sharedState.documents.filter(
+    (doc) => doc.type === "qa sheet"
+  );
 
   useEffect(() => {
     setIsLoading(false);
@@ -43,7 +45,7 @@ const SheetSelector = ({
   const handleSheetSelect = (sheetName: string) => {
     if (selectedSheet === sheetName) {
       setSelectedSheet(null);
-      onSelectSheet('');
+      onSelectSheet("");
     } else {
       setSelectedSheet(sheetName);
       onSelectSheet(sheetName);
@@ -51,7 +53,7 @@ const SheetSelector = ({
   };
 
   const handleNewSheetKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && newSheetName.trim()) {
+    if (e.key === "Enter" && newSheetName.trim()) {
       onCreateNewSheet(newSheetName.trim());
     }
   };
@@ -74,7 +76,7 @@ const SheetSelector = ({
           <FontAwesomeIcon
             icon={faFileAlt}
             className="fa-icon"
-            style={{ marginRight: '10px' }}
+            style={{ marginRight: "10px" }}
           />
           <input
             type="text"
@@ -85,13 +87,13 @@ const SheetSelector = ({
             placeholder="Enter sheet name"
             autoFocus
             style={{
-              border: 'none',
-              background: 'transparent',
-              width: 'calc(100% - 30px)',
-              outline: 'none',
-              fontSize: 'inherit',
-              padding: '0',
-              color: 'black'
+              border: "none",
+              background: "transparent",
+              width: "calc(100% - 30px)",
+              outline: "none",
+              fontSize: "inherit",
+              padding: "0",
+              color: "black"
             }}
           />
         </td>
@@ -117,11 +119,14 @@ const SheetSelector = ({
 
     return sheetsToRender.map((sheet, index) => (
       <tr key={`sheet-${startIndex + index}`}>
-        <td className="sheet-name" onClick={() => handleSheetSelect(sheet.name)}>
+        <td
+          className="sheet-name"
+          onClick={() => handleSheetSelect(sheet.name)}
+        >
           <FontAwesomeIcon
             icon={faFileAlt}
             className="fa-icon"
-            style={{ marginRight: '10px' }}
+            style={{ marginRight: "10px" }}
           />
           {sheet.name}
         </td>
@@ -144,10 +149,18 @@ const SheetSelector = ({
     <Card className="select-library-card-custom mt-0 mb-0">
       <Card.Body className="select-library-card-body-content">
         <div className="select-library-card-content-wrapper">
-          <p>Choose a Q&A Sheet to add your answer to. This sheet will appear as a tab in the Bid Compiler page. Your Question and Answer will be added to the end of the sheet so make sure you scroll to the bottom!</p>
+          <p>
+            Choose a Q&A Sheet to add your answer to. This sheet will appear as
+            a tab in the Bid Compiler page. Your Question and Answer will be
+            added to the end of the sheet so make sure you scroll to the bottom!
+          </p>
           {isLoading ? (
             <div className="spinner-container">
-              <Spinner animation="border" role="status" style={{color: "#ff7f50"}}>
+              <Spinner
+                animation="border"
+                role="status"
+                style={{ color: "#ff7f50" }}
+              >
                 <span className="visually-hidden">Loading...</span>
               </Spinner>
             </div>
@@ -160,16 +173,17 @@ const SheetSelector = ({
             </table>
           )}
           <div className="pagination-controls">
-            {totalPages > 1 && [...Array(totalPages)].map((_, i) => (
-              <button
-                key={i}
-                onClick={() => paginate(i + 1)}
-                disabled={currentPage === i + 1}
-                className={`pagination-button ${currentPage === i + 1 ? 'active' : ''}`}
-              >
-                {i + 1}
-              </button>
-            ))}
+            {totalPages > 1 &&
+              [...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => paginate(i + 1)}
+                  disabled={currentPage === i + 1}
+                  className={`pagination-button ${currentPage === i + 1 ? "active" : ""}`}
+                >
+                  {i + 1}
+                </button>
+              ))}
           </div>
         </div>
       </Card.Body>

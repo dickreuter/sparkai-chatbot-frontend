@@ -1,6 +1,6 @@
-import AddUser from '../components/AddUser'
-import AdminPannel from '../components/AdminPannel'
-import './Pannels.css'
+import AddUser from "../components/AddUser";
+import AdminPannel from "../components/AdminPannel";
+import "./Pannels.css";
 
 function Pannels() {
   return (
@@ -8,7 +8,7 @@ function Pannels() {
       <AddUser />
       <AdminPannel />
     </div>
-  )
+  );
 }
 
-export default Pannels
+export default Pannels;

@@ -1,97 +1,97 @@
 .sidebarsmall {
-    height: 125vh;
-    margin-top: 0px;
-    width: 185px;
-    /* Adjust width as needed */
-    position: fixed;
-    z-index: 200;
-    top: 0;
-    left: 0;
-    background-color: #262626;
-    overflow-x: hidden;
-    padding-top: 65px;
-    padding-left: 10px;
-    padding-right: 10px;
-    margin-bottom: 0;
-    border: none;
-    /* Add some padding to the left */
+  height: 125vh;
+  margin-top: 0px;
+  width: 185px;
+  /* Adjust width as needed */
+  position: fixed;
+  z-index: 200;
+  top: 0;
+  left: 0;
+  background-color: #262626;
+  overflow-x: hidden;
+  padding-top: 65px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-bottom: 0;
+  border: none;
+  /* Add some padding to the left */
 }
 
 .sidebarsmall a {
-    justify-content: start;
-    /* Align items horizontally at the start */
-    padding-top: 8px;
-    padding-bottom: 8px;
-    /* Top and bottom padding only */
-    text-decoration: none;
-    color: white;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    font-size: 20px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    /* Reduce the distance between each line */
-    border-radius: 10px;
-    /* Rounded edges for the rectangle */
+  justify-content: start;
+  /* Align items horizontally at the start */
+  padding-top: 8px;
+  padding-bottom: 8px;
+  /* Top and bottom padding only */
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  /* Reduce the distance between each line */
+  border-radius: 10px;
+  /* Rounded edges for the rectangle */
 }
 
 .sidebarsmall a span {
-    font-size: 14px;
-    /* Reduce text size */
+  font-size: 14px;
+  /* Reduce text size */
 }
 
 .sidebarsmall a:hover {
-    color: white;
-    /* Keep text color white on hover */
-    background-color: #757575;
-    /* Grey background on hover */
+  color: white;
+  /* Keep text color white on hover */
+  background-color: #757575;
+  /* Grey background on hover */
 }
 
 .sidebarsmall a svg {
-    margin: 0 10px 0 0;
-    margin-left: 10px;
-    /* Add margin to the right of SVG to create a gap */
-    width: 16px;
-    height: 16px;
+  margin: 0 10px 0 0;
+  margin-left: 10px;
+  /* Add margin to the right of SVG to create a gap */
+  width: 16px;
+  height: 16px;
 }
 
 .sidebarsmall-image-link {
-    display: flex;
-    align-items: center;
-    padding: 10px 0;
-    text-decoration: none;
-    color: white;
-    font-weight: 500;
-    margin-top: 5px;
-    margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .sidebarsmall-image-link img {
-    height: 24px;
-    width: 22px;
-    margin-right: 7px;
-    margin-left: 6px;
-    /* Add space between image and text */
+  height: 24px;
+  width: 22px;
+  margin-right: 7px;
+  margin-left: 6px;
+  /* Add space between image and text */
 }
 
 .signout-container {
-    border-top: 2px solid #757575;
-    /* Add a bar above the signout link */
-    padding-top: 10px;
-    margin-top: 10px;
+  border-top: 2px solid #757575;
+  /* Add a bar above the signout link */
+  padding-top: 10px;
+  margin-top: 10px;
 }
 
 .signout-link {
-    margin-top: auto;
+  margin-top: auto;
 }
 
 .sidebarsmalllink-active {
-    color: orange;
-    /* Set the color to orange */
+  color: orange;
+  /* Set the color to orange */
 }
 
 .sidebarsmalllink-active svg {
-    color: orange;
-    /* This will make the SVG icon orange */
+  color: orange;
+  /* This will make the SVG icon orange */
 }

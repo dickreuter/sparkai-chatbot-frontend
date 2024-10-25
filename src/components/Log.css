@@ -1,13 +1,13 @@
 .log-table table {
-    font-size: 8px; /* Adjust the size as needed */
-    border: 1px solid #000;
-    text-align: left;
-    margin-top:5em;
-  }
+  font-size: 8px; /* Adjust the size as needed */
+  border: 1px solid #000;
+  text-align: left;
+  margin-top: 5em;
+}
 
-  .log-table table td {
-    padding: 0 0.5em;
-    border: 1px solid #000;
-    vertical-align: top; /* Align text to the top of the cell */
-    padding-top: 1em;
-  }
+.log-table table td {
+  padding: 0 0.5em;
+  border: 1px solid #000;
+  vertical-align: top; /* Align text to the top of the cell */
+  padding-top: 1em;
+}

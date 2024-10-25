@@ -1,8 +1,8 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import './DashboardCard.css';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import "./DashboardCard.css";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardCardProps {
   icon: IconDefinition;
@@ -13,11 +13,18 @@ interface DashboardCardProps {
   onCardClick?: () => void; // Add this prop
 }
 
-const DashboardCard: React.FC<DashboardCardProps> = ({ icon, title, description, path, style, onCardClick }) => {
+const DashboardCard: React.FC<DashboardCardProps> = ({
+  icon,
+  title,
+  description,
+  path,
+  style,
+  onCardClick
+}) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    if (path === '/bid-extractor' && onCardClick) {
+    if (path === "/bid-extractor" && onCardClick) {
       onCardClick(); // Call the provided onCardClick function
     } else {
       navigate(path);

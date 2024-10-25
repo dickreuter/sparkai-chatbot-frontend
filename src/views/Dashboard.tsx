@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { API_URL, HTTP_PREFIX } from '../helper/Constants';
-import axios from 'axios';
-import withAuth from '../routes/withAuth';
-import { useAuthUser } from 'react-auth-kit';
-import SideBarSmall from '../routes/SidebarSmall.tsx';
-import { faEye, faBook } from '@fortawesome/free-solid-svg-icons';
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import axios from "axios";
+import withAuth from "../routes/withAuth";
+import { useAuthUser } from "react-auth-kit";
+import SideBarSmall from "../routes/SidebarSmall.tsx";
+import { faEye, faBook } from "@fortawesome/free-solid-svg-icons";
 import DashboardCard from "../components/DashboardCard.tsx";
-import { faFileSignature, faComments } from '@fortawesome/free-solid-svg-icons';
-import { Link, useNavigate } from 'react-router-dom';
-import handleGAEvent from '../utilities/handleGAEvent';
+import { faFileSignature, faComments } from "@fortawesome/free-solid-svg-icons";
+import { Link, useNavigate } from "react-router-dom";
+import handleGAEvent from "../utilities/handleGAEvent";
 import BidCard from "../components/BidCard.tsx";
 import { Card, Col, Row, Modal, Button, Alert, Spinner } from "react-bootstrap";
-import "./Dashboard.css"
+import "./Dashboard.css";
 import { TextField } from "@mui/material";
 import CustomTextField from "../components/CustomTextField.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
@@ -23,8 +23,8 @@ const Dashboard = () => {
   const [bids, setBids] = useState([]);
   const [selectedBid, setSelectedBid] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [bidName, setBidName] = useState('');
-  const [bidNameError, setBidNameError] = useState('');
+  const [bidName, setBidName] = useState("");
+  const [bidNameError, setBidNameError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -35,13 +35,15 @@ const Dashboard = () => {
 
   const fetchBids = async () => {
     try {
-      const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
         {},
         {
           headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
-        });
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
       if (response.data && response.data.bids) {
         setBids(response.data.bids);
         console.log(response.data);
@@ -54,12 +56,16 @@ const Dashboard = () => {
   };
 
   const recentOngoingBids = bids
-    .filter(bid => bid.status.toLowerCase() === 'ongoing')
+    .filter((bid) => bid.status.toLowerCase() === "ongoing")
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 4);
 
   const handleOngoingSidebarLinkClick = (label) => {
-    handleGAEvent('Sidebar Navigation', 'Ongoing Link Click', 'ongoing link nav');
+    handleGAEvent(
+      "Sidebar Navigation",
+      "Ongoing Link Click",
+      "ongoing link nav"
+    );
   };
 
   const handleWriteProposalClick = () => {
@@ -68,69 +74,68 @@ const Dashboard = () => {
 
   const handleModalClose = () => {
     setShowModal(false);
-    setBidName('');
+    setBidName("");
   };
 
   const handleModalSubmit = () => {
     if (!bidName) {
-      displayAlert('Bid name cannot be empty', 'danger');
+      displayAlert("Bid name cannot be empty", "danger");
       return;
     }
     if (bidName.length > 20) {
-      displayAlert('Bid name cannot exceed 20 characters', 'danger');
+      displayAlert("Bid name cannot exceed 20 characters", "danger");
       return;
     }
-    if (bids.some(bid => bid.bid_title === bidName)) {
-      displayAlert('Bid name already exists', 'danger');
+    if (bids.some((bid) => bid.bid_title === bidName)) {
+      displayAlert("Bid name already exists", "danger");
       return;
     }
 
-    localStorage.removeItem('bidInfo');
-    localStorage.removeItem('backgroundInfo');
-    localStorage.removeItem('response');
-    localStorage.removeItem('inputText');
-    localStorage.removeItem('editorState');
-    localStorage.removeItem('messages');
-    localStorage.removeItem('bidState');
-    handleOngoingSidebarLinkClick('Write a Proposal click');
-    navigate('/bid-extractor', { state: { bidName } });
+    localStorage.removeItem("bidInfo");
+    localStorage.removeItem("backgroundInfo");
+    localStorage.removeItem("response");
+    localStorage.removeItem("inputText");
+    localStorage.removeItem("editorState");
+    localStorage.removeItem("messages");
+    localStorage.removeItem("bidState");
+    handleOngoingSidebarLinkClick("Write a Proposal click");
+    navigate("/bid-extractor", { state: { bidName } });
     setShowModal(false);
   };
 
-
   const navigateToChatbot = (bid) => {
-    localStorage.removeItem('bidInfo');
-    localStorage.removeItem('backgroundInfo');
-    localStorage.removeItem('response');
-    localStorage.removeItem('inputText');
-    localStorage.removeItem('editorState');
-    localStorage.removeItem('messages');
-    localStorage.removeItem('bidState');
-    setSelectedBid(bid);  // Update the selected bid
-    handleOngoingSidebarLinkClick('Ongoing bid click');
-    localStorage.setItem('navigatedFromBidsTable', 'true');
-    navigate('/bid-extractor', { state: { bid: bid, fromBidsTable: true } });
+    localStorage.removeItem("bidInfo");
+    localStorage.removeItem("backgroundInfo");
+    localStorage.removeItem("response");
+    localStorage.removeItem("inputText");
+    localStorage.removeItem("editorState");
+    localStorage.removeItem("messages");
+    localStorage.removeItem("bidState");
+    setSelectedBid(bid); // Update the selected bid
+    handleOngoingSidebarLinkClick("Ongoing bid click");
+    localStorage.setItem("navigatedFromBidsTable", "true");
+    navigate("/bid-extractor", { state: { bid: bid, fromBidsTable: true } });
     fetchBids();
   };
 
   if (isLoading) {
     return (
       <div>
-      <SideBarSmall />
-      <div className="loading-container">
-        <Spinner animation="border" variant="primary" className="spinner" />
-      </div>
+        <SideBarSmall />
+        <div className="loading-container">
+          <Spinner animation="border" variant="primary" className="spinner" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div >
+    <div>
       <SideBarSmall />
 
       <div className="lib-container">
         <div className="mb-3">
-          <h1 className='heavy'>Dashboard</h1>
+          <h1 className="heavy">Dashboard</h1>
         </div>
 
         <div className="dashboard-container">
@@ -154,7 +159,7 @@ const Dashboard = () => {
             path="/calculator"
           />
           <DashboardCard
-            style={{ margin: '0px !important' }}
+            style={{ margin: "0px !important" }}
             icon={faBook}
             title="Company Library"
             description="Upload relevant company information."
@@ -170,7 +175,7 @@ const Dashboard = () => {
                 state={{ bid: bid, fromBidsTable: true }}
                 onClick={() => navigateToChatbot(bid)}
                 to={`/bid-extractor`} // Ensure you replace this with the correct path
-                style={{ textDecoration: 'none' }} // Remove default link styling
+                style={{ textDecoration: "none" }} // Remove default link styling
               >
                 <BidCard
                   title={bid.bid_title}
@@ -182,7 +187,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-         {/* <div className="mt-4">
+        {/* <div className="mt-4">
           <Row>
             <Col md={12}>
               <Card className="lib-custom-card mb-4">
@@ -223,8 +228,12 @@ const Dashboard = () => {
           </Row>
         </div>
      */}
- </div> 
- <Modal show={showModal} onHide={handleModalClose} className="custom-modal-newbid">
+      </div>
+      <Modal
+        show={showModal}
+        onHide={handleModalClose}
+        className="custom-modal-newbid"
+      >
         <Modal.Header closeButton className="px-4 py-3">
           <Modal.Title>Enter Bid Name</Modal.Title>
         </Modal.Header>
@@ -245,8 +254,8 @@ const Dashboard = () => {
           </div>
         </Modal.Body>
       </Modal>
-        </div>
-      );
-    }
+    </div>
+  );
+};
 
 export default withAuth(Dashboard);

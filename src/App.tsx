@@ -1,14 +1,14 @@
-import React, {useEffect} from 'react';
-import { BrowserRouter, useLocation } from 'react-router-dom';
-import { AuthProvider, useAuthUser } from 'react-auth-kit';
-import './App.css';
-import './resources/clash-display.css';
-import NavBar from './routes/NavBar';
-import Routing from './routes/Routing';
+import React, { useEffect } from "react";
+import { BrowserRouter, useLocation } from "react-router-dom";
+import { AuthProvider, useAuthUser } from "react-auth-kit";
+import "./App.css";
+import "./resources/clash-display.css";
+import NavBar from "./routes/NavBar";
+import Routing from "./routes/Routing";
 import ReactGA4 from "react-ga4";
-import './Widget.css';
+import "./Widget.css";
 import SupportChat from "./components/SupportChat.tsx";
-import AutoLogout from './components/auth/AutoLogout.tsx';
+import AutoLogout from "./components/auth/AutoLogout.tsx";
 
 ReactGA4.initialize("G-X8S1ZMRM3C");
 
@@ -24,24 +24,35 @@ const Layout = () => {
   }, [auth?.token]);
 
   const isAuthenticated = auth?.token !== undefined;
-  const showNavBarPaths = ['/library', '/howto', '/bids', '/', '/dashboard', '/chatResponse', "/bid-extractor", "/question-crafter", "/proposal", "/profile", "/calculator"  ];
+  const showNavBarPaths = [
+    "/library",
+    "/howto",
+    "/bids",
+    "/",
+    "/dashboard",
+    "/chatResponse",
+    "/bid-extractor",
+    "/question-crafter",
+    "/proposal",
+    "/profile",
+    "/calculator"
+  ];
   const shouldShowNavBar = showNavBarPaths.includes(location.pathname);
 
   return (
     <>
-     {isAuthenticated && <AutoLogout />}
+      {isAuthenticated && <AutoLogout />}
       {shouldShowNavBar && <NavBar />}
       <div className="main-content">
         <Routing />
       </div>
-      {isAuthenticated && <SupportChat auth={auth} />} {/* Use the ChatBot component */}
+      {isAuthenticated && <SupportChat auth={auth} />}{" "}
+      {/* Use the ChatBot component */}
     </>
   );
 };
 
 const App = () => {
-
-
   return (
     <AuthProvider authType={"localstorage"} authName={"sparkaichatbot"}>
       <BrowserRouter>
@@ -49,7 +60,6 @@ const App = () => {
       </BrowserRouter>
     </AuthProvider>
   );
-}
-
+};
 
 export default App;

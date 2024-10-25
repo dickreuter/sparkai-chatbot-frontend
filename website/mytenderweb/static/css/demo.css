@@ -1,46 +1,46 @@
 .message-box {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    font-size: 26px;
-    color: #fff;
-    background: black;
-    border-radius: 50%;
-    padding: 5px;
-    z-index: 80000;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 26px;
+  color: #fff;
+  background: black;
+  border-radius: 50%;
+  padding: 5px;
+  z-index: 80000;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
 }
 
 .message-box:hover {
-    background-color: #333;
+  background-color: #333;
 }
 
-.message-box>a,
-.message-box>a:active,
-.message-box>a:focus,
-.message-box>a:hover {
-    color: #fff;
+.message-box > a,
+.message-box > a:active,
+.message-box > a:focus,
+.message-box > a:hover {
+  color: #fff;
 }
 
-.message-box>a .slack-message-count {
-    position: absolute;
-    top: 0;
-    right: -5px;
-    display: none;
+.message-box > a .slack-message-count {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  display: none;
 }
 
 @media screen and (max-width: 768px) {
-    .message-box {
-        bottom: 25px;
-        right: 25px;
-        font-size: 20px;
-        height: 40px;
-        width: 40px;
-    }
+  .message-box {
+    bottom: 25px;
+    right: 25px;
+    font-size: 20px;
+    height: 40px;
+    width: 40px;
+  }
 }

@@ -1,76 +1,76 @@
 .search-form {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .snippets {
-    max-height: 65vh;
-    /* Adjust this value as needed */
-    overflow-y: auto;
-    padding-bottom: 15px;
-    padding-right: 10px;
+  max-height: 65vh;
+  /* Adjust this value as needed */
+  overflow-y: auto;
+  padding-bottom: 15px;
+  padding-right: 10px;
 }
 
 .search-input-group {
-    display: flex;
-    position: relative;
+  display: flex;
+  position: relative;
 }
 
 .search-input-group .form-control {
-    flex-grow: 1;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    box-shadow: none;
-    padding-right: 90px;
-    /* Adjust this value based on your button width */
+  flex-grow: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: none;
+  padding-right: 90px;
+  /* Adjust this value based on your button width */
 }
 
 .search-input-group .form-control:focus {
-    border-color: #ced4da;
-    /* Keep the same border color when focused */
-    outline: 0;
-    box-shadow: none;
-    /* Remove the default focus shadow */
+  border-color: #ced4da;
+  /* Keep the same border color when focused */
+  outline: 0;
+  box-shadow: none;
+  /* Remove the default focus shadow */
 }
 
 .search-input-group .form-control:focus-visible {
-    border-color: #ced4da;
-    /* Keep the same border color when focus is visible */
-    outline: 0;
-    box-shadow: none;
-    /* Remove the default focus shadow */
+  border-color: #ced4da;
+  /* Keep the same border color when focus is visible */
+  outline: 0;
+  box-shadow: none;
+  /* Remove the default focus shadow */
 }
 
 .search-button {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    background-color: black;
-    border: black;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: black;
+  border: black;
 }
 
 .search-button:disabled,
 .search-button.btn-disabled {
-    background-color: #262626 !important;
-    /* Black background when disabled */
-    color: white !important;
-    cursor: not-allowed;
+  background-color: #262626 !important;
+  /* Black background when disabled */
+  color: white !important;
+  cursor: not-allowed;
 }
 
 .search-button:hover:not(:disabled) {
-    background-color: #3b3b3b;
+  background-color: #3b3b3b;
 }
 
 .search-button:active:not(:disabled) {
-    background-color: #3b3b3b;
+  background-color: #3b3b3b;
 }
 
 .search-button:focus,
 .search-button:focus-visible {
-    outline: none !important;
-    box-shadow: none !important;
-    background-color: #262626;
-    /* Ensures it doesn't flash blue */
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: #262626;
+  /* Ensures it doesn't flash blue */
 }

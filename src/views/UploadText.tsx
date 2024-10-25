@@ -6,18 +6,18 @@ import withAuth from "../routes/withAuth";
 import "./Upload.css";
 import { displayAlert } from "../helper/Alert";
 import CustomTextField from "../components/CustomTextField";
-import TextField from '@mui/material/TextField';
+import TextField from "@mui/material/TextField";
 import handleGAEvent from "../utilities/handleGAEvent";
-import { Spinner } from 'react-bootstrap'; // Import Spinner component
+import { Spinner } from "react-bootstrap"; // Import Spinner component
 
 const UploadText = ({ folder, get_collections, onClose }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const [text, setText] = useState('');
-  const [profileName, setProfileName] = useState(folder || 'default');
-  const [fileName, setFileName] = useState('');
+  const [text, setText] = useState("");
+  const [profileName, setProfileName] = useState(folder || "default");
+  const [fileName, setFileName] = useState("");
   const [textFormat, setTextFormat] = useState("plain");
   const [isUploading, setIsUploading] = useState(false);
   const [isFormFilled, setIsFormFilled] = useState(false);
@@ -33,30 +33,36 @@ const UploadText = ({ folder, get_collections, onClose }) => {
     setIsUploading(true);
 
     const trimmedProfileName = profileName.trim(); // Remove leading and trailing spaces
-    const formattedProfileName = trimmedProfileName.replace(/\s+/g, '_');
+    const formattedProfileName = trimmedProfileName.replace(/\s+/g, "_");
 
     const trimmedFileName = fileName.trim(); // Remove leading and trailing spaces
-    const formattedFileName = trimmedFileName.replace(/\s+/g, '_');
-   
+    const formattedFileName = trimmedFileName.replace(/\s+/g, "_");
+
     formData.append("text", text);
     formData.append("filename", formattedFileName);
     formData.append("profile_name", formattedProfileName);
     formData.append("mode", textFormat);
 
     if (!/^[a-zA-Z0-9_-]{3,}$/.test(formattedProfileName)) {
-      displayAlert('Folder name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
+      displayAlert(
+        "Folder name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long",
+        "warning"
+      );
       setIsUploading(false);
       return;
     }
 
     if (!/^[a-zA-Z0-9_-]{3,}$/.test(formattedFileName)) {
-      displayAlert('File name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long', 'warning');
+      displayAlert(
+        "File name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long",
+        "warning"
+      );
       setIsUploading(false);
       return;
     }
 
     if (text.length < 30) {
-      displayAlert('Minimum input text is 30 characters', 'warning');
+      displayAlert("Minimum input text is 30 characters", "warning");
       setIsUploading(false);
       return;
     }
@@ -67,21 +73,24 @@ const UploadText = ({ folder, get_collections, onClose }) => {
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${tokenRef.current}` // Adding the token in the request headers
-          },
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${tokenRef.current}` // Adding the token in the request headers
+          }
         }
       );
 
       displayAlert("Upload successful", "success");
       onClose();
       get_collections();
-      handleGAEvent('Library', 'Text Upload', 'Upload Text Button');
+      handleGAEvent("Library", "Text Upload", "Upload Text Button");
     } catch (error) {
       console.error("Error saving strategy:", error);
-  
+
       if (error.response && error.response.status === 409) {
-        displayAlert("A file with this name already exists in this folder", "danger");
+        displayAlert(
+          "A file with this name already exists in this folder",
+          "danger"
+        );
       } else {
         displayAlert("Failed to save", "danger");
       }
@@ -91,23 +100,25 @@ const UploadText = ({ folder, get_collections, onClose }) => {
   };
 
   const formatDisplayName = (name) => {
-    return name.replace(/_/g, ' ').replace(/FORWARDSLASH/g, '/');
+    return name.replace(/_/g, " ").replace(/FORWARDSLASH/g, "/");
   };
 
   // Updated function to reverse the formatting
   const reverseFormatDisplayName = (name) => {
-    return name.replace(/\s+/g, '_').replace(/\//g, 'FORWARDSLASH');
+    return name.replace(/\s+/g, "_").replace(/\//g, "FORWARDSLASH");
   };
 
   return (
-    <div className="App" style={{ textAlign: 'left' }}>
+    <div className="App" style={{ textAlign: "left" }}>
       <div className="input-options-container">
         <CustomTextField
           fullWidth
           label="Folder"
           variant="outlined"
           value={formatDisplayName(profileName)}
-          onChange={(e) => setProfileName(reverseFormatDisplayName(e.target.value))}
+          onChange={(e) =>
+            setProfileName(reverseFormatDisplayName(e.target.value))
+          }
           disabled={!!folder}
           inputProps={{ maxLength: 50 }}
         />
@@ -128,8 +139,12 @@ const UploadText = ({ folder, get_collections, onClose }) => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           sx={{
-            '& .MuiOutlinedInput-root': { fontFamily: '"ClashDisplay", sans-serif' },
-            '& .MuiInputLabel-root': { fontFamily: '"ClashDisplay", sans-serif' },
+            "& .MuiOutlinedInput-root": {
+              fontFamily: '"ClashDisplay", sans-serif'
+            },
+            "& .MuiInputLabel-root": {
+              fontFamily: '"ClashDisplay", sans-serif'
+            }
           }}
         />
 

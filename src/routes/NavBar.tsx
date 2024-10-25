@@ -18,20 +18,16 @@ const NavBar = () => {
 
   const toggle = () => setIsOpen(!isOpen);
 
-
-
   const handleNavLinkClick = () => {
-    handleGAEvent('Navigation', 'Link Click', 'newbid');
-    localStorage.removeItem('bidInfo');
-    localStorage.removeItem('backgroundInfo');
-    localStorage.removeItem('response');
-    localStorage.removeItem('inputText');
-    localStorage.removeItem('editorState');
-    localStorage.removeItem('messages');
-    localStorage.removeItem('bidState');
+    handleGAEvent("Navigation", "Link Click", "newbid");
+    localStorage.removeItem("bidInfo");
+    localStorage.removeItem("backgroundInfo");
+    localStorage.removeItem("response");
+    localStorage.removeItem("inputText");
+    localStorage.removeItem("editorState");
+    localStorage.removeItem("messages");
+    localStorage.removeItem("bidState");
     window.location.href = `/bid-extractor`;
-
-
   };
 
   useEffect(() => {
@@ -48,8 +44,8 @@ const NavBar = () => {
           {},
           {
             headers: {
-              Authorization: `Bearer ${token}`,
-            },
+              Authorization: `Bearer ${token}`
+            }
           }
         );
         const { email } = response.data;
@@ -83,7 +79,6 @@ const NavBar = () => {
       </button>
       <a className="navbar-brand" href="/bids">
         mytender.io &nbsp;
-
       </a>
 
       <div
@@ -93,9 +88,6 @@ const NavBar = () => {
         <ul className="navbar-nav ml-auto">
           {" "}
           {/* Apply ml-auto here */}
-
-
-
           {auth ? (
             email === "adminuser" && (
               <>
@@ -109,41 +101,37 @@ const NavBar = () => {
           ) : (
             <></>
           )}
-           {auth ? (
+          {auth ? (
             email === "adminuser" && (
               <>
-                 <li className="nav-item">
-                <Link className="nav-link" to="/qlog">
-                  Question Log{" "}
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/flog">
-                  Feedback Log{" "}
-                </Link>
-              </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/qlog">
+                    Question Log{" "}
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/flog">
+                    Feedback Log{" "}
+                  </Link>
+                </li>
               </>
             )
           ) : (
             <></>
           )}
-
-
-       {auth ? (
-        <li className="nav-item ">
-            {/*
+          {auth ? (
+            <li className="nav-item ">
+              {/*
           <Link to="/login">
             <button onClick={signOut} className="btn btn-dark nav-link">
             Logout
           </button>
         </Link>
          */}
-         
-        </li>
-        
-      ) : (
-        <>
-          {/* <li className="nav-item"> 
+            </li>
+          ) : (
+            <>
+              {/* <li className="nav-item"> 
           <Link to="/login">
           <button className="btn btn-dark nav-link">
             Login
@@ -151,10 +139,8 @@ const NavBar = () => {
         </Link>
           </li>
            */}
-        </>
-       
-      )}
-
+            </>
+          )}
         </ul>
       </div>
     </nav>

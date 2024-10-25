@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 import { useEffect, useRef, useState } from "react";
@@ -17,7 +17,6 @@ const NavBar = () => {
   const navigate = useNavigate();
 
   const toggle = () => setIsOpen(!isOpen);
-
 
   useEffect(() => {
     tokenRef.current = auth?.token || "default";
@@ -54,21 +53,15 @@ const NavBar = () => {
 
     // Cleanup interval on unmount
     return () => clearInterval(interval);
-  }, [auth]); 
+  }, [auth]);
   return (
     <nav className="navbar navbar-expand-sm fixed-top navbar-light bg-light">
-    
       <a className="navbar-brand" href="/">
         mytender.io &nbsp;
-
       </a>
 
-      <div
-        className={`collapse navbar-collapse ${isOpen ? "show" : ""}`}
-        id="navbarTogglerDemo03"
-      >
-        <ul className="navbar-nav ml-auto">
-        </ul>
+      <div className={`collapse navbar-collapse ${isOpen ? "show" : ""}`} id="navbarTogglerDemo03">
+        <ul className="navbar-nav ml-auto"></ul>
       </div>
     </nav>
   );

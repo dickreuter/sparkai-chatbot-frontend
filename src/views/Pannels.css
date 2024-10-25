@@ -1,11 +1,9 @@
 .Pannels {
-    /* align items horizontally */
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+  /* align items horizontally */
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 
-    /* add padding between items */
-    padding: 2rem;
-
-
+  /* add padding between items */
+  padding: 2rem;
 }

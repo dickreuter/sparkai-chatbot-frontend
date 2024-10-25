@@ -1,28 +1,28 @@
-    /* Custom modal styles */
-    
-    .loading-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 125vh;
-        width: 125vw;
-        padding-top: 0px;
-        /* Full viewport height */
-    }
-    
-    .custom-modal-newbid .modal-dialog {
-        max-width: 32%;
-    }
-    
-    .custom-modal-newbid .modal-title {
-        font-size: 1.25rem;
-        /* Adjust the font size as needed */
-    }
-    
-    .custom-modal-newbid .modal-content {
-        border-radius: 10px;
-    }
-    
-    .spinner {
-        position: relative;
-    }
+/* Custom modal styles */
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 125vh;
+  width: 125vw;
+  padding-top: 0px;
+  /* Full viewport height */
+}
+
+.custom-modal-newbid .modal-dialog {
+  max-width: 32%;
+}
+
+.custom-modal-newbid .modal-title {
+  font-size: 1.25rem;
+  /* Adjust the font size as needed */
+}
+
+.custom-modal-newbid .modal-content {
+  border-radius: 10px;
+}
+
+.spinner {
+  position: relative;
+}

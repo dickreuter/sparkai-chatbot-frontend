@@ -1,17 +1,23 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
-import SheetSelector from '../components/SheetSelector';
+import React, { useContext, useState, useEffect } from "react";
+import { Modal, Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheckCircle, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import SheetSelector from "../components/SheetSelector";
 import { BidContext } from "../views/BidWritingStateManagerView.tsx";
 import "./SaveQASheet.css";
-import { EditorState, Modifier, SelectionState, convertToRaw } from 'draft-js';
+import { EditorState, Modifier, SelectionState, convertToRaw } from "draft-js";
 
-const SaveQASheet = ({ inputText, responseEditorState }: { inputText: string, responseEditorState: EditorState }) => {
+const SaveQASheet = ({
+  inputText,
+  responseEditorState
+}: {
+  inputText: string;
+  responseEditorState: EditorState;
+}) => {
   const [show, setShow] = useState(false);
   const [selectedSheet, setSelectedSheet] = useState(null);
   const { sharedState, setSharedState } = useContext(BidContext);
-  const [saveButtonState, setSaveButtonState] = useState('default');
+  const [saveButtonState, setSaveButtonState] = useState("default");
   const [isCreatingNewSheet, setIsCreatingNewSheet] = useState(false);
 
   const handleShow = () => setShow(true);
@@ -26,14 +32,14 @@ const SaveQASheet = ({ inputText, responseEditorState }: { inputText: string, re
     const newDoc = {
       name: sheetName,
       editorState: newEditorState,
-      type: 'qa sheet'
+      type: "qa sheet"
     };
 
-    setSharedState(prevState => ({
+    setSharedState((prevState) => ({
       ...prevState,
       documents: [...prevState.documents, newDoc]
     }));
-    
+
     setSelectedSheet(sheetName);
     setIsCreatingNewSheet(false);
   };
@@ -42,38 +48,56 @@ const SaveQASheet = ({ inputText, responseEditorState }: { inputText: string, re
     if (selectedSheet) {
       addToQASheet(selectedSheet, inputText, responseEditorState);
       handleClose();
-      setSaveButtonState('success');
+      setSaveButtonState("success");
     }
   };
 
-  const addToQASheet = (sheetName: string, inputText: string, responseEditorState: EditorState) => {
+  const addToQASheet = (
+    sheetName: string,
+    inputText: string,
+    responseEditorState: EditorState
+  ) => {
     setTimeout(() => {
-      const currentDocIndex = sharedState.documents.findIndex(doc => doc.name === sheetName);
+      const currentDocIndex = sharedState.documents.findIndex(
+        (doc) => doc.name === sheetName
+      );
       if (currentDocIndex === -1) {
-        console.error('Selected document not found');
+        console.error("Selected document not found");
         return;
       }
       const currentDoc = sharedState.documents[currentDocIndex];
       const currentContent = currentDoc.editorState.getCurrentContent();
       const lastBlock = currentContent.getBlockMap().last();
       const lengthOfLastBlock = lastBlock.getLength();
-      const selectionState = SelectionState.createEmpty(lastBlock.getKey()).merge({
+      const selectionState = SelectionState.createEmpty(
+        lastBlock.getKey()
+      ).merge({
         anchorOffset: lengthOfLastBlock,
-        focusOffset: lengthOfLastBlock,
+        focusOffset: lengthOfLastBlock
       });
 
       const contentStateWithNewText = Modifier.insertText(
         currentContent,
         selectionState,
-        `\nQuestion:\n${inputText}\n\nAnswer:\n${convertToRaw(responseEditorState.getCurrentContent()).blocks.map(block => block.text).join('\n')}\n\n`
+        `\nQuestion:\n${inputText}\n\nAnswer:\n${convertToRaw(
+          responseEditorState.getCurrentContent()
+        )
+          .blocks.map((block) => block.text)
+          .join("\n")}\n\n`
       );
 
-      const newEditorState = EditorState.push(currentDoc.editorState, contentStateWithNewText, 'insert-characters');
+      const newEditorState = EditorState.push(
+        currentDoc.editorState,
+        contentStateWithNewText,
+        "insert-characters"
+      );
 
       setSharedState((prevState) => ({
         ...prevState,
         documents: prevState.documents.map((doc, index) =>
-          index === currentDocIndex ? { ...doc, editorState: newEditorState } : doc
+          index === currentDocIndex
+            ? { ...doc, editorState: newEditorState }
+            : doc
         )
       }));
 
@@ -86,9 +110,9 @@ const SaveQASheet = ({ inputText, responseEditorState }: { inputText: string, re
   };
 
   useEffect(() => {
-    if (saveButtonState === 'success') {
+    if (saveButtonState === "success") {
       const timer = setTimeout(() => {
-        setSaveButtonState('default');
+        setSaveButtonState("default");
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -96,19 +120,23 @@ const SaveQASheet = ({ inputText, responseEditorState }: { inputText: string, re
 
   const renderSaveButton = () => {
     switch (saveButtonState) {
-      case 'success':
+      case "success":
         return (
-          <Button 
-            className="upload-button mt-2" 
-            style={{backgroundColor: "green", borderColor: "green"}}
+          <Button
+            className="upload-button mt-2"
+            style={{ backgroundColor: "green", borderColor: "green" }}
           >
-            Saved <FontAwesomeIcon icon={faCheckCircle} style={{marginLeft: "5px"}}/>
+            Saved{" "}
+            <FontAwesomeIcon
+              icon={faCheckCircle}
+              style={{ marginLeft: "5px" }}
+            />
           </Button>
         );
       default:
         return (
-          <Button 
-            className="upload-button mt-2" 
+          <Button
+            className="upload-button mt-2"
             id="select-folder"
             onClick={handleShow}
           >
@@ -127,8 +155,13 @@ const SaveQASheet = ({ inputText, responseEditorState }: { inputText: string, re
         dialogClassName="select-qasheet-modal-dialog"
         contentClassName="select-qasheet-modal-content"
       >
-        <Modal.Header style={{paddingLeft: "25px", paddingRight: "30px"}} closeButton>
-          <Modal.Title style={{fontSize: "20px", fontWeight: "600"}}>Select Q&A Sheet</Modal.Title>
+        <Modal.Header
+          style={{ paddingLeft: "25px", paddingRight: "30px" }}
+          closeButton
+        >
+          <Modal.Title style={{ fontSize: "20px", fontWeight: "600" }}>
+            Select Q&A Sheet
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="content-scaler">
@@ -158,9 +191,9 @@ const SaveQASheet = ({ inputText, responseEditorState }: { inputText: string, re
             New Sheet
           </Button>
           <Button
-            className='upload-button'
+            className="upload-button"
             onClick={handleSave}
-            style={{fontSize: "12px"}}
+            style={{ fontSize: "12px" }}
             disabled={!selectedSheet}
           >
             Add to Q&A Sheet

@@ -1,12 +1,12 @@
-import React from 'react'
-import SignInComponent from '../components/auth/SignIn'
+import React from "react";
+import SignInComponent from "../components/auth/SignIn";
 
 function User() {
   return (
     <div>
-      <SignInComponent/>
+      <SignInComponent />
     </div>
-  )
+  );
 }
 
-export default User
+export default User;

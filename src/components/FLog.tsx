@@ -21,8 +21,8 @@ const FLog = () => {
           {},
           {
             headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-            },
+              Authorization: `Bearer ${tokenRef.current}`
+            }
           }
         );
 
@@ -54,8 +54,8 @@ const FLog = () => {
           {
             headers: {
               Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "multipart/form-data", // This header is important for FormData
-            },
+              "Content-Type": "multipart/form-data" // This header is important for FormData
+            }
           }
         );
 

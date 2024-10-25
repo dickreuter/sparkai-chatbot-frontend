@@ -1,76 +1,76 @@
-    @font-face {
-        font-family: 'ClashDisplay';
-        src: url('../resources/fonts/ClashDisplay-Variable.ttf') format('ttf');
-        font-weight: normal;
-        font-style: normal;
-    }
-    
-     :root {
-        --font-family: 'ClashDisplay', sans-serif;
-    }
-    
-    #root {
-        margin: 0;
-        background-color: white;
-        padding: 0;
-        transform-origin: top left;
-        transform: scale(0.8);
-        width: 125vw;
-        height: 100vh;
-        overflow: hidden !important;
-        font-family: var(--font-family) !important;
-    }
-    
-    body {
-        margin: 0;
-        padding: 0;
-        display: flex;
-        font-family: var(--font-family) !important;
-        font-weight: 500;
-        font-size: 14px;
-        overflow-x: hidden !important;
-    }
-    
-    .main-content {
-        padding: 0px;
-        overflow-y: auto;
-        overflow-x: hidden !important;
-        font-family: var(--font-family) !important;
-    }
-    /* Ensure all text elements use the font */
-    
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    span,
-    div,
-    button,
-    input,
-    textarea,
-    select {
-        font-family: var(--font-family) !important;
-    }
-    /* Adjust other styles as needed */
-    
-    .dropdowns-container {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        /* Reduced from 10px */
-    }
-    
-    @keyframes spin {
-        from {
-            transform: rotate(0deg) scale(0.6);
-            /* Reduced from 0.7 */
-        }
-        to {
-            transform: rotate(360deg) scale(0.6);
-            /* Reduced from 0.7 */
-        }
-    }
-    /* You may need to adjust other specific component styles */
+@font-face {
+  font-family: "ClashDisplay";
+  src: url("../resources/fonts/ClashDisplay-Variable.ttf") format("ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --font-family: "ClashDisplay", sans-serif;
+}
+
+#root {
+  margin: 0;
+  background-color: white;
+  padding: 0;
+  transform-origin: top left;
+  transform: scale(0.8);
+  width: 125vw;
+  height: 100vh;
+  overflow: hidden !important;
+  font-family: var(--font-family) !important;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  font-family: var(--font-family) !important;
+  font-weight: 500;
+  font-size: 14px;
+  overflow-x: hidden !important;
+}
+
+.main-content {
+  padding: 0px;
+  overflow-y: auto;
+  overflow-x: hidden !important;
+  font-family: var(--font-family) !important;
+}
+/* Ensure all text elements use the font */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-family) !important;
+}
+/* Adjust other styles as needed */
+
+.dropdowns-container {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  /* Reduced from 10px */
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg) scale(0.6);
+    /* Reduced from 0.7 */
+  }
+  to {
+    transform: rotate(360deg) scale(0.6);
+    /* Reduced from 0.7 */
+  }
+}
+/* You may need to adjust other specific component styles */

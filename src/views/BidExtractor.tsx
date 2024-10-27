@@ -1,46 +1,24 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
-import axios from "axios";
-import withAuth from "../routes/withAuth";
-import { useAuthUser } from "react-auth-kit";
-import SideBarSmall from "../routes/SidebarSmall.tsx";
-import { useLocation, Link } from "react-router-dom";
-import {
-  Button,
-  Card,
-  Col,
-  Form,
-  Modal,
-  Row,
-  Spinner,
-  Tooltip
-} from "react-bootstrap";
+import { API_URL, HTTP_PREFIX } from '../helper/Constants';
+import axios from 'axios';
+import withAuth from '../routes/withAuth';
+import { useAuthUser } from 'react-auth-kit';
+import SideBarSmall from '../routes/SidebarSmall.tsx';
+import { useLocation } from 'react-router-dom';
+import { Button, Card, Col, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./BidExtractor.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
-import {
-  EditorState,
-  ContentState,
-  convertFromRaw,
-  convertToRaw
-} from "draft-js";
-import { displayAlert } from "../helper/Alert";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import { FormControl, InputLabel, Select, styled } from "@mui/material";
+import { EditorState, ContentState } from 'draft-js';
+import { displayAlert } from '../helper/Alert';
+import { FormControl } from "@mui/material";
 import ContributorModal from "../components/ContributorModal.tsx";
-import { Snackbar } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEdit,
-  faEye,
-  faHammer,
-  faScrewdriverWrench,
-  faUsers
-} from "@fortawesome/free-solid-svg-icons";
+import {  faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import CustomDateInput from "../components/CustomDateInput.tsx";
 import BidExtractorWizard from "../wizards/BidExtractorWizard.tsx";
+import { StyledSelect, StyledMenuItem } from '../components/StyledMuiComponents';
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
@@ -497,56 +475,8 @@ const BidExtractor = () => {
     }
 
     document.body.removeChild(measurer);
-  };
+};
 
-  const toggleEditing = () => {
-    if (!canUserEdit) {
-      showViewOnlyMessage();
-      return;
-    }
-    if (!isEditing) {
-      setIsEditing(!isEditing);
-      setTimeout(() => {
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.setStart(bidNameRef.current.childNodes[0], bidInfo.length);
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-        bidNameRef.current.focus();
-      }, 0);
-    } else {
-      // Check if bid name is empty or already exists
-      const newBidName = bidNameRef.current.innerText.trim();
-      if (!newBidName) {
-        displayAlert("Bid name cannot be empty", "warning");
-        return;
-      }
-      if (newBidName.length > CHARACTER_LIMIT) {
-        displayAlert(
-          `Bid name cannot exceed ${CHARACTER_LIMIT} characters`,
-          "warning"
-        );
-        return;
-      }
-      console.log(newBidName);
-      console.log(contextBidInfo);
-      if (
-        existingBidNames.includes(newBidName) &&
-        newBidName !== contextBidInfo
-      ) {
-        displayAlert("Bid name already exists", "warning");
-        return;
-      }
-      // Add any other necessary validation here
-
-      setSharedState((prevState) => ({
-        ...prevState,
-        bidInfo: newBidName
-      }));
-      setIsEditing(false);
-    }
-  };
 
   const handleBlur = () => {
     const newBidName = bidNameTempRef.current.trim();
@@ -581,14 +511,6 @@ const BidExtractor = () => {
       console.log("Questions updated:", questions);
     }
   }, [questions]);
-
-  const handleEditAttempt = (handler) => (e) => {
-    if (!canUserEdit) {
-      showViewOnlyMessage();
-      return;
-    }
-    handler(e);
-  };
 
   const handleOpportunityInformationChange = (e) => {
     const newOpportunityInformation = e.target.value;
@@ -646,14 +568,7 @@ const BidExtractor = () => {
     }));
   };
 
-  const handleContributorsChange = (e) => {
-    const newContributors = e.target.value;
-    setSharedState((prevState) => ({
-      ...prevState,
-      contributors: newContributors
-    }));
-  };
-
+ 
   const clientNameRef = useRef(null);
   const submissionDeadlineRef = useRef(null);
   const bidManagerRef = useRef(null);
@@ -704,67 +619,7 @@ const BidExtractor = () => {
     };
   }, [canUserEdit]);
 
-  const StyledSelect = styled(Select)(({ theme }) => ({
-    height: "38px",
-    padding: "0 8px",
-    backgroundColor: "white",
-    border: "none",
-    outline: "none",
-    boxShadow: "none",
-    fontFamily: '"ClashDisplay", sans-serif',
-    fontSize: "14px",
-    "& .MuiOutlinedInput-notchedOutline": {
-      border: "none"
-    },
-    "&:hover .MuiOutlinedInput-notchedOutline": {
-      border: "none"
-    },
-    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      border: "none"
-    },
-    "&.MuiOutlinedInput-root": {
-      border: "none",
-      backgroundColor: "white"
-    },
-    "& .MuiSelect-select": {
-      fontFamily: '"ClashDisplay", sans-serif',
-      fontSize: "14px",
-      backgroundColor: "white"
-    },
-    "&:hover": {
-      backgroundColor: "white"
-    },
-    "&.Mui-focused": {
-      backgroundColor: "white"
-    },
-    "& .MuiInputBase-input": {
-      backgroundColor: "white"
-    },
-    // Remove underline
-    "&:before": {
-      borderBottom: "none !important"
-    },
-    "&:after": {
-      borderBottom: "none !important"
-    },
-    "&:hover:not(.Mui-disabled):before": {
-      borderBottom: "none !important"
-    },
-    "& .MuiInput-underline:before": {
-      borderBottom: "none !important"
-    },
-    "& .MuiInput-underline:after": {
-      borderBottom: "none !important"
-    },
-    "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
-      borderBottom: "none !important"
-    }
-  }));
 
-  const StyledMenuItem = styled(MenuItem)({
-    fontFamily: '"ClashDisplay", sans-serif',
-    fontSize: "14px"
-  });
   return (
     <div className="chatpage">
       <SideBarSmall />

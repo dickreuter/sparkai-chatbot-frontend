@@ -1,15 +1,16 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import { Button, Col, Dropdown, Form, Modal, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Dropdown, Row, Spinner } from "react-bootstrap";
 import "./WordpaneCopilot.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faChevronLeft, faChevronRight, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import { Editor, EditorState, Modifier, SelectionState, convertToRaw, ContentState, RichUtils } from "draft-js";
+import { faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { EditorState, Modifier, SelectionState, convertToRaw, ContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { useNavigate } from "react-router-dom";
+import useSelectedText from "../hooks/useSelectedText";
 
 const WordpaneCopilot = () => {
   const getAuth = useAuthUser();
@@ -19,11 +20,6 @@ const WordpaneCopilot = () => {
   const navigate = useNavigate();
 
   const [dataset, setDataset] = useState("default");
-  const [availableCollections, setAvailableCollections] = useState([]);
-  const [folderContents, setFolderContents] = useState({});
-  const [isAppended, setIsAppended] = useState(false);
-  const [appendResponse, setAppendResponse] = useState(false);
-  const [selectedQuestionId, setSelectedQuestionId] = useState("-1");
 
   const [isCopilotVisible, setIsCopilotVisible] = useState(false);
   const [selectedText, setSelectedText] = useState("");
@@ -38,26 +34,14 @@ const WordpaneCopilot = () => {
   const [responseEditorState, setResponseEditorState] = useState(
     EditorState.createWithContent(ContentState.createFromText(localStorage.getItem("response") || ""))
   );
-  const [selectionRange, setSelectionRange] = useState({ start: null, end: null });
 
   const responseBoxRef = useRef(null); // Ref for the response box
   const promptsContainerRef = useRef(null); // Ref for the prompts container
-  const editorRef = useRef(null);
 
   const [selectedDropdownOption, setSelectedDropdownOption] = useState("library-chat");
   const bidPilotRef = useRef(null);
 
-  const [selectedDocument, setSelectedDocument] = useState(null); // Default to the first document
-
-  const [selectedFolders, setSelectedFolders] = useState(["default"]);
-
-  const handleSaveSelectedFolders = (folders) => {
-    console.log("Received folders in parent:", folders);
-    setSelectedFolders(folders);
-  };
-  useEffect(() => {
-    console.log("selectedFolders state in QuestionCrafter updated:", selectedFolders);
-  }, [selectedFolders]);
+  useSelectedText({ onChange: setSelectedText });
 
   useEffect(() => {
     localStorage.setItem(
@@ -67,25 +51,6 @@ const WordpaneCopilot = () => {
         .join("\n")
     );
   }, [responseEditorState]);
-
-  const styleMap = {
-    ORANGE: {
-      backgroundColor: "orange",
-    },
-  };
-
-  const handleDatasetChange = (e) => {
-    const newDataset = e.target.value;
-    setDataset(newDataset);
-  };
-
-  const handleSelect = (eventKey) => {
-    handleDatasetChange({ target: { value: eventKey } });
-  };
-  const formatDisplayName = (name) => {
-    return name.replace(/_/g, " ").replace(/FORWARDSLASH/g, "/");
-  };
-  const displayText = dataset === "default" ? "Content Library" : formatDisplayName(dataset);
 
   const handleClearMessages = () => {
     setMessages([
@@ -234,6 +199,8 @@ const WordpaneCopilot = () => {
     const emptySelection = SelectionState.createEmpty(firstBlockKey);
     newEditorState = EditorState.forceSelection(newEditorState, emptySelection);
 
+    replaceSelectedText(selectedOption);
+
     setResponseEditorState(newEditorState);
     setShowOptions(false);
     setIsCopilotVisible(false);
@@ -246,8 +213,10 @@ const WordpaneCopilot = () => {
   useEffect(() => {
     if (selectedText.trim() && selectedText.trim().length > 0) {
       // added extra check because sometimes an empty string would be passed to the copilot
-      console.log(selectedText);
       setIsCopilotVisible(true);
+      if (selectedOptionIndex === null) {
+        setShowOptions(false);
+      }
     } else {
       setIsCopilotVisible(false);
     }
@@ -384,6 +353,18 @@ const WordpaneCopilot = () => {
     setHighlightedRange(null);
 
     setDummyState((prev) => !prev);
+  };
+
+  const replaceSelectedText = (text: string) => {
+    Word.run(async (context) => {
+      const range = context.document.getSelection();
+      range.paragraphs.load("items");
+      return context.sync().then(function () {
+        const par = range.paragraphs.items[0];
+        par.insertText(text, "Replace");
+        return context.sync();
+      });
+    });
   };
 
   const handleCustomPromptFocus = () => {
@@ -591,20 +572,10 @@ const WordpaneCopilot = () => {
   const [bidPilotbroadness, setBidPilotBroadness] = useState("4");
   const [isBidPilotLoading, setIsBidPilotLoading] = useState(false);
 
-  const [choice, setChoice] = useState("3");
-  const [broadness, setBroadness] = useState("4");
-
   const [isLoading, setIsLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [selectedChoices, setSelectedChoices] = useState([]);
-  const [apiChoices, setApiChoices] = useState([]);
-  const [wordAmounts, setWordAmounts] = useState({});
-
-  useEffect(() => {
-    localStorage.setItem("inputText", inputText);
-  }, [inputText]);
 
   useEffect(() => {
     let interval = null;
@@ -824,7 +795,7 @@ const WordpaneCopilot = () => {
                             fontSize: "16px",
                           }}
                         >
-                          <span>Option {index + 1}</span>
+                          <span>Move to word</span>
                         </Button>
                         {selectedOptionIndex === index && (
                           <Button onClick={handleTick} className="tick-button">

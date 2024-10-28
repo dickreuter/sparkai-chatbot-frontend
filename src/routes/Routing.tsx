@@ -1,10 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import SignInComponent from "../components/auth/SignIn";
 import SignOut from "../components/auth/SignOutButton";
-import Chatbot from "../views/Chatbot";
 import Pannels from "../views/Pannels";
-import UploadPDF from "../views/UploadPDF";
-import UploadText from "../views/UploadText";
 import Log from "../components/Log";
 import FLog from "../components/FLog";
 import UploadTemplateText from "../components/UploadTemplateText.tsx";
@@ -21,6 +18,7 @@ import HowTo from "../views/HowTo.tsx";
 import ProfilePage from "../views/Profile.tsx";
 import Signup from "../views/Signup.tsx";
 import ForgotPassword from "../views/ForgotPassword.tsx";
+import ProposalPlan from "../views/ProposalPlan.tsx";
 
 function Routing() {
   return (
@@ -45,6 +43,7 @@ function Routing() {
         {/* Wrap related routes inside a single parent Route with BidManagement */}
         <Route element={<BidManagement />}>
           <Route path="/bid-extractor" element={<BidExtractor />} />
+          <Route path="/proposal-planner" element={<ProposalPlan />} />
           <Route path="/question-crafter" element={<QuestionCrafter />} />
           <Route path="/proposal" element={<Proposal />} />
         </Route>

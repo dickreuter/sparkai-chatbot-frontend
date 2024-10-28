@@ -4,40 +4,116 @@ import axios from 'axios';
 import withAuth from '../routes/withAuth';
 import { useAuthUser } from 'react-auth-kit';
 import SideBarSmall from '../routes/SidebarSmall.tsx';
-import { useLocation } from 'react-router-dom';
-import { Button, Card, Col, Row, Spinner } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
+import BidTitle from "../components/BidTitle.tsx";
+import './ProposalPlan.css';
+
+interface Section {
+  heading: string;
+  word_count: number;
+  reviewer: string;
+  completed: boolean;
+  weighting?: string;
+  page_limit?: string;
+}
+
+const EditableCell = ({ 
+  value: initialValue, 
+  onChange,
+  onBlur,
+  type = "text"
+}: { 
+  value: string | number | undefined,
+  onChange: (value: string) => void,
+  onBlur: () => void,
+  type?: string 
+}) => {
+  // State to hold the current input value
+  const [value, setValue] = useState(initialValue || '');
+
+  // Update local state when prop changes
+  useEffect(() => {
+    setValue(initialValue || '');
+  }, [initialValue]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setValue(newValue);  // Update local state immediately
+    onChange(newValue);  // Update parent state
+  };
+
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={handleChange}
+      onBlur={onBlur}
+      className="editable-cell"
+      placeholder="-"
+    />
+  );
+};
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
-
-  const { sharedState, setSharedState} = useContext(BidContext);
-  const { 
-    bidInfo: contextBidInfo, 
-    opportunity_information, 
-    compliance_requirements,
-    questions, 
-    contributors,
-    object_id
+  const { sharedState, setSharedState } = useContext(BidContext);
+  const [outline, setOutline] = useState<Section[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const {
+    object_id,
+    contributors
   } = sharedState;
-
-
-  const location = useLocation();
-
+  
   const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
+  const currentUserPermission = contributors[auth.email] || "viewer";
+
+  const showViewOnlyMessage = () => {
+    displayAlert("You only have permission to view this bid.", "danger");
+  };
+
+  const fetchOutline = async () => {
+    if (!object_id) return;
+    const formData = new FormData();
+    formData.append('bid_id', object_id);
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_bid_outline`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
+      setOutline(response.data);
+    } catch (err) {
+      console.error('Error fetching outline:', err);
+      displayAlert("Failed to fetch outline", 'danger');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOutline();
+  }, [object_id]);
 
   const generateOutline = async () => {
     setIsGeneratingOutline(true);
     const formData = new FormData();
     formData.append('bid_id', object_id);
-
+    
     try {
-      const result = await axios.post(
+      await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_outline`,
         formData,
         {
@@ -47,38 +123,178 @@ const ProposalPlan = () => {
           }
         }
       );
-
-      setSharedState(prevState => ({
-        ...prevState,
-        opportunity_information: result.data.opportunity_information
-      }));
-
-      displayAlert("Opportunity information generated successfully!", 'success');
+      
+      displayAlert("Outline generated successfully!", 'success');
+      fetchOutline();
     } catch (err) {
-      console.error('Error generating opportunity information:', err);
-      if (err.response && err.response.status === 404) {
-        displayAlert("No documents found in the tender library. Please upload documents before generating opportunity information.", 'warning');
+      console.error('Error generating outline:', err);
+      if (err.response?.status === 404) {
+        displayAlert("No documents found in the tender library. Please upload documents before generating outline.", 'warning');
       } else {
-        displayAlert("No documents found in the tender library. Please upload documents before generating opportunity information.", 'danger');
+        displayAlert("Failed to generate outline", 'danger');
       }
     } finally {
       setIsGeneratingOutline(false);
     }
   };
 
+  const updateSection = async (section: Section, sectionIndex: number) => {
+    try {
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/update_section`,
+        {
+          bid_id: object_id,
+          section,
+          section_index: sectionIndex // Add section index to the payload
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+    } catch (err) {
+      console.error('Error updating section:', err);
+     
+    }
+  };
+
+  const handleSectionChange = (index: number, field: keyof Section, value: any) => {
+    const newOutline = [...outline];
+    const processedValue = field === 'completed' ? Boolean(value) : value;
+    
+    newOutline[index] = {
+      ...newOutline[index],
+      [field]: processedValue
+    };
+    
+    setOutline(newOutline);
+    
+    // For checkboxes, update immediately since there's no blur event
+    if (field === 'completed') {
+      updateSection(newOutline[index], index);
+    }
+  };
 
   return (
     <div className="chatpage">
       <SideBarSmall />
-      <div className="lib-container" >
+      <div className="lib-container">
         <div className="scroll-container">
-        <BidNavbar  />
+          <BidNavbar />
+          <BidTitle
+            canUserEdit={true}
+            displayAlert={displayAlert}
+            setSharedState={setSharedState}
+            sharedState={sharedState}
+            showViewOnlyMessage={showViewOnlyMessage}
+            initialBidName={"initialBidName"}
+          />
+          
+          <div>
+            <Button 
+              onClick={generateOutline}
+              disabled={isGeneratingOutline}
+              className="mb-4"
+              variant="primary"
+            >
+              {isGeneratingOutline ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                    className="me-2"
+                  />
+                  Generating...
+                </>
+              ) : (
+                'Generate Outline'
+              )}
+            </Button>
 
+            <div className="table-responsive">
+              <table className="outline-table w-100">
+                <thead>
+                  <tr>
+                    <th className="py-3 px-4">Section</th>
+                    <th className="py-3 px-4" style={{width: '10%'}}>Word Count</th>
+                    <th className="py-3 px-4" style={{width: '10%'}}>Weighting</th>
+                    <th className="py-3 px-4">Page Limit</th>
+                    <th className="py-3 px-4">Reviewer</th>
+                    <th className="py-3 px-4">Completed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-4">
+                        <Spinner animation="border" size="sm" /> Loading...
+                      </td>
+                    </tr>
+                  ) : outline.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-4">
+                        No sections found. Generate an outline to get started.
+                      </td>
+                    </tr>
+                  ) : (
+                    outline.map((section, index) => (
+                      <tr key={index}>
+                        <td className="py-2 px-4">
+                          <EditableCell
+                            value={section.heading}
+                            onChange={(value) => handleSectionChange(index, 'heading', value)}
+                            onBlur={() => updateSection(outline[index], index)}
+                          />
+                        </td>
+                        <td className="py-2 px-4">{section.word_count}</td>
+                        <td className="py-2 px-4">
+                          <EditableCell
+                            value={section.weighting}
+                            onChange={(value) => handleSectionChange(index, 'weighting', value)}
+                            onBlur={() => updateSection(outline[index], index)}
+                          />
+                        </td>
+                        <td className="py-2 px-4">
+                          <EditableCell
+                            value={section.page_limit}
+                            onChange={(value) => handleSectionChange(index, 'page_limit', value)}
+                            onBlur={() => updateSection(outline[index], index)}
+                          />
+                        </td>
+                        <td className="py-2 px-4">
+                          <EditableCell
+                            value={section.reviewer}
+                            onChange={(value) => handleSectionChange(index, 'reviewer', value)}
+                            onBlur={() => updateSection(outline[index], index)}
+                          />
+                        </td>
+                        <td className="py-2 px-4 text-center checkbox-cell">
+                          <div className="custom-checkbox">
+                            <input
+                              id={`section-${index}`}
+                              type="checkbox"
+                              checked={!!section.completed}
+                              onChange={(e) => handleSectionChange(index, 'completed', e.target.checked)}
+                            />
+                            <label htmlFor={`section-${index}`}></label>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        </div>
+      </div>
     </div>
-    
   );
-}
+};
 
 export default withAuth(ProposalPlan);

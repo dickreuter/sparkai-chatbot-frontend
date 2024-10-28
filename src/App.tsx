@@ -28,14 +28,15 @@ const Layout = () => {
     "/library",
     "/howto",
     "/bids",
-    "/",
+    "/proposal-planner",
     "/dashboard",
     "/chatResponse",
     "/bid-extractor",
     "/question-crafter",
     "/proposal",
     "/profile",
-    "/calculator"
+    "/calculator",
+    "/",
   ];
   const shouldShowNavBar = showNavBarPaths.includes(location.pathname);
 

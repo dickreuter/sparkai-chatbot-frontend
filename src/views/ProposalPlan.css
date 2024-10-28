@@ -1,0 +1,76 @@
+.outline-table input[type="text"],
+.outline-table input[type="number"] {
+    min-width: 80px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.outline-table input[type="text"]:hover,
+.outline-table input[type="number"]:hover {
+    border-color: #e2e8f0;
+}
+
+.outline-table input[type="text"]:focus,
+.outline-table input[type="number"]:focus {
+    border-color: #3b82f6;
+    outline: none;
+    background-color: white;
+}
+
+.outline-table input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.editable-cell {
+    background-color: white;
+    color: black;
+}
+
+.outline-table {
+    width: 100%;
+    table-layout: fixed;
+    margin: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ced4da;
+    background-color: white;
+}
+
+.outline-table th,
+.outline-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 12px;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid #ddd;
+}
+
+
+/* Add left margin to the first column */
+
+.outline-table td:first-child,
+.outline-table th:first-child {
+    padding-left: 20px;
+}
+
+.outline-table th {
+    background-color: #f2f2f2;
+    font-weight: 500;
+    color: black;
+}
+
+
+/* Specifically target the Action column to make it narrower */
+
+.outline-table th:last-child,
+.outline-table td:last-child {
+    width: 8%;
+    justify-content: center;
+}
+
+.outline-table tr:last-child td {
+    border-bottom: none;
+}

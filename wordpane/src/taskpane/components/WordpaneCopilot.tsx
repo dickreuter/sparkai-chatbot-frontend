@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
@@ -11,6 +10,9 @@ import { EditorState, Modifier, SelectionState, convertToRaw, ContentState } fro
 import "draft-js/dist/Draft.css";
 import { useNavigate } from "react-router-dom";
 import useSelectedText from "../hooks/useSelectedText";
+import { apiURL } from "../helper/urls";
+import { IPilotOption, IPromptType } from "../../types";
+import { getBase64FromBlob } from "../helper/file";
 
 const WordpaneCopilot = () => {
   const getAuth = useAuthUser();
@@ -24,11 +26,12 @@ const WordpaneCopilot = () => {
   const [isCopilotVisible, setIsCopilotVisible] = useState(false);
   const [selectedText, setSelectedText] = useState("");
   const [tempText, setTempText] = useState("");
-  const [copilotOptions, setCopilotOptions] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [copilotOptions, setCopilotOptions] = useState<IPilotOption[]>([]);
+  const [selectedOption, setSelectedOption] = useState<IPilotOption>(null);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
   const [copilotLoading, setCopilotLoading] = useState(false);
+  const [actionOnClick, setActionOnClick] = useState<"Insert" | "Replace">("Replace");
 
   const [inputText, setInputText] = useState(localStorage.getItem("inputText") || "");
   const [responseEditorState, setResponseEditorState] = useState(
@@ -78,7 +81,7 @@ const WordpaneCopilot = () => {
     try {
       const requests = [
         axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/copilot`,
+          apiURL("copilot"),
           {
             input_text: copilotInput,
             extra_instructions: instructions,
@@ -95,12 +98,42 @@ const WordpaneCopilot = () => {
       ];
 
       const results = await Promise.all(requests);
-      const options = results.map((result) => result.data);
+      const options: IPilotOption[] = results
+        .map((result) => result.data)
+        .map((data: string) => ({
+          type: "text",
+          value: data,
+        }));
       setCopilotOptions(options);
     } catch (error) {
       console.error("Error sending question:", error);
     }
     setCopilotLoading(false);
+  };
+
+  const askDiagram = (prompt: string) => {
+    setQuestionAsked(true);
+    localStorage.setItem("questionAsked", "true");
+    setCopilotLoading(true);
+    setStartTime(Date.now()); // Set start time for the timer
+
+    axios
+      .post(apiURL("generate_diagram"), prompt, { responseType: "blob" })
+      .then(async (response) => {
+        console.log(response);
+        setCopilotOptions([
+          {
+            type: "image",
+            value: await getBase64FromBlob(response.data),
+          },
+        ]);
+      })
+      .catch((error) => {
+        console.error("Error sending question:", error);
+      })
+      .finally(() => {
+        setCopilotLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -199,7 +232,11 @@ const WordpaneCopilot = () => {
     const emptySelection = SelectionState.createEmpty(firstBlockKey);
     newEditorState = EditorState.forceSelection(newEditorState, emptySelection);
 
-    replaceSelectedText(selectedOption);
+    if (actionOnClick === "Insert") {
+      insertToWord(selectedOption, "End");
+    } else {
+      insertToWord(selectedOption, "Replace");
+    }
 
     setResponseEditorState(newEditorState);
     setShowOptions(false);
@@ -227,7 +264,7 @@ const WordpaneCopilot = () => {
 
   const [highlightedRange, setHighlightedRange] = useState(null);
 
-  const handleLinkClick = (linkName) => (e) => {
+  const handleLinkClick = (linkName: IPromptType) => (e) => {
     e.preventDefault();
     const copilot_mode = linkName.toLowerCase().replace(/\s+/g, "_");
     const instructions = "";
@@ -295,14 +332,20 @@ const WordpaneCopilot = () => {
     setResponseEditorState(newEditorState);
 
     setTimeout(() => {
-      askCopilot(selectedText, instructions, "1" + copilot_mode);
+      if (linkName === "Diagram") {
+        askDiagram(selectedText);
+        setActionOnClick("Insert");
+      } else {
+        askCopilot(selectedText, instructions, "1" + copilot_mode);
+        setActionOnClick("Replace");
+      }
       setShowOptions(true);
       setIsCopilotVisible(false);
     }, 0);
   };
 
-  const handleOptionSelect = (option, index) => {
-    console.log("handleOptionSelect called", { option, index, highlightedRange });
+  const handleOptionSelect = (option: IPilotOption, index) => {
+    console.log("handleOptionSelect called", { option: option.value, index, highlightedRange });
     if (!highlightedRange) {
       console.log("No highlighted range, exiting");
       return;
@@ -328,13 +371,13 @@ const WordpaneCopilot = () => {
         focusKey: startKey,
         focusOffset: startOffset,
       }),
-      option
+      option.value
     );
 
     console.log("Applying ORANGE style to new text");
     const styledSelection = SelectionState.createEmpty(startKey).merge({
       anchorOffset: startOffset,
-      focusOffset: startOffset + option.length,
+      focusOffset: startOffset + option.value.length,
     });
     newContentState = Modifier.applyInlineStyle(newContentState, styledSelection, "ORANGE");
 
@@ -344,7 +387,7 @@ const WordpaneCopilot = () => {
 
     console.log("Setting new editor state");
     setResponseEditorState(newEditorState);
-    setTempText(option);
+    setTempText(option.value);
     setSelectedOption(option);
     setSelectedOptionIndex(index);
     setShowOptions(true);
@@ -355,15 +398,34 @@ const WordpaneCopilot = () => {
     setDummyState((prev) => !prev);
   };
 
-  const replaceSelectedText = (text: string) => {
+  const insertToWord = (
+    { type, value }: IPilotOption,
+    insertLocation:
+      | Word.InsertLocation.replace
+      | Word.InsertLocation.start
+      | Word.InsertLocation.end
+      | "Replace"
+      | "Start"
+      | "End"
+  ) => {
     Word.run(async (context) => {
       const range = context.document.getSelection();
       range.paragraphs.load("items");
-      return context.sync().then(function () {
-        const par = range.paragraphs.items[0];
-        par.insertText(text, "Replace");
-        return context.sync();
-      });
+      return context
+        .sync()
+        .then(async function () {
+          const par = range.paragraphs.items[0];
+          if (type === "image") {
+            const newPar = par.insertParagraph("", "After");
+            newPar.insertInlinePictureFromBase64(value.split(",")[1], insertLocation);
+          } else if (type === "text") {
+            par.insertText(value, insertLocation);
+          }
+          return await context.sync();
+        })
+        .catch((error) => {
+          console.error("Error: ", error);
+        });
     });
   };
 
@@ -630,7 +692,7 @@ const WordpaneCopilot = () => {
 
     try {
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/perplexity`,
+        apiURL("perplexity"),
         {
           input_text: question + "Respond in a full sentence format.",
           dataset: "default",
@@ -724,7 +786,7 @@ const WordpaneCopilot = () => {
 
     try {
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question`,
+        apiURL("question"),
         {
           choice: bidPilotchoice,
           broadness: bidPilotbroadness,
@@ -804,7 +866,11 @@ const WordpaneCopilot = () => {
                         )}
                       </div>
                       <div className="option-item mt-2">
-                        <p>{option}</p>
+                        {option.type === "image" ? (
+                          <img src={option.value} alt="option" style={{ maxWidth: "100%" }} />
+                        ) : (
+                          <p>{option.value}</p>
+                        )}
                       </div>
                     </div>
                   ))
@@ -819,6 +885,9 @@ const WordpaneCopilot = () => {
                     onClick={handleLinkClick("Summarise")}
                   >
                     Summarise
+                  </Button>
+                  <Button className="prompt-button" onClick={handleLinkClick("Diagram")}>
+                    Diagram
                   </Button>
                   <Button className="prompt-button" onClick={handleLinkClick("Expand")}>
                     Expand

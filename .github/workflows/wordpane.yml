@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: WordPane Build and Deploy
 
 on:
   push:

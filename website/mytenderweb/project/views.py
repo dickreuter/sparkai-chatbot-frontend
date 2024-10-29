@@ -161,7 +161,7 @@ def guide(request):
                 🚀 While You Wait: Exclusive Offer! 🚀
                 Book a free 30-minute consultation with our bid writing experts before Monday, and receive a personalised walkthrough of how to apply the techniques to your specific needs.
 
-                👉 Click here to book your session: https://calendly.com/sam-od9g/mytender-io-training-call
+                👉 Click here to book your session: https://calendly.com/mytender_io/mytender-io-discovery-call
 
                 Your guide will be sent out on Monday, but why wait? Take advantage of this limited-time offer to start winning more RFPs today!
 

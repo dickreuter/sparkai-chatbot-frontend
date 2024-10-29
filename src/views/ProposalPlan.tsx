@@ -11,8 +11,12 @@ import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import BidTitle from "../components/BidTitle.tsx";
 import './ProposalPlan.css';
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 interface Section {
+  section_id: string;
   heading: string;
   word_count: number;
   reviewer: string;
@@ -61,6 +65,7 @@ const EditableCell = ({
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
+  const navigate = useNavigate();
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState, setSharedState } = useContext(BidContext);
   const [outline, setOutline] = useState<Section[]>([]);
@@ -73,6 +78,15 @@ const ProposalPlan = () => {
   
   const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
   const currentUserPermission = contributors[auth.email] || "viewer";
+
+  const handleEditClick = (section: Section) => {
+    navigate('/question-crafter', { 
+      state: { 
+        section,
+        bid_id: object_id 
+      } 
+    });
+  };
 
   const showViewOnlyMessage = () => {
     displayAlert("You only have permission to view this bid.", "danger");
@@ -160,6 +174,40 @@ const ProposalPlan = () => {
     }
   };
 
+  const deleteSection = async (sectionId: string, sectionIndex: number) => {
+    try {
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/delete_section`,
+        {
+          bid_id: object_id,
+          section_id: sectionId,
+          section_index: sectionIndex
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      
+      // Update the local state after successful deletion
+      const newOutline = outline.filter((_, index) => index !== sectionIndex);
+      setOutline(newOutline);
+      displayAlert("Section deleted successfully", 'success');
+    } catch (err) {
+      console.error('Error deleting section:', err);
+      displayAlert("Failed to delete section", 'danger');
+    }
+  };
+
+  const handleDeleteClick = (section: Section, index: number) => {
+    if (window.confirm('Are you sure you want to delete this section? This action cannot be undone.')) {
+      deleteSection(section.section_id, index);
+    }
+  };
+
+
   const handleSectionChange = (index: number, field: keyof Section, value: any) => {
     const newOutline = [...outline];
     const processedValue = field === 'completed' ? Boolean(value) : value;
@@ -176,7 +224,6 @@ const ProposalPlan = () => {
       updateSection(newOutline[index], index);
     }
   };
-
   return (
     <div className="chatpage">
       <SideBarSmall />
@@ -225,19 +272,21 @@ const ProposalPlan = () => {
                     <th className="py-3 px-4" style={{width: '10%'}}>Weighting</th>
                     <th className="py-3 px-4">Page Limit</th>
                     <th className="py-3 px-4">Reviewer</th>
+                    <th className="py-3 px-4" style={{width: '5%'}}>Edit</th>
                     <th className="py-3 px-4">Completed</th>
+                    
                   </tr>
                 </thead>
                 <tbody>
                   {isLoading ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-4">
+                      <td colSpan={7} className="text-center py-4">
                         <Spinner animation="border" size="sm" /> Loading...
                       </td>
                     </tr>
                   ) : outline.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-4">
+                      <td colSpan={7} className="text-center py-4">
                         No sections found. Generate an outline to get started.
                       </td>
                     </tr>
@@ -273,6 +322,24 @@ const ProposalPlan = () => {
                             onBlur={() => updateSection(outline[index], index)}
                           />
                         </td>
+                        <td className="py-2 px-4 text-center">
+                          <div className="d-flex justify-content-center gap-3">
+                            <button
+                              onClick={() => handleEditClick(section)}
+                              className="bg-transparent border-0 text-primary hover:text-blue-700 cursor-pointer"
+                              title="Edit section"
+                            >
+                              <FontAwesomeIcon icon={faPencil} size="sm" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(section, index)}
+                              className="bg-transparent border-0 text-danger hover:text-red-700 cursor-pointer"
+                              title="Delete section"
+                            >
+                              <FontAwesomeIcon icon={faTrash} size="sm" />
+                            </button>
+                          </div>
+                        </td>
                         <td className="py-2 px-4 text-center checkbox-cell">
                           <div className="custom-checkbox">
                             <input
@@ -284,6 +351,7 @@ const ProposalPlan = () => {
                             <label htmlFor={`section-${index}`}></label>
                           </div>
                         </td>
+                        
                       </tr>
                     ))
                   )}

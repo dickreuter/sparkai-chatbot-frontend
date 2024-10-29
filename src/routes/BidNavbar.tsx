@@ -113,13 +113,6 @@ const BidNavbar = () => {
           Proposal Planner
         </NavLink>
         <NavLink
-          to="/question-crafter"
-          className={`bidnav-item ${activeTab === "/question-crafter" ? "active" : ""}`}
-          onClick={() => handleTabClick("/question-crafter")}
-        >
-          Q&A Generator
-        </NavLink>
-        <NavLink
           to="/proposal"
           className={`bidnav-item ${activeTab === "/proposal" ? "active" : ""}`}
           onClick={() => handleTabClick("/proposal")}

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import "./SupportChat.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComments, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { apiURL } from "../helper/urls";
 
 const SupportChat = ({ auth }) => {
   const [messages, setMessages] = useState([]);
@@ -48,7 +48,7 @@ const SupportChat = ({ auth }) => {
     if (!auth?.token) return;
     try {
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/slack_get_messages`,
+        apiURL(`slack_get_messages`),
         {},
         {
           headers: {
@@ -102,7 +102,7 @@ const SupportChat = ({ auth }) => {
     try {
       const formData = new FormData();
       formData.append("message", `USER ${newMessage}`);
-      const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/slack_send_message`, formData, {
+      const response = await axios.post(apiURL(`slack_send_message`), formData, {
         headers: {
           Authorization: `Bearer ${auth?.token}`,
           "Content-Type": "multipart/form-data",

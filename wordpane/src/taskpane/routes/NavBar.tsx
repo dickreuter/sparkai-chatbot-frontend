@@ -4,8 +4,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import { useEffect, useRef, useState } from "react";
 import { useAuthUser, useSignOut } from "react-auth-kit";
 import { Link, useNavigate } from "react-router-dom";
-import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import "./Navbar.css";
+import { apiURL } from "../helper/urls";
 
 const NavBar = () => {
   const getAuth = useAuthUser();
@@ -28,7 +28,7 @@ const NavBar = () => {
       try {
         const token = tokenRef.current;
         const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/get_login_email`,
+          apiURL(`get_login_email`),
           {},
           {
             headers: {

@@ -4,7 +4,7 @@ import { Alert, Button, Snackbar, TextField, Modal } from "@mui/material";
 import useAuthSignIn from "./UseAuthsignIn";
 import AuthState from "./AuthState";
 import axios from "axios";
-import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
+import { apiURL } from "../../helper/urls";
 
 const FullScreenTwoCards = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -46,7 +46,7 @@ const FullScreenTwoCards = () => {
 
   const handleForgotPassword = async () => {
     try {
-      const response = await axios.post(`http${HTTP_PREFIX}://${API_URL}/forgot_password`, {
+      const response = await axios.post(apiURL(`forgot_password`), {
         email: forgotPasswordEmail,
       });
       setSnackbarMessage("Password reset email sent successfully");

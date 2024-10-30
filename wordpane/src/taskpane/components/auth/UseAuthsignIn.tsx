@@ -3,7 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useSignIn } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
-import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
+import { apiURL } from "../../helper/urls";
 
 const useAuthSignIn = () => {
   const signIn = useSignIn();
@@ -15,7 +15,7 @@ const useAuthSignIn = () => {
     setIsLoading(true);
     console.log("auth submit signin");
     try {
-      const res = await axios.post(`http${HTTP_PREFIX}://${API_URL}/login`, formData);
+      const res = await axios.post(apiURL(`login`), formData);
       setIsLoading(false);
       console.log(res.status);
       console.log("posted signin");

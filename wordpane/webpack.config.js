@@ -4,16 +4,10 @@ const devCerts = require("office-addin-dev-certs");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
-const dotenv = require("dotenv");
+const Dotenv = require("dotenv-webpack");
 const urlDev = "https://localhost:3000/";
 const urlProd = "https://app.mytender.io:3000"; // CHANGE THIS TO YOUR PRODUCTION DEPLOYMENT LOCATION
-const env = dotenv.config().parsed;
-
-// Explicitly define the environment variables we want to expose
-const envKeys = {
-  "process.env.REACT_APP_API_URL": JSON.stringify(env.REACT_APP_API_URL),
-  "process.env.REACT_APP_API_URL_PREFIX_HTTPS": JSON.stringify(env.REACT_APP_API_URL_PREFIX_HTTPS),
-};
+const path = require("path");
 
 async function getHttpsOptions() {
   const httpsOptions = await devCerts.getHttpsServerOptions();
@@ -111,7 +105,9 @@ module.exports = async (env, options) => {
       new webpack.ProvidePlugin({
         Promise: ["es6-promise", "Promise"],
       }),
-      new webpack.DefinePlugin(envKeys),
+      new Dotenv({
+        path: path.resolve(__dirname, `.env.${options.mode}`),
+      }),
     ],
     devServer: {
       hot: true,

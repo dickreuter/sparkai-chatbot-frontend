@@ -5,8 +5,6 @@ import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import {
   Button,
-  Col,
-  Row,
   Card,
   Modal,
   FormControl,
@@ -19,30 +17,21 @@ import "./Library.css";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
 import {
-  faEye,
-  faTrash,
   faFolder,
   faFileAlt,
-  faArrowUpFromBracket,
   faEllipsisVertical,
   faSearch,
   faQuestionCircle,
   faPlus,
-  faArrowLeft,
   faReply,
   faTimes,
-  faChevronDown,
-  faChevronRight
 } from "@fortawesome/free-solid-svg-icons";
 import "./Chatbot.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  UploadPDFModal,
-  UploadTextModal,
   UploadButtonWithDropdown
 } from "./UploadButtonWithDropdown.tsx";
-import { Menu, MenuItem, IconButton } from "@mui/material";
-import { MoreVert as MoreVertIcon } from "@mui/icons-material";
+import { Menu, MenuItem } from "@mui/material";
 import FileContentModal from "../components/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import LibraryWizard from "../wizards/LibraryWizard.tsx"; // Adjust the import path as needed
@@ -1082,7 +1071,7 @@ const Library = () => {
                   onClose={handleMenuClose}
                   PaperProps={{
                     style: {
-                      width: "180px" // Reduced width
+                      width: "220px" // Reduced width
                     }
                   }}
                 >
@@ -1091,7 +1080,7 @@ const Library = () => {
                     className="styled-menu-item"
                   >
                     <i className="fas fa-file-pdf styled-menu-item-icon"></i>
-                    Upload PDF/Word
+                    Upload PDF/Word/Excel 
                   </MenuItem>
                   <MenuItem
                     onClick={() => handleMenuItemClick("text")}

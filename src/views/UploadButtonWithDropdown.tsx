@@ -87,13 +87,13 @@ const UploadButtonWithDropdown = ({
         onClose={handleClose}
         PaperProps={{
           style: {
-            width: "160px" // Reduced width
+            width: "220px" // Reduced width
           }
         }}
       >
         <MenuItem onClick={handlePDFClick} className="styled-menu-item">
           <i className="fas fa-file-pdf styled-menu-item-icon"></i>
-          Upload PDF
+          Upload PDF/Word/Excel
         </MenuItem>
         <MenuItem onClick={handleTextClick} className="styled-menu-item">
           <i className="fas fa-file-alt styled-menu-item-icon"></i>

@@ -10,7 +10,8 @@ import {
   faComments,
   faCircleQuestion,
   faUser,
-  faCircleExclamation
+  faCircleExclamation,
+  faFileWord
 } from "@fortawesome/free-solid-svg-icons";
 // Import the image import sidebarIcon from '../resources/images/mytender.io_badge.png';
 
@@ -64,6 +65,13 @@ const SideBarSmall = () => {
     window.dispatchEvent(new Event("showTips"));
   };
 
+  const handleWordAddInClick = (e) => {
+    e.preventDefault(); // Prevent any default navigation
+    const url = 'https://appsource.microsoft.com/en-us/product/office/WA200007690?src=office&corrid=bd0c24c3-6022-e897-73ad-0dc9bdf3558b&omexanonuid=&referralurl=';
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+  
+
   return (
     <div className="sidebarsmall">
       <div>
@@ -104,6 +112,14 @@ const SideBarSmall = () => {
         >
           <FontAwesomeIcon icon={faUser} />
           <span>Profile</span>
+        </Link>
+        <Link
+          to="#"
+          className="sidebarsmalllink"
+          onClick={handleWordAddInClick}
+        >
+          <FontAwesomeIcon icon={faFileWord} />
+          <span>Wordpane</span>
         </Link>
         <Link
           to="#"

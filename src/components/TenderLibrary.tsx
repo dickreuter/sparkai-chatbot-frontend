@@ -11,7 +11,8 @@ import {
   Modal,
   FormControl,
   InputGroup,
-  Spinner
+  Spinner,
+  Table
 } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -30,6 +31,19 @@ import FileContentModal from "../components/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import UploadText from "../views/UploadText.tsx";
 import InterrogateTenderModal from "./InterrogateTenderModal.tsx";
+
+const getFileMode = (fileType) => {
+  if (fileType === 'application/pdf') {
+    return 'pdf';
+  } else if (fileType === 'application/msword' || 
+             fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+    return 'word';
+  } else if (fileType === 'application/vnd.ms-excel' || 
+             fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+    return 'excel';
+  }
+  return null;
+};
 
 const TenderLibrary = ({ object_id }) => {
   const getAuth = useAuthUser();
@@ -54,6 +68,8 @@ const TenderLibrary = ({ object_id }) => {
   const [documentListVersion, setDocumentListVersion] = useState(0);
   const [showWordModal, setShowWordModal] = useState(false);
   const [wordFileContent, setWordFileContent] = useState(null);
+  const [showExcelModal, setShowExcelModal] = useState(false);
+  const [excelData, setExcelData] = useState(null);
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -183,6 +199,8 @@ const TenderLibrary = ({ object_id }) => {
         setWordFileContent(response.data.content);
         setCurrentFileName(fileName);
         setShowWordModal(true);
+      } else if (["xls", "xlsx"].includes(fileExtension)) {
+        console.log("viewing excel files not supported yet");
       } else {
         throw new Error("Unsupported file type");
       }
@@ -298,17 +316,22 @@ const TenderLibrary = ({ object_id }) => {
       const allowedTypes = [
         "application/pdf",
         "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
       ];
 
-      const validFiles = newFiles.filter((file) =>
-        allowedTypes.includes(file.type)
-      );
+      const validFiles = newFiles.filter((file) => {
+        const isAllowedType = allowedTypes.includes(file.type);
+        const mode = getFileMode(file.type);
+        return isAllowedType && mode !== null;
+      });
+
       setFiles((prevFiles) => [...prevFiles, ...validFiles]);
 
       if (validFiles.length !== newFiles.length) {
         displayAlert(
-          "Some files were not added. Only PDF and Word documents are allowed.",
+          "Some files were not added. Only PDF, Word, and Excel documents are allowed.",
           "warning"
         );
       }
@@ -325,9 +348,17 @@ const TenderLibrary = ({ object_id }) => {
       let failCount = 0;
 
       for (const file of files) {
+        const mode = getFileMode(file.type);
+        if (!mode) {
+          failCount++;
+          setUploadStatus((prev) => ({ ...prev, [file.name]: "fail" }));
+          continue;
+        }
+
         const formData = new FormData();
         formData.append("file", file);
         formData.append("bid_id", object_id);
+        formData.append("mode", mode);
 
         setUploadStatus((prev) => ({ ...prev, [file.name]: "uploading" }));
 
@@ -370,7 +401,6 @@ const TenderLibrary = ({ object_id }) => {
         displayAlert(`Failed to upload ${failCount} file(s)`, "danger");
       }
 
-      // Delay hiding the modal to allow users to see the final status
       setTimeout(() => {
         setFiles([]);
         setUploadStatus({});
@@ -387,7 +417,7 @@ const TenderLibrary = ({ object_id }) => {
           <p>
             Documents uploaded to the Tender Library will be used as context by
             our AI to generate compliance requirements and opportunity
-            information for the Tender.{" "}
+            information for the Tender.
           </p>
           <div
             className={`drop-zone ${dragActive ? "active" : ""}`}
@@ -409,7 +439,7 @@ const TenderLibrary = ({ object_id }) => {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".pdf,.doc,.docx"
+              accept=".pdf,.doc,.docx,.xls,.xlsx"
               onChange={handleFileSelect}
               style={{ display: "none" }}
               multiple
@@ -420,7 +450,7 @@ const TenderLibrary = ({ object_id }) => {
               style={{ marginBottom: "10px", color: "#ff7f50" }}
             />
             <p>
-              Drag and drop your PDF or Word documents here or click to select
+              Drag and drop your PDF, Word, or Excel documents here or click to select
               files
             </p>
             {files.length > 0 && (
@@ -443,7 +473,9 @@ const TenderLibrary = ({ object_id }) => {
                         justifyContent: "center"
                       }}
                     >
-                      <span style={{ marginRight: "10px" }}>{file.name}</span>
+                      <span style={{ marginRight: "10px" }}>
+                        {file.name} ({getFileMode(file.type)})
+                      </span>
                       {uploadStatus[file.name] === "uploading" && (
                         <FontAwesomeIcon
                           icon={faSpinner}
@@ -499,6 +531,44 @@ const TenderLibrary = ({ object_id }) => {
     </Modal>
   );
 
+  // Add Excel Modal Component
+  const ExcelViewerModal = ({ show, onHide, data, fileName }) => (
+    <Modal show={show} onHide={onHide} size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>{fileName}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body style={{ maxHeight: "70vh", overflowY: "auto" }}>
+        {data && data.sheets ? (
+          Object.entries(data.sheets).map(([sheetName, sheetData]) => (
+            <div key={sheetName} className="mb-4">
+              <h4>{sheetName}</h4>
+              <Table striped bordered hover responsive>
+                <thead>
+                  <tr>
+                    {sheetData[0] && sheetData[0].map((header, index) => (
+                      <th key={index}>{header}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sheetData.slice(1).map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {row.map((cell, cellIndex) => (
+                        <td key={cellIndex}>{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+          ))
+        ) : (
+          <p>No data available</p>
+        )}
+      </Modal.Body>
+    </Modal>
+  );
+
   return (
     <>
       <Row>
@@ -531,7 +601,7 @@ const TenderLibrary = ({ object_id }) => {
                       onClose={handleMenuClose}
                       PaperProps={{
                         style: {
-                          width: "180px" // Reduced width
+                          width: "220px" // Reduced width
                         }
                       }}
                     >
@@ -540,7 +610,7 @@ const TenderLibrary = ({ object_id }) => {
                         className="styled-menu-item"
                       >
                         <i className="fas fa-file-pdf styled-menu-item-icon"></i>
-                        Upload PDF/Word
+                        Upload PDF/Word/Excel
                       </MenuItem>
                     </Menu>
                   </div>
@@ -588,6 +658,13 @@ const TenderLibrary = ({ object_id }) => {
         show={showPDFModal}
         onHide={() => setShowPDFModal(false)}
         object_id={object_id}
+      />
+
+      <ExcelViewerModal
+        show={showExcelModal}
+        onHide={() => setShowExcelModal(false)}
+        data={excelData}
+        fileName={currentFileName}
       />
 
       {showPdfViewerModal && (

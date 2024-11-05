@@ -28,6 +28,19 @@ const UploadPDF = ({
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
 
+  const getFileMode = (fileType) => {
+    if (fileType === 'application/pdf') {
+      return 'pdf';
+    } else if (fileType === 'application/msword' || 
+               fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      return 'word';
+    } else if (fileType === 'application/vnd.ms-excel' || 
+               fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+      return 'excel';
+    }
+    return null;
+  };
+
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -55,9 +68,11 @@ const UploadPDF = ({
 
   const handleFiles = (newFiles) => {
     const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ];
 
     const validFiles = newFiles.filter((file) =>
@@ -67,16 +82,22 @@ const UploadPDF = ({
 
     if (validFiles.length !== newFiles.length) {
       displayAlert(
-        "Some files were not added. Only PDF and Word documents are allowed.",
+        "Some files were not added. Please select valid PDF, Word, or Excel files.",
         "warning"
       );
     }
   };
 
   const uploadFile = async (file) => {
+    const mode = getFileMode(file.type);
+    if (!mode) {
+      throw new Error("Unsupported file type");
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("profile_name", folder || "");
+    formData.append("mode", mode);
 
     try {
       const response = await axios.post(
@@ -159,7 +180,7 @@ const UploadPDF = ({
         <input
           ref={fileInputRef}
           type="file"
-          accept=".pdf,.doc,.docx"
+          accept=".pdf,.doc,.docx,.xls,.xlsx"
           onChange={handleFileSelect}
           style={{ display: "none" }}
           multiple
@@ -170,8 +191,9 @@ const UploadPDF = ({
           style={{ marginBottom: "10px", color: "#ff7f50" }}
         />
         <p>
-          Drag and drop your PDF or Word documents here or click to select files
+          Drag and drop your PDF, Word, or Excel documents here or click to select files
         </p>
+      
         {selectedFiles.length > 0 && (
           <div
             style={{ textAlign: "center", maxWidth: "400px", margin: "0 auto" }}
@@ -188,7 +210,9 @@ const UploadPDF = ({
                     justifyContent: "center"
                   }}
                 >
-                  <span style={{ marginRight: "10px" }}>{file.name}</span>
+                  <span style={{ marginRight: "10px" }}>
+                    {file.name} ({getFileMode(file.type)})
+                  </span>
                   {isUploading && !uploadedFiles[file.name] ? (
                     <FontAwesomeIcon
                       icon={faSpinner}

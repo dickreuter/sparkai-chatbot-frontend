@@ -13,17 +13,112 @@ import BidTitle from "../components/BidTitle.tsx";
 import './ProposalPlan.css';
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCheckCircle, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { Menu, MenuItem } from "@mui/material";
+import { CheckCircle } from "@mui/icons-material";
 
 interface Section {
   section_id: string;
   heading: string;
   word_count: number;
   reviewer: string;
-  completed: boolean;
+  status: 'Not Started' | 'In Progress' | 'Completed';
   weighting?: string;
   page_limit?: string;
 }
+
+const StatusMenu = ({
+  value,
+  onChange
+}: {
+  value: Section['status'],
+  onChange: (value: Section['status']) => void
+}) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSelect = (status: Section['status']) => {
+    onChange(status);
+    handleClose();
+  };
+
+  const getStatusColor = (status: Section['status']) => {
+    switch (status) {
+      case 'Completed':
+        return 'status-complete';
+      case 'In Progress':
+        return 'status-in-progress';
+      case 'Not Started':
+        return 'status-not-started';
+      default:
+        return 'status-not-started';
+    }
+  };
+
+  return (
+    <div >
+      <Button
+        onClick={handleClick}
+        className={` ${getStatusColor(value)} `}
+        
+        aria-controls="simple-menu"
+        aria-haspopup="true"
+        sx={{
+          borderRadius: "50%",
+          minWidth: 0,
+          padding: "10px",
+          backgroundColor: "transparent",
+          "&.MuiButton-root:active": {
+            boxShadow: "none"
+          }
+        }}
+      >
+        {value}
+      </Button>
+      <Menu
+      id="simple-menu"
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        keepMounted
+        PaperProps={{
+          elevation: 1, // Reduced elevation for lighter shadow
+          style: {
+            width: "120px",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.1)" // Custom subtle shadow
+          }
+        }}
+      >
+        <MenuItem
+          onClick={() => handleSelect('Not Started')}
+          className="styled-menu-item"
+        >
+          Not Started
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleSelect('In Progress')}
+          className="styled-menu-item"
+        >
+          In Progress
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleSelect('Completed')}
+          className="styled-menu-item"
+        >
+          Completed
+        </MenuItem>
+      </Menu>
+    </div>
+  );
+};
+
 
 const EditableCell = ({ 
   value: initialValue, 
@@ -36,18 +131,16 @@ const EditableCell = ({
   onBlur: () => void,
   type?: string 
 }) => {
-  // State to hold the current input value
   const [value, setValue] = useState(initialValue || '');
 
-  // Update local state when prop changes
   useEffect(() => {
     setValue(initialValue || '');
   }, [initialValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    setValue(newValue);  // Update local state immediately
-    onChange(newValue);  // Update parent state
+    setValue(newValue);
+    onChange(newValue);
   };
 
   return (
@@ -61,6 +154,7 @@ const EditableCell = ({
     />
   );
 };
+
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
@@ -92,6 +186,34 @@ const ProposalPlan = () => {
     displayAlert("You only have permission to view this bid.", "danger");
   };
 
+  const isAllSectionsComplete = () => {
+    return outline.length > 0 && outline.every(section => section.status === 'Completed');
+  };
+  
+  const generateProposal = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('bid_id', object_id);
+      
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/generate_proposal`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
+      
+      displayAlert("Proposal generation started successfully!", 'success');
+    } catch (err) {
+      console.error('Error generating proposal:', err);
+      displayAlert("Failed to generate proposal", 'danger');
+    }
+  };
+  
+
   const fetchOutline = async () => {
     if (!object_id) return;
     const formData = new FormData();
@@ -108,7 +230,14 @@ const ProposalPlan = () => {
           }
         }
       );
-      setOutline(response.data);
+      // Map the response data and preserve or set the status field
+      const outlineWithStatus = response.data.map((section: any) => ({
+        ...section,
+        // If status exists in the response, use it; otherwise convert from completed boolean
+        status: section.status || (section.completed ? 'Completed' : 
+          section.in_progress ? 'In Progress' : 'Not Started')
+      }));
+      setOutline(outlineWithStatus);
     } catch (err) {
       console.error('Error fetching outline:', err);
       displayAlert("Failed to fetch outline", 'danger');
@@ -158,8 +287,8 @@ const ProposalPlan = () => {
         `http${HTTP_PREFIX}://${API_URL}/update_section`,
         {
           bid_id: object_id,
-          section,
-          section_index: sectionIndex // Add section index to the payload
+          section: section,
+          section_index: sectionIndex
         },
         {
           headers: {
@@ -170,7 +299,6 @@ const ProposalPlan = () => {
       );
     } catch (err) {
       console.error('Error updating section:', err);
-     
     }
   };
 
@@ -210,17 +338,18 @@ const ProposalPlan = () => {
 
   const handleSectionChange = (index: number, field: keyof Section, value: any) => {
     const newOutline = [...outline];
-    const processedValue = field === 'completed' ? Boolean(value) : value;
     
+    // Update the section with the new value
     newOutline[index] = {
       ...newOutline[index],
-      [field]: processedValue
+      [field]: value
     };
     
+    // Update local state
     setOutline(newOutline);
     
-    // For checkboxes, update immediately since there's no blur event
-    if (field === 'completed') {
+    // For status changes, update immediately
+    if (field === 'status') {
       updateSection(newOutline[index], index);
     }
   };
@@ -262,6 +391,19 @@ const ProposalPlan = () => {
                 'Generate Outline'
               )}
             </Button>
+            {isAllSectionsComplete() && (
+              <Button 
+                onClick={generateProposal}
+                className="mb-4 ms-2 d-flex align-items-center gap-2"
+                variant="success"
+              >
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  style={{ marginLeft: "5px" }}
+                />
+                Generate Proposal
+              </Button>
+            )}
 
             <div className="table-responsive">
               <table className="outline-table w-100">
@@ -273,7 +415,7 @@ const ProposalPlan = () => {
                     <th className="py-3 px-4">Page Limit</th>
                     <th className="py-3 px-4">Reviewer</th>
                     <th className="py-3 px-4" style={{width: '5%'}}>Edit</th>
-                    <th className="py-3 px-4">Completed</th>
+                    <th className="py-3 px-4 text-center">Completed</th>
                     
                   </tr>
                 </thead>
@@ -340,16 +482,11 @@ const ProposalPlan = () => {
                             </button>
                           </div>
                         </td>
-                        <td className="py-2 px-4 text-center checkbox-cell">
-                          <div className="custom-checkbox">
-                            <input
-                              id={`section-${index}`}
-                              type="checkbox"
-                              checked={!!section.completed}
-                              onChange={(e) => handleSectionChange(index, 'completed', e.target.checked)}
-                            />
-                            <label htmlFor={`section-${index}`}></label>
-                          </div>
+                        <td className="py-2 px-4 text-center">
+                          <StatusMenu
+                            value={section.status}
+                            onChange={(value) => handleSectionChange(index, 'status', value)}
+                          />
                         </td>
                         
                       </tr>

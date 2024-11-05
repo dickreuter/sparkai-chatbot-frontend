@@ -67,10 +67,52 @@
 
 .outline-table th:last-child,
 .outline-table td:last-child {
-    width: 8%;
+    width: 12%;
     justify-content: center;
 }
 
 .outline-table tr:last-child td {
     border-bottom: none;
+}
+
+.status-not-started {
+    color: #000000;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid #000000;
+}
+
+.status-in-progress {
+    color: #FF8C00;
+    background-color: rgba(255, 140, 0, 0.1);
+    border: 1px solid #FF8C00;
+}
+
+.status-complete {
+    color: #228B22;
+    background-color: rgba(34, 139, 34, 0.1);
+    border: 1px solid #228B22;
+}
+
+
+/* Menu item hover states */
+
+.status-not-started:hover,
+.status-not-started:focus,
+.status-not-started:active {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid #000000 !important;
+}
+
+.status-in-progress:hover,
+.status-in-progress:focus,
+.status-in-progress:active {
+    background-color: rgba(255, 140, 0, 0.08) !important;
+    border: 1px solid #FF8C00 !important;
+}
+
+.status-complete:hover,
+.status-complete:focus,
+.status-complete:active {
+    background-color: rgba(34, 139, 34, 0.08) !important;
+    border: 1px solid #228B22 !important;
 }

@@ -31,8 +31,18 @@ import SaveQASheet from "../modals/SaveQASheet.tsx";
 import { useLocation } from "react-router-dom";
 import BidTitle from "../components/BidTitle.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
+import WordCountSelector from "../components/WordCountSelector.tsx";
+import { debounce } from "lodash";
 
 const QuestionCrafter = () => {
+
+   interface Subheading {
+    subheading_id: string;
+    title: string;
+    extra_instructions: string;
+    word_count: number;
+  }
+
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -57,21 +67,17 @@ const QuestionCrafter = () => {
     )
   );
   const [contentLoaded, setContentLoaded] = useState(true); // Set to true initially
-
+  const [sectionAnswer, setSectionAnswer] = useState(null); // the answer generated for the subheadings
   const currentUserPermission = contributors[auth.email] || "viewer"; // Default to 'viewer' if not found
   const canUserEdit =
     currentUserPermission === "admin" || currentUserPermission === "editor";
 
   const [selectedFolders, setSelectedFolders] = useState(["default"]);
 
-  
-
-
   const showViewOnlyMessage = () => {
     displayAlert("You only have permission to view this bid.", "danger");
   };
 
-  
   const handleSaveSelectedFolders = (folders) => {
     console.log("Received folders in parent:", folders);
     setSelectedFolders(folders);
@@ -85,7 +91,6 @@ const QuestionCrafter = () => {
 
 
   /////////////////////////////////////////////////////////////////////////////////////////////
-
  
   const [choice, setChoice] = useState("3");
   const [broadness, setBroadness] = useState("4");
@@ -101,36 +106,35 @@ const QuestionCrafter = () => {
   const [subheadings, setSubheadings] = useState<Subheading[]>([]);
   const [answerSections, setAnswerSections] = useState<AnswerSection[]>([]);
   const [isLoadingSubheadings, setIsLoadingSubheadings] = useState(false);
-  // Add a new effect specifically for handling references when answerSections change
-  useEffect(() => {
-    if (answerSections.length > 0) {
-      console.log("Making references bold for sections:", answerSections.length);
-      setAnswerSections(prev => 
-        prev.map(section => {
-          console.log(`Processing references for section: ${section.title}`);
-          const currentText = convertToRaw(section.editorState.getCurrentContent())
-            .blocks.map(block => block.text)
-            .join('\n');
-          console.log(`Current text contains references:`, currentText.includes('[Extracted'));
-          
-          return {
-            ...section,
-            editorState: makeReferencesBoldForState(section.editorState)
-          };
-        })
-      );
-    }
-  }, [answerSections.length]); // Only run when the number of sections changes
 
-  // Update the fetchSubheadings function to handle references after setting state
-  const fetchSubheadings = async () => {
-    setIsLoadingSubheadings(true);
+  const [sectionWordCounts, setSectionWordCounts] = useState<Record<string, number>>({});
+  const [isCompleting, setIsCompleting] = useState(false);
+
+  // Add this utility function to convert EditorState to plain text
+  const getPlainTextFromEditorState = (editorState) => {
+    const contentState = editorState.getCurrentContent();
+    const rawContent = convertToRaw(contentState);
+    return rawContent.blocks.map(block => block.text).join('\n');
+  };
+
+  // Add this function to handle the API call
+  const updateSubheading = async (
+    tokenRef: React.MutableRefObject<string>,
+    bid_id: string,
+    section_id: string,
+    subheading_id: string,
+    extra_instructions: string,
+    word_count: number
+  ) => {
     try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_subheadings`,
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/update_subheading`,
         {
-          bid_id: bid_id,
-          section_id: section.section_id
+          bid_id,
+          section_id,
+          subheading_id,
+          extra_instructions,
+          word_count
         },
         {
           headers: {
@@ -139,33 +143,189 @@ const QuestionCrafter = () => {
           }
         }
       );
-      
-      setSubheadings(response.data.subheadings);
-      
-      // Initialize answer sections and make references bold immediately
-      const newAnswerSections = response.data.subheadings.map((sh: Subheading) => {
-        const initialState = EditorState.createWithContent(
-          ContentState.createFromText(sh.body || '')
-        );
-        // Make references bold right away
-        return {
-          subheading_id: sh.subheading_id,
-          title: sh.title,
-          editorState: makeReferencesBoldForState(initialState)
-        };
-      });
-      
-      console.log("Setting new answer sections with bold references");
-      setAnswerSections(newAnswerSections);
-      
+      console.log('Successfully updated subheading:', subheading_id);
+      // Fetch updated subheadings after successful update
     } catch (error) {
-      console.error('Error fetching subheadings:', error);
-      displayAlert("Failed to fetch subheadings", 'danger');
-    } finally {
-      setIsLoadingSubheadings(false);
+      console.error('Error updating subheading:', error);
+     
+    }
+  };
+  
+
+  // Create a debounced version of the update function
+  const debouncedUpdateSubheading = debounce((...args) => {
+    updateSubheading(...args).catch(error => {
+      console.error('Error in debounced update:', error);
+    });
+  }, 1000);
+
+  const handleWordCountChange = (subheadingId: string, newCount: number) => {
+    setSectionWordCounts(prev => ({
+      ...prev,
+      [subheadingId]: newCount
+    }));
+  
+    // Find the current extra instructions for this subheading
+    const currentSection = answerSections.find(
+      section => section.subheading_id === subheadingId
+    );
+    
+    if (currentSection) {
+      const extraInstructions = getPlainTextFromEditorState(currentSection.editorState);
+      
+      debouncedUpdateSubheading(
+        tokenRef,
+        bid_id,
+        section.section_id,
+        subheadingId,
+        extraInstructions,
+        newCount
+      );
     }
   };
 
+  // Update the handleAnswerChange function
+  const handleAnswerChange = (editorState: EditorState, subheadingId: string) => {
+    console.log(`Updating editor state for section ${subheadingId}`, editorState);
+    
+    setAnswerSections(prev => {
+      const updatedSections = prev.map(section => {
+        if (section.subheading_id === subheadingId) {
+          console.log(`Found matching section, updating content for ${section.title}`);
+          return {
+            ...section,
+            editorState
+          };
+        }
+        return section;
+      });
+      return updatedSections;
+    });
+
+    // Get the plain text content from the editor state
+    const extraInstructions = getPlainTextFromEditorState(editorState);
+    
+    // Get the current word count for this subheading
+    const wordCount = sectionWordCounts[subheadingId] || 250;
+
+    // Call the debounced update function
+    debouncedUpdateSubheading(
+      tokenRef,
+      bid_id,
+      section.section_id,
+      subheadingId,
+      extraInstructions,
+      wordCount
+    );
+  };
+    
+  const handleMarkAsComplete = async () => {
+    if (isCompleting) return;
+   
+    setIsCompleting(true);
+    try {
+      // Get sections in consistent order
+      const orderedSections = answerSections.map(section => ({
+        id: section.subheading_id,
+        title: section.title,
+        // Convert EditorState content to plain text for extra instructions
+        extraInstructions: getPlainTextFromEditorState(section.editorState),
+        wordCount: sectionWordCounts[section.subheading_id] || 250
+      }));
+
+      console.log("Preparing section data:", orderedSections);
+
+      const request = {
+        bid_id: bid_id,
+        section_id: section.section_id,
+        choice: "3b",
+        broadness: broadness,
+        input_text: inputText,
+        extra_instructions: backgroundInfo, // Pass general background info
+        selected_choices: orderedSections.map(s => s.title),
+        datasets: ['default'],
+        word_amounts: orderedSections.map(s => s.wordCount),
+        extra_detail: orderedSections.map(s => s.extraInstructions)
+      };
+
+      console.log("Sending request to mark section complete:", request);
+
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/mark_section_as_complete`,
+        request,
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+   
+      setSectionAnswer(response.data);
+      displayAlert("Section marked as complete successfully!", 'success');
+    } catch (error) {
+      // Enhanced error logging
+      console.error('Error completing section:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        console.error('Error status:', error.response.status);
+      }
+      displayAlert("Failed to mark section as complete", 'danger');
+    } finally {
+      setIsCompleting(false);
+    }
+  };
+
+  
+  // Update the fetchSubheadings function to handle references after setting state
+  const fetchSubheadings = async () => {
+  setIsLoadingSubheadings(true);
+  try {
+    const response = await axios.post(
+      `http${HTTP_PREFIX}://${API_URL}/get_subheadings`,
+      {
+        bid_id: bid_id,
+        section_id: section.section_id
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${tokenRef.current}`,
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+    
+    setSubheadings(response.data.subheadings);
+    
+    // Initialize answer sections and update word counts
+    const newAnswerSections = response.data.subheadings.map((sh: Subheading) => {
+      const initialState = EditorState.createWithContent(
+        ContentState.createFromText(sh.extra_instructions || '')
+      );
+
+      // Update word counts state
+      setSectionWordCounts(prev => ({
+        ...prev,
+        [sh.subheading_id]: sh.word_count || 250
+      }));
+
+      return {
+        subheading_id: sh.subheading_id,
+        title: sh.title,
+        editorState: initialState
+      };
+    });
+    
+    console.log("Setting new answer sections with updated content");
+    setAnswerSections(newAnswerSections);
+    
+  } catch (error) {
+    console.error('Error fetching subheadings:', error);
+    displayAlert("Failed to fetch subheadings", 'danger');
+  } finally {
+    setIsLoadingSubheadings(false);
+  }
+};
   // Fetch subheadings when component mounts or when section changes
   useEffect(() => {
     if (section?.section_id) {
@@ -308,22 +468,6 @@ const QuestionCrafter = () => {
                   {choice}
                 </span>
               )}
-              {selectedChoices.includes(choice) && (
-                <Form.Control
-                  type="number"
-                  value={wordAmounts[choice] || 250}
-                  onChange={(e) =>
-                    setWordAmounts({
-                      ...wordAmounts,
-                      [choice]: parseInt(e.target.value, 10)
-                    })
-                  }
-                  min={1}
-                  className="ml-2"
-                  placeholder="250"
-                  style={{ width: "120px", marginLeft: "10px" }}
-                />
-              )}
             </div>
           ))}
       </div>
@@ -369,15 +513,9 @@ const QuestionCrafter = () => {
       });
 
       const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
+        `http${HTTP_PREFIX}://${API_URL}/add_section_subheadings`,
         {
-          choice: "3b",
-          broadness: broadness,
-          input_text: inputText,
-          extra_instructions: backgroundInfo,
           selected_choices: selectedChoices,
-          datasets: selectedFolders,
-          word_amounts,
           bid_id: sharedState.object_id,
           section_id: section.section_id  // Add section_id to the request
         },
@@ -394,13 +532,13 @@ const QuestionCrafter = () => {
         // Update answer sections from the response
         const newAnswerSections = result.data.section.subheadings.map(sh => {
           const initialState = EditorState.createWithContent(
-            ContentState.createFromText(sh.body || '')
+            ContentState.createFromText(sh.extra_instructions || '')
           );
           // Make references bold immediately when creating new sections
           return {
             subheading_id: sh.subheading_id,
             title: sh.title,
-            editorState: makeReferencesBoldForState(initialState)
+            editorState: initialState
           };
         });
         
@@ -515,24 +653,6 @@ const QuestionCrafter = () => {
     );
   };
   
-  // Updated handleAnswerChange function
-  const handleAnswerChange = (editorState: EditorState, subheadingId: string) => {
-    console.log(`Updating editor state for section ${subheadingId}`, editorState);
-    
-    setAnswerSections(prev => {
-      const updatedSections = prev.map(section => {
-        if (section.subheading_id === subheadingId) {
-          console.log(`Found matching section, updating content for ${section.title}`);
-          return {
-            ...section,
-            editorState
-          };
-        }
-        return section;
-      });
-      return updatedSections;
-    });
-  };
   
   // Function to handle removing references for a specific section
   const handleRemoveReferences = (subheadingId: string) => {
@@ -567,12 +687,12 @@ const QuestionCrafter = () => {
             <div key={answerSection.subheading_id} className="answer-section mb-4">
               <div className="proposal-header">
                 <h3 className="lib-title mb-3">{answerSection.title}</h3>
-                <Button 
-                  className="upload-button"
-                  onClick={() => handleRemoveReferences(answerSection.subheading_id)}
-                >
-                  Remove References
-                </Button>
+                <WordCountSelector
+                subheadingId={answerSection.subheading_id}
+                initialCount={sectionWordCounts[answerSection.subheading_id] || 250}
+                onChange={handleWordCountChange}
+                disabled={!canUserEdit}
+              />
               </div>
               
               <div className="response-box draft-editor">
@@ -585,21 +705,12 @@ const QuestionCrafter = () => {
                       BOLD: { fontWeight: "bold" }
                     }}
                     readOnly={!canUserEdit}
-                    placeholder="Content will be generated here..."
+                    placeholder="Add extra information here about what you want to write about..."
                   />
                 </div>
               </div>
               
-              <div className="text-muted mt-2">
-                Word Count:{" "}
-                {
-                  convertToRaw(answerSection.editorState.getCurrentContent())
-                    .blocks.map((block) => block.text)
-                    .join("\n")
-                    .split(/\s+/)
-                    .filter(Boolean).length
-                }
-              </div>
+              
             </div>
           );
         })
@@ -670,12 +781,7 @@ const QuestionCrafter = () => {
                 <h1 className="lib-title" id="question-section">
                   Question
                 </h1>
-                <div className="dropdown-container">
-                  <SelectFolderModal
-                    onSaveSelectedFolders={handleSaveSelectedFolders}
-                    initialSelectedFolders={selectedFolders}
-                  />
-                </div>
+               
               </div>
 
               <div className="question-answer-box">
@@ -726,18 +832,36 @@ const QuestionCrafter = () => {
            
              
                 <div className="proposal-header">
-                  <h1 id="answer-section" className="lib-title mt-4 mb-3">
-                  Responses
-                  </h1>
+                <h2 className="heavy mt-4 mb-2" >
+                  Order
+                  </h2>
+                  <Button 
+                    onClick={handleMarkAsComplete} // Removed the ()
+                    disabled={isCompleting || !canUserEdit}
+                    className="upload-button mt-3"
+                  >
+                    {isCompleting ? (
+                      <>
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                          className="me-2"
+                        />
+                        Marking as Complete...
+                      </>
+                    ) : (
+                      'Mark as Complete'
+                    )}
+                  </Button>
                   </div>
                   {renderAnswerSections()}
                  
                 
 
-                <SaveQASheet
-                  inputText={inputText}
-                  responseEditorState={responseEditorState}
-                />
+                <p>{sectionAnswer}</p>
             
               
             

@@ -36,6 +36,7 @@ body {
   overflow-y: auto;
   overflow-x: hidden !important;
   font-family: var(--font-family) !important;
+  height: 100%;
 }
 /* Ensure all text elements use the font */
 
@@ -63,6 +64,11 @@ select {
   /* Reduced from 10px */
 }
 
+.content-scaler {
+  height: 100%;
+  max-height: 100%;
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg) scale(0.6);
@@ -74,3 +80,18 @@ select {
   }
 }
 /* You may need to adjust other specific component styles */
+.container,
+#container {
+  width: 100%;
+  height: 100vh;
+}
+
+#container > div {
+  height: 100%;
+}
+
+#container > div > div {
+  height: 125vh;
+  max-height: 125vh;
+  overflow-y: hidden;
+}

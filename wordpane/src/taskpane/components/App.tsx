@@ -10,6 +10,7 @@ import "./App.css";
 import "./Proposal.css";
 import "./Upload.css";
 import "bootstrap/dist/css/bootstrap.css";
+import ThemeProvider from "../providers/ThemeProvider";
 
 interface AppProps {
   title: string;
@@ -27,11 +28,13 @@ const useStyles = makeStyles({
 
 const Layout: React.FC<{ title: string }> = ({ title }) => {
   return (
-    <div className="content-scaler">
-      <div className="main-content">
-        <Outlet />
+    <ThemeProvider>
+      <div className="content-scaler">
+        <div className="main-content">
+          <Outlet />
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 };
 

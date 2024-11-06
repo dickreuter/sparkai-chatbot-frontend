@@ -1,0 +1,23 @@
+.creator {
+  display: flex;
+  width: 140px;
+  padding: 3px 5px;
+  align-items: center;
+}
+
+.creator > span[class^="MuiTypography-root"] {
+  font-size: 15px;
+  line-height: normal;
+}
+
+.creator > *:first-child {
+  margin-right: 5px;
+}
+
+.creator > img,
+.creator > svg {
+  min-width: 33px;
+  min-height: 35px;
+  width: 33px;
+  height: 35px;
+}

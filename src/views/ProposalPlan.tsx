@@ -195,18 +195,36 @@ const ProposalPlan = () => {
       const formData = new FormData();
       formData.append('bid_id', object_id);
       
-      await axios.post(
+      const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_proposal`,
         formData,
         {
           headers: {
             'Authorization': `Bearer ${tokenRef.current}`,
             'Content-Type': 'multipart/form-data',
-          }
+          },
+          responseType: 'blob'  // Important for handling file downloads
         }
       );
       
-      displayAlert("Proposal generation started successfully!", 'success');
+      // Create a blob from the response data
+      const blob = new Blob([response.data], { type: 'application/msword' });
+      
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create a temporary link element and trigger the download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = response.headers['content-disposition']?.split('filename=')[1] || 'proposal.docx';
+      document.body.appendChild(link);
+      link.click();
+      
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+      
+      displayAlert("Proposal downloaded successfully!", 'success');
     } catch (err) {
       console.error('Error generating proposal:', err);
       displayAlert("Failed to generate proposal", 'danger');

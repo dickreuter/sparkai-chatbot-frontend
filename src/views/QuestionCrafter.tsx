@@ -233,7 +233,7 @@ const QuestionCrafter = () => {
           id: section.subheading_id,
           title: section.title,
           // Format combined text to maintain clear separation between title and instructions
-          combinedText: `${section.title}\n\nContext & Requirements:\n${extraInstructions || 'No additional instructions provided.'}`,
+          combinedText: `###${section.title}!!!Context & Requirements: ${extraInstructions || ''}!!!###`,
           wordCount: sectionWordCounts[section.subheading_id] || 250
         };
       });

@@ -1,17 +1,15 @@
-export interface IPilotOption {
-  type: "text" | "image";
+export interface IMessage {
+  type: "text" | "image" | "loading";
   value: string;
+  createdBy: "user" | "bot";
 }
 
 export type IPromptType =
   | "Summarise"
-  | "Diagram"
   | "Expand"
-  | "Rephrase"
-  | "Inject Company Voice"
-  | "Inject Tender Context"
-  | "Improve Grammar"
-  | "Add Statistics"
-  | "For Example"
-  | "Translate to English"
-  | "We will Active Voice";
+  | "Inject Tender Content"
+  | "Inject Tone-of-Voice"
+  | "We will Active Voice"
+  | "Graph";
+
+export type IShortcutType = "insert" | "replace" | "refine";

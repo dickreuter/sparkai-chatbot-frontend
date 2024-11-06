@@ -7,9 +7,9 @@
   border: 1px solid #ced4da;
   border-top: none;
   overflow-x: hidden;
-  height: 640px;
   overflow-y: none;
   margin-bottom: 0px;
+  height: 100%;
 }
 
 .input-header {
@@ -332,9 +332,7 @@
 }
 
 .message-bubble-small {
-  display: flex;
-  /* Inline block to fit content */
-  max-width: 80%;
+  max-width: 100%;
   min-width: 50px;
   padding: 10px;
   border-radius: 15px;
@@ -343,21 +341,8 @@
   font-size: 17px;
 }
 
-.message-bubble-small.user {
-  background-color: orange;
-  align-self: flex-end;
-  border-top-right-radius: 0;
-  color: white;
-  opacity: 1;
-}
-
-.message-bubble-small.bot {
-  background-color: #f5f5f5;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ced4da;
-  align-self: flex-start;
-  border-top-left-radius: 0;
-  color: black;
+.message-body {
+  margin-top: 10px;
 }
 
 .message-bubble-small ol,
@@ -501,7 +486,7 @@
 
 .loading-dots {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
   height: 100%;
   font-size: 24px;
@@ -608,4 +593,32 @@
 .custom-prompt-input:focus {
   outline: 1px solid white;
   /* Replace 'yourColor' with the desired color */
+}
+
+.enhance-prompt-menu {
+  position: fixed;
+  transform: translateY(calc(-100% - 10px));
+}
+
+.prompt-toolbar {
+  position: relative;
+}
+
+textarea.chat-input {
+  padding: 5px 10px;
+  width: 100%;
+  resize: none;
+  border-color: #0000001f;
+  border-radius: 6px;
+}
+
+button.chat-send-button {
+  position: absolute;
+  right: 15px;
+  bottom: 18px;
+}
+
+.border-box {
+  border: solid 1px #0000001f;
+  border-radius: 4px;
 }

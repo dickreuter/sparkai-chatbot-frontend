@@ -12,6 +12,7 @@ const ThemeProvider = ({ children }) => {
       button: {
         textTransform: "none",
       },
+      fontFamily: "calc(--font-family)",
     },
     components: {
       MuiButton: {

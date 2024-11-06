@@ -59,7 +59,7 @@ const MessageBox = ({ messages, showShortcuts, handleClickShortcut, shortcutVisi
             )}
           </div>
           {showShortcuts && message.createdBy === "bot" && message.type !== "loading" && (
-            <Grid container spacing={1}>
+            <Grid container spacing={1} className="shortcuts">
               {shortcuts.map((shortcut, idx) => {
                 if (shortcutVisible === undefined || shortcutVisible(message, shortcut.type)) {
                   return (

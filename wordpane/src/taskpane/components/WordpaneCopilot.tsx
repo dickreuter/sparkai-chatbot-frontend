@@ -352,7 +352,9 @@ const WordpaneCopilot = () => {
             const newPar = par.insertParagraph("", "After");
             newPar.insertInlinePictureFromBase64(value.split(",")[1], insertLocation);
           } else if (type === "text") {
-            par.insertText(value, insertLocation);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(value, "text/html");
+            par.insertText(doc.body.textContent || "", insertLocation);
           }
           return await context.sync();
         })
@@ -566,8 +568,8 @@ const WordpaneCopilot = () => {
 
   const shortcutVisible = (message: IMessage, type: IShortcutType) => {
     if (message.type === "text" && type === "replace") return true;
-    if (message.type === "image" && type === "insert") return true;
-    if (type === "refine") return true;
+    if (message.type === "image" && type === "insert" && isCustomPromptTab) return true;
+    if (type === "refine" && isCustomPromptTab) return true;
     return false;
   };
 
@@ -601,9 +603,19 @@ const WordpaneCopilot = () => {
               shortcutVisible={shortcutVisible}
             />
           ) : isInternetSearchTab ? (
-            <MessageBox messages={internetResearchMessages} showShortcuts={false} />
+            <MessageBox
+              messages={internetResearchMessages}
+              showShortcuts={true}
+              handleClickShortcut={handleClickMessageShortcut}
+              shortcutVisible={shortcutVisible}
+            />
           ) : (
-            <MessageBox messages={libraryChatMessages} showShortcuts={false} />
+            <MessageBox
+              messages={libraryChatMessages}
+              showShortcuts={true}
+              handleClickShortcut={handleClickMessageShortcut}
+              shortcutVisible={shortcutVisible}
+            />
           )}
         </div>
       </Box>

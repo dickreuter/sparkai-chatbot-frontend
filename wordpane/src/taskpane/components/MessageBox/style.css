@@ -21,3 +21,7 @@
   width: 33px;
   height: 35px;
 }
+
+div.MuiGrid-root.shortcuts {
+  margin-top: 5px;
+}

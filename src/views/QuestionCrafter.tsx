@@ -221,35 +221,40 @@ const QuestionCrafter = () => {
     
   const handleMarkAsComplete = async () => {
     if (isCompleting) return;
-   
+     
     setIsCompleting(true);
     try {
-      // Get sections in consistent order
-      const orderedSections = answerSections.map(section => ({
-        id: section.subheading_id,
-        title: section.title,
-        // Convert EditorState content to plain text for extra instructions
-        extraInstructions: getPlainTextFromEditorState(section.editorState),
-        wordCount: sectionWordCounts[section.subheading_id] || 250
-      }));
-
+      // Get sections in consistent order and combine each title with its instructions
+      const orderedSections = answerSections.map(section => {
+        const extraInstructions = getPlainTextFromEditorState(section.editorState);
+        
+        // Create array with proper order of instructions for each section
+        return {
+          id: section.subheading_id,
+          title: section.title,
+          // Format combined text to maintain clear separation between title and instructions
+          combinedText: `${section.title}\n\nContext & Requirements:\n${extraInstructions || 'No additional instructions provided.'}`,
+          wordCount: sectionWordCounts[section.subheading_id] || 250
+        };
+      });
+  
       console.log("Preparing section data:", orderedSections);
-
+  
       const request = {
         bid_id: bid_id,
         section_id: section.section_id,
         choice: "3b",
         broadness: broadness,
         input_text: inputText,
-        extra_instructions: backgroundInfo, // Pass general background info
-        selected_choices: orderedSections.map(s => s.title),
+        extra_instructions: backgroundInfo, // General background info
+        // Use combinedText array that maintains title-instruction relationships
+        selected_choices: orderedSections.map(s => s.combinedText),
         datasets: ['default'],
-        word_amounts: orderedSections.map(s => s.wordCount),
-        extra_detail: orderedSections.map(s => s.extraInstructions)
+        word_amounts: orderedSections.map(s => s.wordCount)
       };
-
+  
       console.log("Sending request to mark section complete:", request);
-
+  
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/mark_section_as_complete`,
         request,
@@ -260,11 +265,10 @@ const QuestionCrafter = () => {
           }
         }
       );
-   
+     
       setSectionAnswer(response.data);
       displayAlert("Section marked as complete successfully!", 'success');
     } catch (error) {
-      // Enhanced error logging
       console.error('Error completing section:', error);
       if (error.response) {
         console.error('Error response:', error.response.data);
@@ -275,7 +279,6 @@ const QuestionCrafter = () => {
       setIsCompleting(false);
     }
   };
-
   
   // Update the fetchSubheadings function to handle references after setting state
   const fetchSubheadings = async () => {

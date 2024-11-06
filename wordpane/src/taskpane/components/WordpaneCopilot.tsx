@@ -1,48 +1,114 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import { Button, Col, Dropdown, Row, Spinner } from "react-bootstrap";
 import "./WordpaneCopilot.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { EditorState, Modifier, SelectionState, convertToRaw, ContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
-import { useNavigate } from "react-router-dom";
 import useSelectedText from "../hooks/useSelectedText";
 import { apiURL } from "../helper/urls";
-import { IPilotOption, IPromptType } from "../../types";
+import { IMessage, IPromptType, IShortcutType } from "../../types";
 import { getBase64FromBlob } from "../helper/file";
+import { Box, Button, Grid, MenuItem, MenuList, Paper, Tab, Tabs } from "@mui/material";
+import MessageBox from "./MessageBox";
+import { customPrompts } from "./WordpaneCopilot.constants";
+
+const getDefaultMessage = (type: "library-chat" | "internet-search", useCache: boolean = false): IMessage[] => {
+  const savedMessages = localStorage.getItem(type);
+
+  if (useCache && savedMessages) {
+    const parsedMessages = JSON.parse(savedMessages);
+    if (parsedMessages.length > 0) {
+      return parsedMessages;
+    }
+  }
+
+  return [
+    {
+      createdBy: "bot",
+      type: "text",
+      value:
+        "Welcome to Bid Pilot! Ask questions about your company library data or search the internet for up to date information. Select text in the response box to use copilot and refine the response.",
+    },
+  ];
+};
 
 const WordpaneCopilot = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
-  const navigate = useNavigate();
-
-  const [dataset, setDataset] = useState("default");
-
-  const [isCopilotVisible, setIsCopilotVisible] = useState(false);
+  const [isCustomPromptMenuVisible, setCustomPromptMenuVisible] = useState(false);
   const [selectedText, setSelectedText] = useState("");
-  const [tempText, setTempText] = useState("");
-  const [copilotOptions, setCopilotOptions] = useState<IPilotOption[]>([]);
-  const [selectedOption, setSelectedOption] = useState<IPilotOption>(null);
-  const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
-  const [showOptions, setShowOptions] = useState(false);
-  const [copilotLoading, setCopilotLoading] = useState(false);
-  const [actionOnClick, setActionOnClick] = useState<"Insert" | "Replace">("Replace");
+  const [customPromptMessages, setCustomPromptMessages] = useState<IMessage[]>([]);
 
-  const [inputText, setInputText] = useState(localStorage.getItem("inputText") || "");
+  const [libraryChatMessages, setLibraryChatMessages] = useState<IMessage[]>(getDefaultMessage("library-chat", true));
+  const [internetResearchMessages, setInternetResearchMessages] = useState<IMessage[]>(
+    getDefaultMessage("internet-search", true)
+  );
+  const [selectedCustomPrompt, setSelectedCustomPrompt] = useState<IPromptType>(null);
+
+  const [showOptions, setShowOptions] = useState(false);
+
+  const [inputValue, setInputValue] = useState("");
+
+  const [bidPilotChoice] = useState("2");
+  const [bidPilotBroadness] = useState("4");
+  const optionsContainerRef = useRef(null); // Ref for the options container
+  const responseMessageBoxRef = useRef(null); // Ref for the response message box
+  const textInputRef = useRef(null);
+
   const [responseEditorState, setResponseEditorState] = useState(
     EditorState.createWithContent(ContentState.createFromText(localStorage.getItem("response") || ""))
   );
 
-  const responseBoxRef = useRef(null); // Ref for the response box
-  const promptsContainerRef = useRef(null); // Ref for the prompts container
+  const [originalEditorState, setOriginalEditorState] = useState(responseEditorState);
 
-  const [selectedDropdownOption, setSelectedDropdownOption] = useState("library-chat");
-  const bidPilotRef = useRef(null);
+  const [startTime, setStartTime] = useState(null);
+
+  const responseBoxRef = useRef(null); // Ref for the response box
+
+  const [selectedTab, setSelectedTab] = useState<"library-chat" | "internet-search" | "custom-prompt">("library-chat");
+
+  const isLibraryChatTab = useMemo(() => selectedTab === "library-chat", [selectedTab]);
+  const isInternetSearchTab = useMemo(() => selectedTab === "internet-search", [selectedTab]);
+  const isCustomPromptTab = useMemo(() => selectedTab === "custom-prompt", [selectedTab]);
+
+  const isLiveChatLoading = useMemo(
+    () => isLibraryChatTab && libraryChatMessages.find((item) => item.type === "loading") !== undefined,
+    [isLibraryChatTab, libraryChatMessages]
+  );
+
+  const isInternetSearchLoading = useMemo(
+    () => isInternetSearchTab && internetResearchMessages.find((item) => item.type === "loading") !== undefined,
+    [isInternetSearchTab, internetResearchMessages]
+  );
+
+  const isCustomPromptLoading = useMemo(
+    () => isCustomPromptTab && customPromptMessages.find((item) => item.type === "loading") !== undefined,
+    [isCustomPromptTab, customPromptMessages]
+  );
+
+  const isLoading = useMemo(
+    () => isLiveChatLoading || isInternetSearchLoading || isCustomPromptLoading,
+    [isLiveChatLoading, isInternetSearchLoading, isCustomPromptLoading]
+  );
+
+  useEffect(() => {
+    if (responseMessageBoxRef?.current) {
+      const scrollBox = responseMessageBoxRef.current.querySelector(".mini-messages");
+      scrollBox.scrollTop = scrollBox.scrollHeight;
+    }
+    if (textInputRef?.current && isLoading === false) {
+      textInputRef.current.focus();
+    }
+  }, [isLoading]);
+
+  const toggleCustomPromptMenuVisible: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    setTimeout(() => {
+      setCustomPromptMenuVisible(!isCustomPromptMenuVisible);
+    }, 10);
+  };
 
   useSelectedText({ onChange: setSelectedText });
 
@@ -56,15 +122,22 @@ const WordpaneCopilot = () => {
   }, [responseEditorState]);
 
   const handleClearMessages = () => {
-    setMessages([
-      {
-        type: "bot",
-        text: "Welcome to Bid Pilot! Ask questions about your company library data or search the internet for up to date information. Select text in the response box to use copilot and refine the response.",
-      },
-    ]);
-    localStorage.removeItem("messages");
+    console.log("Clearing messages");
+    switch (selectedTab) {
+      case "library-chat":
+        setLibraryChatMessages(getDefaultMessage("library-chat"));
+        break;
+      case "internet-search":
+        setInternetResearchMessages(getDefaultMessage("internet-search"));
+        break;
+      case "custom-prompt":
+        setCustomPromptMessages([]);
+        setSelectedTab("library-chat");
+      default:
+        break;
+    }
 
-    setIsCopilotVisible(false);
+    setCustomPromptMenuVisible(false);
 
     if (showOptions == true) {
       resetEditorState();
@@ -72,10 +145,8 @@ const WordpaneCopilot = () => {
     setShowOptions(false);
   };
 
-  const askCopilot = async (copilotInput, instructions, copilot_mode) => {
-    setQuestionAsked(true);
+  const askCopilot = async (copilotInput: string, instructions: string, copilot_mode: string) => {
     localStorage.setItem("questionAsked", "true");
-    setCopilotLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
 
     try {
@@ -98,68 +169,51 @@ const WordpaneCopilot = () => {
       ];
 
       const results = await Promise.all(requests);
-      const options: IPilotOption[] = results
+      const options: IMessage[] = results
         .map((result) => result.data)
         .map((data: string) => ({
           type: "text",
           value: data,
+          createdBy: "bot",
         }));
-      setCopilotOptions(options);
+      return options;
     } catch (error) {
       console.error("Error sending question:", error);
+      return [];
     }
-    setCopilotLoading(false);
   };
 
-  const askDiagram = (prompt: string) => {
-    setQuestionAsked(true);
+  const askDiagram = async (prompt: string): Promise<IMessage[]> => {
+    console.log("askDiagram called");
     localStorage.setItem("questionAsked", "true");
-    setCopilotLoading(true);
     setStartTime(Date.now()); // Set start time for the timer
 
-    axios
-      .post(apiURL("generate_diagram"), prompt, { responseType: "blob" })
-      .then(async (response) => {
-        console.log(response);
-        setCopilotOptions([
-          {
-            type: "image",
-            value: await getBase64FromBlob(response.data),
-          },
-        ]);
-      })
-      .catch((error) => {
-        console.error("Error sending question:", error);
-      })
-      .finally(() => {
-        setCopilotLoading(false);
-      });
+    try {
+      const response = await axios.post(apiURL("generate_diagram"), prompt, { responseType: "blob" });
+      return [
+        {
+          type: "image",
+          value: await getBase64FromBlob(response.data),
+          createdBy: "bot",
+        },
+      ];
+    } catch (error) {
+      console.error("Error sending question:", error);
+      return [];
+    }
   };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       console.log("click outside");
-      if (
-        responseBoxRef.current &&
-        promptsContainerRef.current &&
-        bidPilotRef.current &&
-        !responseBoxRef.current.contains(event.target) &&
-        !promptsContainerRef.current.contains(event.target) &&
-        !bidPilotRef.current.contains(event.target)
-      ) {
-        setIsCopilotVisible(false);
-      }
+      setCustomPromptMenuVisible(false);
     };
 
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }, [showOptions, isCopilotVisible]);
-
-  const optionsContainerRef = useRef(null); // Ref for the options container
-
-  const [originalEditorState, setOriginalEditorState] = useState(responseEditorState);
+  }, [showOptions, isCustomPromptMenuVisible]);
 
   const resetEditorState = () => {
     const contentState = originalEditorState.getCurrentContent();
@@ -181,7 +235,7 @@ const WordpaneCopilot = () => {
 
     const newEditorState = EditorState.createWithContent(newContentState);
     setResponseEditorState(newEditorState);
-    setIsCopilotVisible(false);
+    setCustomPromptMenuVisible(false);
     setSelectedText("");
   };
 
@@ -207,199 +261,78 @@ const WordpaneCopilot = () => {
     };
   }, [showOptions, responseEditorState]);
 
-  const handleTick = () => {
-    const contentState = responseEditorState.getCurrentContent();
-    const blocks = contentState.getBlockMap();
-
-    let newContentState = contentState;
-
-    // Remove ORANGE style from all blocks
-    blocks.forEach((block) => {
-      const blockKey = block.getKey();
-      const length = block.getLength();
-      const blockSelection = SelectionState.createEmpty(blockKey).merge({
-        anchorOffset: 0,
-        focusOffset: length,
-      });
-
-      newContentState = Modifier.removeInlineStyle(newContentState, blockSelection, "ORANGE");
-    });
-
-    let newEditorState = EditorState.push(responseEditorState, newContentState, "change-inline-style");
-
-    // Clear the selection
-    const firstBlockKey = newEditorState.getCurrentContent().getFirstBlock().getKey();
-    const emptySelection = SelectionState.createEmpty(firstBlockKey);
-    newEditorState = EditorState.forceSelection(newEditorState, emptySelection);
-
-    if (actionOnClick === "Insert") {
-      insertToWord(selectedOption, "End");
-    } else {
-      insertToWord(selectedOption, "Replace");
+  const handleClickMessageShortcut = (action: IShortcutType, option: IMessage) => {
+    console.log("handleClickMessageShortcut called", { action });
+    if (action === "refine") {
+      handleLinkClick(selectedCustomPrompt, true)();
+      return;
+    }
+    if (action === "insert") {
+      insertToWord(option, "End");
+    } else if (action === "replace") {
+      insertToWord(option, "Replace");
     }
 
-    setResponseEditorState(newEditorState);
     setShowOptions(false);
-    setIsCopilotVisible(false);
+    setCustomPromptMenuVisible(false);
     setSelectedText("");
-    setSelectedOptionIndex(null);
+    setCustomPromptMessages([]);
+    setSelectedTab("library-chat");
 
     console.log("handleTick - clearedText");
   };
 
   useEffect(() => {
     if (selectedText.trim() && selectedText.trim().length > 0) {
-      // added extra check because sometimes an empty string would be passed to the copilot
-      setIsCopilotVisible(true);
-      if (selectedOptionIndex === null) {
-        setShowOptions(false);
-      }
     } else {
-      setIsCopilotVisible(false);
+      setCustomPromptMenuVisible(false);
     }
-  }, [selectedText, responseEditorState]);
+  }, [selectedText]);
 
-  // Dummy state to force re-render of the editor component
-  const [dummyState, setDummyState] = useState(false);
+  const handleLinkClick =
+    (promptId: IPromptType, isRefine: boolean | undefined = false) =>
+    () => {
+      console.log(`Custom prompt asked`, promptId);
+      const copilot_mode = promptId.toLowerCase().replace(/\s+/g, "_");
+      let instructions = "";
 
-  const [highlightedRange, setHighlightedRange] = useState(null);
+      setSelectedTab("custom-prompt");
+      setCustomPromptMenuVisible(false);
+      setSelectedCustomPrompt(promptId);
+      setCustomPromptMessages([
+        {
+          createdBy: "user",
+          type: "loading",
+          value: "loading",
+        },
+      ]);
 
-  const handleLinkClick = (linkName: IPromptType) => (e) => {
-    e.preventDefault();
-    const copilot_mode = linkName.toLowerCase().replace(/\s+/g, "_");
-    const instructions = "";
+      let prompt = selectedText;
 
-    setOriginalEditorState(responseEditorState);
-
-    const contentState = responseEditorState.getCurrentContent();
-    const selection = responseEditorState.getSelection();
-    const startKey = selection.getStartKey();
-    const endKey = selection.getEndKey();
-    const startOffset = selection.getStartOffset();
-    const endOffset = selection.getEndOffset();
-
-    let newContentState = contentState;
-
-    // Store the highlighted range
-    setHighlightedRange({
-      startKey,
-      endKey,
-      startOffset,
-      endOffset,
-    });
-
-    // Apply ORANGE style (rest of the function remains the same)
-    if (startKey === endKey) {
-      const blockSelection = SelectionState.createEmpty(startKey).merge({
-        anchorOffset: startOffset,
-        focusOffset: endOffset,
-      });
-      newContentState = Modifier.applyInlineStyle(newContentState, blockSelection, "ORANGE");
-    } else {
-      // If the selection spans multiple blocks
-      const blocks = contentState.getBlockMap();
-      let isWithinSelection = false;
-
-      newContentState = blocks.reduce((updatedContent, block, blockKey) => {
-        if (blockKey === startKey) {
-          isWithinSelection = true;
-          const blockSelection = SelectionState.createEmpty(blockKey).merge({
-            anchorOffset: startOffset,
-            focusOffset: block.getLength(),
-          });
-          return Modifier.applyInlineStyle(updatedContent, blockSelection, "ORANGE");
-        } else if (blockKey === endKey) {
-          isWithinSelection = false;
-          const blockSelection = SelectionState.createEmpty(blockKey).merge({
-            anchorOffset: 0,
-            focusOffset: endOffset,
-          });
-          return Modifier.applyInlineStyle(updatedContent, blockSelection, "ORANGE");
-        } else if (isWithinSelection) {
-          const blockSelection = SelectionState.createEmpty(blockKey).merge({
-            anchorOffset: 0,
-            focusOffset: block.getLength(),
-          });
-          return Modifier.applyInlineStyle(updatedContent, blockSelection, "ORANGE");
+      if (isRefine) {
+        if (promptId !== "Graph") {
+          instructions = inputValue;
         }
-        return updatedContent;
-      }, newContentState);
-    }
-
-    let newEditorState = EditorState.push(responseEditorState, newContentState, "change-inline-style");
-    newEditorState = EditorState.forceSelection(newEditorState, selection);
-
-    setResponseEditorState(newEditorState);
-
-    setTimeout(() => {
-      if (linkName === "Diagram") {
-        askDiagram(selectedText);
-        setActionOnClick("Insert");
-      } else {
-        askCopilot(selectedText, instructions, "1" + copilot_mode);
-        setActionOnClick("Replace");
+        prompt = prompt + " instruction: " + inputValue;
       }
-      setShowOptions(true);
-      setIsCopilotVisible(false);
-    }, 0);
-  };
 
-  const handleOptionSelect = (option: IPilotOption, index) => {
-    console.log("handleOptionSelect called", { option: option.value, index, highlightedRange });
-    if (!highlightedRange) {
-      console.log("No highlighted range, exiting");
-      return;
-    }
-
-    const contentState = responseEditorState.getCurrentContent();
-    const { startKey, endKey, startOffset, endOffset } = highlightedRange;
-
-    console.log("Creating highlight selection", { startKey, endKey, startOffset, endOffset });
-    const highlightSelection = SelectionState.createEmpty(startKey).merge({
-      anchorOffset: startOffset,
-      focusKey: endKey,
-      focusOffset: endOffset,
-    });
-
-    console.log("Removing highlighted text");
-    let newContentState = Modifier.removeRange(contentState, highlightSelection, "backward");
-
-    console.log("Inserting new option text");
-    newContentState = Modifier.insertText(
-      newContentState,
-      highlightSelection.merge({
-        focusKey: startKey,
-        focusOffset: startOffset,
-      }),
-      option.value
-    );
-
-    console.log("Applying ORANGE style to new text");
-    const styledSelection = SelectionState.createEmpty(startKey).merge({
-      anchorOffset: startOffset,
-      focusOffset: startOffset + option.value.length,
-    });
-    newContentState = Modifier.applyInlineStyle(newContentState, styledSelection, "ORANGE");
-
-    console.log("Creating new editor state");
-    let newEditorState = EditorState.push(responseEditorState, newContentState, "insert-fragment");
-    newEditorState = EditorState.forceSelection(newEditorState, styledSelection);
-
-    console.log("Setting new editor state");
-    setResponseEditorState(newEditorState);
-    setTempText(option.value);
-    setSelectedOption(option);
-    setSelectedOptionIndex(index);
-    setShowOptions(true);
-
-    console.log("Clearing highlighted range");
-    setHighlightedRange(null);
-
-    setDummyState((prev) => !prev);
-  };
+      setTimeout(async () => {
+        let options = [];
+        if (promptId === "Graph") {
+          options = await askDiagram(prompt);
+        } else {
+          options = await askCopilot(prompt, instructions, "1" + copilot_mode);
+        }
+        setCustomPromptMessages(options);
+        setShowOptions(true);
+        if (isRefine) {
+          setInputValue("");
+        }
+      }, 0);
+    };
 
   const insertToWord = (
-    { type, value }: IPilotOption,
+    { type, value }: IMessage,
     insertLocation:
       | Word.InsertLocation.replace
       | Word.InsertLocation.start
@@ -429,145 +362,17 @@ const WordpaneCopilot = () => {
     });
   };
 
-  const handleCustomPromptFocus = () => {
-    console.log("handleCustomPromptFocus called");
-    setOriginalEditorState(responseEditorState);
-
-    const contentState = responseEditorState.getCurrentContent();
-    const selection = responseEditorState.getSelection();
-    const startKey = selection.getStartKey();
-    const endKey = selection.getEndKey();
-    const startOffset = selection.getStartOffset();
-    const endOffset = selection.getEndOffset();
-
-    console.log("Current selection", {
-      isCollapsed: selection.isCollapsed(),
-      startKey,
-      endKey,
-      startOffset,
-      endOffset,
-    });
-
-    // Always set the highlighted range, even if the selection is collapsed
-    setHighlightedRange({
-      startKey,
-      endKey,
-      startOffset,
-      endOffset,
-    });
-
-    let newContentState = contentState;
-
-    // Apply ORANGE style
-    if (startKey === endKey) {
-      const blockSelection = SelectionState.createEmpty(startKey).merge({
-        anchorOffset: startOffset,
-        focusOffset: endOffset,
-      });
-      newContentState = Modifier.applyInlineStyle(newContentState, blockSelection, "ORANGE");
-    } else {
-      // If the selection spans multiple blocks
-      const blocks = contentState.getBlockMap();
-      let isWithinSelection = false;
-
-      newContentState = blocks.reduce((updatedContent, block, blockKey) => {
-        if (blockKey === startKey) {
-          isWithinSelection = true;
-          const blockSelection = SelectionState.createEmpty(blockKey).merge({
-            anchorOffset: startOffset,
-            focusOffset: block.getLength(),
-          });
-          return Modifier.applyInlineStyle(updatedContent, blockSelection, "ORANGE");
-        } else if (blockKey === endKey) {
-          isWithinSelection = false;
-          const blockSelection = SelectionState.createEmpty(blockKey).merge({
-            anchorOffset: 0,
-            focusOffset: endOffset,
-          });
-          return Modifier.applyInlineStyle(updatedContent, blockSelection, "ORANGE");
-        } else if (isWithinSelection) {
-          const blockSelection = SelectionState.createEmpty(blockKey).merge({
-            anchorOffset: 0,
-            focusOffset: block.getLength(),
-          });
-          return Modifier.applyInlineStyle(updatedContent, blockSelection, "ORANGE");
-        }
-        return updatedContent;
-      }, newContentState);
-    }
-
-    console.log("Applying ORANGE style");
-    const newEditorState = EditorState.push(responseEditorState, newContentState, "change-inline-style");
-    setResponseEditorState(newEditorState);
-
-    console.log("Set highlighted range", { startKey, endKey, startOffset, endOffset });
-  };
-
   let isSubmitButtonClicked = false;
 
   const handleMouseDownOnSubmit = () => {
     isSubmitButtonClicked = true;
   };
 
-  const handleCustomPromptBlur = () => {
-    if (!isSubmitButtonClicked) {
-      const contentState = responseEditorState.getCurrentContent();
-      const blocks = contentState.getBlockMap();
-
-      // Remove ORANGE style from all blocks
-      let newContentState = contentState;
-      blocks.forEach((block) => {
-        const blockKey = block.getKey();
-        const length = block.getLength();
-        const blockSelection = SelectionState.createEmpty(blockKey).merge({
-          anchorOffset: 0,
-          focusOffset: length,
-        });
-
-        newContentState = Modifier.removeInlineStyle(newContentState, blockSelection, "ORANGE");
-      });
-
-      const newEditorState = EditorState.push(responseEditorState, newContentState, "change-inline-style");
-      setResponseEditorState(newEditorState);
-
-      // Clear the highlighted range
-      //setHighlightedRange(null);
-    }
-    isSubmitButtonClicked = false; // Reset flag after handling
-  };
-
   const handleCustomPromptSubmit = () => {
     console.log("handleCustomPromptSubmit called", { inputValue: inputValue.trim() });
     if (inputValue.trim()) {
       isSubmitButtonClicked = true;
-
-      const copilot_mode = inputValue.toLowerCase().replace(/\s+/g, "_");
-      const instructions = "";
-
-      const contentState = responseEditorState.getCurrentContent();
-
-      let selectedText;
-      if (highlightedRange) {
-        const { startKey, endKey, startOffset, endOffset } = highlightedRange;
-        console.log("Using highlighted range", { startKey, endKey, startOffset, endOffset });
-
-        selectedText = getTextFromRange(responseEditorState, highlightedRange);
-      } else {
-        console.log("No highlighted range, using full content");
-        selectedText = contentState.getPlainText();
-      }
-
-      console.log("Selected text", { selectedText });
-
-      setTimeout(() => {
-        console.log("Calling askCopilot");
-        askCopilot(selectedText, instructions, "4" + copilot_mode);
-        setShowOptions(true);
-        setSelectedDropdownOption("internet-search");
-      }, 0);
-
-      setInputValue("");
-      setIsCopilotVisible(false);
+      handleLinkClick(selectedCustomPrompt, true)();
     }
   };
 
@@ -604,92 +409,61 @@ const WordpaneCopilot = () => {
 
   /////////////////////////////////////////////////////////////////////////////////////////////
 
-  const [messages, setMessages] = useState(() => {
-    const savedMessages = localStorage.getItem("messages");
-    console.log("Saved messages:", savedMessages);
-
-    if (savedMessages) {
-      const parsedMessages = JSON.parse(savedMessages);
-      if (parsedMessages.length > 0) {
-        return parsedMessages;
-      }
-    }
-
-    return [
-      {
-        type: "bot",
-        text: "Welcome to Bid Pilot! Ask questions about your company library data or search the internet for up to date information. Select text in the response box to use copilot and refine the response.",
-      },
-    ];
-  });
+  useEffect(() => {
+    localStorage.setItem("internet-search", JSON.stringify(internetResearchMessages));
+  }, [internetResearchMessages]);
 
   useEffect(() => {
-    // Save messages to localStorage whenever they change
-    localStorage.setItem("messages", JSON.stringify(messages));
-  }, [messages]);
+    localStorage.setItem("library-chat", JSON.stringify(libraryChatMessages));
+  }, [libraryChatMessages]);
 
-  const [inputValue, setInputValue] = useState("");
-
-  const [bidPilotchoice, setBidPilotChoice] = useState("2");
-  const [bidPilotbroadness, setBidPilotBroadness] = useState("4");
-  const [isBidPilotLoading, setIsBidPilotLoading] = useState(false);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [questionAsked, setQuestionAsked] = useState(false);
-  const [startTime, setStartTime] = useState(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
-
-  useEffect(() => {
-    let interval = null;
-    if (isLoading && startTime) {
-      interval = setInterval(() => {
-        setElapsedTime((Date.now() - startTime) / 1000); // Update elapsed time in seconds
-      }, 100);
-    } else if (!isLoading) {
-      clearInterval(interval);
-    }
-    return () => clearInterval(interval);
-  }, [isLoading, startTime]);
-
-  const handleSendMessage = () => {
-    console.log("handleMessage");
+  const handleLibraryChatMessage = () => {
+    console.log("Library chat function called");
     if (inputValue.trim() !== "") {
       if (showOptions == true) {
         resetEditorState();
       }
-
-      setIsCopilotVisible(false);
-      setShowOptions(false);
-      setMessages([...messages, { type: "user", text: inputValue }]);
-      sendQuestion(inputValue);
+      setStartTime(Date.now());
+      setLibraryChatMessages([
+        ...libraryChatMessages,
+        { type: "text", createdBy: "user", value: inputValue },
+        { type: "loading", createdBy: "bot", value: "loading" },
+      ]);
+      askLibraryChatQuestion(inputValue, libraryChatMessages)
+        .then((message) => {
+          setLibraryChatMessages((libraryChatMessages) => [...libraryChatMessages.slice(0, -1), message]);
+        })
+        .catch(console.log);
       setInputValue("");
     }
   };
 
-  const handleInternetSearch = () => {
+  const handleInternetSearchMessage = () => {
     // Implement your internet search logic here
     console.log("Internet Search function called");
     if (inputValue.trim() !== "") {
       if (showOptions == true) {
         resetEditorState();
       }
-
-      setIsCopilotVisible(false);
-      setShowOptions(false);
-      setMessages([...messages, { type: "user", text: inputValue }]);
-      sendInternetQuestion(inputValue);
+      setStartTime(Date.now());
+      setInternetResearchMessages([
+        ...internetResearchMessages,
+        { type: "text", createdBy: "user", value: inputValue },
+        { type: "loading", createdBy: "bot", value: "loading" },
+      ]);
+      askInternetQuestion(inputValue)
+        .then((message) => {
+          setInternetResearchMessages((internetResearchMessages) => [
+            ...internetResearchMessages.slice(0, -1),
+            message,
+          ]);
+        })
+        .catch(console.log);
       setInputValue("");
     }
   };
 
-  const sendInternetQuestion = async (question) => {
-    setQuestionAsked(true);
-    setIsBidPilotLoading(true);
-    setStartTime(Date.now()); // Set start time for the timer
-    console.log(dataset);
-    // Add a temporary bot message with loading dots
-    setMessages((prevMessages) => [...prevMessages, { type: "bot", text: "loading" }]);
-
+  const askInternetQuestion = async (question: string): Promise<IMessage> => {
     try {
       const result = await axios.post(
         apiURL("perplexity"),
@@ -703,48 +477,29 @@ const WordpaneCopilot = () => {
           },
         }
       );
-
-      // Replace the temporary loading message with the actual response
-      setMessages((prevMessages) => [...prevMessages.slice(0, -1), { type: "bot", text: result.data }]);
+      return { createdBy: "bot", type: "text", value: result.data };
     } catch (error) {
       console.error("Error sending question:", error);
       // Replace the temporary loading message with the error message
-      setMessages((prevMessages) => [
-        ...prevMessages.slice(0, -1),
-        {
-          type: "bot",
-          text: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
-        },
-      ]);
+      return {
+        createdBy: "bot",
+        type: "text",
+        value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
+      };
     }
-    setIsBidPilotLoading(false);
   };
 
-  useEffect(() => {
-    if (showOptions) {
-      setSelectedDropdownOption("internet-search");
-    }
-  }, [selectedDropdownOption]);
-
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !isBidPilotLoading) {
-      if (selectedDropdownOption === "internet-search") {
-        handleInternetSearch();
-      } else if (selectedDropdownOption === "custom-prompt" && isCopilotVisible) {
+    if (e.key === "Enter") {
+      if (selectedTab === "internet-search") {
+        handleInternetSearchMessage();
+      } else if (selectedTab === "custom-prompt") {
         handleCustomPromptSubmit();
       } else {
-        handleSendMessage();
+        handleLibraryChatMessage();
       }
     }
   };
-
-  useEffect(() => {
-    if (isCopilotVisible) {
-      setSelectedDropdownOption("custom-prompt");
-    } else {
-      setSelectedDropdownOption("internet-search");
-    }
-  }, [isCopilotVisible]);
 
   const formatResponse = (response) => {
     // Handle numbered lists
@@ -771,25 +526,15 @@ const WordpaneCopilot = () => {
     return response;
   };
 
-  const sendQuestion = async (question) => {
-    setQuestionAsked(true);
-    setIsBidPilotLoading(true);
-    setStartTime(Date.now()); // Set start time for the timer
-
-    // Add a temporary bot message with loading dots
-    setMessages((prevMessages) => [...prevMessages, { type: "bot", text: "loading" }]);
-
-    const chatHistory = messages.map((msg) => `${msg.type}: ${msg.text}`).join("\n");
-    console.log(chatHistory);
-    console.log(bidPilotbroadness);
-    console.log(bidPilotchoice);
+  const askLibraryChatQuestion = async (question: string, messages: IMessage[]): Promise<IMessage> => {
+    const chatHistory = messages.map((msg) => `${msg.createdBy}: ${msg.value}`).join("\n");
 
     try {
       const result = await axios.post(
         apiURL("question"),
         {
-          choice: bidPilotchoice,
-          broadness: bidPilotbroadness,
+          choice: bidPilotChoice,
+          broadness: bidPilotBroadness,
           input_text: question,
           extra_instructions: chatHistory,
           datasets: ["default"],
@@ -802,209 +547,145 @@ const WordpaneCopilot = () => {
         }
       );
 
-      // Replace the temporary loading message with the actual response
       const formattedResponse = formatResponse(result.data);
-
-      setMessages((prevMessages) => [...prevMessages.slice(0, -1), { type: "bot", text: formattedResponse }]);
+      return {
+        type: "text",
+        value: formattedResponse,
+        createdBy: "bot",
+      };
     } catch (error) {
       console.error("Error sending question:", error);
-      // Replace the temporary loading message with the error message
-      setMessages((prevMessages) => [
-        ...prevMessages.slice(0, -1),
-        {
-          type: "bot",
-          text: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
-        },
-      ]);
+
+      return {
+        type: "text",
+        value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
+        createdBy: "bot",
+      };
     }
-    setIsBidPilotLoading(false);
+  };
+
+  const shortcutVisible = (message: IMessage, type: IShortcutType) => {
+    if (message.type === "text" && type === "replace") return true;
+    if (message.type === "image" && type === "insert") return true;
+    if (type === "refine") return true;
+    return false;
   };
 
   return (
-    <div>
-      <Row>
-        <Col lg={5} md={12}>
-          <div className="input-header">
-            <div className="proposal-header mb-2">
-              <h1 className="lib-title" style={{ color: "white" }} id="bid-pilot-section">
-                Bid Pilot
-              </h1>
-              <Button className="option-button" onClick={() => navigate("/logout")}>
-                Sign Out
-              </Button>
-              <div className="dropdown-container"></div>
-            </div>
-          </div>
-
-          <div className="bid-pilot-container">
-            {showOptions ? (
-              <div className="options-container" ref={optionsContainerRef}>
-                {copilotLoading ? (
-                  <div className="spinner-container">
-                    <Spinner animation="border" />
-                    <p>Generating Options...</p>
-                  </div>
-                ) : (
-                  copilotOptions.map((option, index) => (
-                    <div key={index} className="option">
-                      <div className="option-content">
-                        <Button
-                          onClick={() => handleOptionSelect(option, index)}
-                          className={`upload-button ${selectedOptionIndex === index ? "selected" : ""}`}
-                          style={{
-                            backgroundColor: selectedOptionIndex === index ? "orange" : "#262626",
-                            color: selectedOptionIndex === index ? "black" : "#fff",
-                            fontSize: "16px",
-                          }}
-                        >
-                          <span>Move to word</span>
-                        </Button>
-                        {selectedOptionIndex === index && (
-                          <Button onClick={handleTick} className="tick-button">
-                            <FontAwesomeIcon icon={faCheck} className="tick-icon" />
-                          </Button>
-                        )}
-                      </div>
-                      <div className="option-item mt-2">
-                        {option.type === "image" ? (
-                          <img src={option.value} alt="option" style={{ maxWidth: "100%" }} />
-                        ) : (
-                          <p>{option.value}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            ) : isCopilotVisible ? (
-              <div className={`prompts-container ${!isCopilotVisible ? "fade-out" : ""}`} ref={promptsContainerRef}>
-                <div className="prompts">
-                  <Button
-                    className="prompt-button"
-                    style={{ borderTop: "2px solid #555555" }}
-                    onClick={handleLinkClick("Summarise")}
-                  >
-                    Summarise
-                  </Button>
-                  <Button className="prompt-button" onClick={handleLinkClick("Diagram")}>
-                    Diagram
-                  </Button>
-                  <Button className="prompt-button" onClick={handleLinkClick("Expand")}>
-                    Expand
-                  </Button>
-                  <Button className="prompt-button" onClick={handleLinkClick("Rephrase")}>
-                    Rephrase
-                  </Button>
-                  <Button className="prompt-button" onClick={handleLinkClick("Inject Company Voice")}>
-                    Inject Company Voice
-                  </Button>
-                  <Button className="prompt-button" onClick={handleLinkClick("Inject Tender Context")}>
-                    Inject Tender Context
-                  </Button>
-                  <Button className="prompt-button" onClick={handleLinkClick("Improve Grammar")}>
-                    Improve Grammar
-                  </Button>
-                  <Button className="prompt-button" onClick={handleLinkClick("Add Statistics")}>
-                    Add Statistic
-                  </Button>
-                  <Button className="prompt-button" onClick={handleLinkClick("For Example")}>
-                    For Example
-                  </Button>
-                  <Button className="prompt-button" onClick={handleLinkClick("Translate to English")}>
-                    Translate to English
-                  </Button>
-                  <Button className="prompt-button" onClick={handleLinkClick("We will Active Voice")}>
-                    We will
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="mini-messages">
-                {messages.map((message, index) => (
-                  <div key={index} className={`message-bubble-small ${message.type}`}>
-                    {message.text === "loading" ? (
-                      <div className="loading-dots">
-                        <span>. </span>
-                        <span>. </span>
-                        <span>. </span>
-                      </div>
-                    ) : (
-                      <div dangerouslySetInnerHTML={{ __html: message.text }} />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="input-console">
-              <div className="dropdown-clear-container mb-3">
-                <Dropdown
-                  onSelect={(key) => setSelectedDropdownOption(key)}
-                  className="chat-dropdown"
-                  id="bid-pilot-options"
+    <Box display="flex" flexDirection="column" height="100%" padding={"3px"}>
+      <Box>
+        <Tabs
+          variant="fullWidth"
+          onChange={(_e, value) => setSelectedTab(value)}
+          value={selectedTab}
+          TabIndicatorProps={{ style: { display: "none" } }}
+        >
+          <Tab label="Chat" value="library-chat" />
+          <Tab label="Research" value="internet-search" />
+          <Tab label="Custom Prompt" value="custom-prompt" hidden />
+        </Tabs>
+      </Box>
+      <Box
+        sx={{
+          flexGrow: 1,
+          overflowY: "auto",
+        }}
+        ref={responseMessageBoxRef}
+      >
+        <div className="bid-pilot-container border-box">
+          {isCustomPromptTab ? (
+            <MessageBox
+              messages={customPromptMessages}
+              showShortcuts={true}
+              handleClickShortcut={handleClickMessageShortcut}
+              shortcutVisible={shortcutVisible}
+            />
+          ) : isInternetSearchTab ? (
+            <MessageBox messages={internetResearchMessages} showShortcuts={false} />
+          ) : (
+            <MessageBox messages={libraryChatMessages} showShortcuts={false} />
+          )}
+        </div>
+      </Box>
+      <Box marginTop="2px">
+        <div className="border-box" style={{ padding: "5px 10px" }}>
+          {isCustomPromptMenuVisible && (
+            <Paper variant="outlined" className="enhance-prompt-menu">
+              <MenuList>
+                {customPrompts.map((item) => {
+                  return (
+                    <MenuItem onClick={handleLinkClick(item.id)} key={item.id}>
+                      {item.title}
+                    </MenuItem>
+                  );
+                })}
+              </MenuList>
+            </Paper>
+          )}
+          <Box display="flex" flexDirection="row">
+            <Grid item container spacing={1}>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  color="info"
+                  disabled={selectedText.length === 0 || isLoading}
+                  onClick={toggleCustomPromptMenuVisible}
                 >
-                  <Dropdown.Toggle
-                    className="upload-button"
-                    style={{
-                      backgroundColor: selectedDropdownOption === "custom-prompt" ? "orange" : "#383838",
-                      color: selectedDropdownOption === "custom-prompt" ? "black" : "white",
-                    }}
-                  >
-                    {selectedDropdownOption === "internet-search"
-                      ? "Internet Search"
-                      : selectedDropdownOption === "custom-prompt"
-                        ? "Custom Prompt"
-                        : "Library Chat"}
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item eventKey="internet-search">Internet Search</Dropdown.Item>
-                    <Dropdown.Item eventKey="library-chat">Library Chat</Dropdown.Item>
-                    {/* Removed the Custom Prompt option */}
-                  </Dropdown.Menu>
-                </Dropdown>
-                <Button className="option-button" onClick={handleClearMessages}>
-                  Clear
+                  Enhance
                 </Button>
-              </div>
-              <div className="bid-input-bar" ref={bidPilotRef}>
-                <input
-                  type="text"
-                  placeholder={
-                    selectedDropdownOption === "internet-search"
-                      ? "Please type your question in here..."
-                      : selectedDropdownOption === "custom-prompt"
-                        ? "Type in a custom prompt here..."
-                        : "Please type your question in here..."
-                  }
-                  value={inputValue}
-                  onFocus={selectedDropdownOption === "custom-prompt" ? handleCustomPromptFocus : null}
-                  onBlur={handleCustomPromptBlur}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  style={{
-                    color: selectedDropdownOption === "custom-prompt" ? "white" : "lightgray",
-                  }}
-                />
-                <button
-                  onMouseDown={handleMouseDownOnSubmit}
-                  onClick={
-                    !isBidPilotLoading
-                      ? selectedDropdownOption === "internet-search"
-                        ? handleInternetSearch
-                        : selectedDropdownOption === "custom-prompt" && isCopilotVisible
-                          ? handleCustomPromptSubmit
-                          : handleSendMessage
-                      : null
-                  }
-                  disabled={isBidPilotLoading}
+              </Grid>
+              <Grid item>
+                <Button
+                  variant="outlined"
+                  color="info"
+                  onClick={handleLinkClick("Graph")}
+                  disabled={selectedText.length === 0 || isLoading}
                 >
-                  <FontAwesomeIcon icon={faPaperPlane} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </Col>
-      </Row>
-    </div>
+                  Graph
+                </Button>
+              </Grid>
+            </Grid>
+            <Grid item>
+              <Button variant="outlined" color="info" onClick={handleClearMessages} disabled={isLoading}>
+                Clear
+              </Button>
+            </Grid>
+          </Box>
+        </div>
+      </Box>
+      <Box marginTop="2px">
+        <div className="border-box" style={{ padding: "5px 10px", position: "relative" }}>
+          <textarea
+            placeholder={
+              isInternetSearchTab
+                ? "Please type your question in here..."
+                : isCustomPromptTab
+                  ? "Type in a custom prompt here..."
+                  : "Please type your question in here..."
+            }
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isLoading && (isCustomPromptTab ? customPromptMessages.length > 0 : true)}
+            className="chat-input"
+            rows={5}
+            ref={textInputRef}
+          />
+          <Button
+            onMouseDown={handleMouseDownOnSubmit}
+            onClick={
+              isLibraryChatTab ? handleLibraryChatMessage : isInternetSearchTab ? handleInternetSearchMessage : () => {}
+            }
+            disabled={isCustomPromptTab || isLoading || inputValue.trim() === ""}
+            className="chat-send-button"
+            color="primary"
+            variant="contained"
+          >
+            Generate
+          </Button>
+        </div>
+      </Box>
+    </Box>
   );
 };
 

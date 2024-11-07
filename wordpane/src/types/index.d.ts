@@ -7,8 +7,8 @@ export interface IMessage {
 export type IPromptType =
   | "Summarise"
   | "Expand"
-  | "Inject Tender Content"
-  | "Inject Tone-of-Voice"
+  | "Inject Tender Context"
+  | "Inject Company Voice"
   | "We will Active Voice"
   | "Graph";
 

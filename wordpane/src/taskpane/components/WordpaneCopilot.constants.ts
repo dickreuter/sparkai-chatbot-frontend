@@ -10,12 +10,12 @@ export const customPrompts: { id: IPromptType; title: string }[] = [
     title: "Expand",
   },
   {
-    id: "Inject Tender Content",
+    id: "Inject Tender Context",
     title: "Inject Tender Context",
   },
   {
-    id: "Inject Tone-of-Voice",
-    title: "Inject Company Voice",
+    id: "Inject Company Voice",
+    title: "Inject Tone-of-Voice",
   },
   {
     id: "We will Active Voice",

@@ -179,7 +179,7 @@ const WordpaneCopilot = () => {
       return options;
     } catch (error) {
       console.error("Error sending question:", error);
-      return [];
+      return [{ type: "text", value: "Message failed, please contact support...", createdBy: "bot" }];
     }
   };
 

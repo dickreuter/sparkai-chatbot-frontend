@@ -7,6 +7,7 @@ import SideBarSmall from "../routes/SidebarSmall.tsx";
 import handleGAEvent from "../utilities/handleGAEvent";
 import {
   Button,
+  Card,
   Col,
   Form,
   Row,
@@ -14,28 +15,26 @@ import {
 } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./QuestionsCrafter.css";
-import FolderLogic from "../components/Folders.tsx";
 import {
   Editor,
   EditorState,
-  Modifier,
-  SelectionState,
   convertToRaw,
   ContentState,
 } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
-import SelectFolderModal from "../components/SelectFolderModal.tsx";
-import SaveQASheet from "../modals/SaveQASheet.tsx";
 import { useLocation } from "react-router-dom";
 import BidTitle from "../components/BidTitle.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import WordCountSelector from "../components/WordCountSelector.tsx";
 import { debounce } from "lodash";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import StatusMenu, { Section } from "../components/StatusMenu.tsx";
+
 
 const QuestionCrafter = () => {
-
    interface Subheading {
     subheading_id: string;
     title: string;
@@ -61,11 +60,7 @@ const QuestionCrafter = () => {
   const [inputText, setInputText] = useState(
     localStorage.getItem("inputText") || section.question || ""
   );
-  const [responseEditorState, setResponseEditorState] = useState(
-    EditorState.createWithContent(
-      ContentState.createFromText(localStorage.getItem("response") || "")
-    )
-  );
+ 
   const [contentLoaded, setContentLoaded] = useState(true); // Set to true initially
   const [sectionAnswer, setSectionAnswer] = useState(null); // the answer generated for the subheadings
   const currentUserPermission = contributors[auth.email] || "viewer"; // Default to 'viewer' if not found
@@ -89,7 +84,6 @@ const QuestionCrafter = () => {
     );
   }, [selectedFolders]);
 
-
   /////////////////////////////////////////////////////////////////////////////////////////////
  
   const [choice, setChoice] = useState("3");
@@ -105,6 +99,7 @@ const QuestionCrafter = () => {
 
   const [subheadings, setSubheadings] = useState<Subheading[]>([]);
   const [answerSections, setAnswerSections] = useState<AnswerSection[]>([]);
+  const [sectionStatus, setSectionStatus] = useState(section.status);
   const [isLoadingSubheadings, setIsLoadingSubheadings] = useState(false);
 
   const [sectionWordCounts, setSectionWordCounts] = useState<Record<string, number>>({});
@@ -116,6 +111,40 @@ const QuestionCrafter = () => {
     const rawContent = convertToRaw(contentState);
     return rawContent.blocks.map(block => block.text).join('\n');
   };
+
+
+  const updateStatus = async (status: String) => {
+    try {
+      await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/update_status`,
+        {
+          bid_id: sharedState.object_id,
+          section_id: section.section_id,
+          status: status
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      
+      // Update the local state after successful API call
+      setSectionStatus(status);
+
+    } catch (err) {
+      console.error('Error updating section:', err);
+      // Revert to previous status if update fails
+      setSectionStatus(section.status);
+      displayAlert("Failed to update status", "danger");
+    }
+  };
+
+  // Add useEffect to initialize status from section prop
+  useEffect(() => {
+    setSectionStatus(section.status);
+  }, [section.status]);
 
   // Add this function to handle the API call
   const updateSubheading = async (
@@ -144,6 +173,7 @@ const QuestionCrafter = () => {
         }
       );
       console.log('Successfully updated subheading:', subheading_id);
+      updateStatus("In Progress");
       // Fetch updated subheadings after successful update
     } catch (error) {
       console.error('Error updating subheading:', error);
@@ -151,7 +181,6 @@ const QuestionCrafter = () => {
     }
   };
   
-
   // Create a debounced version of the update function
   const debouncedUpdateSubheading = debounce((...args) => {
     updateSubheading(...args).catch(error => {
@@ -267,6 +296,7 @@ const QuestionCrafter = () => {
       );
      
       setSectionAnswer(response.data);
+      updateStatus("Completed");
       displayAlert("Section marked as complete successfully!", 'success');
     } catch (error) {
       console.error('Error completing section:', error);
@@ -280,6 +310,7 @@ const QuestionCrafter = () => {
     }
   };
   
+
   // Update the fetchSubheadings function to handle references after setting state
   const fetchSubheadings = async () => {
   setIsLoadingSubheadings(true);
@@ -441,6 +472,7 @@ const QuestionCrafter = () => {
         [selectedChoice]: 250 // Default word amount
       }));
     }
+    updateStatus("In Progress");
   };
 
   const renderChoices = () => {
@@ -562,163 +594,121 @@ const QuestionCrafter = () => {
     }
   };
 
-  const makeReferencesBoldForState = (editorState: EditorState): EditorState => {
-    const contentState = editorState.getCurrentContent();
-    const blockMap = contentState.getBlockMap();
+  const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+  };
   
-    let newContentState = contentState;
-    let modificationsCount = 0;
-  
-    blockMap.forEach((block) => {
-      const text = block.getText();
-      const key = block.getKey();
-  
-      // Pattern to match [Extracted...] sections
-      const pattern = /\[(?=.*Extracted).*?\]/g;
-  
-      let matchArray;
-      while ((matchArray = pattern.exec(text)) !== null) {
-        modificationsCount++;
-        const start = matchArray.index;
-        const end = start + matchArray[0].length;
-  
-        const selectionState = SelectionState.createEmpty(key).merge({
-          anchorOffset: start,
-          focusOffset: end
-        });
-  
-        newContentState = Modifier.applyInlineStyle(
-          newContentState,
-          selectionState,
-          "BOLD"
-        );
-      }
-    });
-  
-    console.log(`Made ${modificationsCount} reference(s) bold`);
-  
-    if (modificationsCount > 0) {
-      return EditorState.push(
-        editorState,
-        newContentState,
-        'change-inline-style'
-      );
+  // Add this handler to your component
+  const onDragEnd = (result) => {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
     }
-    return editorState;
-  };
   
-  
-  // Utility function to remove references from an editor state
-  const removeReferencesFromState = (editorState: EditorState): EditorState => {
-    const contentState = editorState.getCurrentContent();
-    const blockMap = contentState.getBlockMap();
-  
-    let newContentState = contentState;
-  
-    // Pattern to match [Extracted...] sections
-    const pattern = /\[(?=.*Extracted).*?\]/g;
-  
-    blockMap.forEach((block) => {
-      const text = block.getText();
-      const key = block.getKey();
-  
-      let match;
-      let ranges = [];
-  
-      // Find all matches in the current block
-      while ((match = pattern.exec(text)) !== null) {
-        ranges.push({
-          start: match.index,
-          end: pattern.lastIndex
-        });
-      }
-  
-      // Remove ranges in reverse order to maintain correct indices
-      for (let i = ranges.length - 1; i >= 0; i--) {
-        const { start, end } = ranges[i];
-        const selectionState = SelectionState.createEmpty(key).merge({
-          anchorOffset: start,
-          focusOffset: end
-        });
-  
-        newContentState = Modifier.removeRange(
-          newContentState,
-          selectionState,
-          "backward"
-        );
-      }
-    });
-  
-    return EditorState.push(
-      editorState,
-      newContentState,
-      'remove-range'
+    const reorderedSections = reorder(
+      answerSections,
+      result.source.index,
+      result.destination.index
     );
+  
+    setAnswerSections(reorderedSections);
   };
   
-  
-  // Function to handle removing references for a specific section
-  const handleRemoveReferences = (subheadingId: string) => {
-    setAnswerSections(prev => {
-      const updatedSections = prev.map(section => {
-        if (section.subheading_id === subheadingId) {
-          const newEditorState = removeReferencesFromState(section.editorState);
-          return {
-            ...section,
-            editorState: newEditorState
-          };
-        }
-        return section;
-      });
-      return updatedSections;
-    });
-  };
-  
-  // Updated renderAnswerSections function
   const renderAnswerSections = () => (
-    <div className="answer-sections">
-      {isLoadingSubheadings ? (
-        <div className="text-center py-4">
-          <Spinner animation="border" />
-          <p>Loading sections...</p>
-        </div>
-      ) : answerSections.length === 0 ? (
-        <p>No sections available. Generate some sections to get started.</p>
-      ) : (
-        answerSections.map((answerSection) => {
-          return (
-            <div key={answerSection.subheading_id} className="answer-section mb-4">
-              <div className="proposal-header">
-                <h3 className="lib-title mb-3">{answerSection.title}</h3>
-                <WordCountSelector
-                subheadingId={answerSection.subheading_id}
-                initialCount={sectionWordCounts[answerSection.subheading_id] || 250}
-                onChange={handleWordCountChange}
-                disabled={!canUserEdit}
-              />
-              </div>
-              
-              <div className="response-box draft-editor">
-                <div className="editor-container">
-                  <Editor
-                    editorState={answerSection.editorState}
-                    onChange={(newState) => handleAnswerChange(newState, answerSection.subheading_id)}
-                    customStyleMap={{
-                      ...styleMap,
-                      BOLD: { fontWeight: "bold" }
+    <div style={{ marginLeft: '40px' }}>
+    
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="droppable">
+          {(provided, snapshot) => (
+             <div
+             {...provided.droppableProps}
+             ref={provided.innerRef}
+             className="droppable-container" // Add this class here
+             style={{ 
+               minHeight: '100px'
+             }}
+           >
+              {answerSections.map((answerSection, index) => (
+                <Draggable
+                  key={answerSection.subheading_id}
+                  draggableId={answerSection.subheading_id}
+                  index={index}
+                >
+                 {(provided, snapshot) => (
+
+                  
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    className={`draggable-section ${snapshot.isDragging ? 'dragging' : ''}`}
+                    style={{
+                      ...provided.draggableProps.style,
+                      transform: provided.draggableProps.style?.transform,
+                      transformOrigin: '0 0',
+                      width: '100%' // Ensure consistent width
                     }}
-                    readOnly={!canUserEdit}
-                    placeholder="Add extra information here about what you want to write about..."
-                  />
-                </div>
-              </div>
-              
-              
+                  >
+                    <div
+                      {...provided.dragHandleProps}
+                      className="drag-handle"
+                      style={{
+                        // Prevent the drag handle from jumping
+                        touchAction: 'none',
+                        userSelect: 'none'
+                      }}
+                    >
+                      <DragIndicatorIcon style={{ 
+                        fontSize: '35px',
+                        color: '#6c757d',
+                        display: 'block',
+                        pointerEvents: 'none',
+                        touchAction: 'none'
+                      }} />
+                    </div>
+                      
+                      <Card className="section-card mb-4">
+                        <div className="section-header">
+                          <h3 className="section-title" title={answerSection.title}>
+                            {answerSection.title}
+                          </h3>
+                          <div>
+                            <WordCountSelector
+                              subheadingId={answerSection.subheading_id}
+                              initialCount={sectionWordCounts[answerSection.subheading_id] || 250}
+                              onChange={handleWordCountChange}
+                              disabled={!canUserEdit}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="editor-container">
+                          <Editor
+                            editorState={answerSection.editorState}
+                            onChange={(newState) => 
+                              handleAnswerChange(newState, answerSection.subheading_id)
+                            }
+                            customStyleMap={{
+                              BOLD: { fontWeight: "bold" }
+                            }}
+                            readOnly={!canUserEdit}
+                            placeholder="Add extra information here about what you want to write about..."
+                          />
+                        </div>
+                      </Card>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
             </div>
-          );
-        })
-      )}
-    </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+
+  </div>
   );
   // Force a re-render after updating the sections
   useEffect(() => {
@@ -730,12 +720,6 @@ const QuestionCrafter = () => {
       return () => clearTimeout(timeoutId);
     }
   }, [contentLoaded]);
-
-  const styleMap = {
-    ORANGE: {
-      backgroundColor: "orange"
-    }
-  };
 
 
   return (
@@ -751,13 +735,6 @@ const QuestionCrafter = () => {
               className="justify-content-md-center"
               style={{ visibility: "hidden", height: 0, overflow: "hidden" }}
             >
-              <FolderLogic
-                tokenRef={tokenRef}
-                setAvailableCollections={setAvailableCollections}
-                setFolderContents={setFolderContents}
-                availableCollections={availableCollections}
-                folderContents={folderContents}
-              />
             </Row>
 
             <Col md={12}>
@@ -769,7 +746,14 @@ const QuestionCrafter = () => {
               showViewOnlyMessage={showViewOnlyMessage}
               initialBidName={"initialBidName"}
             />
-              <h2 className="heavy mb-4">{section.heading}</h2>
+            <div className="proposal-header">
+            <h2 className="heavy mb-4">{section.heading}</h2>
+            <StatusMenu
+              value={sectionStatus} // Use the local state instead of section.status
+              onChange={(value) => updateStatus(value)}
+            />
+            </div>
+              
               <h1 className="lib-title" id="question-section">
                   Search tender for relevant information
                 </h1>
@@ -833,40 +817,40 @@ const QuestionCrafter = () => {
             </Col>
 
            
-             
-                <div className="proposal-header">
-                <h2 className="heavy mt-4 mb-2" >
-                  Order
-                  </h2>
-                  <Button 
-                    onClick={handleMarkAsComplete} // Removed the ()
-                    disabled={isCompleting || !canUserEdit}
-                    className="upload-button mt-3"
-                  >
-                    {isCompleting ? (
-                      <>
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                          className="me-2"
-                        />
-                        Marking as Complete...
-                      </>
-                    ) : (
-                      'Mark as Complete'
-                    )}
-                  </Button>
-                  </div>
-                  {renderAnswerSections()}
-                 
-                
-
-                <p>{sectionAnswer}</p>
-            
+            {isLoadingSubheadings ? (
+              <div className="loading-container text-center py-4">
+                <Spinner animation="border" />
               
+              </div>
+            ) : (
+              <div className="proposal-header mb-2">
+                <h2 className="heavy mt-4 text-center">Order</h2>
+                <Button
+                  onClick={handleMarkAsComplete} // Removed the ()
+                  disabled={isCompleting || !canUserEdit}
+                  className="upload-button mt-3"
+                >
+                  {isCompleting ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                        className="me-2"
+                      />
+                      Marking as Complete...
+                    </>
+                  ) : (
+                    'Mark as Complete'
+                  )}
+                </Button>
+              </div>
+            )}
+            {renderAnswerSections()}
+            <p>{sectionAnswer}</p>
+                          
             
           </div>
         </div>

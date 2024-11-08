@@ -622,3 +622,103 @@
     outline: 1px solid white;
     /* Replace 'yourColor' with the desired color */
 }
+
+.draggable-section {
+    position: relative;
+    /* Remove any transitions that might interfere with dragging */
+    transition: none;
+    /* Ensure stable positioning */
+    transform-origin: 0 0;
+}
+
+.draggable-section.dragging {
+    z-index: 9999;
+    /* Preserve the drag handle position during drag */
+    transform-origin: 0 0;
+    pointer-events: none;
+}
+
+.drag-handle {
+    position: absolute;
+    left: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 4px;
+    border-radius: 4px;
+    cursor: grab;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    transform-origin: 0 0;
+}
+
+.dragging .drag-handle {
+    background-color: #f8f9fa;
+    cursor: grabbing !important;
+    /* Don't modify the position during drag */
+    position: absolute;
+}
+
+
+/* Enhanced shadow effect while dragging */
+
+.dragging .section-card {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Container for all draggable items */
+
+.droppable-container {
+    min-height: 100px;
+    padding: 1px 0;
+    position: relative;
+    /* Prevent margin collapse */
+}
+
+
+/* Non-dragging items should animate position changes */
+
+.droppable-container>div:not(.dragging) {
+    transition: transform 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+
+/* Header styles */
+
+.section-card {
+    border: 1px solid #dee2e6;
+    background: white;
+    transition: box-shadow 200ms ease;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.section-title {
+    flex: 1;
+    margin: 0;
+    font-size: 19px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0;
+    padding-right: 30px;
+}
+
+.editor-container {
+    padding-left: 15px;
+    padding-right: 15px;
+}

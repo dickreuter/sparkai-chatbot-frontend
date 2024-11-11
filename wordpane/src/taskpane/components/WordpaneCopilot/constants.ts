@@ -1,4 +1,4 @@
-import { IPromptType } from "../../types";
+import { IPromptType } from "../../../types";
 
 export const customPrompts: { id: IPromptType; title: string }[] = [
   {

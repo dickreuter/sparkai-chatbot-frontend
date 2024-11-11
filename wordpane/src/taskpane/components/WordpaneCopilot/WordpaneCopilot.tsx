@@ -1,19 +1,24 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
-import withAuth from "../routes/withAuth";
+import withAuth from "../../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import "./WordpaneCopilot.css";
 import { EditorState, Modifier, SelectionState, convertToRaw, ContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
-import useSelectedText from "../hooks/useSelectedText";
-import { apiURL } from "../helper/urls";
-import { IMessage, IPromptType, IShortcutType } from "../../types";
-import { getBase64FromBlob } from "../helper/file";
+import useSelectedText from "../../hooks/useSelectedText";
+import { apiURL } from "../../helper/urls";
+import { IMessage, IPromptType, IShortcutType, IPromptOption, IButtonStatus } from "../../../types";
+import { getBase64FromBlob } from "../../helper/file";
 import { Box, Button, Grid, MenuItem, MenuList, Paper, Tab, Tabs } from "@mui/material";
-import MessageBox from "./MessageBox";
-import { customPrompts } from "./WordpaneCopilot.constants";
+import MessageBox from "../MessageBox";
+import { customPrompts } from "./constants";
+import { formatResponse, getExtraInstruction, refineResponse, removeDoubleBr, withId } from "./helper";
+import Welcome from "./Welcome";
 
-const getDefaultMessage = (type: "library-chat" | "internet-search", useCache: boolean = false): IMessage[] => {
+const getDefaultMessage = (
+  type: "library-chat" | "internet-search" | "custom-prompt",
+  useCache: boolean = false
+): IMessage[] => {
   const savedMessages = localStorage.getItem(type);
 
   if (useCache && savedMessages) {
@@ -23,14 +28,7 @@ const getDefaultMessage = (type: "library-chat" | "internet-search", useCache: b
     }
   }
 
-  return [
-    {
-      createdBy: "bot",
-      type: "text",
-      value:
-        "Welcome to Bid Pilot! Ask questions about your company library data or search the internet for up to date information. Select text in the response box to use copilot and refine the response.",
-    },
-  ];
+  return [];
 };
 
 const WordpaneCopilot = () => {
@@ -40,7 +38,9 @@ const WordpaneCopilot = () => {
 
   const [isCustomPromptMenuVisible, setCustomPromptMenuVisible] = useState(false);
   const [selectedText, setSelectedText] = useState("");
-  const [customPromptMessages, setCustomPromptMessages] = useState<IMessage[]>([]);
+  const [customPromptMessages, setCustomPromptMessages] = useState<IMessage[]>(
+    getDefaultMessage("custom-prompt", true)
+  );
 
   const [libraryChatMessages, setLibraryChatMessages] = useState<IMessage[]>(getDefaultMessage("library-chat", true));
   const [internetResearchMessages, setInternetResearchMessages] = useState<IMessage[]>(
@@ -97,7 +97,7 @@ const WordpaneCopilot = () => {
   useEffect(() => {
     if (responseMessageBoxRef?.current) {
       const scrollBox = responseMessageBoxRef.current.querySelector(".mini-messages");
-      scrollBox.scrollTop = scrollBox.scrollHeight;
+      if (scrollBox) scrollBox.scrollTop = scrollBox.scrollHeight;
     }
     if (textInputRef?.current && isLoading === false) {
       textInputRef.current.focus();
@@ -122,7 +122,7 @@ const WordpaneCopilot = () => {
   }, [responseEditorState]);
 
   const handleClearMessages = () => {
-    console.log("Clearing messages");
+    setInputValue("");
     switch (selectedTab) {
       case "library-chat":
         setLibraryChatMessages(getDefaultMessage("library-chat"));
@@ -131,8 +131,7 @@ const WordpaneCopilot = () => {
         setInternetResearchMessages(getDefaultMessage("internet-search"));
         break;
       case "custom-prompt":
-        setCustomPromptMessages([]);
-        setSelectedTab("library-chat");
+        setCustomPromptMessages(getDefaultMessage("custom-prompt"));
       default:
         break;
     }
@@ -145,67 +144,89 @@ const WordpaneCopilot = () => {
     setShowOptions(false);
   };
 
-  const askCopilot = async (copilotInput: string, instructions: string, copilot_mode: string) => {
+  const askCopilot = async (
+    text: string,
+    _promptType: IPromptType,
+    copilot_mode: string,
+    messages: IMessage[],
+    option: IPromptOption
+  ): Promise<IMessage> => {
     localStorage.setItem("questionAsked", "true");
     setStartTime(Date.now()); // Set start time for the timer
-
     try {
-      const requests = [
-        axios.post(
-          apiURL("copilot"),
-          {
-            input_text: copilotInput,
-            extra_instructions: instructions,
-            copilot_mode: copilot_mode,
-            datasets: [],
-            bid_id: "32212",
+      const response = await axios.post(
+        apiURL("copilot"),
+        {
+          input_text: option.isRefine ? `Refine the previous response.${text}` : text,
+          extra_instructions: getExtraInstruction(messages),
+          copilot_mode: copilot_mode,
+          datasets: [],
+          bid_id: "32212",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-            },
-          }
-        ),
-      ];
+        }
+      );
 
-      const results = await Promise.all(requests);
-      const options: IMessage[] = results
-        .map((result) => result.data)
-        .map((data: string) => ({
-          type: "text",
-          value: data,
-          createdBy: "bot",
-        }));
-      return options;
+      return withId({
+        type: "text",
+        value: response.data,
+        createdBy: "bot",
+        action: "default",
+        isRefine: option.isRefine,
+      });
     } catch (error) {
       console.error("Error sending question:", error);
-      return [{ type: "text", value: "Message failed, please contact support...", createdBy: "bot" }];
+      return withId({
+        type: "text",
+        value: "Message failed, please contact support...",
+        createdBy: "bot",
+        action: "default",
+        isRefine: option.isRefine,
+      });
     }
   };
 
-  const askDiagram = async (prompt: string): Promise<IMessage[]> => {
-    console.log("askDiagram called");
+  const askDiagram = async (
+    text: string,
+    _promptType: IPromptType,
+    messages: IMessage[],
+    option: IPromptOption
+  ): Promise<IMessage> => {
     localStorage.setItem("questionAsked", "true");
     setStartTime(Date.now()); // Set start time for the timer
 
     try {
-      const response = await axios.post(apiURL("generate_diagram"), prompt, { responseType: "blob" });
-      return [
+      const response = await axios.post(
+        apiURL("generate_diagram"),
+        `${getExtraInstruction(messages)}\n\n user: ${option.isRefine ? `Refine the previous response. ${text}` : text}`,
         {
-          type: "image",
-          value: await getBase64FromBlob(response.data),
-          createdBy: "bot",
-        },
-      ];
+          responseType: "blob",
+        }
+      );
+      return withId({
+        type: "image",
+        value: await getBase64FromBlob(response.data),
+        createdBy: "bot",
+        action: "default",
+        isRefine: option.isRefine,
+      });
     } catch (error) {
       console.error("Error sending question:", error);
-      return [];
+      return withId({
+        type: "text",
+        value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
+        createdBy: "bot",
+        action: "default",
+        isRefine: option.isRefine,
+      });
     }
   };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      console.log("click outside");
       setCustomPromptMenuVisible(false);
     };
 
@@ -261,75 +282,61 @@ const WordpaneCopilot = () => {
     };
   }, [showOptions, responseEditorState]);
 
-  const handleClickMessageShortcut = (action: IShortcutType, option: IMessage) => {
-    console.log("handleClickMessageShortcut called", { action });
+  const handleClickMessageShortcut = (action: IShortcutType, message: IMessage) => {
     if (action === "refine") {
-      handleLinkClick(selectedCustomPrompt, true)();
-      return;
-    }
-    if (action === "insert") {
-      insertToWord(option, "End");
+      if (isLibraryChatTab) {
+        const refine = refineResponse(inputValue, message, libraryChatMessages);
+        handleLibraryChatMessage(refine.prompt, refine.messages, { isRefine: true });
+      } else if (isInternetSearchTab) {
+        const refine = refineResponse(inputValue, message, internetResearchMessages);
+        handleInternetSearchMessage(refine.prompt, refine.messages, { isRefine: true });
+      } else {
+        const refine = refineResponse(inputValue, message, customPromptMessages);
+        handleCustomPromptMessage(selectedText, selectedCustomPrompt, refine.messages, { isRefine: true });
+      }
+    } else if (action === "insert") {
+      insertToWord(message, "End");
     } else if (action === "replace") {
-      insertToWord(option, "Replace");
+      insertToWord(message, "Replace");
     }
 
-    setShowOptions(false);
     setCustomPromptMenuVisible(false);
     setSelectedText("");
-    setCustomPromptMessages([]);
-    setSelectedTab("library-chat");
-
-    console.log("handleTick - clearedText");
   };
 
   useEffect(() => {
     if (selectedText.trim() && selectedText.trim().length > 0) {
+      setCustomPromptMenuVisible(true);
     } else {
       setCustomPromptMenuVisible(false);
     }
   }, [selectedText]);
 
-  const handleLinkClick =
-    (promptId: IPromptType, isRefine: boolean | undefined = false) =>
-    () => {
-      console.log(`Custom prompt asked`, promptId);
-      const copilot_mode = promptId.toLowerCase().replace(/\s+/g, "_");
-      let instructions = "";
-
-      setSelectedTab("custom-prompt");
-      setCustomPromptMenuVisible(false);
-      setSelectedCustomPrompt(promptId);
-      setCustomPromptMessages([
-        {
-          createdBy: "user",
-          type: "loading",
-          value: "loading",
-        },
-      ]);
-
-      let prompt = selectedText;
-
-      if (isRefine) {
-        if (promptId !== "Graph") {
-          instructions = inputValue;
-        }
-        prompt = prompt + " instruction: " + inputValue;
+  const askCustomPrompt = async (
+    text: string,
+    promptType: IPromptType,
+    messages: IMessage[],
+    option: IPromptOption
+  ): Promise<IMessage> => {
+    try {
+      const copilot_mode = promptType.toLowerCase().replace(/\s+/g, "_");
+      if (promptType === "Graph") {
+        return await askDiagram(text, promptType, messages, option);
+      } else {
+        return await askCopilot(text, promptType, "1" + copilot_mode, messages, option);
       }
-
-      setTimeout(async () => {
-        let options = [];
-        if (promptId === "Graph") {
-          options = await askDiagram(prompt);
-        } else {
-          options = await askCopilot(prompt, instructions, "1" + copilot_mode);
-        }
-        setCustomPromptMessages(options);
-        setShowOptions(true);
-        if (isRefine) {
-          setInputValue("");
-        }
-      }, 0);
-    };
+    } catch (error) {
+      console.error("Error sending question:", error);
+      // Replace the temporary loading message with the error message
+      return withId({
+        createdBy: "bot",
+        type: "text",
+        value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
+        action: "default",
+        isRefine: option.isRefine,
+      });
+    }
+  };
 
   const insertToWord = (
     { type, value }: IMessage,
@@ -352,9 +359,7 @@ const WordpaneCopilot = () => {
             const newPar = par.insertParagraph("", "After");
             newPar.insertInlinePictureFromBase64(value.split(",")[1], insertLocation);
           } else if (type === "text") {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(value, "text/html");
-            par.insertText(doc.body.textContent || "", insertLocation);
+            par.insertHtml(removeDoubleBr(value), insertLocation);
           }
           return await context.sync();
         })
@@ -370,47 +375,6 @@ const WordpaneCopilot = () => {
     isSubmitButtonClicked = true;
   };
 
-  const handleCustomPromptSubmit = () => {
-    console.log("handleCustomPromptSubmit called", { inputValue: inputValue.trim() });
-    if (inputValue.trim()) {
-      isSubmitButtonClicked = true;
-      handleLinkClick(selectedCustomPrompt, true)();
-    }
-  };
-
-  // Helper function to get text from a range
-  const getTextFromRange = (editorState, range) => {
-    const contentState = editorState.getCurrentContent();
-    const startBlock = contentState.getBlockForKey(range.startKey);
-    const endBlock = contentState.getBlockForKey(range.endKey);
-    let text = "";
-
-    if (startBlock === endBlock) {
-      text = startBlock.getText().slice(range.startOffset, range.endOffset);
-    } else {
-      const blockMap = contentState.getBlockMap();
-      const blocksInRange = blockMap
-        .skipUntil((_, k) => k === range.startKey)
-        .takeUntil((_, k) => k === range.endKey)
-        .concat(new Map([[range.endKey, endBlock]]));
-
-      blocksInRange.forEach((block, blockKey) => {
-        let blockText = block.getText();
-        if (blockKey === range.startKey) {
-          blockText = blockText.slice(range.startOffset);
-        }
-        if (blockKey === range.endKey) {
-          blockText = blockText.slice(0, range.endOffset);
-        }
-        text += blockText + "\n";
-      });
-    }
-
-    return text.trim();
-  };
-
-  /////////////////////////////////////////////////////////////////////////////////////////////
-
   useEffect(() => {
     localStorage.setItem("internet-search", JSON.stringify(internetResearchMessages));
   }, [internetResearchMessages]);
@@ -419,58 +383,91 @@ const WordpaneCopilot = () => {
     localStorage.setItem("library-chat", JSON.stringify(libraryChatMessages));
   }, [libraryChatMessages]);
 
-  const handleLibraryChatMessage = () => {
-    console.log("Library chat function called");
-    if (inputValue.trim() !== "") {
-      if (showOptions == true) {
-        resetEditorState();
-      }
+  useEffect(() => {
+    localStorage.setItem("custom-prompt", JSON.stringify(customPromptMessages));
+  }, [customPromptMessages]);
+
+  const handleClickSubmitButton = () => {
+    if (isLibraryChatTab) {
+      handleLibraryChatMessage(inputValue, libraryChatMessages, { isRefine: false });
+    } else if (isInternetSearchTab) {
+      handleInternetSearchMessage(inputValue, internetResearchMessages, { isRefine: false });
+    } else if (isCustomPromptTab) {
+      handleCustomPromptMessage(selectedText, selectedCustomPrompt, internetResearchMessages, { isRefine: false });
+    }
+  };
+
+  const handleLibraryChatMessage = (prompt: string, messages: IMessage[], option: IPromptOption) => {
+    if (prompt.trim() !== "") {
       setStartTime(Date.now());
       setLibraryChatMessages([
-        ...libraryChatMessages,
-        { type: "text", createdBy: "user", value: inputValue },
-        { type: "loading", createdBy: "bot", value: "loading" },
+        ...messages,
+        withId({ type: "text", createdBy: "user", value: prompt, action: "default", isRefine: option.isRefine }),
+        withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false }),
       ]);
-      askLibraryChatQuestion(inputValue, libraryChatMessages)
+      askLibraryChatQuestion(prompt, messages, option)
         .then((message) => {
-          setLibraryChatMessages((libraryChatMessages) => [...libraryChatMessages.slice(0, -1), message]);
+          setLibraryChatMessages((messages) => [...messages.slice(0, -1), message]);
         })
         .catch(console.log);
       setInputValue("");
     }
   };
 
-  const handleInternetSearchMessage = () => {
-    // Implement your internet search logic here
-    console.log("Internet Search function called");
-    if (inputValue.trim() !== "") {
-      if (showOptions == true) {
-        resetEditorState();
-      }
+  const handleInternetSearchMessage = (prompt: string, messages: IMessage[], option: IPromptOption) => {
+    if (prompt.trim() !== "") {
       setStartTime(Date.now());
       setInternetResearchMessages([
-        ...internetResearchMessages,
-        { type: "text", createdBy: "user", value: inputValue },
-        { type: "loading", createdBy: "bot", value: "loading" },
+        ...messages,
+        withId({ type: "text", createdBy: "user", value: prompt, action: "default", isRefine: option.isRefine }),
+        withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false }),
       ]);
-      askInternetQuestion(inputValue)
+      askInternetQuestion(prompt, messages, option)
         .then((message) => {
-          setInternetResearchMessages((internetResearchMessages) => [
-            ...internetResearchMessages.slice(0, -1),
-            message,
-          ]);
+          setInternetResearchMessages((messages) => [...messages.slice(0, -1), message]);
         })
         .catch(console.log);
       setInputValue("");
     }
   };
 
-  const askInternetQuestion = async (question: string): Promise<IMessage> => {
+  const handleCustomPromptMessage = (
+    text: string,
+    promptType: IPromptType,
+    messages: IMessage[],
+    option: IPromptOption
+  ) => {
+    setSelectedTab("custom-prompt");
+    if (text.trim()) {
+      setStartTime(Date.now());
+      setCustomPromptMessages([
+        ...messages,
+        withId({ type: "text", createdBy: "user", value: text, action: promptType, isRefine: option.isRefine }),
+        withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false }),
+      ]);
+      askCustomPrompt(text, promptType, messages, option)
+        .then((message) => {
+          setCustomPromptMessages((messages) => [...messages.slice(0, -1), message]);
+        })
+        .catch(console.log);
+      setInputValue("");
+    }
+  };
+
+  const askInternetQuestion = async (
+    question: string,
+    messages: IMessage[],
+    option: IPromptOption
+  ): Promise<IMessage> => {
     try {
       const result = await axios.post(
         apiURL("perplexity"),
         {
-          input_text: question + "Respond in a full sentence format.",
+          input_text:
+            getExtraInstruction(messages) +
+            "\n\nuser: " +
+            (option.isRefine ? `Refine the previous response.${question}` : question) +
+            "\n\n Respond in a full sentence format.",
           dataset: "default",
         },
         {
@@ -479,66 +476,39 @@ const WordpaneCopilot = () => {
           },
         }
       );
-      return { createdBy: "bot", type: "text", value: result.data };
+      return withId({ createdBy: "bot", type: "text", value: result.data, action: "default", isRefine: false });
     } catch (error) {
       console.error("Error sending question:", error);
       // Replace the temporary loading message with the error message
-      return {
+      return withId({
         createdBy: "bot",
         type: "text",
         value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
-      };
+        action: "default",
+        isRefine: option.isRefine,
+      });
     }
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      if (selectedTab === "internet-search") {
-        handleInternetSearchMessage();
-      } else if (selectedTab === "custom-prompt") {
-        handleCustomPromptSubmit();
-      } else {
-        handleLibraryChatMessage();
-      }
+      handleClickSubmitButton();
     }
   };
 
-  const formatResponse = (response) => {
-    // Handle numbered lists
-    response = response.replace(/^\d+\.\s(.+)$/gm, "<li>$1</li>");
-    if (response.includes("<li>")) {
-      response = `<ol>${response}</ol>`;
-    }
-
-    // Handle bullet points
-    response = response.replace(/^[-•]\s(.+)$/gm, "<li>$1</li>");
-    if (response.includes("<li>") && !response.includes("<ol>")) {
-      response = `<ul>${response}</ul>`;
-    }
-
-    // Handle bold text
-    response = response.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-
-    // Handle italic text
-    response = response.replace(/\*(.*?)\*/g, "<em>$1</em>");
-
-    // Handle newlines for better readability
-    response = response.replace(/\n/g, "<br>");
-
-    return response;
-  };
-
-  const askLibraryChatQuestion = async (question: string, messages: IMessage[]): Promise<IMessage> => {
-    const chatHistory = messages.map((msg) => `${msg.createdBy}: ${msg.value}`).join("\n");
-
+  const askLibraryChatQuestion = async (
+    question: string,
+    messages: IMessage[],
+    option: IPromptOption
+  ): Promise<IMessage> => {
     try {
       const result = await axios.post(
         apiURL("question"),
         {
           choice: bidPilotChoice,
           broadness: bidPilotBroadness,
-          input_text: question,
-          extra_instructions: chatHistory,
+          input_text: option.isRefine ? `Refine the previous response.${question}` : question,
+          extra_instructions: getExtraInstruction(messages),
           datasets: ["default"],
           bid_id: "sharedState.object_id",
         },
@@ -550,27 +520,32 @@ const WordpaneCopilot = () => {
       );
 
       const formattedResponse = formatResponse(result.data);
-      return {
+      return withId({
         type: "text",
         value: formattedResponse,
         createdBy: "bot",
-      };
+        action: "default",
+        isRefine: option.isRefine,
+      });
     } catch (error) {
       console.error("Error sending question:", error);
 
-      return {
+      return withId({
         type: "text",
         value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
         createdBy: "bot",
-      };
+        action: "default",
+        isRefine: false,
+      });
     }
   };
 
-  const shortcutVisible = (message: IMessage, type: IShortcutType) => {
-    if (message.type === "text" && type === "replace") return true;
-    if (message.type === "image" && type === "insert" && isCustomPromptTab) return true;
-    if (type === "refine" && isCustomPromptTab) return true;
-    return false;
+  const shortcutVisible = (message: IMessage, type: IShortcutType): IButtonStatus => {
+    if (message.type === "text" && type === "replace") return "enabled";
+    if (message.type === "image" && type === "insert" && isCustomPromptTab) return "enabled";
+    if (type === "refine" && inputValue.trim().length > 0) return "enabled";
+    if (type === "refine" && inputValue.trim().length === 0) return "disabled";
+    return "hidden";
   };
 
   return (
@@ -582,7 +557,7 @@ const WordpaneCopilot = () => {
           value={selectedTab}
           TabIndicatorProps={{ style: { display: "none" } }}
         >
-          <Tab label="Chat" value="library-chat" />
+          <Tab label="Library" value="library-chat" />
           <Tab label="Research" value="internet-search" />
           <Tab label="Custom Prompt" value="custom-prompt" hidden />
         </Tabs>
@@ -596,26 +571,36 @@ const WordpaneCopilot = () => {
       >
         <div className="bid-pilot-container border-box">
           {isCustomPromptTab ? (
-            <MessageBox
-              messages={customPromptMessages}
-              showShortcuts={true}
-              handleClickShortcut={handleClickMessageShortcut}
-              shortcutVisible={shortcutVisible}
-            />
+            customPromptMessages.length ? (
+              <MessageBox
+                messages={customPromptMessages}
+                showShortcuts={true}
+                handleClickShortcut={handleClickMessageShortcut}
+                shortcutVisible={shortcutVisible}
+              />
+            ) : (
+              <Welcome />
+            )
           ) : isInternetSearchTab ? (
-            <MessageBox
-              messages={internetResearchMessages}
-              showShortcuts={true}
-              handleClickShortcut={handleClickMessageShortcut}
-              shortcutVisible={shortcutVisible}
-            />
-          ) : (
+            internetResearchMessages.length ? (
+              <MessageBox
+                messages={internetResearchMessages}
+                showShortcuts={true}
+                handleClickShortcut={handleClickMessageShortcut}
+                shortcutVisible={shortcutVisible}
+              />
+            ) : (
+              <Welcome />
+            )
+          ) : libraryChatMessages.length ? (
             <MessageBox
               messages={libraryChatMessages}
               showShortcuts={true}
               handleClickShortcut={handleClickMessageShortcut}
               shortcutVisible={shortcutVisible}
             />
+          ) : (
+            <Welcome />
           )}
         </div>
       </Box>
@@ -626,7 +611,14 @@ const WordpaneCopilot = () => {
               <MenuList>
                 {customPrompts.map((item) => {
                   return (
-                    <MenuItem onClick={handleLinkClick(item.id)} key={item.id}>
+                    <MenuItem
+                      onClick={() =>
+                        handleCustomPromptMessage(`${selectedText}. ${inputValue}`, item.id, customPromptMessages, {
+                          isRefine: false,
+                        })
+                      }
+                      key={item.id}
+                    >
                       {item.title}
                     </MenuItem>
                   );
@@ -650,7 +642,11 @@ const WordpaneCopilot = () => {
                 <Button
                   variant="outlined"
                   color="info"
-                  onClick={handleLinkClick("Graph")}
+                  onClick={() =>
+                    handleCustomPromptMessage(`${selectedText}. ${inputValue}`, "Graph", customPromptMessages, {
+                      isRefine: false,
+                    })
+                  }
                   disabled={selectedText.length === 0 || isLoading}
                 >
                   Graph
@@ -685,9 +681,7 @@ const WordpaneCopilot = () => {
           />
           <Button
             onMouseDown={handleMouseDownOnSubmit}
-            onClick={
-              isLibraryChatTab ? handleLibraryChatMessage : isInternetSearchTab ? handleInternetSearchMessage : () => {}
-            }
+            onClick={handleClickSubmitButton}
             disabled={isCustomPromptTab || isLoading || inputValue.trim() === ""}
             className="chat-send-button"
             color="primary"

@@ -13,6 +13,9 @@ const ThemeProvider = ({ children }) => {
         textTransform: "none",
       },
       fontFamily: "calc(--font-family)",
+      subtitle1: {
+        color: "#F5861999",
+      },
     },
     components: {
       MuiButton: {

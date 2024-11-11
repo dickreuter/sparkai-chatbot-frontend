@@ -2,6 +2,9 @@ export interface IMessage {
   type: "text" | "image" | "loading";
   value: string;
   createdBy: "user" | "bot";
+  action: "default" | IPromptType;
+  isRefine: boolean;
+  id: string;
 }
 
 export type IPromptType =
@@ -13,3 +16,9 @@ export type IPromptType =
   | "Graph";
 
 export type IShortcutType = "insert" | "replace" | "refine";
+
+export interface IPromptOption {
+  isRefine: boolean;
+}
+
+export type IButtonStatus = "hidden" | "disabled" | "enabled";

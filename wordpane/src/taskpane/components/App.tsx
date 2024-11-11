@@ -2,7 +2,7 @@ import * as React from "react";
 import { createMemoryRouter, RouterProvider, Outlet } from "react-router-dom";
 import { AuthProvider } from "react-auth-kit";
 import { makeStyles } from "@fluentui/react-components";
-import WordpaneCopilot from "./WordpaneCopilot";
+import WordpaneCopilot from "./WordpaneCopilot/WordpaneCopilot";
 import SignInComponent from "../components/auth/SignIn";
 import SignOut from "../components/auth/SignOutButton";
 import "../resources/clash-display.css";

@@ -622,3 +622,19 @@ button.chat-send-button {
   border: solid 1px #0000001f;
   border-radius: 4px;
 }
+
+.welcome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex-wrap: wrap;
+}
+
+.welcome > img {
+  margin-right: 10px;
+}
+
+.welcome > h5 {
+  line-height: 1.5;
+}

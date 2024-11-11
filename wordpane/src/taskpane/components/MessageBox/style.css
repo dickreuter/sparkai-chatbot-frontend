@@ -25,3 +25,12 @@
 div.MuiGrid-root.shortcuts {
   margin-top: 5px;
 }
+
+.message-body__content {
+  position: relative;
+}
+
+.message-body__content_action {
+  position: absolute;
+  line-height: 1.5;
+}

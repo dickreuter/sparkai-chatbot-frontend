@@ -69,7 +69,8 @@
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.27.0",
     "react-tooltip": "^5.25.0",
-    "regenerator-runtime": "^0.14.1"
+    "regenerator-runtime": "^0.14.1",
+    "uuid": "^11.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",

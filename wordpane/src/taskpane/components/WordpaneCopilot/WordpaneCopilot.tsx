@@ -7,13 +7,14 @@ import { EditorState, Modifier, SelectionState, convertToRaw, ContentState } fro
 import "draft-js/dist/Draft.css";
 import useSelectedText from "../../hooks/useSelectedText";
 import { apiURL } from "../../helper/urls";
-import { IMessage, IPromptType, IShortcutType, IPromptOption, IButtonStatus } from "../../../types";
+import { IMessage, IPromptType, IShortcutType, IPromptOption, IButtonStatus, IChatTypes } from "../../../types";
 import { getBase64FromBlob } from "../../helper/file";
 import { Box, Button, Grid, MenuItem, MenuList, Paper, Tab, Tabs } from "@mui/material";
 import MessageBox from "../MessageBox";
 import { customPrompts } from "./constants";
 import { formatResponse, getExtraInstruction, refineResponse, removeDoubleBr, withId } from "./helper";
 import Welcome from "./Welcome";
+import useShowWelcome from "../../hooks/useShowWelcome";
 
 const getDefaultMessage = (
   type: "library-chat" | "internet-search" | "custom-prompt",
@@ -68,7 +69,9 @@ const WordpaneCopilot = () => {
 
   const responseBoxRef = useRef(null); // Ref for the response box
 
-  const [selectedTab, setSelectedTab] = useState<"library-chat" | "internet-search" | "custom-prompt">("library-chat");
+  const [selectedTab, setSelectedTab] = useState<IChatTypes>("library-chat");
+
+  const { showWelcome, setShowWelcome } = useShowWelcome();
 
   const isLibraryChatTab = useMemo(() => selectedTab === "library-chat", [selectedTab]);
   const isInternetSearchTab = useMemo(() => selectedTab === "internet-search", [selectedTab]);
@@ -93,6 +96,9 @@ const WordpaneCopilot = () => {
     () => isLiveChatLoading || isInternetSearchLoading || isCustomPromptLoading,
     [isLiveChatLoading, isInternetSearchLoading, isCustomPromptLoading]
   );
+
+  const [currentRefine, setCurrentRefine] = useState<{ tab: IChatTypes; message: IMessage }>(undefined);
+  const isRefine = useMemo(() => currentRefine !== undefined, [currentRefine]);
 
   useEffect(() => {
     if (responseMessageBoxRef?.current) {
@@ -146,7 +152,7 @@ const WordpaneCopilot = () => {
 
   const askCopilot = async (
     text: string,
-    _promptType: IPromptType,
+    promptType: IPromptType,
     copilot_mode: string,
     messages: IMessage[],
     option: IPromptOption
@@ -174,7 +180,7 @@ const WordpaneCopilot = () => {
         type: "text",
         value: response.data,
         createdBy: "bot",
-        action: "default",
+        action: promptType,
         isRefine: option.isRefine,
       });
     } catch (error) {
@@ -183,7 +189,7 @@ const WordpaneCopilot = () => {
         type: "text",
         value: "Message failed, please contact support...",
         createdBy: "bot",
-        action: "default",
+        action: promptType,
         isRefine: option.isRefine,
       });
     }
@@ -191,7 +197,7 @@ const WordpaneCopilot = () => {
 
   const askDiagram = async (
     text: string,
-    _promptType: IPromptType,
+    promptType: IPromptType,
     messages: IMessage[],
     option: IPromptOption
   ): Promise<IMessage> => {
@@ -210,7 +216,7 @@ const WordpaneCopilot = () => {
         type: "image",
         value: await getBase64FromBlob(response.data),
         createdBy: "bot",
-        action: "default",
+        action: promptType,
         isRefine: option.isRefine,
       });
     } catch (error) {
@@ -219,7 +225,7 @@ const WordpaneCopilot = () => {
         type: "text",
         value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
         createdBy: "bot",
-        action: "default",
+        action: promptType,
         isRefine: option.isRefine,
       });
     }
@@ -284,16 +290,7 @@ const WordpaneCopilot = () => {
 
   const handleClickMessageShortcut = (action: IShortcutType, message: IMessage) => {
     if (action === "refine") {
-      if (isLibraryChatTab) {
-        const refine = refineResponse(inputValue, message, libraryChatMessages);
-        handleLibraryChatMessage(refine.prompt, refine.messages, { isRefine: true });
-      } else if (isInternetSearchTab) {
-        const refine = refineResponse(inputValue, message, internetResearchMessages);
-        handleInternetSearchMessage(refine.prompt, refine.messages, { isRefine: true });
-      } else {
-        const refine = refineResponse(inputValue, message, customPromptMessages);
-        handleCustomPromptMessage(selectedText, selectedCustomPrompt, refine.messages, { isRefine: true });
-      }
+      setCurrentRefine({ tab: selectedTab, message });
     } else if (action === "insert") {
       insertToWord(message, "End");
     } else if (action === "replace") {
@@ -388,12 +385,29 @@ const WordpaneCopilot = () => {
   }, [customPromptMessages]);
 
   const handleClickSubmitButton = () => {
-    if (isLibraryChatTab) {
-      handleLibraryChatMessage(inputValue, libraryChatMessages, { isRefine: false });
-    } else if (isInternetSearchTab) {
-      handleInternetSearchMessage(inputValue, internetResearchMessages, { isRefine: false });
-    } else if (isCustomPromptTab) {
-      handleCustomPromptMessage(selectedText, selectedCustomPrompt, internetResearchMessages, { isRefine: false });
+    setShowWelcome(false);
+    if (isRefine) {
+      if (currentRefine.tab === "library-chat") {
+        const refine = refineResponse(inputValue, currentRefine.message, libraryChatMessages);
+        handleLibraryChatMessage(refine.prompt, refine.messages, { isRefine: true });
+      } else if (currentRefine.tab === "internet-search") {
+        const refine = refineResponse(inputValue, currentRefine.message, internetResearchMessages);
+        handleInternetSearchMessage(refine.prompt, refine.messages, { isRefine: true });
+      } else {
+        const refine = refineResponse(inputValue, currentRefine.message, customPromptMessages);
+        handleCustomPromptMessage(inputValue, currentRefine.message.action as IPromptType, refine.messages, {
+          isRefine: true,
+        });
+      }
+      setCurrentRefine(undefined);
+    } else {
+      if (isLibraryChatTab) {
+        handleLibraryChatMessage(inputValue, libraryChatMessages, { isRefine: false });
+      } else if (isInternetSearchTab) {
+        handleInternetSearchMessage(inputValue, internetResearchMessages, { isRefine: false });
+      } else if (isCustomPromptTab) {
+        handleCustomPromptMessage(selectedText, selectedCustomPrompt, internetResearchMessages, { isRefine: false });
+      }
     }
   };
 
@@ -543,8 +557,8 @@ const WordpaneCopilot = () => {
   const shortcutVisible = (message: IMessage, type: IShortcutType): IButtonStatus => {
     if (message.type === "text" && type === "replace") return "enabled";
     if (message.type === "image" && type === "insert" && isCustomPromptTab) return "enabled";
-    if (type === "refine" && inputValue.trim().length > 0) return "enabled";
-    if (type === "refine" && inputValue.trim().length === 0) return "disabled";
+    if (type === "refine" && currentRefine?.message?.id === message.id) return "disabled";
+    if (type === "refine" && currentRefine?.message?.id !== message.id) return "enabled";
     return "hidden";
   };
 
@@ -570,37 +584,29 @@ const WordpaneCopilot = () => {
         ref={responseMessageBoxRef}
       >
         <div className="bid-pilot-container border-box">
-          {isCustomPromptTab ? (
-            customPromptMessages.length ? (
-              <MessageBox
-                messages={customPromptMessages}
-                showShortcuts={true}
-                handleClickShortcut={handleClickMessageShortcut}
-                shortcutVisible={shortcutVisible}
-              />
-            ) : (
-              <Welcome />
-            )
+          {showWelcome ? (
+            <Welcome />
+          ) : isCustomPromptTab ? (
+            <MessageBox
+              messages={customPromptMessages}
+              showShortcuts={true}
+              handleClickShortcut={handleClickMessageShortcut}
+              shortcutVisible={shortcutVisible}
+            />
           ) : isInternetSearchTab ? (
-            internetResearchMessages.length ? (
-              <MessageBox
-                messages={internetResearchMessages}
-                showShortcuts={true}
-                handleClickShortcut={handleClickMessageShortcut}
-                shortcutVisible={shortcutVisible}
-              />
-            ) : (
-              <Welcome />
-            )
-          ) : libraryChatMessages.length ? (
+            <MessageBox
+              messages={internetResearchMessages}
+              showShortcuts={true}
+              handleClickShortcut={handleClickMessageShortcut}
+              shortcutVisible={shortcutVisible}
+            />
+          ) : (
             <MessageBox
               messages={libraryChatMessages}
               showShortcuts={true}
               handleClickShortcut={handleClickMessageShortcut}
               shortcutVisible={shortcutVisible}
             />
-          ) : (
-            <Welcome />
           )}
         </div>
       </Box>
@@ -665,29 +671,32 @@ const WordpaneCopilot = () => {
         <div className="border-box" style={{ padding: "5px 10px", position: "relative" }}>
           <textarea
             placeholder={
-              isInternetSearchTab
-                ? "Please type your question in here..."
-                : isCustomPromptTab
-                  ? "Type in a custom prompt here..."
-                  : "Please type your question in here..."
+              isRefine
+                ? "Please type your refinement in here..."
+                : isInternetSearchTab
+                  ? "Please type your question in here..."
+                  : isCustomPromptTab
+                    ? "Please use the enhance button to select a prompt..."
+                    : "Please type your question in here..."
             }
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={isLoading && (isCustomPromptTab ? customPromptMessages.length > 0 : true)}
+            disabled={isLoading || (isCustomPromptTab && !isRefine)}
             className="chat-input"
-            rows={5}
+            rows={4}
             ref={textInputRef}
           />
           <Button
             onMouseDown={handleMouseDownOnSubmit}
             onClick={handleClickSubmitButton}
-            disabled={isCustomPromptTab || isLoading || inputValue.trim() === ""}
+            disabled={isLoading || inputValue.trim() === "" || (isCustomPromptTab && !isRefine)}
             className="chat-send-button"
             color="primary"
             variant="contained"
+            size="small"
           >
-            Generate
+            {isRefine ? "Refine" : "Generate"}
           </Button>
         </div>
       </Box>

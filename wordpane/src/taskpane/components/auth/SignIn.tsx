@@ -5,6 +5,7 @@ import useAuthSignIn from "./UseAuthsignIn";
 import AuthState from "./AuthState";
 import axios from "axios";
 import { apiURL } from "../../helper/urls";
+import useShowWelcome from "../../hooks/useShowWelcome";
 
 const FullScreenTwoCards = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -14,6 +15,7 @@ const FullScreenTwoCards = () => {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState<boolean>(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState<string>("");
+  const { setShowWelcome } = useShowWelcome();
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
@@ -29,6 +31,7 @@ const FullScreenTwoCards = () => {
     try {
       console.log("submit signin");
       const { success, message } = await submitSignIn(formData);
+      setShowWelcome(true);
       setSnackbarMessage(success ? message : "Incorrect Username or Password");
       setSnackbarSeverity(success ? "success" : "error");
     } catch (error) {

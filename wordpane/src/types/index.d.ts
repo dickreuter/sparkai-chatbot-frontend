@@ -22,3 +22,5 @@ export interface IPromptOption {
 }
 
 export type IButtonStatus = "hidden" | "disabled" | "enabled";
+
+export type IChatTypes = "library-chat" | "internet-search" | "custom-prompt";

@@ -115,7 +115,7 @@ const Bids = () => {
 
   // Update the table header to include sorting
   const headers = [
-    { key: "bid_title", label: "Tender Name", width: "20%" },
+    { key: "bid_title", label: "Tender Name", width: "18%" },
     { key: "timestamp", label: "Last edited" },
     { key: "status", label: "Status" },
     { key: "client_name", label: "Client" },

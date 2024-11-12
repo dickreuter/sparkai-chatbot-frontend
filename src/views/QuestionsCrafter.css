@@ -722,3 +722,12 @@
     padding-left: 15px;
     padding-right: 15px;
 }
+
+.delete-cross {
+    margin-top: 2px;
+    margin-right: 5px;
+    background-color: #f0f0f0;
+    color: #000;
+    border: none;
+    padding: 0;
+}

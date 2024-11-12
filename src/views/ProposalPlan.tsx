@@ -13,10 +13,11 @@ import BidTitle from "../components/BidTitle.tsx";
 import './ProposalPlan.css';
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCheckCircle, faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Menu, MenuItem } from "@mui/material";
 import { CheckCircle } from "@mui/icons-material";
 import StatusMenu, { Section } from "../components/StatusMenu.tsx";
+import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 
 
 
@@ -64,6 +65,7 @@ const ProposalPlan = () => {
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState, setSharedState } = useContext(BidContext);
   const [outline, setOutline] = useState<Section[]>([]);
+  const [outlinefetched, setOutlineFetched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
   const {
@@ -131,6 +133,17 @@ const ProposalPlan = () => {
       displayAlert("Failed to generate proposal", 'danger');
     }
   };
+
+  useEffect(() => {
+    if (outline.length === 0 && outlinefetched === true) {
+      setShowModal(true);
+    }
+  }, [outline.length, outlinefetched]);
+
+  const handleRegenerateClick = () => {
+    setShowModal(true);
+  };
+
   
 
   const fetchOutline = async () => {
@@ -162,43 +175,17 @@ const ProposalPlan = () => {
       displayAlert("Failed to fetch outline", 'danger');
     } finally {
       setIsLoading(false);
+      setOutlineFetched(true);
     }
   };
 
+  const [showModal, setShowModal] = useState(false);
+  
   useEffect(() => {
+    if (!object_id) return;
     fetchOutline();
   }, [object_id]);
 
-  const generateOutline = async () => {
-    setIsGeneratingOutline(true);
-    const formData = new FormData();
-    formData.append('bid_id', object_id);
-    
-    try {
-      await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/generate_outline`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
-            'Content-Type': 'multipart/form-data',
-          }
-        }
-      );
-      
-      displayAlert("Outline generated successfully!", 'success');
-      fetchOutline();
-    } catch (err) {
-      console.error('Error generating outline:', err);
-      if (err.response?.status === 404) {
-        displayAlert("No documents found in the tender library. Please upload documents before generating outline.", 'warning');
-      } else {
-        displayAlert("Failed to generate outline", 'danger');
-      }
-    } finally {
-      setIsGeneratingOutline(false);
-    }
-  };
 
   const updateSection = async (section: Section, sectionIndex: number) => {
     try {
@@ -278,143 +265,134 @@ const ProposalPlan = () => {
       <div className="lib-container">
         <div className="scroll-container">
           <BidNavbar />
-          <BidTitle
-            canUserEdit={true}
-            displayAlert={displayAlert}
-            setSharedState={setSharedState}
-            sharedState={sharedState}
-            showViewOnlyMessage={showViewOnlyMessage}
-            initialBidName={"initialBidName"}
-          />
-          
-          <div>
-            <Button 
-              onClick={generateOutline}
-              disabled={isGeneratingOutline}
-              className="mb-4"
-              variant="primary"
-            >
-              {isGeneratingOutline ? (
-                <>
-                  <Spinner
-                    as="span"
-                    animation="border"
-                    size="sm"
-                    role="status"
-                    aria-hidden="true"
-                    className="me-2"
-                  />
-                  Generating...
-                </>
-              ) : (
-                'Generate Outline'
-              )}
-            </Button>
-            {isAllSectionsComplete() && (
-              <Button 
-                onClick={generateProposal}
-                className="mb-4 ms-2 d-flex align-items-center gap-2"
-                variant="success"
+          <OutlineInstructionsModal
+              show={showModal}
+              onHide={() => setShowModal(false)}
+              bid_id = {object_id}
+              fetchOutline = {fetchOutline}
+              
+            />
+          {outline.length === 0 && outlinefetched === true ? (
+            <div>
+              </div>
+          ) : (
+            <div>
+              <div className="proposal-header">
+              <BidTitle
+                canUserEdit={true}
+                displayAlert={displayAlert}
+                setSharedState={setSharedState}
+                sharedState={sharedState}
+                showViewOnlyMessage={showViewOnlyMessage}
+                initialBidName={"initialBidName"}
+              />
+              <button
+                onClick={handleRegenerateClick}
+                className="upload-button"
+                style={{ minWidth: "fit-content" }}
               >
-                <FontAwesomeIcon
-                  icon={faCheckCircle}
-                  style={{ marginLeft: "5px" }}
-                />
-                Generate Proposal
-              </Button>
-            )}
-
-            <div className="table-responsive">
-              <table className="outline-table w-100">
-                <thead>
-                  <tr>
-                    <th className="py-3 px-4">Section</th>
-                    <th className="py-3 px-4" style={{width: '10%'}}>Word Count</th>
-                    <th className="py-3 px-4" style={{width: '10%'}}>Weighting</th>
-                    <th className="py-3 px-4">Page Limit</th>
-                    <th className="py-3 px-4">Reviewer</th>
-                    <th className="py-3 px-4" style={{width: '5%'}}>Edit</th>
-                    <th className="py-3 px-4 text-center">Completed</th>
-                    
-                  </tr>
-                </thead>
-                <tbody>
-                  {isLoading ? (
+                <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon> 
+                New Outline
+              </button>
+              </div>
+              {isAllSectionsComplete() && (
+                <Button 
+                  onClick={generateProposal}
+                  className="mb-4 ms-2 d-flex align-items-center gap-2"
+                  variant="success"
+                >
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    style={{ marginLeft: "5px" }}
+                  />
+                  Generate Proposal
+                </Button>
+              )}
+  
+              <div className="table-responsive">
+                <table className="outline-table w-100">
+                  <thead>
                     <tr>
-                      <td colSpan={7} className="text-center py-4">
-                        <Spinner animation="border" size="sm" /> Loading...
-                      </td>
+                      <th className="py-3 px-4" style={{width: '30%'}}>Section</th>
+                      <th className="py-3 px-4" style={{width: '10%'}}>Word Count</th>
+                      <th className="py-3 px-4" style={{width: '10%'}}>Weighting</th>
+                      <th className="py-3 px-4" style={{width: '15%'}}>Page Limit</th>
+                      <th className="py-3 px-4">Reviewer</th>
+                      <th className="py-3 px-4" style={{width: '8%'}}>Edit</th>
+                      <th className="py-3 px-4 text-center">Completed</th>
                     </tr>
-                  ) : outline.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="text-center py-4">
-                        No sections found. Generate an outline to get started.
-                      </td>
-                    </tr>
-                  ) : (
-                    outline.map((section, index) => (
-                      <tr key={index}>
-                        <td className="py-2 px-4">
-                          <EditableCell
-                            value={section.heading}
-                            onChange={(value) => handleSectionChange(index, 'heading', value)}
-                            onBlur={() => updateSection(outline[index], index)}
-                          />
+                  </thead>
+                  <tbody>
+                    {isLoading ? (
+                      <tr>
+                        <td colSpan={7} className="text-center py-4">
+                          <Spinner animation="border" size="sm" /> Loading...
                         </td>
-                        <td className="py-2 px-4">{section.word_count}</td>
-                        <td className="py-2 px-4">
-                          <EditableCell
-                            value={section.weighting}
-                            onChange={(value) => handleSectionChange(index, 'weighting', value)}
-                            onBlur={() => updateSection(outline[index], index)}
-                          />
-                        </td>
-                        <td className="py-2 px-4">
-                          <EditableCell
-                            value={section.page_limit}
-                            onChange={(value) => handleSectionChange(index, 'page_limit', value)}
-                            onBlur={() => updateSection(outline[index], index)}
-                          />
-                        </td>
-                        <td className="py-2 px-4">
-                          <EditableCell
-                            value={section.reviewer}
-                            onChange={(value) => handleSectionChange(index, 'reviewer', value)}
-                            onBlur={() => updateSection(outline[index], index)}
-                          />
-                        </td>
-                        <td className="py-2 px-4 text-center">
-                          <div className="d-flex justify-content-center gap-3">
-                            <button
-                              onClick={() => handleEditClick(section)}
-                              className="bg-transparent border-0 text-primary hover:text-blue-700 cursor-pointer"
-                              title="Edit section"
-                            >
-                              <FontAwesomeIcon icon={faPencil} size="sm" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(section, index)}
-                              className="bg-transparent border-0 text-danger hover:text-red-700 cursor-pointer"
-                              title="Delete section"
-                            >
-                              <FontAwesomeIcon icon={faTrash} size="sm" />
-                            </button>
-                          </div>
-                        </td>
-                        <td className="py-2 px-4 text-center">
-                          <StatusMenu
-                            value={section.status}
-                            onChange={(value) => handleSectionChange(index, 'status', value)}
-                          />
-                        </td>
-                        
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      outline.map((section, index) => (
+                        <tr key={index}>
+                          <td className="py-2 px-4">
+                            <EditableCell
+                              value={section.heading}
+                              onChange={(value) => handleSectionChange(index, 'heading', value)}
+                              onBlur={() => updateSection(outline[index], index)}
+                            />
+                          </td>
+                          <td className="py-2 px-4">{section.word_count}</td>
+                          <td className="py-2 px-4">
+                            <EditableCell
+                              value={section.weighting}
+                              onChange={(value) => handleSectionChange(index, 'weighting', value)}
+                              onBlur={() => updateSection(outline[index], index)}
+                            />
+                          </td>
+                          <td className="py-2 px-4">
+                            <EditableCell
+                              value={section.page_limit}
+                              onChange={(value) => handleSectionChange(index, 'page_limit', value)}
+                              onBlur={() => updateSection(outline[index], index)}
+                            />
+                          </td>
+                          <td className="py-2 px-4">
+                            <EditableCell
+                              value={section.reviewer}
+                              onChange={(value) => handleSectionChange(index, 'reviewer', value)}
+                              onBlur={() => updateSection(outline[index], index)}
+                            />
+                          </td>
+                          <td className="py-2 px-4 text-center">
+                            <div className="d-flex justify-content-centers">
+                              <button
+                                onClick={() => handleEditClick(section)}
+                                className="bg-transparent border-0 text-primary hover:text-blue-700 cursor-pointer"
+                                title="Edit section"
+                              >
+                                <FontAwesomeIcon icon={faPencil} size="sm" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(section, index)}
+                                className="bg-transparent border-0 text-danger hover:text-red-700 cursor-pointer"
+                                title="Delete section"
+                              >
+                                <FontAwesomeIcon icon={faTrash} size="sm" />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="py-2 px-4 text-center">
+                            <StatusMenu
+                              value={section.status}
+                              onChange={(value) => handleSectionChange(index, 'status', value)}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

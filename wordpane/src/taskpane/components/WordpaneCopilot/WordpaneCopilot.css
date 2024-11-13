@@ -338,7 +338,6 @@
   border-radius: 15px;
   margin-bottom: 10px;
   word-wrap: break-word;
-  font-size: 16px;
 }
 
 .message-body {
@@ -637,4 +636,9 @@ button.chat-send-button {
 
 .welcome > h5 {
   line-height: 1.5;
+}
+
+.chat-input,
+.message-bubble-small {
+  font-size: 14px;
 }

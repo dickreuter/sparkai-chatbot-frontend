@@ -16,16 +16,21 @@ import { formatResponse, getExtraInstruction, refineResponse, removeDoubleBr, wi
 import Welcome from "./Welcome";
 import useShowWelcome from "../../hooks/useShowWelcome";
 
-const getDefaultMessage = (
-  type: "library-chat" | "internet-search" | "custom-prompt",
-  useCache: boolean = false
-): IMessage[] => {
+const getDefaultMessage = (type: "library-chat" | "internet-search", useCache: boolean = false): IMessage[] => {
   const savedMessages = localStorage.getItem(type);
 
   if (useCache && savedMessages) {
-    const parsedMessages = JSON.parse(savedMessages);
+    const parsedMessages: IMessage[] = JSON.parse(savedMessages);
     if (parsedMessages.length > 0) {
-      return parsedMessages;
+      const filtered: IMessage[] = [];
+      for (let i = 0; i < parsedMessages.length; i++) {
+        const message = parsedMessages[i];
+        if (message.createdBy === "user" && parsedMessages?.[i + 1]?.type === "loading") {
+          break;
+        }
+        filtered.push(message);
+      }
+      return filtered;
     }
   }
 
@@ -39,15 +44,10 @@ const WordpaneCopilot = () => {
 
   const [isCustomPromptMenuVisible, setCustomPromptMenuVisible] = useState(false);
   const [selectedText, setSelectedText] = useState("");
-  const [customPromptMessages, setCustomPromptMessages] = useState<IMessage[]>(
-    getDefaultMessage("custom-prompt", true)
-  );
-
   const [libraryChatMessages, setLibraryChatMessages] = useState<IMessage[]>(getDefaultMessage("library-chat", true));
   const [internetResearchMessages, setInternetResearchMessages] = useState<IMessage[]>(
     getDefaultMessage("internet-search", true)
   );
-  const [selectedCustomPrompt, setSelectedCustomPrompt] = useState<IPromptType>(null);
 
   const [showOptions, setShowOptions] = useState(false);
 
@@ -75,7 +75,6 @@ const WordpaneCopilot = () => {
 
   const isLibraryChatTab = useMemo(() => selectedTab === "library-chat", [selectedTab]);
   const isInternetSearchTab = useMemo(() => selectedTab === "internet-search", [selectedTab]);
-  const isCustomPromptTab = useMemo(() => selectedTab === "custom-prompt", [selectedTab]);
 
   const isLiveChatLoading = useMemo(
     () => isLibraryChatTab && libraryChatMessages.find((item) => item.type === "loading") !== undefined,
@@ -87,14 +86,9 @@ const WordpaneCopilot = () => {
     [isInternetSearchTab, internetResearchMessages]
   );
 
-  const isCustomPromptLoading = useMemo(
-    () => isCustomPromptTab && customPromptMessages.find((item) => item.type === "loading") !== undefined,
-    [isCustomPromptTab, customPromptMessages]
-  );
-
   const isLoading = useMemo(
-    () => isLiveChatLoading || isInternetSearchLoading || isCustomPromptLoading,
-    [isLiveChatLoading, isInternetSearchLoading, isCustomPromptLoading]
+    () => isLiveChatLoading || isInternetSearchLoading,
+    [isLiveChatLoading, isInternetSearchLoading]
   );
 
   const [currentRefine, setCurrentRefine] = useState<{ tab: IChatTypes; message: IMessage }>(undefined);
@@ -136,8 +130,6 @@ const WordpaneCopilot = () => {
       case "internet-search":
         setInternetResearchMessages(getDefaultMessage("internet-search"));
         break;
-      case "custom-prompt":
-        setCustomPromptMessages(getDefaultMessage("custom-prompt"));
       default:
         break;
     }
@@ -163,7 +155,9 @@ const WordpaneCopilot = () => {
       const response = await axios.post(
         apiURL("copilot"),
         {
-          input_text: option.isRefine ? `Refine the previous response.${text}` : text,
+          input_text: option.isRefine
+            ? `${getExtraInstruction(messages)}. \n\n.Refine the previous response.\n\n ${text}`
+            : `${getExtraInstruction(messages)}. \n\n ${text}`,
           extra_instructions: getExtraInstruction(messages),
           copilot_mode: copilot_mode,
           datasets: [],
@@ -173,6 +167,7 @@ const WordpaneCopilot = () => {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`,
           },
+          timeout: 30000,
         }
       );
 
@@ -207,9 +202,10 @@ const WordpaneCopilot = () => {
     try {
       const response = await axios.post(
         apiURL("generate_diagram"),
-        `${getExtraInstruction(messages)}\n\n user: ${option.isRefine ? `Refine the previous response. ${text}` : text}`,
+        `${getExtraInstruction(messages)}\n\n user: ${option.isRefine ? `Refine the previous response. \n\n${text}` : text}`,
         {
           responseType: "blob",
+          timeout: 30000,
         }
       );
       return withId({
@@ -380,24 +376,21 @@ const WordpaneCopilot = () => {
     localStorage.setItem("library-chat", JSON.stringify(libraryChatMessages));
   }, [libraryChatMessages]);
 
-  useEffect(() => {
-    localStorage.setItem("custom-prompt", JSON.stringify(customPromptMessages));
-  }, [customPromptMessages]);
-
   const handleClickSubmitButton = () => {
     setShowWelcome(false);
     if (isRefine) {
       if (currentRefine.tab === "library-chat") {
         const refine = refineResponse(inputValue, currentRefine.message, libraryChatMessages);
-        handleLibraryChatMessage(refine.prompt, refine.messages, { isRefine: true });
+        if (currentRefine.message.action === "default") {
+          handleLibraryChatMessage(refine.prompt, refine.messages, { isRefine: true });
+        } else {
+          handleCustomPromptMessage(refine.prompt, currentRefine.message.action, libraryChatMessages, {
+            isRefine: true,
+          });
+        }
       } else if (currentRefine.tab === "internet-search") {
         const refine = refineResponse(inputValue, currentRefine.message, internetResearchMessages);
         handleInternetSearchMessage(refine.prompt, refine.messages, { isRefine: true });
-      } else {
-        const refine = refineResponse(inputValue, currentRefine.message, customPromptMessages);
-        handleCustomPromptMessage(inputValue, currentRefine.message.action as IPromptType, refine.messages, {
-          isRefine: true,
-        });
       }
       setCurrentRefine(undefined);
     } else {
@@ -405,8 +398,6 @@ const WordpaneCopilot = () => {
         handleLibraryChatMessage(inputValue, libraryChatMessages, { isRefine: false });
       } else if (isInternetSearchTab) {
         handleInternetSearchMessage(inputValue, internetResearchMessages, { isRefine: false });
-      } else if (isCustomPromptTab) {
-        handleCustomPromptMessage(selectedText, selectedCustomPrompt, internetResearchMessages, { isRefine: false });
       }
     }
   };
@@ -451,17 +442,17 @@ const WordpaneCopilot = () => {
     messages: IMessage[],
     option: IPromptOption
   ) => {
-    setSelectedTab("custom-prompt");
+    setSelectedTab("library-chat");
     if (text.trim()) {
       setStartTime(Date.now());
-      setCustomPromptMessages([
+      setLibraryChatMessages([
         ...messages,
         withId({ type: "text", createdBy: "user", value: text, action: promptType, isRefine: option.isRefine }),
         withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false }),
       ]);
       askCustomPrompt(text, promptType, messages, option)
         .then((message) => {
-          setCustomPromptMessages((messages) => [...messages.slice(0, -1), message]);
+          setLibraryChatMessages((messages) => [...messages.slice(0, -1), message]);
         })
         .catch(console.log);
       setInputValue("");
@@ -488,6 +479,7 @@ const WordpaneCopilot = () => {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`,
           },
+          timeout: 30000,
         }
       );
       return withId({ createdBy: "bot", type: "text", value: result.data, action: "default", isRefine: false });
@@ -521,7 +513,7 @@ const WordpaneCopilot = () => {
         {
           choice: bidPilotChoice,
           broadness: bidPilotBroadness,
-          input_text: option.isRefine ? `Refine the previous response.${question}` : question,
+          input_text: option.isRefine ? `Refine the previous response. \n\n${question}` : question,
           extra_instructions: getExtraInstruction(messages),
           datasets: ["default"],
           bid_id: "sharedState.object_id",
@@ -530,6 +522,7 @@ const WordpaneCopilot = () => {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`,
           },
+          timeout: 30000,
         }
       );
 
@@ -556,7 +549,7 @@ const WordpaneCopilot = () => {
 
   const shortcutVisible = (message: IMessage, type: IShortcutType): IButtonStatus => {
     if (message.type === "text" && type === "replace") return "enabled";
-    if (message.type === "image" && type === "insert" && isCustomPromptTab) return "enabled";
+    if (message.type === "image" && type === "insert") return "enabled";
     if (type === "refine" && currentRefine?.message?.id === message.id) return "disabled";
     if (type === "refine" && currentRefine?.message?.id !== message.id) return "enabled";
     return "hidden";
@@ -567,13 +560,16 @@ const WordpaneCopilot = () => {
       <Box>
         <Tabs
           variant="fullWidth"
-          onChange={(_e, value) => setSelectedTab(value)}
+          onChange={(_e, value) => isLoading || setSelectedTab(value)}
           value={selectedTab}
           TabIndicatorProps={{ style: { display: "none" } }}
         >
-          <Tab label="Library" value="library-chat" />
-          <Tab label="Research" value="internet-search" />
-          <Tab label="Custom Prompt" value="custom-prompt" hidden />
+          <Tab
+            label="Company Library Chat"
+            value="library-chat"
+            onClick={() => isLoading || setSelectedTab("library-chat")}
+          />
+          <Tab label="Internet Research" value="internet-search" />
         </Tabs>
       </Box>
       <Box
@@ -586,13 +582,6 @@ const WordpaneCopilot = () => {
         <div className="bid-pilot-container border-box">
           {showWelcome ? (
             <Welcome />
-          ) : isCustomPromptTab ? (
-            <MessageBox
-              messages={customPromptMessages}
-              showShortcuts={true}
-              handleClickShortcut={handleClickMessageShortcut}
-              shortcutVisible={shortcutVisible}
-            />
           ) : isInternetSearchTab ? (
             <MessageBox
               messages={internetResearchMessages}
@@ -613,13 +602,19 @@ const WordpaneCopilot = () => {
       <Box marginTop="2px">
         <div className="border-box" style={{ padding: "5px 10px" }}>
           {isCustomPromptMenuVisible && (
-            <Paper variant="outlined" className="enhance-prompt-menu">
+            <Paper
+              variant="outlined"
+              className="enhance-prompt-menu"
+              sx={{
+                borderColor: (theme) => theme.palette.primary.main,
+              }}
+            >
               <MenuList>
                 {customPrompts.map((item) => {
                   return (
                     <MenuItem
                       onClick={() =>
-                        handleCustomPromptMessage(`${selectedText}. ${inputValue}`, item.id, customPromptMessages, {
+                        handleCustomPromptMessage(`${selectedText}. ${inputValue}`, item.id, libraryChatMessages, {
                           isRefine: false,
                         })
                       }
@@ -636,8 +631,8 @@ const WordpaneCopilot = () => {
             <Grid item container spacing={1}>
               <Grid item>
                 <Button
-                  variant="outlined"
-                  color="info"
+                  variant={isCustomPromptMenuVisible ? "contained" : "outlined"}
+                  color={isCustomPromptMenuVisible ? "primary" : "info"}
                   disabled={selectedText.length === 0 || isLoading}
                   onClick={toggleCustomPromptMenuVisible}
                 >
@@ -649,7 +644,7 @@ const WordpaneCopilot = () => {
                   variant="outlined"
                   color="info"
                   onClick={() =>
-                    handleCustomPromptMessage(`${selectedText}. ${inputValue}`, "Graph", customPromptMessages, {
+                    handleCustomPromptMessage(`${selectedText}. ${inputValue}`, "Graph", libraryChatMessages, {
                       isRefine: false,
                     })
                   }
@@ -675,14 +670,12 @@ const WordpaneCopilot = () => {
                 ? "Please type your refinement in here..."
                 : isInternetSearchTab
                   ? "Please type your question in here..."
-                  : isCustomPromptTab
-                    ? "Please use the enhance button to select a prompt..."
-                    : "Please type your question in here..."
+                  : "Please type your question in here..."
             }
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={isLoading || (isCustomPromptTab && !isRefine)}
+            disabled={isLoading}
             className="chat-input"
             rows={4}
             ref={textInputRef}
@@ -690,7 +683,7 @@ const WordpaneCopilot = () => {
           <Button
             onMouseDown={handleMouseDownOnSubmit}
             onClick={handleClickSubmitButton}
-            disabled={isLoading || inputValue.trim() === "" || (isCustomPromptTab && !isRefine)}
+            disabled={isLoading || inputValue.trim() === ""}
             className="chat-send-button"
             color="primary"
             variant="contained"

@@ -6,7 +6,7 @@ export const getPromptWithHistory = (prompt: string, history: IMessage[]) => {
 };
 
 export const getExtraInstruction = (history: IMessage[]) => {
-  return history.map((msg) => `${msg.createdBy}: ${msg.value}`).join("\n");
+  return history.map((msg) => `${msg.createdBy}: ${msg.type === "image" ? "image" : msg.value}`).join("\n");
 };
 
 export const removeDoubleBr = (htmlText: string) => {

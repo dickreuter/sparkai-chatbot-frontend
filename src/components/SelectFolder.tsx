@@ -10,7 +10,7 @@ import {
   faReply
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Skeleton } from "@mui/material";
+import './SelectFolderModal.css';
 
 const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const getAuth = useAuthUser();
@@ -294,6 +294,9 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   return (
     <Card className="select-library-card-custom mt-0 mb-0">
       <Card.Body className="select-library-card-body-content">
+      <Card.Title className="select-library-card-title px-3">
+      Select the folders below from your content library to use as context in your final proposal. The AI will be able to use information from these when generating an answer for each section.
+    </Card.Title>
         <div className="select-library-card-content-wrapper">
           <div className="breadcrumb-and-back-container">
             <div className="breadcrumb-container">{renderBreadcrumbs()}</div>

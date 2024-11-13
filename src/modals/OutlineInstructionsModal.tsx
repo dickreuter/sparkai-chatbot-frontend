@@ -568,7 +568,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
             <Modal.Header className="p-6">
                 <Modal.Title className="px-4">{getHeaderTitle()}</Modal.Title>
             </Modal.Header>
-            <Modal.Body className="p-6">
+            <Modal.Body className="p-2">
                 {renderStepContent()}
             </Modal.Body>
             <Modal.Footer>

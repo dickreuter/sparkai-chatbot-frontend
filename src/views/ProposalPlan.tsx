@@ -18,6 +18,7 @@ import { Menu, MenuItem } from "@mui/material";
 import { CheckCircle } from "@mui/icons-material";
 import StatusMenu, { Section } from "../components/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
+import GenerateProposalModal from "../modals/GenerateProposalModal.tsx";
 
 
 
@@ -75,6 +76,7 @@ const ProposalPlan = () => {
   
   const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
   const currentUserPermission = contributors[auth.email] || "viewer";
+  const [showModal, setShowModal] = useState(false);
 
   const handleEditClick = (section: Section) => {
     navigate('/question-crafter', { 
@@ -93,46 +95,6 @@ const ProposalPlan = () => {
     return outline.length > 0 && outline.every(section => section.status === 'Completed');
   };
   
-  const generateProposal = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('bid_id', object_id);
-      
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/generate_proposal`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
-            'Content-Type': 'multipart/form-data',
-          },
-          responseType: 'blob'  // Important for handling file downloads
-        }
-      );
-      
-      // Create a blob from the response data
-      const blob = new Blob([response.data], { type: 'application/msword' });
-      
-      // Create a URL for the blob
-      const url = window.URL.createObjectURL(blob);
-      
-      // Create a temporary link element and trigger the download
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = response.headers['content-disposition']?.split('filename=')[1] || 'proposal.docx';
-      document.body.appendChild(link);
-      link.click();
-      
-      // Clean up
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(link);
-      
-      displayAlert("Proposal downloaded successfully!", 'success');
-    } catch (err) {
-      console.error('Error generating proposal:', err);
-      displayAlert("Failed to generate proposal", 'danger');
-    }
-  };
 
   useEffect(() => {
     if (outline.length === 0 && outlinefetched === true) {
@@ -144,6 +106,18 @@ const ProposalPlan = () => {
     setShowModal(true);
   };
 
+  const [selectedFolders, setSelectedFolders] = useState(["default"]);
+
+  const handleSaveSelectedFolders = (folders) => {
+      console.log("Received folders in parent:", folders);
+      setSelectedFolders(folders);
+    };
+    useEffect(() => {
+      console.log(
+        "selectedFolders state in QuestionCrafter updated:",
+        selectedFolders
+      );
+    }, [selectedFolders]);
   
 
   const fetchOutline = async () => {
@@ -178,8 +152,6 @@ const ProposalPlan = () => {
       setOutlineFetched(true);
     }
   };
-
-  const [showModal, setShowModal] = useState(false);
   
   useEffect(() => {
     if (!object_id) return;
@@ -272,6 +244,7 @@ const ProposalPlan = () => {
               fetchOutline = {fetchOutline}
               
             />
+
           {outline.length === 0 && outlinefetched === true ? (
             <div>
               </div>
@@ -294,20 +267,13 @@ const ProposalPlan = () => {
                 <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon> 
                 New Outline
               </button>
+              <GenerateProposalModal
+              onSaveSelectedFolders={handleSaveSelectedFolders}
+              initialSelectedFolders={selectedFolders}
+              bid_id = {object_id}
+              
+            />
               </div>
-              {isAllSectionsComplete() && (
-                <Button 
-                  onClick={generateProposal}
-                  className="mb-4 ms-2 d-flex align-items-center gap-2"
-                  variant="success"
-                >
-                  <FontAwesomeIcon
-                    icon={faCheckCircle}
-                    style={{ marginLeft: "5px" }}
-                  />
-                  Generate Proposal
-                </Button>
-              )}
   
               <div className="table-responsive">
                 <table className="outline-table w-100">

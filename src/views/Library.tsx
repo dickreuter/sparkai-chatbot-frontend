@@ -9,7 +9,8 @@ import {
   Modal,
   FormControl,
   InputGroup,
-  Form
+  Form,
+  Spinner
 } from "react-bootstrap";
 import UploadPDF from "./UploadPDF";
 import UploadText from "./UploadText";
@@ -159,6 +160,8 @@ const Library = () => {
   const searchBarRef = useRef(null);
 
   const [updateTrigger, setUpdateTrigger] = useState(0);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const getTopLevelFolders = () => {
     return availableCollections.filter(
@@ -500,10 +503,13 @@ const Library = () => {
   };
 
   const viewFile = async (fileName, folderName, unique_id) => {
+    setIsLoading(true);
+    setShowModal(true);
+    setModalContent(null);
     const formData = new FormData();
     formData.append("file_name", fileName);
     formData.append("profile_name", folderName);
-
+  
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/show_file_content`,
@@ -514,21 +520,27 @@ const Library = () => {
           }
         }
       );
-
+  
       setModalContent(response.data);
-      setCurrentFileId(unique_id); // Set the current file ID
-      setCurrentFileName(fileName); // Set the current file name
-      setShowModal(true);
+      setCurrentFileId(unique_id);
+      setCurrentFileName(fileName);
+      
     } catch (error) {
       console.error("Error viewing file:", error);
+      displayAlert("Error loading document", "danger");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const viewPdfFile = async (fileName, folderName) => {
+    setIsLoading(true);
+    setPdfUrl(null);
+    setShowPdfViewerModal(true);
     const formData = new FormData();
     formData.append("file_name", fileName);
     formData.append("profile_name", folderName);
-
+  
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/show_file_content_pdf_format`,
@@ -537,26 +549,25 @@ const Library = () => {
           headers: {
             Authorization: `Bearer ${tokenRef.current}`
           },
-          responseType: "blob" // Important to get the response as a blob
+          responseType: "blob"
         }
       );
-
-      // Create a URL for the PDF file
+  
       const fileURL = URL.createObjectURL(
         new Blob([response.data], { type: "application/pdf" })
       );
       setPdfUrl(fileURL);
-      setShowPdfViewerModal(true);
+      
     } catch (error) {
       console.error("Error viewing PDF file:", error);
-
       if (error.response && error.response.status === 404) {
-        // Try using the viewFile function if the file was not found as a PDF
         displayAlert(
           "PDF file not found, try reuploading the pdf file",
           "danger"
         );
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   const deleteDocument = async (uniqueId) => {
@@ -1153,6 +1164,7 @@ const Library = () => {
             fileName={currentFileName}
             folderName={activeFolder}
             onViewPdf={viewPdfFile}
+            isLoading={isLoading}
           />
 
           <DeleteFolderModal
@@ -1199,7 +1211,32 @@ const Library = () => {
           {showPdfViewerModal && (
             <div className="pdf-viewer-modal" onClick={closeModal}>
               <div className="pdf-viewer-modal-content" ref={modalRef}>
-                <iframe src={pdfUrl} width="100%" height="750px"></iframe>
+                {isLoading && (
+                  <div 
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "rgba(255, 255, 255, 0.8)",
+                      zIndex: 1000
+                    }}
+                  >
+                    <Spinner 
+                      animation="border" 
+                      style={{
+                        width: "2rem",
+                        height: "2rem",
+                        color: "black"
+                      }}
+                    />
+                  </div>
+                )}
+                <iframe src={pdfUrl} width="100%" height="700px"></iframe>
               </div>
             </div>
           )}

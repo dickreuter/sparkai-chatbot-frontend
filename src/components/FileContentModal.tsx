@@ -1,7 +1,7 @@
 import { faPencil, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState, useEffect } from "react";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Spinner } from "react-bootstrap";
 
 const FileContentModal = ({
   showModal,
@@ -11,10 +11,12 @@ const FileContentModal = ({
   documentId,
   fileName,
   folderName,
-  onViewPdf
+  onViewPdf,
+  isLoading
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editableContent, setEditableContent] = useState(modalContent);
+  console.log("isloading", isLoading);
 
   useEffect(() => {
     setEditableContent(modalContent);
@@ -40,7 +42,7 @@ const FileContentModal = ({
   };
 
   return (
-    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" >
       <Modal.Header
         closeButton
         style={{
@@ -55,7 +57,32 @@ const FileContentModal = ({
           </Modal.Title>
         </div>
       </Modal.Header>
-      <Modal.Body style={{ height: "600px" }}>
+      <Modal.Body style={{ height: "500px", position: "relative" }}>
+        {isLoading && (
+          <div 
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              zIndex: 1000
+            }}
+          >
+            <Spinner 
+              animation="border" 
+              style={{
+                width: "2rem",
+                height: "2rem",
+                color: "black"
+              }}
+            />
+          </div>
+        )}
         {isEditing ? (
           <textarea
             style={{

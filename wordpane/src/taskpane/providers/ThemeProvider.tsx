@@ -7,6 +7,9 @@ const ThemeProvider = ({ children }) => {
       primary: {
         main: "#F5861999",
       },
+      grey: {
+        "100": "#D3D3D3",
+      },
     },
     typography: {
       button: {
@@ -15,6 +18,7 @@ const ThemeProvider = ({ children }) => {
       fontFamily: "calc(--font-family)",
       subtitle1: {
         color: "#F5861999",
+        fontSize: "14px",
       },
     },
     components: {

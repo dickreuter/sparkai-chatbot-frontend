@@ -109,19 +109,18 @@ const GenerateProposalModal = ({ onSaveSelectedFolders, initialSelectedFolders =
     };
 
     const getHeaderTitle = () => {
-        if (currentStep === 1) {
-            return "Select Folders";
-        } else if (currentStep === 2 ){
-            return "Generate proposal";
-        }
+        return `Step ${currentStep} of 2`; 
     };
 
     const renderStepContent = () => {
         if (currentStep === 1) {
             return (
-                <div className="px-4 ">
+                <div className="p-4">
+                    <div className="px-3">
+                    Select the folders below from your content library to use as context in your final proposal. The AI will be able to use information from these when generating an answer for each section.
+                    </div>
                     
-                    <div className="selectfolder-container">
+                    <div className="selectfolder-container mt-3">
                         <SelectFolder
                         onFolderSelect={handleFolderSelection}
                         initialSelectedFolders={selectedFolders}
@@ -131,10 +130,13 @@ const GenerateProposalModal = ({ onSaveSelectedFolders, initialSelectedFolders =
             );
         } else if (currentStep === 2) {
             return (
-                <div className="px-4 py-2">
-                <p>
-                The documents chosen here will be used to generate the outline for your proposal. Make sure you only upload the documents which contain the questions you need to answer in your bid!
-              </p>
+                <div className="px-4 py-3">
+                    <div className="px-3">
+                    <p>
+                        Only sections marked as complete will be used to generate the proposal. Remember, if you want to add detail to a section, you can add some subsections by clicking the button. If you haven't added any subsections the originial question will be used.
+                    </p>
+                    </div>
+               
             
               </div>
             );
@@ -144,8 +146,8 @@ const GenerateProposalModal = ({ onSaveSelectedFolders, initialSelectedFolders =
 
     return (
         <>
-        <Button className="upload-button" onClick={handleShow} style={{minWidth: "fit-content"}}>
-            Select Folders
+        <Button className="upload-button" onClick={handleShow} style={{minWidth: "fit-content", backgroundColor: "#ff9900", color: "black"}}>
+            Generate Proposal
         </Button>
         <Modal
             show={show}
@@ -155,7 +157,7 @@ const GenerateProposalModal = ({ onSaveSelectedFolders, initialSelectedFolders =
              <Modal.Header className="p-6">
                 <Modal.Title className="px-4">{getHeaderTitle()}</Modal.Title>
             </Modal.Header>
-            <Modal.Body className="">
+            <Modal.Body className="p-0">
                 {renderStepContent()}
             </Modal.Body>
             <Modal.Footer>

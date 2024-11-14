@@ -20,7 +20,7 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const [availableCollections, setAvailableCollections] = useState([]);
   const [folderContents, setFolderContents] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 9;
+  const rowsPerPage = 7;
   const [totalPages, setTotalPages] = useState(0);
   const [activeFolder, setActiveFolder] = useState(null);
   const [selectedFolders, setSelectedFolders] = useState(() => {
@@ -294,9 +294,6 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   return (
     <Card className="select-library-card-custom mt-0 mb-0">
       <Card.Body className="select-library-card-body-content">
-      <Card.Title className="select-library-card-title px-3">
-      Select the folders below from your content library to use as context in your final proposal. The AI will be able to use information from these when generating an answer for each section.
-    </Card.Title>
         <div className="select-library-card-content-wrapper">
           <div className="breadcrumb-and-back-container">
             <div className="breadcrumb-container">{renderBreadcrumbs()}</div>

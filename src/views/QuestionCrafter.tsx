@@ -191,6 +191,7 @@ const QuestionCrafter = () => {
     word_count: number
   ) => {
     try {
+      console.log("updating subheadings");
       await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/update_subheading`,
         {
@@ -347,6 +348,7 @@ const QuestionCrafter = () => {
 
   // Update the fetchSubheadings function to handle references after setting state
   const fetchSubheadings = async () => {
+    console.log("fetching subheadings");
     setIsLoadingSubheadings(true);
     try {
       const response = await axios.post(
@@ -843,7 +845,7 @@ const QuestionCrafter = () => {
                 onClick={sendQuestionToChatbot}
                 disabled={inputText.trim() === ""}
               >
-                Submit
+                Add Subsections
               </Button>
 
               <Row>
@@ -873,13 +875,20 @@ const QuestionCrafter = () => {
 
            
             {isLoadingSubheadings ? (
-              <div className="">
-              </div>
+             <div style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}>
+              <Spinner></Spinner>
+            </div>
             ) : (
               <>
-                {answerSections.length > 0 && (
+                {answerSections.length > 0 ? (
                   <div className="proposal-header mb-2">
-                    <h2 className="heavy mt-4 text-center">Order</h2>
+                    <h2 className="heavy mt-4 text-center">Subsections</h2>
                     <Button
                       onClick={handleMarkAsComplete}
                       disabled={isCompleting || !canUserEdit}
@@ -901,6 +910,10 @@ const QuestionCrafter = () => {
                         'Mark as Complete'
                       )}
                     </Button>
+                  </div>
+                ) : (
+                  <div>
+                    
                   </div>
                 )}
               </>

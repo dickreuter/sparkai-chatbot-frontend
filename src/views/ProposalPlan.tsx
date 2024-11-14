@@ -13,9 +13,7 @@ import BidTitle from "../components/BidTitle.tsx";
 import './ProposalPlan.css';
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle, faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { Menu, MenuItem } from "@mui/material";
-import { CheckCircle } from "@mui/icons-material";
+import { faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import StatusMenu, { Section } from "../components/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import GenerateProposalModal from "../modals/GenerateProposalModal.tsx";
@@ -259,6 +257,11 @@ const ProposalPlan = () => {
                 showViewOnlyMessage={showViewOnlyMessage}
                 initialBidName={"initialBidName"}
               />
+              <GenerateProposalModal
+                onSaveSelectedFolders={handleSaveSelectedFolders}
+                initialSelectedFolders={selectedFolders}
+                bid_id = {object_id}
+              />
               <button
                 onClick={handleRegenerateClick}
                 className="upload-button"
@@ -267,12 +270,7 @@ const ProposalPlan = () => {
                 <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon> 
                 New Outline
               </button>
-              <GenerateProposalModal
-              onSaveSelectedFolders={handleSaveSelectedFolders}
-              initialSelectedFolders={selectedFolders}
-              bid_id = {object_id}
               
-            />
               </div>
   
               <div className="table-responsive">
@@ -284,15 +282,16 @@ const ProposalPlan = () => {
                       <th className="py-3 px-4" style={{width: '10%'}}>Weighting</th>
                       <th className="py-3 px-4" style={{width: '15%'}}>Page Limit</th>
                       <th className="py-3 px-4">Reviewer</th>
-                      <th className="py-3 px-4" style={{width: '8%'}}>Edit</th>
+                      <th className="py-3 px-4 text-center" style={{width: '12%'}}>Subsections</th>
                       <th className="py-3 px-4 text-center">Completed</th>
+                      <th className="py-3 px-4 text-center" style={{width: '6%'}}>Delete</th>
                     </tr>
                   </thead>
                   <tbody>
                     {isLoading ? (
                       <tr>
                         <td colSpan={7} className="text-center py-4">
-                          <Spinner animation="border" size="sm" /> Loading...
+                          <Spinner animation="border" size="sm" className="me-2" /> Loading Sections...
                         </td>
                       </tr>
                     ) : (
@@ -328,21 +327,17 @@ const ProposalPlan = () => {
                             />
                           </td>
                           <td className="py-2 px-4 text-center">
-                            <div className="d-flex justify-content-centers">
+                            <div className="d-flex justify-content-center">
                               <button
                                 onClick={() => handleEditClick(section)}
-                                className="bg-transparent border-0 text-primary hover:text-blue-700 cursor-pointer"
+                                className="upload-button"
                                 title="Edit section"
                               >
-                                <FontAwesomeIcon icon={faPencil} size="sm" />
+            
+                                <FontAwesomeIcon icon={faPencil} size="sm" className="pr-2" />
+                                Edit
                               </button>
-                              <button
-                                onClick={() => handleDeleteClick(section, index)}
-                                className="bg-transparent border-0 text-danger hover:text-red-700 cursor-pointer"
-                                title="Delete section"
-                              >
-                                <FontAwesomeIcon icon={faTrash} size="sm" />
-                              </button>
+    
                             </div>
                           </td>
                           <td className="py-2 px-4 text-center">
@@ -350,6 +345,17 @@ const ProposalPlan = () => {
                               value={section.status}
                               onChange={(value) => handleSectionChange(index, 'status', value)}
                             />
+                          </td>
+                          <td className="py-2 px-4 text-center">
+                            <div className="d-flex justify-content-center">
+                              <button
+                                onClick={() => handleDeleteClick(section, index)}
+                                className="bg-transparent border-0 cursor-pointer text-black"
+                                title="Delete section"
+                              >
+                                <FontAwesomeIcon icon={faTrash} size="sm" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))

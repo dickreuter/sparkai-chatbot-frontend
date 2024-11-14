@@ -17,6 +17,7 @@ import { faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import StatusMenu, { Section } from "../components/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import GenerateProposalModal from "../modals/GenerateProposalModal.tsx";
+import SectionMenu from "../components/SectionMenu.tsx";
 
 
 
@@ -75,6 +76,74 @@ const ProposalPlan = () => {
   const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
   const currentUserPermission = contributors[auth.email] || "viewer";
   const [showModal, setShowModal] = useState(false);
+
+  const [contextMenu, setContextMenu] = useState(null);
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+
+  const handleContextMenu = (e, index) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY });
+    setSelectedRowIndex(index);
+  };
+
+  const handleClickOutside = (e) => {
+    if (contextMenu && !e.target.closest('.context-menu')) {
+      setContextMenu(null);
+      setSelectedRowIndex(null);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [contextMenu]);
+
+  const handleAddSection = async () => {
+    if (!object_id || selectedRowIndex === null) return;
+    
+    const newSection = {
+      heading: "New Section",
+      word_count: 0,
+      weighting: 0,
+      reviewer: "",
+      status: "Not Started",
+      subsections: 0
+    };
+
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/add_section`,
+        {
+          bid_id: object_id,
+          section: newSection,
+          insert_index: selectedRowIndex
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      const updatedOutline = [...outline];
+      updatedOutline.splice(selectedRowIndex, 0, { ...newSection, section_id: response.data.section_id });
+      setOutline(updatedOutline);
+      displayAlert("Section added successfully", 'success');
+    } catch (err) {
+      console.error('Error adding section:', err);
+      displayAlert("Failed to add section", 'danger');
+    }
+    setContextMenu(null);
+  };
+
+  const handleDeleteSection = () => {
+    if (selectedRowIndex !== null) {
+      handleDeleteClick(outline[selectedRowIndex], selectedRowIndex);
+    }
+    setContextMenu(null);
+  };
+
 
   const handleEditClick = (section: Section) => {
     navigate('/question-crafter', { 
@@ -280,9 +349,10 @@ const ProposalPlan = () => {
                       <th className="py-3 px-4" style={{width: '30%'}}>Section</th>
                       <th className="py-3 px-4" style={{width: '10%'}}>Word Count</th>
                       <th className="py-3 px-4" style={{width: '10%'}}>Weighting</th>
-                      <th className="py-3 px-4" style={{width: '15%'}}>Page Limit</th>
+                     
                       <th className="py-3 px-4">Reviewer</th>
-                      <th className="py-3 px-4 text-center" style={{width: '12%'}}>Subsections</th>
+                      <th className="py-3 px-4 text-center" style={{width: '12%'}}>Add Subsection</th>
+                      <th className="py-3 px-4 text-center" style={{width: '9%'}}>Subsections</th>
                       <th className="py-3 px-4 text-center">Completed</th>
                       <th className="py-3 px-4 text-center" style={{width: '6%'}}>Delete</th>
                     </tr>
@@ -296,12 +366,16 @@ const ProposalPlan = () => {
                       </tr>
                     ) : (
                       outline.map((section, index) => (
-                        <tr key={index}>
+                        <tr 
+                          key={index} 
+                          onContextMenu={(e) => handleContextMenu(e, index)}
+                          className="hover:bg-gray-50"
+                        >
                           <td className="py-2 px-4">
                             <EditableCell
-                              value={section.heading}
-                              onChange={(value) => handleSectionChange(index, 'heading', value)}
-                              onBlur={() => updateSection(outline[index], index)}
+                                value={section.heading}
+                                onChange={(value) => handleSectionChange(index, 'heading', value)}
+                                onBlur={() => updateSection(outline[index], index)}
                             />
                           </td>
                           <td className="py-2 px-4">{section.word_count}</td>
@@ -309,13 +383,6 @@ const ProposalPlan = () => {
                             <EditableCell
                               value={section.weighting}
                               onChange={(value) => handleSectionChange(index, 'weighting', value)}
-                              onBlur={() => updateSection(outline[index], index)}
-                            />
-                          </td>
-                          <td className="py-2 px-4">
-                            <EditableCell
-                              value={section.page_limit}
-                              onChange={(value) => handleSectionChange(index, 'page_limit', value)}
                               onBlur={() => updateSection(outline[index], index)}
                             />
                           </td>
@@ -340,6 +407,11 @@ const ProposalPlan = () => {
     
                             </div>
                           </td>
+                          <td className="py-2 px-4">
+                             <div className="d-flex justify-content-center">
+                              {section.subsections}
+                            </div>
+                            </td>
                           <td className="py-2 px-4 text-center">
                             <StatusMenu
                               value={section.status}
@@ -363,6 +435,15 @@ const ProposalPlan = () => {
                   </tbody>
                 </table>
               </div>
+              {contextMenu && (
+              <SectionMenu 
+                  x={contextMenu.x} 
+                  y={contextMenu.y}
+                  onClose={() => setContextMenu(null)}
+                  onAddSection={handleAddSection}
+                  onDeleteSection={handleDeleteSection}
+                />
+              )}
             </div>
           )}
         </div>

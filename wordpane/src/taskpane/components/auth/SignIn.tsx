@@ -29,9 +29,8 @@ const FullScreenTwoCards = () => {
     }
 
     try {
-      console.log("submit signin");
-      const { success, message } = await submitSignIn(formData);
       setShowWelcome(true);
+      const { success, message } = await submitSignIn(formData);
       setSnackbarMessage(success ? message : "Incorrect Username or Password");
       setSnackbarSeverity(success ? "success" : "error");
     } catch (error) {

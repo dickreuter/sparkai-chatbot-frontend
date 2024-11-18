@@ -63,28 +63,17 @@ const QuestionCrafter = () => {
     localStorage.getItem("inputText") || section.question || ""
   );
  
+  console.log("selectedfolders:", sharedState.selectedFolders);
   const [contentLoaded, setContentLoaded] = useState(true); // Set to true initially
   const [sectionAnswer, setSectionAnswer] = useState(null); // the answer generated for the subheadings
   const currentUserPermission = contributors[auth.email] || "viewer"; // Default to 'viewer' if not found
   const canUserEdit =
     currentUserPermission === "admin" || currentUserPermission === "editor";
 
-  const [selectedFolders, setSelectedFolders] = useState(["default"]);
-
   const showViewOnlyMessage = () => {
     displayAlert("You only have permission to view this bid.", "danger");
   };
 
-  const handleSaveSelectedFolders = (folders) => {
-    console.log("Received folders in parent:", folders);
-    setSelectedFolders(folders);
-  };
-  useEffect(() => {
-    console.log(
-      "selectedFolders state in QuestionCrafter updated:",
-      selectedFolders
-    );
-  }, [selectedFolders]);
 
   /////////////////////////////////////////////////////////////////////////////////////////////
  
@@ -313,7 +302,7 @@ const QuestionCrafter = () => {
         extra_instructions: backgroundInfo, // General background info
         // Use combinedText array that maintains title-instruction relationships
         selected_choices: orderedSections.map(s => s.combinedText),
-        datasets: ['default'],
+        datasets: sharedState.selectedFolders,
         word_amounts: orderedSections.map(s => s.wordCount)
       };
   
@@ -444,8 +433,7 @@ const QuestionCrafter = () => {
 
     console.log("Starting question request with:", {
       inputText,
-      backgroundInfo,
-      selectedFolders
+      backgroundInfo
     });
 
     try {
@@ -456,7 +444,7 @@ const QuestionCrafter = () => {
             broadness: broadness,
             input_text: inputText,
             extra_instructions: backgroundInfo,
-            datasets: selectedFolders,
+            datasets: sharedState.selectedFolders,
             bid_id: sharedState.object_id
           },
           {
@@ -592,12 +580,6 @@ const QuestionCrafter = () => {
         String(wordAmounts[choice] || "100")
       );
       
-      console.log("Sending request to question_multistep with params:", {
-        selectedChoices,
-        word_amounts,
-        datasets: selectedFolders
-      });
-
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/add_section_subheadings`,
         {

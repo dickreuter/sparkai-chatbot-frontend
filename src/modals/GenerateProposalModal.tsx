@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Modal, Button } from "react-bootstrap";
 import SelectFolder from "../components/SelectFolder";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faSpinner, faWarning } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { BidContext } from "../views/BidWritingStateManagerView";
 
-const GenerateProposalModal = ({ onSaveSelectedFolders, initialSelectedFolders = [], bid_id }) => {
+const GenerateProposalModal = ({ bid_id, outline }) => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const navigate = useNavigate();
@@ -16,10 +17,9 @@ const GenerateProposalModal = ({ onSaveSelectedFolders, initialSelectedFolders =
     const tokenRef = useRef(auth?.token || "default");
     const [show, setShow] = useState(false);
     const [isGeneratingProposal, setIsGeneratingProposal ] = useState(false);
-    const [selectedFolders, setSelectedFolders] = useState(() => {
-        const initialSelection = new Set(initialSelectedFolders);
-        return Array.from(initialSelection);
-    });
+
+    const incompleteSections = outline?.filter(section => section.status !== 'Completed') || [];
+    const hasIncompleteSections = incompleteSections.length > 0;
 
     const generateProposal = async () => {
         try {
@@ -35,29 +35,25 @@ const GenerateProposalModal = ({ onSaveSelectedFolders, initialSelectedFolders =
                     'Authorization': `Bearer ${tokenRef.current}`,
                     'Content-Type': 'multipart/form-data',
                 },
-                responseType: 'blob'  // Important for handling file downloads
+                responseType: 'blob'
                 }
             );
             
-            // Create a blob from the response data
             const blob = new Blob([response.data], { type: 'application/msword' });
-            
-            // Create a URL for the blob
             const url = window.URL.createObjectURL(blob);
             
-            // Create a temporary link element and trigger the download
             const link = document.createElement('a');
             link.href = url;
             link.download = response.headers['content-disposition']?.split('filename=')[1] || 'proposal.docx';
             document.body.appendChild(link);
             link.click();
             
-            // Clean up
             window.URL.revokeObjectURL(url);
             document.body.removeChild(link);
+            handleClose();
 
         } catch (err) {
-        console.error('Error generating proposal:', err);
+            console.error('Error generating proposal:', err);
         } finally {
             setIsGeneratingProposal(false);
         }
@@ -65,51 +61,39 @@ const GenerateProposalModal = ({ onSaveSelectedFolders, initialSelectedFolders =
 
     const handleShow = () => setShow(true);
     const handleClose = () => {
-        console.log("Closing modal. Selected folders:", selectedFolders);
-
         setShow(false);
+        setCurrentStep(1);
     };
-    const handleFolderSelection = (folders) => {
-        console.log("Folders selected in SelectFolder component:", folders);
-        setSelectedFolders(folders);
-        onSaveSelectedFolders(selectedFolders);
-    };
-    useEffect(() => {
-        console.log("selectedFolders state updated:", selectedFolders);
-    }, [selectedFolders]);
 
     const handleNext = async () => {
         if (currentStep === 1) {
-            setCurrentStep(2);
-        } else if (currentStep === 2) {
-            generateProposal();
+                generateProposal();
         }
+       
     };
 
     const handleBack = () => {
         if (currentStep === 2) {
             setCurrentStep(1);
         } else {
-            setShow(false);
+            handleClose();
         }
     };
 
     const getButtonLabel = () => {
-        switch (currentStep) {
-            case 1:
-                return "Next";
-            case 2:
-                return isGeneratingProposal ? (
-                    <>
-                        <FontAwesomeIcon icon={faSpinner} spin className="me-2" />
-                        Processing...
-                    </>
-                ) : "Finish";
+        if (isGeneratingProposal) {
+            return (
+                <>
+                    <FontAwesomeIcon icon={faSpinner} spin className="me-2" />
+                    Processing...
+                </>
+            );
         }
+        return "Generate Proposal";
     };
 
     const getHeaderTitle = () => {
-        return `Step ${currentStep} of 2`; 
+        return "Generate Proposal" ; 
     };
 
     const renderStepContent = () => {
@@ -117,45 +101,63 @@ const GenerateProposalModal = ({ onSaveSelectedFolders, initialSelectedFolders =
             return (
                 <div className="p-4">
                     <div className="px-3">
-                    Select the folders below from your content library to use as context in your final proposal. The AI will be able to use information from these when generating an answer for each section.
+                        <p>
+                            Only sections marked as complete will be used to generate the proposal. The proposal will be generated as a Word document that you can then edit and format as needed.
+                        </p>
+                        {hasIncompleteSections && (
+                            <>
+                                <div className="mt-3 text-warning">
+                                    <FontAwesomeIcon icon={faWarning} className="me-2" />
+                                    There are {incompleteSections.length} incomplete sections:
+                                </div>
+                                <div 
+                                    className="mt-2 border rounded p-3 bg-light" 
+                                    style={{
+                                        maxHeight: '200px',
+                                        overflowY: 'auto'
+                                    }}
+                                >
+                                    <ul className="list-unstyled mb-0">
+                                        {incompleteSections.map((section, index) => (
+                                            <li 
+                                                key={index} 
+                                                className="mb-2 d-flex justify-content-between align-items-center"
+                                            >
+                                                <span className="fw-medium">{section.heading}</span>
+                                                <FontAwesomeIcon icon={faWarning} className="me-2" />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </>
+                        )}
                     </div>
-                    
-                    <div className="selectfolder-container mt-3">
-                        <SelectFolder
-                        onFolderSelect={handleFolderSelection}
-                        initialSelectedFolders={selectedFolders}
-                        />
-                     </div>
                 </div>
-            );
-        } else if (currentStep === 2) {
-            return (
-                <div className="px-4 py-3">
-                    <div className="px-3">
-                    <p>
-                        Only sections marked as complete will be used to generate the proposal. Remember, if you want to add detail to a section, you can add some subsections by clicking the button. If you haven't added any subsections the originial question will be used.
-                    </p>
-                    </div>
-               
-            
-              </div>
             );
         } 
     };
 
-
     return (
         <>
-        <Button className="upload-button" onClick={handleShow} style={{minWidth: "fit-content", backgroundColor: "#ff9900", color: "black"}}>
+        <Button 
+            className="upload-button" 
+            onClick={handleShow} 
+            style={{
+                minWidth: "fit-content", 
+                backgroundColor: "#ff9900", 
+                color: "black"
+            }}
+        >
             Generate Proposal
         </Button>
         <Modal
             show={show}
             onHide={handleClose}
-            size="lg" centered
+            size="lg" 
+            centered
         >
-             <Modal.Header className="p-6">
-                <Modal.Title className="px-4">{getHeaderTitle()}</Modal.Title>
+            <Modal.Header className="p-4">
+                <Modal.Title>{getHeaderTitle()}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="p-0">
                 {renderStepContent()}
@@ -167,7 +169,7 @@ const GenerateProposalModal = ({ onSaveSelectedFolders, initialSelectedFolders =
                 <Button
                     className="upload-button"
                     onClick={handleNext}
-                    disabled={(currentStep === 2) || isGeneratingProposal}
+                    disabled={isGeneratingProposal}
                 >
                     {getButtonLabel()}
                 </Button>

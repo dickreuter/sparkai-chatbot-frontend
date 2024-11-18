@@ -45,6 +45,7 @@ export interface SharedState {
   object_id: string | null;
   documents: Document[];
   currentDocumentIndex: number;
+  selectedFolders: string[];
 }
 
 export interface BidContextType {
@@ -81,7 +82,8 @@ const defaultState: BidContextType = {
         type: "qa sheet"
       }
     ],
-    currentDocumentIndex: 0
+    currentDocumentIndex: 0,
+    selectedFolders: ["default"]
   },
   setSharedState: () => {},
   saveProposal: () => {},
@@ -94,36 +96,34 @@ const defaultState: BidContextType = {
 export const BidContext = createContext<BidContextType>(defaultState);
 
 const BidManagement: React.FC = () => {
+  // In BidManagement.tsx, modify the state initialization:
   const [sharedState, setSharedState] = useState<SharedState>(() => {
     const savedState = localStorage.getItem("bidState");
-    //console.log('Saved state from localStorage:', savedState); // Debug log
     if (savedState) {
       const parsedState = JSON.parse(savedState);
-      //console.log('Parsed state:', parsedState); // Debug log
       return {
         ...parsedState,
-        documents: parsedState.documents.map((doc) => {
-          //console.log('Processing document:', doc); // Debug log
-          return {
-            ...doc,
-            editorState: doc.editorState
-              ? EditorState.createWithContent(
-                  convertFromRaw(JSON.parse(doc.editorState))
-                )
-              : EditorState.createEmpty(),
-            type: doc.type || "qa sheet"
-          };
-        }),
+        documents: parsedState.documents.map((doc) => ({
+          ...doc,
+          editorState: doc.editorState
+            ? EditorState.createWithContent(
+                convertFromRaw(JSON.parse(doc.editorState))
+              )
+            : EditorState.createEmpty(),
+          type: doc.type || "qa sheet"
+        })),
         contributors: parsedState.contributors || {},
         original_creator: parsedState.original_creator || "",
         isSaved: false,
         isLoading: false,
         saveSuccess: null,
         object_id: parsedState.object_id || null,
-        currentDocumentIndex: parsedState.currentDocumentIndex || 0
+        currentDocumentIndex: parsedState.currentDocumentIndex || 0,
+        selectedFolders: parsedState.selectedFolders || ["default"], // Add this line
       };
     }
     return defaultState.sharedState;
+
   });
 
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
@@ -455,6 +455,7 @@ const BidManagement: React.FC = () => {
     sharedState.contributors,
     sharedState.documents,
     sharedState.original_creator,
+    sharedState.selectedFolders,
     canUserSave // Add canUserSave to the dependency array
   ]);
 

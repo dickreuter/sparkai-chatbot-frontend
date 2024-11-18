@@ -173,20 +173,6 @@ const ProposalPlan = () => {
     setShowModal(true);
   };
 
-  const [selectedFolders, setSelectedFolders] = useState(["default"]);
-
-  const handleSaveSelectedFolders = (folders) => {
-      console.log("Received folders in parent:", folders);
-      setSelectedFolders(folders);
-    };
-    useEffect(() => {
-      console.log(
-        "selectedFolders state in QuestionCrafter updated:",
-        selectedFolders
-      );
-    }, [selectedFolders]);
-  
-
   const fetchOutline = async () => {
     if (!object_id) return;
     const formData = new FormData();
@@ -327,9 +313,8 @@ const ProposalPlan = () => {
                 initialBidName={"initialBidName"}
               />
               <GenerateProposalModal
-                onSaveSelectedFolders={handleSaveSelectedFolders}
-                initialSelectedFolders={selectedFolders}
                 bid_id = {object_id}
+                outline = {outline}
               />
               <button
                 onClick={handleRegenerateClick}

@@ -1,7 +1,18 @@
 .select-folder-modal {}
 
 .selectfolder-container {
-    font-size: small;
+    font-size: small !important;
+}
+
+.selectfolder-container * {
+    font-size: inherit !important;
+}
+
+.select-tenderlibrary-card-custom {
+    height: 360px;
+    box-shadow: none !important;
+    margin-bottom: 0;
+    margin: 0;
 }
 
 .select-library-card-custom {
@@ -78,7 +89,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 550px;
+    height: 410px;
 }
 
 .select-folder-modal-dialog {

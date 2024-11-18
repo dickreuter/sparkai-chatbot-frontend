@@ -24,9 +24,6 @@ const SelectFolderModal = ({
     setSelectedFolders(folders);
     onSaveSelectedFolders(selectedFolders);
   };
-  useEffect(() => {
-    console.log("selectedFolders state updated:", selectedFolders);
-  }, [selectedFolders]);
 
   return (
     <>

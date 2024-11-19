@@ -60,7 +60,7 @@ const QuestionCrafter = () => {
   const [availableCollections, setAvailableCollections] = useState([]);
   const [folderContents, setFolderContents] = useState({});
   const [inputText, setInputText] = useState(
-    localStorage.getItem("inputText") || section.question || ""
+     section.question || ""
   );
  
   console.log("selectedfolders:", sharedState.selectedFolders);

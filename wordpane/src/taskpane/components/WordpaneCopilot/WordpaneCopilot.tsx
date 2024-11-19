@@ -1,18 +1,23 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import axios from "axios";
 import withAuth from "../../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import "./WordpaneCopilot.css";
 import { EditorState, Modifier, SelectionState, convertToRaw, ContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
 import useSelectedText from "../../hooks/useSelectedText";
-import { apiURL } from "../../helper/urls";
 import { IMessage, IPromptType, IShortcutType, IPromptOption, IButtonStatus, IChatTypes } from "../../../types";
-import { getBase64FromBlob } from "../../helper/file";
 import { Box, Button, Grid, MenuItem, MenuList, Paper, Tab, Tabs } from "@mui/material";
 import MessageBox from "../MessageBox";
 import { customPrompts } from "./constants";
-import { formatResponse, getExtraInstruction, refineResponse, removeDoubleBr, withId } from "./helper";
+import {
+  askCopilot,
+  askDiagram,
+  askInternetQuestion,
+  askLibraryChatQuestion,
+  refineResponse,
+  removeDoubleBr,
+  withId,
+} from "./helper";
 import Welcome from "./Welcome";
 import useShowWelcome from "../../hooks/useShowWelcome";
 
@@ -53,8 +58,6 @@ const WordpaneCopilot = () => {
 
   const [inputValue, setInputValue] = useState("");
 
-  const [bidPilotChoice] = useState("2");
-  const [bidPilotBroadness] = useState("4");
   const optionsContainerRef = useRef(null); // Ref for the options container
   const responseMessageBoxRef = useRef(null); // Ref for the response message box
   const textInputRef = useRef(null);
@@ -62,10 +65,6 @@ const WordpaneCopilot = () => {
   const [responseEditorState, setResponseEditorState] = useState(
     EditorState.createWithContent(ContentState.createFromText(localStorage.getItem("response") || ""))
   );
-
-  const [originalEditorState, setOriginalEditorState] = useState(responseEditorState);
-
-  const [startTime, setStartTime] = useState(null);
 
   const responseBoxRef = useRef(null); // Ref for the response box
 
@@ -136,95 +135,7 @@ const WordpaneCopilot = () => {
 
     setCustomPromptMenuVisible(false);
 
-    if (showOptions == true) {
-      resetEditorState();
-    }
     setShowOptions(false);
-  };
-
-  const askCopilot = async (
-    text: string,
-    promptType: IPromptType,
-    copilot_mode: string,
-    messages: IMessage[],
-    option: IPromptOption
-  ): Promise<IMessage> => {
-    localStorage.setItem("questionAsked", "true");
-    setStartTime(Date.now()); // Set start time for the timer
-    try {
-      const response = await axios.post(
-        apiURL("copilot"),
-        {
-          input_text: option.isRefine
-            ? `${getExtraInstruction(messages)}. \n\n.Refine the previous response.\n\n ${text}`
-            : `${getExtraInstruction(messages)}. \n\n ${text}`,
-          extra_instructions: getExtraInstruction(messages),
-          copilot_mode: copilot_mode,
-          datasets: [],
-          bid_id: "32212",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
-          timeout: 30000,
-        }
-      );
-
-      return withId({
-        type: "text",
-        value: response.data,
-        createdBy: "bot",
-        action: promptType,
-        isRefine: option.isRefine,
-      });
-    } catch (error) {
-      console.error("Error sending question:", error);
-      return withId({
-        type: "text",
-        value: "Message failed, please contact support...",
-        createdBy: "bot",
-        action: promptType,
-        isRefine: option.isRefine,
-      });
-    }
-  };
-
-  const askDiagram = async (
-    text: string,
-    promptType: IPromptType,
-    messages: IMessage[],
-    option: IPromptOption
-  ): Promise<IMessage> => {
-    localStorage.setItem("questionAsked", "true");
-    setStartTime(Date.now()); // Set start time for the timer
-
-    try {
-      const response = await axios.post(
-        apiURL("generate_diagram"),
-        `${getExtraInstruction(messages)}\n\n user: ${option.isRefine ? `Refine the previous response. \n\n${text}` : text}`,
-        {
-          responseType: "blob",
-          timeout: 30000,
-        }
-      );
-      return withId({
-        type: "image",
-        value: await getBase64FromBlob(response.data),
-        createdBy: "bot",
-        action: promptType,
-        isRefine: option.isRefine,
-      });
-    } catch (error) {
-      console.error("Error sending question:", error);
-      return withId({
-        type: "text",
-        value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
-        createdBy: "bot",
-        action: promptType,
-        isRefine: option.isRefine,
-      });
-    }
   };
 
   useEffect(() => {
@@ -238,30 +149,6 @@ const WordpaneCopilot = () => {
     };
   }, [showOptions, isCustomPromptMenuVisible]);
 
-  const resetEditorState = () => {
-    const contentState = originalEditorState.getCurrentContent();
-    const blocks = contentState.getBlockMap();
-
-    let newContentState = contentState;
-
-    // Remove ORANGE style from all blocks
-    blocks.forEach((block) => {
-      const blockKey = block.getKey();
-      const length = block.getLength();
-      const blockSelection = SelectionState.createEmpty(blockKey).merge({
-        anchorOffset: 0,
-        focusOffset: length,
-      });
-
-      newContentState = Modifier.removeInlineStyle(newContentState, blockSelection, "ORANGE");
-    });
-
-    const newEditorState = EditorState.createWithContent(newContentState);
-    setResponseEditorState(newEditorState);
-    setCustomPromptMenuVisible(false);
-    setSelectedText("");
-  };
-
   //only hide options if show Options equals true and the user clicks somewhere else in the response box. So clicking on an option and the selected text changing should not trigger this
   useEffect(() => {
     const handleClickOutsideOptions = (event) => {
@@ -274,7 +161,6 @@ const WordpaneCopilot = () => {
       ) {
         setShowOptions(false);
         // Clear the orange style and reset the text
-        resetEditorState();
       }
     };
 
@@ -314,9 +200,9 @@ const WordpaneCopilot = () => {
     try {
       const copilot_mode = promptType.toLowerCase().replace(/\s+/g, "_");
       if (promptType === "Graph") {
-        return await askDiagram(text, promptType, messages, option);
+        return await askDiagram(tokenRef.current, text, promptType, messages, option);
       } else {
-        return await askCopilot(text, promptType, "1" + copilot_mode, messages, option);
+        return await askCopilot(tokenRef.current, text, promptType, "1" + copilot_mode, messages, option);
       }
     } catch (error) {
       console.error("Error sending question:", error);
@@ -404,13 +290,12 @@ const WordpaneCopilot = () => {
 
   const handleLibraryChatMessage = (prompt: string, messages: IMessage[], option: IPromptOption) => {
     if (prompt.trim() !== "") {
-      setStartTime(Date.now());
       setLibraryChatMessages([
         ...messages,
         withId({ type: "text", createdBy: "user", value: prompt, action: "default", isRefine: option.isRefine }),
         withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false }),
       ]);
-      askLibraryChatQuestion(prompt, messages, option)
+      askLibraryChatQuestion(tokenRef.current, prompt, messages, option)
         .then((message) => {
           setLibraryChatMessages((messages) => [...messages.slice(0, -1), message]);
         })
@@ -421,13 +306,12 @@ const WordpaneCopilot = () => {
 
   const handleInternetSearchMessage = (prompt: string, messages: IMessage[], option: IPromptOption) => {
     if (prompt.trim() !== "") {
-      setStartTime(Date.now());
       setInternetResearchMessages([
         ...messages,
         withId({ type: "text", createdBy: "user", value: prompt, action: "default", isRefine: option.isRefine }),
         withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false }),
       ]);
-      askInternetQuestion(prompt, messages, option)
+      askInternetQuestion(tokenRef.current, prompt, messages, option)
         .then((message) => {
           setInternetResearchMessages((messages) => [...messages.slice(0, -1), message]);
         })
@@ -444,7 +328,6 @@ const WordpaneCopilot = () => {
   ) => {
     setSelectedTab("library-chat");
     if (text.trim()) {
-      setStartTime(Date.now());
       setLibraryChatMessages([
         ...messages,
         withId({ type: "text", createdBy: "user", value: text, action: promptType, isRefine: option.isRefine }),
@@ -459,99 +342,18 @@ const WordpaneCopilot = () => {
     }
   };
 
-  const askInternetQuestion = async (
-    question: string,
-    messages: IMessage[],
-    option: IPromptOption
-  ): Promise<IMessage> => {
-    try {
-      const result = await axios.post(
-        apiURL("perplexity"),
-        {
-          input_text:
-            getExtraInstruction(messages) +
-            "\n\nuser: " +
-            (option.isRefine ? `Refine the previous response.${question}` : question) +
-            "\n\n Respond in a full sentence format.",
-          dataset: "default",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
-          timeout: 30000,
-        }
-      );
-      return withId({ createdBy: "bot", type: "text", value: result.data, action: "default", isRefine: false });
-    } catch (error) {
-      console.error("Error sending question:", error);
-      // Replace the temporary loading message with the error message
-      return withId({
-        createdBy: "bot",
-        type: "text",
-        value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
-        action: "default",
-        isRefine: option.isRefine,
-      });
-    }
-  };
-
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleClickSubmitButton();
     }
   };
 
-  const askLibraryChatQuestion = async (
-    question: string,
-    messages: IMessage[],
-    option: IPromptOption
-  ): Promise<IMessage> => {
-    try {
-      const result = await axios.post(
-        apiURL("question"),
-        {
-          choice: bidPilotChoice,
-          broadness: bidPilotBroadness,
-          input_text: option.isRefine ? `Refine the previous response. \n\n${question}` : question,
-          extra_instructions: getExtraInstruction(messages),
-          datasets: ["default"],
-          bid_id: "sharedState.object_id",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-          },
-          timeout: 30000,
-        }
-      );
-
-      const formattedResponse = formatResponse(result.data);
-      return withId({
-        type: "text",
-        value: formattedResponse,
-        createdBy: "bot",
-        action: "default",
-        isRefine: option.isRefine,
-      });
-    } catch (error) {
-      console.error("Error sending question:", error);
-
-      return withId({
-        type: "text",
-        value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
-        createdBy: "bot",
-        action: "default",
-        isRefine: false,
-      });
-    }
-  };
-
   const shortcutVisible = (message: IMessage, type: IShortcutType): IButtonStatus => {
+    if (type === "refine") return "hidden";
     if (message.type === "text" && type === "replace") return "enabled";
     if (message.type === "image" && type === "insert") return "enabled";
-    if (type === "refine" && currentRefine?.message?.id === message.id) return "disabled";
-    if (type === "refine" && currentRefine?.message?.id !== message.id) return "enabled";
+    // if (type === "refine" && currentRefine?.message?.id === message.id) return "disabled";
+    // if (type === "refine" && currentRefine?.message?.id !== message.id) return "enabled";
     return "hidden";
   };
 

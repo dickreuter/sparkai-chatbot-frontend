@@ -22,3 +22,6 @@ export const customPrompts: { id: IPromptType; title: string }[] = [
     title: "Active Voice",
   },
 ];
+
+export const BID_PILOT_CHOICE = "2";
+export const BID_PILOT_BROADNESS = "4";

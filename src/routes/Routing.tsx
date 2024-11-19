@@ -19,6 +19,7 @@ import ProfilePage from "../views/Profile.tsx";
 import Signup from "../views/Signup.tsx";
 import ForgotPassword from "../views/ForgotPassword.tsx";
 import ProposalPlan from "../views/ProposalPlan.tsx";
+import QAGenerator from "../views/Q&AGenerator.tsx";
 
 function Routing() {
   return (
@@ -40,6 +41,7 @@ function Routing() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/reset_password" element={<ForgotPassword />} />
+        <Route path="/question-answer" element={<QAGenerator />} />
         {/* Wrap related routes inside a single parent Route with BidManagement */}
         <Route element={<BidManagement />}>
           <Route path="/bid-extractor" element={<BidExtractor />} />

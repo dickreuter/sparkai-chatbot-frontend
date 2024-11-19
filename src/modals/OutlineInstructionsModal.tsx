@@ -39,33 +39,33 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
 
     const generateOutline = async () => {
         if (isGeneratingOutline) return;
-        
+       
         setIsGeneratingOutline(true);
-        const formData = new FormData();
-        formData.append('bid_id', bid_id);
-        
-        selectedFiles.forEach(file => {
-            formData.append('file_names', file);
-        });
-        
+        console.log(bid_id);
+        console.log(sharedState.selectedFolders);
+        console.log(selectedFiles);
         try {
             const response = await axios.post(
                 `http${HTTP_PREFIX}://${API_URL}/generate_outline`,
-                formData,
+                {
+                    bid_id: bid_id,
+                    extra_instructions: "",
+                    datasets: sharedState.selectedFolders,
+                    file_names: selectedFiles
+                },
                 {
                     headers: {
-                        'Authorization': `Bearer ${tokenRef.current}`,
-                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${tokenRef.current}`
                     }
                 }
             );
             setCurrentStep(4);
             await fetchOutline();
-            
+           
         } catch (err) {
-            console.error('Error generating outline:', err);
+            console.error('Full error:', err.response?.data);
             if (err.response?.status === 404) {
-                displayAlert("No documents found in the tender library. Please select documents before generating outline.", 'warning');
+                displayAlert("No documents found in the tender library.", 'warning');
             } else {
                 displayAlert("Failed to generate outline", 'danger');
             }

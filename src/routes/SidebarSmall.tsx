@@ -98,6 +98,13 @@ const SideBarSmall = () => {
           <span id="welcome">Quick Question</span>
         </Link>
         <Link
+          to="/question-answer"
+          className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
+        >
+          <FontAwesomeIcon icon={faCircleQuestion} />
+          <span>Q&A Generator</span>
+        </Link>
+        <Link
           to="/howto"
           className={`sidebarsmalllink ${isActive("/howto") ? "sidebarsmalllink-active" : ""}`}
         >

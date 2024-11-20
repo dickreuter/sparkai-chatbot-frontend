@@ -16,10 +16,10 @@
 
 .creator > img,
 .creator > svg {
-  min-width: 33px;
-  min-height: 35px;
-  width: 33px;
-  height: 35px;
+  min-width: 28px;
+  min-height: 30px;
+  width: 28px;
+  height: 30px;
 }
 
 div.MuiGrid-root.shortcuts {

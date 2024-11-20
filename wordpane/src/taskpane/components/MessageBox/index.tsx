@@ -8,7 +8,7 @@ import {
 } from "@mui/icons-material";
 import Creator from "./Creator";
 
-import "./style.css";
+import "./MessageBox.css";
 
 interface MessageBoxProps {
   messages: IMessage[];

@@ -334,7 +334,7 @@
 .message-bubble-small {
   max-width: 100%;
   min-width: 50px;
-  padding: 10px;
+  padding: 10px 10px 0 10px;
   border-radius: 15px;
   margin-bottom: 10px;
   word-wrap: break-word;
@@ -342,6 +342,10 @@
 
 .message-body {
   margin-top: 10px;
+}
+
+.message-body > div > p {
+  margin-bottom: 5px;
 }
 
 .message-bubble-small ol,

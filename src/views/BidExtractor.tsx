@@ -19,7 +19,6 @@ import TenderLibrary from "../components/TenderLibrary.tsx";
 import CustomDateInput from "../components/CustomDateInput.tsx";
 import BidExtractorWizard from "../wizards/BidExtractorWizard.tsx";
 import { StyledSelect, StyledMenuItem } from '../components/StyledMuiComponents';
-import BidTitle from "../components/BidTitle.tsx";
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
@@ -493,16 +492,10 @@ const BidExtractor = () => {
       <SideBarSmall />
       <div className="lib-container">
         <div className="scroll-container">
-          <BidNavbar />
-          <BidTitle
-            canUserEdit={true}
-            displayAlert={displayAlert}
-            setSharedState={setSharedState}
-            sharedState={sharedState}
-            showViewOnlyMessage={showViewOnlyMessage}
-            initialBidName={initialBidName}
-          />
-
+        <BidNavbar 
+          showViewOnlyMessage={showViewOnlyMessage} 
+          initialBidName={initialBidName} 
+        />
           <div>
             <div className="input-container mt-3">
               <Row className="no-gutters mx-n2">

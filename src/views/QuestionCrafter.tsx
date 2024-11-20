@@ -24,8 +24,7 @@ import {
 import "draft-js/dist/Draft.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
-import { useLocation } from "react-router-dom";
-import BidTitle from "../components/BidTitle.tsx";
+import { useLocation } from "react-router-dom";;
 import { displayAlert } from "../helper/Alert.tsx";
 import WordCountSelector from "../components/WordCountSelector.tsx";
 import { debounce } from "lodash";
@@ -786,16 +785,8 @@ const QuestionCrafter = () => {
             </Row>
 
             <Col md={12}>
-            <BidTitle
-              canUserEdit={true}
-              displayAlert={displayAlert}
-              setSharedState={setSharedState}
-              sharedState={sharedState}
-              showViewOnlyMessage={showViewOnlyMessage}
-              initialBidName={"initialBidName"}
-            />
-            <div className="proposal-header">
-            <h2 className="heavy mb-4">{section.heading}</h2>
+            <div className="proposal-header mt-3">
+            <h2 className="heavy mb-3">{section.heading}</h2>
             <StatusMenu
               value={sectionStatus} // Use the local state instead of section.status
               onChange={(value) => updateStatus(value)}

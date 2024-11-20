@@ -7,15 +7,25 @@ import {
   faCheckCircle,
   faEdit,
   faEye,
+  faPlus,
   faTimesCircle,
   faUsers
 } from "@fortawesome/free-solid-svg-icons";
 import "./BidNavbar.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAuthUser } from "react-auth-kit";
+import BidTitle from "../components/BidTitle";
+import { displayAlert } from "../helper/Alert";
+import GenerateProposalModal from "../modals/GenerateProposalModal";
 
-const BidNavbar = () => {
-  const { sharedState } = useContext(BidContext);
+const BidNavbar = ({showViewOnlyMessage = () => {},
+                    initialBidName = '', 
+                    outline = [], // default value
+                    outlinefetched = false,
+                    object_id = null,
+                    handleRegenerateClick = () => {} }) => {
+
+  const { sharedState, setSharedState } = useContext(BidContext);
   const { isLoading, saveSuccess, bidInfo } = sharedState;
 
   const getAuth = useAuthUser();
@@ -80,7 +90,12 @@ const BidNavbar = () => {
   const permissionDetails = getPermissionDetails(currentUserPermission);
 
   const handleBackClick = () => {
-    navigate("/bids");
+    if (location.pathname == '/question-crafter') {
+      navigate("/proposal-planner");
+    } else {
+      navigate("/bids");
+    }
+    
   };
 
   const handleTabClick = (path) => {
@@ -89,15 +104,9 @@ const BidNavbar = () => {
   };
 
   return (
+    <div>
     <div className="bidnav">
       <div className="bidnav-section">
-        <button
-          className="back-button"
-          onClick={handleBackClick}
-          title="Back to Bids"
-        >
-          <FontAwesomeIcon icon={faArrowLeft} />
-        </button>
         <NavLink
           to="/bid-extractor"
           className={`bidnav-item ${activeTab === "/bid-extractor" ? "active" : ""}`}
@@ -113,11 +122,11 @@ const BidNavbar = () => {
           Proposal Planner
         </NavLink>
         <NavLink
-          to="/proposal"
-          className={`bidnav-item ${activeTab === "/proposal" ? "active" : ""}`}
-          onClick={() => handleTabClick("/proposal")}
+          to="/proposal-preview"
+          className={`bidnav-item ${activeTab === "/proposal-preview" ? "active" : ""}`}
+          onClick={() => handleTabClick("/proposal-preview")}
         >
-          Bid Compiler
+          Preview Proposal
         </NavLink>
         <div className="status-indicator mt-2">
           {isLoading ? (
@@ -141,6 +150,7 @@ const BidNavbar = () => {
           ) : null}
         </div>
       </div>
+      
       <Button
         className="upload-button mt-2"
         style={{ textTransform: "none" }}
@@ -151,6 +161,45 @@ const BidNavbar = () => {
         {permissionDetails.text}
       </Button>
     </div>
+    <div className="proposal-header" >
+      <div style={{display: 'flex', alignItems: 'center', gap: '6px', }}>
+        <button
+          className="back-arrow-button"
+          onClick={handleBackClick}
+          title="Back to Bids"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} size="xl"/>
+        </button>
+        <BidTitle
+          canUserEdit={true}
+          displayAlert={displayAlert}
+          setSharedState={setSharedState}
+          sharedState={sharedState}
+          showViewOnlyMessage={showViewOnlyMessage}
+          initialBidName={initialBidName}
+        />
+      </div>
+      {outline.length === 0 && outlinefetched === false ? (
+           <div>
+            </div>
+          ) : (
+            <div>
+            <GenerateProposalModal
+              bid_id = {object_id}
+              outline = {outline}
+            />
+            <button
+              onClick={handleRegenerateClick}
+              className="upload-button ms-2"
+              style={{ minWidth: "fit-content" }}
+            >
+              <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon> 
+              New Outline
+            </button>
+            </div>
+        )}
+    </div>
+  </div>
   );
 };
 

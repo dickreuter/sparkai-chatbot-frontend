@@ -9,7 +9,6 @@ import BidNavbar from "../routes/BidNavbar.tsx";
 import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
-import BidTitle from "../components/BidTitle.tsx";
 import './ProposalPlan.css';
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -289,7 +288,13 @@ const ProposalPlan = () => {
       <SideBarSmall />
       <div className="lib-container">
         <div className="scroll-container">
-          <BidNavbar />
+          <BidNavbar 
+          showViewOnlyMessage={showViewOnlyMessage}
+          initialBidName={"initialBidName"}
+          outline={outline}
+          outlinefetched={outlinefetched}
+          object_id={object_id}
+          handleRegenerateClick={handleRegenerateClick}/>
           <OutlineInstructionsModal
               show={showModal}
               onHide={() => setShowModal(false)}
@@ -303,31 +308,8 @@ const ProposalPlan = () => {
               </div>
           ) : (
             <div>
-              <div className="proposal-header">
-              <BidTitle
-                canUserEdit={true}
-                displayAlert={displayAlert}
-                setSharedState={setSharedState}
-                sharedState={sharedState}
-                showViewOnlyMessage={showViewOnlyMessage}
-                initialBidName={"initialBidName"}
-              />
-              <GenerateProposalModal
-                bid_id = {object_id}
-                outline = {outline}
-              />
-              <button
-                onClick={handleRegenerateClick}
-                className="upload-button"
-                style={{ minWidth: "fit-content" }}
-              >
-                <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon> 
-                New Outline
-              </button>
-              
-              </div>
   
-              <div className="table-responsive">
+              <div className="table-responsive mt-3">
                 <table className="outline-table w-100">
                   <thead>
                     <tr>

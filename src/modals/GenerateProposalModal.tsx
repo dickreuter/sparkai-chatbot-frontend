@@ -13,6 +13,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
     const getAuth = useAuthUser();
     const auth = getAuth();
     const navigate = useNavigate();
+    const { sharedState, setSharedState } = useContext(BidContext);
     const [currentStep, setCurrentStep] = useState(1);
     const tokenRef = useRef(auth?.token || "default");
     const [show, setShow] = useState(false);
@@ -24,16 +25,17 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
     const generateProposal = async () => {
         try {
             setIsGeneratingProposal(true);
-            const formData = new FormData();
-            formData.append('bid_id', bid_id);
             
             const response = await axios.post(
                 `http${HTTP_PREFIX}://${API_URL}/generate_proposal`,
-                formData,
+                {
+                    bid_id: bid_id,
+                    extra_instructions: "",
+                    datasets: sharedState.selectedFolders
+                },
                 {
                 headers: {
                     'Authorization': `Bearer ${tokenRef.current}`,
-                    'Content-Type': 'multipart/form-data',
                 },
                 responseType: 'blob'
                 }

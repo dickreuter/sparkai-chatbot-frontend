@@ -57,8 +57,6 @@ const QuestionCrafter = () => {
 
   const backgroundInfo = getBackgroundInfo();
 
-  const [availableCollections, setAvailableCollections] = useState([]);
-  const [folderContents, setFolderContents] = useState({});
   const [inputText, setInputText] = useState(
      section.question || ""
   );

@@ -1,4 +1,4 @@
-import { IMessage, IMessageRequest, IPromptOption, IPromptType } from "../../../types";
+import { IMessage, IMessageRequest, IPromptType } from "../../../types";
 import { v4 } from "uuid";
 import { getBase64FromBlob } from "../../helper/file";
 import { apiURL } from "../../helper/urls";

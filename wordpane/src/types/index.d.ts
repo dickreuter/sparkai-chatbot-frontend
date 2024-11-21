@@ -40,10 +40,6 @@ export type IPromptType =
 
 export type IShortcutType = "insert" | "replace" | "refine";
 
-export interface IPromptOption {
-  isRefine: boolean;
-}
-
 export type IButtonStatus = "hidden" | "disabled" | "enabled";
 
 export type IChatTypes = "library-chat" | "internet-search";

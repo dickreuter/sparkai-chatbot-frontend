@@ -2,18 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import withAuth from "../../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import "./WordpaneCopilot.css";
-import { EditorState, Modifier, SelectionState, convertToRaw, ContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
 import useSelectedText from "../../hooks/useSelectedText";
-import {
-  IMessage,
-  IPromptType,
-  IShortcutType,
-  IPromptOption,
-  IButtonStatus,
-  IChatTypes,
-  IMessageRequest,
-} from "../../../types";
+import { IMessage, IPromptType, IShortcutType, IButtonStatus, IChatTypes, IMessageRequest } from "../../../types";
 import { Box, Button, Grid, MenuItem, MenuList, Paper, Tab, Tabs } from "@mui/material";
 import MessageBox from "../MessageBox";
 import { customPrompts } from "./constants";
@@ -50,10 +41,6 @@ const WordpaneCopilot = () => {
   const optionsContainerRef = useRef(null); // Ref for the options container
   const responseMessageBoxRef = useRef(null); // Ref for the response message box
   const textInputRef = useRef(null);
-
-  const [responseEditorState, setResponseEditorState] = useState(
-    EditorState.createWithContent(ContentState.createFromText(localStorage.getItem("response") || ""))
-  );
 
   const responseBoxRef = useRef(null); // Ref for the response box
 
@@ -101,15 +88,6 @@ const WordpaneCopilot = () => {
   };
 
   useSelectedText({ onChange: setSelectedText });
-
-  useEffect(() => {
-    localStorage.setItem(
-      "response",
-      convertToRaw(responseEditorState.getCurrentContent())
-        .blocks.map((block) => block.text)
-        .join("\n")
-    );
-  }, [responseEditorState]);
 
   const handleClearMessages = () => {
     setInputValue("");
@@ -159,7 +137,7 @@ const WordpaneCopilot = () => {
     return () => {
       document.removeEventListener("click", handleClickOutsideOptions);
     };
-  }, [showOptions, responseEditorState]);
+  }, [showOptions]);
 
   const handleClickMessageShortcut = (action: IShortcutType, message: IMessage) => {
     if (action === "refine") {
@@ -254,12 +232,6 @@ const WordpaneCopilot = () => {
           console.error("Error: ", error);
         });
     });
-  };
-
-  let isSubmitButtonClicked = false;
-
-  const handleMouseDownOnSubmit = () => {
-    isSubmitButtonClicked = true;
   };
 
   const handleClickMenuItem = (item: { id: IPromptType; title: string }) => () => {
@@ -575,7 +547,6 @@ const WordpaneCopilot = () => {
             ref={textInputRef}
           />
           <Button
-            onMouseDown={handleMouseDownOnSubmit}
             onClick={handleClickSubmitButton}
             disabled={isLoading || inputValue.trim() === ""}
             className="chat-send-button"

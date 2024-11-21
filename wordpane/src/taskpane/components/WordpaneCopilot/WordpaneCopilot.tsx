@@ -169,12 +169,18 @@ const WordpaneCopilot = () => {
   useEffect(() => {
     if (currentRefine) {
       setIsCustomPrompt(false);
+      if (textInputRef.current) {
+        textInputRef.current.focus();
+      }
     }
   }, [currentRefine]);
 
   useEffect(() => {
     if (isCustomPrompt) {
       setCurrentRefine(undefined);
+      if (textInputRef.current) {
+        textInputRef.current.focus();
+      }
     }
   }, [isCustomPrompt]);
 

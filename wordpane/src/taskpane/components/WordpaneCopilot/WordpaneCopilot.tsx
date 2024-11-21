@@ -535,7 +535,7 @@ const WordpaneCopilot = () => {
                 : isCustomPrompt
                   ? "Please type your custom prompt in here..."
                   : isInternetSearchTab
-                    ? "Please type your question in here..."
+                    ? "Please type your search query in here..."
                     : "Please type your question in here..."
             }
             value={inputValue}

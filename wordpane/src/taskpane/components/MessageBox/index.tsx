@@ -93,14 +93,14 @@ const MessageBox = ({ messages, showShortcuts, handleClickShortcut, shortcutVisi
                       ref={actionRef}
                       id={message.id}
                     >
-                      {actionText}&nbsp;&nbsp;:
+                      {actionText}&nbsp;:
                     </Typography>
                   )}
                   <p
                     dangerouslySetInnerHTML={{
                       __html: message.value,
                     }}
-                    style={{ textIndent: !!actionText ? `${actionWidth[message.id] + 8}px` : 0 }}
+                    style={{ textIndent: !!actionText ? `${actionWidth[message.id] + 4}px` : 0 }}
                   />
                 </div>
               )}

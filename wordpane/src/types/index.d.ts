@@ -5,7 +5,29 @@ export interface IMessage {
   action: "default" | IPromptType;
   isRefine: boolean;
   id: string;
+  request: IMessageRequest;
 }
+
+export type IMessageRequest =
+  | {
+      type: "text" | "image";
+      highlightedText: string;
+      instructionText: string;
+      action: IPromptType | "default";
+      messages: IMessage[];
+      isRefine: false;
+      isCustomPrompt: boolean;
+    }
+  | {
+      type: "text" | "image";
+      highlightedText: string;
+      instructionText: string;
+      action: IPromptType | "default";
+      messages: IMessage[];
+      isRefine: true;
+      isCustomPrompt: boolean;
+      refineInstruction: string;
+    };
 
 export type IPromptType =
   | "Summarise"
@@ -13,7 +35,8 @@ export type IPromptType =
   | "Inject Tender Context"
   | "Inject Company Voice"
   | "We will Active Voice"
-  | "Graph";
+  | "Graph"
+  | "Custom Prompt";
 
 export type IShortcutType = "insert" | "replace" | "refine";
 

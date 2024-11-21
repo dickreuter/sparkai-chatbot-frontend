@@ -14,6 +14,7 @@ import {
   askInternetQuestion,
   askLibraryChatQuestion,
   getDefaultMessage,
+  htmlToPlainText,
   refineResponse,
   removeDoubleBr,
   setCacheVersion,
@@ -157,6 +158,7 @@ const WordpaneCopilot = () => {
       setCustomPromptMenuVisible(true);
     } else {
       setCustomPromptMenuVisible(false);
+      setIsCustomPrompt(false);
     }
   }, [selectedText]);
 
@@ -230,7 +232,7 @@ const WordpaneCopilot = () => {
             const newPar = par.insertParagraph("", "After");
             newPar.insertInlinePictureFromBase64(value.split(",")[1], insertLocation);
           } else if (type === "text") {
-            par.insertHtml(removeDoubleBr(value), insertLocation);
+            par.insertText(htmlToPlainText(value), insertLocation);
           }
           return await context.sync();
         })
@@ -496,7 +498,7 @@ const WordpaneCopilot = () => {
               <Grid item>
                 <Button
                   variant={isCustomPromptMenuVisible ? "contained" : "outlined"}
-                  color={isCustomPromptMenuVisible ? "primary" : "info"}
+                  color={isCustomPromptMenuVisible || isCustomPrompt ? "primary" : "info"}
                   disabled={selectedText.length === 0 || isLoading}
                   onClick={toggleCustomPromptMenuVisible}
                 >
@@ -548,7 +550,7 @@ const WordpaneCopilot = () => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isLoading}
-            className="chat-input"
+            className={"chat-input" + (isCustomPrompt ? " custom-prompt" : "")}
             rows={4}
             ref={textInputRef}
           />

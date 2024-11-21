@@ -2,10 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import withAuth from "../../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import "./WordpaneCopilot.css";
-import { EditorState, Modifier, SelectionState, convertToRaw, ContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
 import useSelectedText from "../../hooks/useSelectedText";
-import { IMessage, IPromptType, IShortcutType, IPromptOption, IButtonStatus, IChatTypes } from "../../../types";
+import { IMessage, IPromptType, IShortcutType, IButtonStatus, IChatTypes, IMessageRequest } from "../../../types";
 import { Box, Button, Grid, MenuItem, MenuList, Paper, Tab, Tabs } from "@mui/material";
 import MessageBox from "../MessageBox";
 import { customPrompts } from "./constants";
@@ -14,33 +13,14 @@ import {
   askDiagram,
   askInternetQuestion,
   askLibraryChatQuestion,
+  getDefaultMessage,
   refineResponse,
   removeDoubleBr,
+  setCacheVersion,
   withId,
 } from "./helper";
 import Welcome from "./Welcome";
 import useShowWelcome from "../../hooks/useShowWelcome";
-
-const getDefaultMessage = (type: "library-chat" | "internet-search", useCache: boolean = false): IMessage[] => {
-  const savedMessages = localStorage.getItem(type);
-
-  if (useCache && savedMessages) {
-    const parsedMessages: IMessage[] = JSON.parse(savedMessages);
-    if (parsedMessages.length > 0) {
-      const filtered: IMessage[] = [];
-      for (let i = 0; i < parsedMessages.length; i++) {
-        const message = parsedMessages[i];
-        if (message.createdBy === "user" && parsedMessages?.[i + 1]?.type === "loading") {
-          break;
-        }
-        filtered.push(message);
-      }
-      return filtered;
-    }
-  }
-
-  return [];
-};
 
 const WordpaneCopilot = () => {
   const getAuth = useAuthUser();
@@ -61,10 +41,6 @@ const WordpaneCopilot = () => {
   const optionsContainerRef = useRef(null); // Ref for the options container
   const responseMessageBoxRef = useRef(null); // Ref for the response message box
   const textInputRef = useRef(null);
-
-  const [responseEditorState, setResponseEditorState] = useState(
-    EditorState.createWithContent(ContentState.createFromText(localStorage.getItem("response") || ""))
-  );
 
   const responseBoxRef = useRef(null); // Ref for the response box
 
@@ -90,6 +66,8 @@ const WordpaneCopilot = () => {
     [isLiveChatLoading, isInternetSearchLoading]
   );
 
+  const [isCustomPrompt, setIsCustomPrompt] = useState(false);
+
   const [currentRefine, setCurrentRefine] = useState<{ tab: IChatTypes; message: IMessage }>(undefined);
   const isRefine = useMemo(() => currentRefine !== undefined, [currentRefine]);
 
@@ -110,15 +88,6 @@ const WordpaneCopilot = () => {
   };
 
   useSelectedText({ onChange: setSelectedText });
-
-  useEffect(() => {
-    localStorage.setItem(
-      "response",
-      convertToRaw(responseEditorState.getCurrentContent())
-        .blocks.map((block) => block.text)
-        .join("\n")
-    );
-  }, [responseEditorState]);
 
   const handleClearMessages = () => {
     setInputValue("");
@@ -168,7 +137,7 @@ const WordpaneCopilot = () => {
     return () => {
       document.removeEventListener("click", handleClickOutsideOptions);
     };
-  }, [showOptions, responseEditorState]);
+  }, [showOptions]);
 
   const handleClickMessageShortcut = (action: IShortcutType, message: IMessage) => {
     if (action === "refine") {
@@ -191,18 +160,34 @@ const WordpaneCopilot = () => {
     }
   }, [selectedText]);
 
-  const askCustomPrompt = async (
-    text: string,
-    promptType: IPromptType,
-    messages: IMessage[],
-    option: IPromptOption
-  ): Promise<IMessage> => {
+  useEffect(() => {
+    if (selectedTab !== "library-chat" && isCustomPrompt) {
+      setIsCustomPrompt(false);
+    }
+  }, [selectedTab]);
+
+  useEffect(() => {
+    if (currentRefine) {
+      setIsCustomPrompt(false);
+    }
+  }, [currentRefine]);
+
+  useEffect(() => {
+    if (isCustomPrompt) {
+      setCurrentRefine(undefined);
+    }
+  }, [isCustomPrompt]);
+
+  const askCustomPrompt = async (request: IMessageRequest): Promise<IMessage> => {
     try {
-      const copilot_mode = promptType.toLowerCase().replace(/\s+/g, "_");
-      if (promptType === "Graph") {
-        return await askDiagram(tokenRef.current, text, promptType, messages, option);
+      if (request.action === "Graph") {
+        return await askDiagram(tokenRef.current, request);
+      } else if (request.action === "Custom Prompt") {
+        const response = await askCopilot(tokenRef.current, request);
+        setIsCustomPrompt(false);
+        return response;
       } else {
-        return await askCopilot(tokenRef.current, text, promptType, "1" + copilot_mode, messages, option);
+        return await askCopilot(tokenRef.current, request);
       }
     } catch (error) {
       console.error("Error sending question:", error);
@@ -212,7 +197,8 @@ const WordpaneCopilot = () => {
         type: "text",
         value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
         action: "default",
-        isRefine: option.isRefine,
+        isRefine: request.isRefine,
+        request,
       });
     }
   };
@@ -248,18 +234,41 @@ const WordpaneCopilot = () => {
     });
   };
 
-  let isSubmitButtonClicked = false;
-
-  const handleMouseDownOnSubmit = () => {
-    isSubmitButtonClicked = true;
+  const handleClickMenuItem = (item: { id: IPromptType; title: string }) => () => {
+    if (item.id === "Custom Prompt") {
+      setIsCustomPrompt(true);
+      setSelectedTab("library-chat");
+    } else {
+      handleCustomPromptMessage({
+        highlightedText: selectedText,
+        instructionText: inputValue,
+        action: item.id,
+        messages: libraryChatMessages,
+        isRefine: false,
+        isCustomPrompt: false,
+        type: "text",
+      });
+    }
   };
 
   useEffect(() => {
-    localStorage.setItem("internet-search", JSON.stringify(internetResearchMessages));
+    localStorage.setItem(
+      "internet-search",
+      JSON.stringify(
+        internetResearchMessages.map((message) => ({ ...message, request: { ...message.request, messages: [] } }))
+      )
+    );
+    setCacheVersion();
   }, [internetResearchMessages]);
 
   useEffect(() => {
-    localStorage.setItem("library-chat", JSON.stringify(libraryChatMessages));
+    localStorage.setItem(
+      "library-chat",
+      JSON.stringify(
+        libraryChatMessages.map((message) => ({ ...message, request: { ...message.request, messages: [] } }))
+      )
+    );
+    setCacheVersion();
   }, [libraryChatMessages]);
 
   const handleClickSubmitButton = () => {
@@ -268,34 +277,80 @@ const WordpaneCopilot = () => {
       if (currentRefine.tab === "library-chat") {
         const refine = refineResponse(inputValue, currentRefine.message, libraryChatMessages);
         if (currentRefine.message.action === "default") {
-          handleLibraryChatMessage(refine.prompt, refine.messages, { isRefine: true });
-        } else {
-          handleCustomPromptMessage(refine.prompt, currentRefine.message.action, libraryChatMessages, {
+          handleLibraryChatMessage({
+            ...currentRefine.message.request,
             isRefine: true,
+            refineInstruction: inputValue,
+            messages: refine.messages,
+          });
+        } else {
+          handleCustomPromptMessage({
+            ...currentRefine.message.request,
+            isRefine: true,
+            refineInstruction: inputValue,
+            messages: refine.messages,
           });
         }
       } else if (currentRefine.tab === "internet-search") {
         const refine = refineResponse(inputValue, currentRefine.message, internetResearchMessages);
-        handleInternetSearchMessage(refine.prompt, refine.messages, { isRefine: true });
+        handleInternetSearchMessage({
+          ...currentRefine.message.request,
+          isRefine: true,
+          refineInstruction: inputValue,
+          messages: refine.messages,
+        });
       }
       setCurrentRefine(undefined);
+    } else if (isCustomPrompt) {
+      handleCustomPromptMessage({
+        highlightedText: selectedText,
+        instructionText: inputValue,
+        action: "Custom Prompt",
+        messages: libraryChatMessages,
+        isRefine: false,
+        isCustomPrompt: true,
+        type: "text",
+      });
     } else {
       if (isLibraryChatTab) {
-        handleLibraryChatMessage(inputValue, libraryChatMessages, { isRefine: false });
+        handleLibraryChatMessage({
+          highlightedText: selectedText,
+          instructionText: inputValue,
+          action: "default",
+          messages: libraryChatMessages,
+          isRefine: false,
+          isCustomPrompt: false,
+          type: "text",
+        });
       } else if (isInternetSearchTab) {
-        handleInternetSearchMessage(inputValue, internetResearchMessages, { isRefine: false });
+        handleInternetSearchMessage({
+          highlightedText: selectedText,
+          instructionText: inputValue,
+          action: "default",
+          messages: internetResearchMessages,
+          isRefine: false,
+          isCustomPrompt: false,
+          type: "text",
+        });
       }
     }
   };
 
-  const handleLibraryChatMessage = (prompt: string, messages: IMessage[], option: IPromptOption) => {
-    if (prompt.trim() !== "") {
+  const handleLibraryChatMessage = (request: IMessageRequest) => {
+    if (request.instructionText.trim() !== "") {
       setLibraryChatMessages([
-        ...messages,
-        withId({ type: "text", createdBy: "user", value: prompt, action: "default", isRefine: option.isRefine }),
-        withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false }),
+        ...request.messages,
+        withId({
+          type: "text",
+          createdBy: "user",
+          value: request.instructionText,
+          action: "default",
+          isRefine: request.isRefine,
+          request,
+        }),
+        withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false, request }),
       ]);
-      askLibraryChatQuestion(tokenRef.current, prompt, messages, option)
+      askLibraryChatQuestion(tokenRef.current, request)
         .then((message) => {
           setLibraryChatMessages((messages) => [...messages.slice(0, -1), message]);
         })
@@ -304,14 +359,21 @@ const WordpaneCopilot = () => {
     }
   };
 
-  const handleInternetSearchMessage = (prompt: string, messages: IMessage[], option: IPromptOption) => {
-    if (prompt.trim() !== "") {
+  const handleInternetSearchMessage = (request: IMessageRequest) => {
+    if (request.instructionText.trim() !== "") {
       setInternetResearchMessages([
-        ...messages,
-        withId({ type: "text", createdBy: "user", value: prompt, action: "default", isRefine: option.isRefine }),
-        withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false }),
+        ...request.messages,
+        withId({
+          type: "text",
+          createdBy: "user",
+          value: request.instructionText,
+          action: "default",
+          isRefine: request.isRefine,
+          request,
+        }),
+        withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false, request }),
       ]);
-      askInternetQuestion(tokenRef.current, prompt, messages, option)
+      askInternetQuestion(tokenRef.current, request)
         .then((message) => {
           setInternetResearchMessages((messages) => [...messages.slice(0, -1), message]);
         })
@@ -320,20 +382,22 @@ const WordpaneCopilot = () => {
     }
   };
 
-  const handleCustomPromptMessage = (
-    text: string,
-    promptType: IPromptType,
-    messages: IMessage[],
-    option: IPromptOption
-  ) => {
+  const handleCustomPromptMessage = (request: IMessageRequest) => {
     setSelectedTab("library-chat");
-    if (text.trim()) {
+    if (request.highlightedText.trim()) {
       setLibraryChatMessages([
-        ...messages,
-        withId({ type: "text", createdBy: "user", value: text, action: promptType, isRefine: option.isRefine }),
-        withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false }),
+        ...request.messages,
+        withId({
+          type: "text",
+          createdBy: "user",
+          value: request.highlightedText,
+          action: request.action,
+          isRefine: request.isRefine,
+          request,
+        }),
+        withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false, request }),
       ]);
-      askCustomPrompt(text, promptType, messages, option)
+      askCustomPrompt(request)
         .then((message) => {
           setLibraryChatMessages((messages) => [...messages.slice(0, -1), message]);
         })
@@ -349,11 +413,10 @@ const WordpaneCopilot = () => {
   };
 
   const shortcutVisible = (message: IMessage, type: IShortcutType): IButtonStatus => {
-    if (type === "refine") return "hidden";
     if (message.type === "text" && type === "replace") return "enabled";
     if (message.type === "image" && type === "insert") return "enabled";
-    // if (type === "refine" && currentRefine?.message?.id === message.id) return "disabled";
-    // if (type === "refine" && currentRefine?.message?.id !== message.id) return "enabled";
+    if (type === "refine" && currentRefine?.message?.id === message.id) return "disabled";
+    if (type === "refine" && currentRefine?.message?.id !== message.id) return "enabled";
     return "hidden";
   };
 
@@ -414,14 +477,7 @@ const WordpaneCopilot = () => {
               <MenuList>
                 {customPrompts.map((item) => {
                   return (
-                    <MenuItem
-                      onClick={() =>
-                        handleCustomPromptMessage(`${selectedText}. ${inputValue}`, item.id, libraryChatMessages, {
-                          isRefine: false,
-                        })
-                      }
-                      key={item.id}
-                    >
+                    <MenuItem onClick={handleClickMenuItem(item)} key={item.id}>
                       {item.title}
                     </MenuItem>
                   );
@@ -446,8 +502,14 @@ const WordpaneCopilot = () => {
                   variant="outlined"
                   color="info"
                   onClick={() =>
-                    handleCustomPromptMessage(`${selectedText}. ${inputValue}`, "Graph", libraryChatMessages, {
+                    handleCustomPromptMessage({
+                      highlightedText: selectedText,
+                      instructionText: inputValue,
+                      action: "Graph",
+                      messages: libraryChatMessages,
                       isRefine: false,
+                      isCustomPrompt: false,
+                      type: "text",
                     })
                   }
                   disabled={selectedText.length === 0 || isLoading}
@@ -470,9 +532,11 @@ const WordpaneCopilot = () => {
             placeholder={
               isRefine
                 ? "Please type your refinement in here..."
-                : isInternetSearchTab
-                  ? "Please type your question in here..."
-                  : "Please type your question in here..."
+                : isCustomPrompt
+                  ? "Please type your custom prompt in here..."
+                  : isInternetSearchTab
+                    ? "Please type your search query in here..."
+                    : "Please type your question in here..."
             }
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -483,7 +547,6 @@ const WordpaneCopilot = () => {
             ref={textInputRef}
           />
           <Button
-            onMouseDown={handleMouseDownOnSubmit}
             onClick={handleClickSubmitButton}
             disabled={isLoading || inputValue.trim() === ""}
             className="chat-send-button"

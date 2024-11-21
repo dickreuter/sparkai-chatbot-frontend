@@ -1,5 +1,7 @@
 import { IPromptType } from "../../../types";
 
+export const LOCAL_STORAGE_CACHE_VERSION = "0.0.1";
+
 export const customPrompts: { id: IPromptType; title: string }[] = [
   {
     id: "Summarise",
@@ -20,6 +22,10 @@ export const customPrompts: { id: IPromptType; title: string }[] = [
   {
     id: "We will Active Voice",
     title: "Active Voice",
+  },
+  {
+    id: "Custom Prompt",
+    title: "Custom Prompt",
   },
 ];
 

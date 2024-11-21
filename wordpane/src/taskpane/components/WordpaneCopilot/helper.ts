@@ -1,9 +1,9 @@
-import { IMessage, IPromptOption, IPromptType } from "../../../types";
+import { IMessage, IMessageRequest, IPromptType } from "../../../types";
 import { v4 } from "uuid";
 import { getBase64FromBlob } from "../../helper/file";
 import { apiURL } from "../../helper/urls";
 import axios from "axios";
-import { BID_PILOT_BROADNESS, BID_PILOT_CHOICE } from "./constants";
+import { BID_PILOT_BROADNESS, BID_PILOT_CHOICE, LOCAL_STORAGE_CACHE_VERSION } from "./constants";
 
 export const getPromptWithHistory = (prompt: string, history: IMessage[]) => {
   return `Chat history: ${JSON.stringify(history)}\n\n; Prompt: ${prompt}`;
@@ -58,25 +58,22 @@ export const refineResponse = (prompt: string, message: IMessage, history: IMess
   cloned.splice(index + 1);
 
   return {
-    prompt,
+    prompt: prompt,
     messages: cloned,
   };
 };
 
-export const askLibraryChatQuestion = async (
-  token: string,
-  question: string,
-  messages: IMessage[],
-  option: IPromptOption
-): Promise<IMessage> => {
+export const askLibraryChatQuestion = async (token: string, request: IMessageRequest): Promise<IMessage> => {
   try {
     const result = await axios.post(
       apiURL("question"),
       {
         choice: BID_PILOT_CHOICE,
         broadness: BID_PILOT_BROADNESS,
-        input_text: question,
-        extra_instructions: normalizeChatHistory(messages),
+        input_text: request.isRefine
+          ? `${request.instructionText};\n\n ${request.refineInstruction}`
+          : request.instructionText,
+        extra_instructions: normalizeChatHistory(request.messages),
         datasets: ["default"],
         bid_id: "sharedState.object_id",
       },
@@ -94,7 +91,8 @@ export const askLibraryChatQuestion = async (
       value: formattedResponse,
       createdBy: "bot",
       action: "default",
-      isRefine: option.isRefine,
+      isRefine: request.isRefine,
+      request,
     });
   } catch (error) {
     console.error("Error sending question:", error);
@@ -105,21 +103,19 @@ export const askLibraryChatQuestion = async (
       createdBy: "bot",
       action: "default",
       isRefine: false,
+      request,
     });
   }
 };
 
-export const askInternetQuestion = async (
-  token: string,
-  question: string,
-  messages: IMessage[],
-  option: IPromptOption
-): Promise<IMessage> => {
+export const askInternetQuestion = async (token: string, request: IMessageRequest): Promise<IMessage> => {
   try {
     const result = await axios.post(
       apiURL("perplexity"),
       {
-        input_text: `${question}\n\n Respond in a full sentence format.`,
+        input_text: request.isRefine
+          ? `${request.instructionText};\n\n ${request.refineInstruction}`
+          : `${request.instructionText}\n\n Respond in a full sentence format.`,
         dataset: "default",
       },
       {
@@ -129,7 +125,7 @@ export const askInternetQuestion = async (
         timeout: 30000,
       }
     );
-    return withId({ createdBy: "bot", type: "text", value: result.data, action: "default", isRefine: false });
+    return withId({ createdBy: "bot", type: "text", value: result.data, action: "default", isRefine: false, request });
   } catch (error) {
     console.error("Error sending question:", error);
     // Replace the temporary loading message with the error message
@@ -138,27 +134,24 @@ export const askInternetQuestion = async (
       type: "text",
       value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
       action: "default",
-      isRefine: option.isRefine,
+      isRefine: request.isRefine,
+      request,
     });
   }
 };
 
-export const askCopilot = async (
-  token: string,
-  text: string,
-  promptType: IPromptType,
-  copilot_mode: string,
-  messages: IMessage[],
-  option: IPromptOption
-): Promise<IMessage> => {
+export const askCopilot = async (token: string, request: IMessageRequest): Promise<IMessage> => {
   localStorage.setItem("questionAsked", "true");
   try {
     const response = await axios.post(
       apiURL("copilot"),
       {
-        input_text: text,
-        extra_instructions: normalizeChatHistory(messages),
-        copilot_mode: copilot_mode,
+        input_text: request.highlightedText,
+        extra_instructions: normalizeChatHistory(request.messages),
+        copilot_mode: getCopilotMode(
+          request.isRefine ? "Custom Prompt" : request.action,
+          request.isRefine ? request.refineInstruction : request.instructionText
+        ),
         datasets: [],
         bid_id: "32212",
       },
@@ -174,8 +167,9 @@ export const askCopilot = async (
       type: "text",
       value: response.data,
       createdBy: "bot",
-      action: promptType,
-      isRefine: option.isRefine,
+      action: request.action,
+      isRefine: request.isRefine,
+      request,
     });
   } catch (error) {
     console.error("Error sending question:", error);
@@ -183,32 +177,32 @@ export const askCopilot = async (
       type: "text",
       value: "Message failed, please contact support...",
       createdBy: "bot",
-      action: promptType,
-      isRefine: option.isRefine,
+      action: request.action,
+      isRefine: request.isRefine,
+      request,
     });
   }
 };
 
-export const askDiagram = async (
-  _token: string,
-  text: string,
-  promptType: IPromptType,
-  messages: IMessage[],
-  option: IPromptOption
-): Promise<IMessage> => {
+export const askDiagram = async (_token: string, request: IMessageRequest): Promise<IMessage> => {
   localStorage.setItem("questionAsked", "true");
 
   try {
-    const response = await axios.post(apiURL("generate_diagram"), text, {
-      responseType: "blob",
-      timeout: 30000,
-    });
+    const response = await axios.post(
+      apiURL("generate_diagram"),
+      request.isRefine ? `${request.highlightedText}; ${request.refineInstruction}` : request.highlightedText,
+      {
+        responseType: "blob",
+        timeout: 30000,
+      }
+    );
     return withId({
       type: "image",
       value: await getBase64FromBlob(response.data),
       createdBy: "bot",
-      action: promptType,
-      isRefine: option.isRefine,
+      action: request.action,
+      isRefine: request.isRefine,
+      request,
     });
   } catch (error) {
     console.error("Error sending question:", error);
@@ -216,8 +210,46 @@ export const askDiagram = async (
       type: "text",
       value: error.response?.status === 400 ? "Message failed, please contact support..." : error.message,
       createdBy: "bot",
-      action: promptType,
-      isRefine: option.isRefine,
+      action: request.action,
+      isRefine: request.isRefine,
+      request,
     });
   }
+};
+
+export const getCopilotMode = (action: IPromptType | "default", prompt: string): string => {
+  if (action === "Custom Prompt") {
+    return `4${prompt}`;
+  } else {
+    return `1${action.toLowerCase().replace(/\s+/g, "_")}`;
+  }
+};
+
+export const getDefaultMessage = (type: "library-chat" | "internet-search", useCache: boolean = false): IMessage[] => {
+  const version = localStorage.getItem("version");
+  if (version !== LOCAL_STORAGE_CACHE_VERSION) {
+    return [];
+  }
+  const savedMessages = localStorage.getItem(type);
+
+  if (useCache && savedMessages) {
+    const parsedMessages: IMessage[] = JSON.parse(savedMessages);
+    if (parsedMessages.length > 0) {
+      const filtered: IMessage[] = [];
+      for (let i = 0; i < parsedMessages.length; i++) {
+        const message = parsedMessages[i];
+        if (message.createdBy === "user" && parsedMessages?.[i + 1]?.type === "loading") {
+          break;
+        }
+        filtered.push(message);
+      }
+      return filtered;
+    }
+  }
+
+  return [];
+};
+
+export const setCacheVersion = () => {
+  localStorage.setItem("version", LOCAL_STORAGE_CACHE_VERSION);
 };

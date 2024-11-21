@@ -94,7 +94,7 @@ const MessageBox = ({ messages, showShortcuts, handleClickShortcut, shortcutVisi
                       id={message.id}
                       fontWeight="bold"
                     >
-                      {actionText}&nbsp;:
+                      {actionText}:
                     </Typography>
                   )}
                   <p

@@ -253,3 +253,9 @@ export const getDefaultMessage = (type: "library-chat" | "internet-search", useC
 export const setCacheVersion = () => {
   localStorage.setItem("version", LOCAL_STORAGE_CACHE_VERSION);
 };
+
+export const htmlToPlainText = (html) => {
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = html;
+  return tempDiv.textContent || tempDiv.innerText || "";
+};

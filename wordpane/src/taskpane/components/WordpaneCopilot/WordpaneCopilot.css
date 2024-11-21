@@ -646,3 +646,11 @@ button.chat-send-button {
 .message-bubble-small {
   font-size: 14px;
 }
+
+.chat-input.custom-prompt {
+  border: solid #f5861999 1px;
+}
+
+.chat-input.custom-prompt:focus {
+  outline: none;
+}

@@ -92,6 +92,7 @@ const MessageBox = ({ messages, showShortcuts, handleClickShortcut, shortcutVisi
                       className="message-body__content_action"
                       ref={actionRef}
                       id={message.id}
+                      fontWeight="bold"
                     >
                       {actionText}&nbsp;:
                     </Typography>

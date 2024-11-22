@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { faSpinner, faWarning } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BidContext } from "../views/BidWritingStateManagerView";
+import { LinearProgress, Typography, Box } from '@mui/material';
 
 const GenerateProposalModal = ({ bid_id, outline }) => {
     const getAuth = useAuthUser();
@@ -22,10 +23,64 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
     const incompleteSections = outline?.filter(section => section.status !== 'Completed') || [];
     const hasIncompleteSections = incompleteSections.length > 0;
 
+    const [progress, setProgress] = useState(0);
+    const progressInterval = useRef(null);
+
+    
+    function LinearProgressWithLabel(props) {
+    return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ width: '100%', mr: 1 }}>
+            <LinearProgress 
+            variant="determinate" 
+            {...props} 
+            sx={{ 
+                height: 10, 
+                borderRadius: 5,
+                backgroundColor: '#ffd699',
+                '& .MuiLinearProgress-bar': {
+                backgroundColor: '#ff9900'
+                }
+            }}
+            />
+        </Box>
+        <Box sx={{ minWidth: 35 }}>
+            <Typography variant="body2" color="text.secondary">
+            {`${Math.round(props.value)}%`}
+            </Typography>
+        </Box>
+        </Box>
+    );
+    }
+
+    const startProgressBar = () => {
+        const duration = 90000; // 1:30 minutes in ms
+        const interval = 100; // Update every 100ms
+        const steps = duration / interval;
+        const increment = 98 / steps; // Go up to 98% until complete
+        
+        let currentProgress = 0;
+        progressInterval.current = setInterval(() => {
+            currentProgress += increment;
+            if (currentProgress >= 98) {
+                clearInterval(progressInterval.current);
+                // Only complete if proposal is done
+                if (!isGeneratingProposal) {
+                    setProgress(100);
+                } else {
+                    setProgress(98);
+                }
+            } else {
+                setProgress(currentProgress);
+            }
+        }, interval);
+    };
+
     const generateProposal = async () => {
         try {
             setIsGeneratingProposal(true);
-            
+            startProgressBar();
+
             const response = await axios.post(
                 `http${HTTP_PREFIX}://${API_URL}/generate_proposal`,
                 {
@@ -52,11 +107,14 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
             
             window.URL.revokeObjectURL(url);
             document.body.removeChild(link);
+            setProgress(60);
             handleClose();
+            
 
         } catch (err) {
             console.error('Error generating proposal:', err);
         } finally {
+            clearInterval(progressInterval.current);
             setIsGeneratingProposal(false);
         }
     };
@@ -101,7 +159,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
     const renderStepContent = () => {
         if (currentStep === 1) {
             return (
-                <div className="p-4">
+                <div className="px-2 py-4">
                     <div className="px-3">
                         <p>
                             Only sections marked as complete will be used to generate the proposal. The proposal will be generated as a Word document that you can then edit and format as needed.
@@ -132,6 +190,11 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
                                     </ul>
                                 </div>
                             </>
+                        )}
+                        {isGeneratingProposal && (
+                            <div className="mt-4">
+                                 <LinearProgressWithLabel value={progress} />
+                            </div>
                         )}
                     </div>
                 </div>

@@ -103,7 +103,6 @@ const ProposalPlan = () => {
     const newSection = {
       heading: "New Section",
       word_count: 0,
-      weighting: 0,
       reviewer: "",
       status: "Not Started",
       subsections: 0
@@ -313,14 +312,13 @@ const ProposalPlan = () => {
                 <table className="outline-table w-100">
                   <thead>
                     <tr>
-                      <th className="py-3 px-4" style={{width: '30%'}}>Section</th>
-                      <th className="py-3 px-4" style={{width: '10%'}}>Word Count</th>
-                      <th className="py-3 px-4" style={{width: '10%'}}>Weighting</th>
+                      <th className="py-3 px-4" style={{width: '50%'}}>Section</th>
                      
-                      <th className="py-3 px-4">Reviewer</th>
+                      <th className="py-3 px-4" style={{width: '15%'}}>Reviewer</th>
                       <th className="py-3 px-4 text-center" style={{width: '12%'}}>Add Subsection</th>
                       <th className="py-3 px-4 text-center" style={{width: '9%'}}>Subsections</th>
-                      <th className="py-3 px-4 text-center">Completed</th>
+                      <th className="py-3 px-4 text-center" style={{width: '6.5%'}}>Words</th>
+                      <th className="py-3 px-4 text-center" style={{width: '10%'}}>Completed</th>
                       <th className="py-3 px-4 text-center" style={{width: '6%'}}>Delete</th>
                     </tr>
                   </thead>
@@ -345,14 +343,6 @@ const ProposalPlan = () => {
                                 onBlur={() => updateSection(outline[index], index)}
                             />
                           </td>
-                          <td className="py-2 px-4">{section.word_count}</td>
-                          <td className="py-2 px-4">
-                            <EditableCell
-                              value={section.weighting}
-                              onChange={(value) => handleSectionChange(index, 'weighting', value)}
-                              onBlur={() => updateSection(outline[index], index)}
-                            />
-                          </td>
                           <td className="py-2 px-4">
                             <EditableCell
                               value={section.reviewer}
@@ -374,11 +364,10 @@ const ProposalPlan = () => {
     
                             </div>
                           </td>
-                          <td className="py-2 px-4">
-                             <div className="d-flex justify-content-center">
+                          <td className="py-2 px-4 text-center">
                               {section.subsections}
-                            </div>
                             </td>
+                            <td className="py-2 px-4 text-center">{section.word_count}</td>
                           <td className="py-2 px-4 text-center">
                             <StatusMenu
                               value={section.status}

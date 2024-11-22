@@ -22,7 +22,7 @@ const SelectFolderModal = ({
   const handleFolderSelection = (folders) => {
     console.log("Folders selected in SelectFolder component:", folders);
     setSelectedFolders(folders);
-    onSaveSelectedFolders(selectedFolders);
+    onSaveSelectedFolders(folders);
   };
 
   return (

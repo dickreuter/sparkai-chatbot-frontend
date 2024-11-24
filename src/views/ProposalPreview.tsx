@@ -218,11 +218,14 @@ const ProposalPreview = () => {
                   </div>
                 ) : pdfUrl ? (
                   <embed
-                    src={`${pdfUrl}#toolbar=0`}
+                    src={`${pdfUrl}#toolbar=0&zoom=100&view=FitH`}
                     type="application/pdf"
                     width="100%"
                     height="100%"
-                    style={{ border: "none" }}
+                    style={{
+                      border: "none",
+                      overflow: "auto"
+                    }}
                   />
                 ) : (
                   <div

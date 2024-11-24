@@ -20,6 +20,7 @@ import Signup from "../views/Signup.tsx";
 import ForgotPassword from "../views/ForgotPassword.tsx";
 import ProposalPlan from "../views/ProposalPlan.tsx";
 import QAGenerator from "../views/Q&AGenerator.tsx";
+import ProposalPreview from "../views/ProposalPreview.tsx";
 
 function Routing() {
   return (
@@ -48,6 +49,7 @@ function Routing() {
           <Route path="/proposal-planner" element={<ProposalPlan />} />
           <Route path="/question-crafter" element={<QuestionCrafter />} />
           <Route path="/proposal" element={<Proposal />} />
+          <Route path="/proposal-preview" element={<ProposalPreview />} />
         </Route>
       </Routes>
     </div>

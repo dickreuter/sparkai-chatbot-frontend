@@ -37,6 +37,7 @@ const Layout = () => {
     "/profile",
     "/calculator",
     "/question-answer",
+    "/proposal-preview",
     "/",
   ];
   const shouldShowNavBar = showNavBarPaths.includes(location.pathname);

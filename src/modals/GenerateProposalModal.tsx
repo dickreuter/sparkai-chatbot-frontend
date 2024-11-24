@@ -101,20 +101,17 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
     let currentProgress = 0;
     let messageIndex = 0;
 
+    const messageRotationInterval = setInterval(() => {
+      messageIndex = (messageIndex + 1) % loadingMessages.length;
+      setLoadingMessage(loadingMessages[messageIndex]);
+    }, 1000); // Changed from 3000 to 1000 to rotate every second
+
     progressInterval.current = setInterval(() => {
       currentProgress += increment;
 
-      // Update loading message every ~10% progress
-      if (
-        Math.floor(currentProgress / 5) >
-        Math.floor((currentProgress - increment) / 5)
-      ) {
-        messageIndex = (messageIndex + 1) % loadingMessages.length;
-        setLoadingMessage(loadingMessages[messageIndex]);
-      }
-
       if (currentProgress >= 98) {
         clearInterval(progressInterval.current);
+        clearInterval(messageRotationInterval);
         if (!isGeneratingProposal) {
           setProgress(100);
           setLoadingMessage("Proposal ready!");

@@ -6,36 +6,80 @@ import { API_URL, HTTP_PREFIX } from '../helper/Constants';
 import axios from 'axios';
 import DescriptionIcon from '@mui/icons-material/Description';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import ArticleIcon from '@mui/icons-material/Article';
 import ErrorIcon from '@mui/icons-material/Error';
 import BidNavbar from '../routes/BidNavbar';
 import SideBarSmall from '../routes/SidebarSmall';
 import CircularProgress from '@mui/material/CircularProgress';
 import { displayAlert } from '../helper/Alert';
+import withAuth from '../routes/withAuth';
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState } = useContext(BidContext);
 
-  // Create the viewer URL using the GET endpoint
-  const previewUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-    `http${HTTP_PREFIX}://${API_URL}/preview_proposal/${sharedState.object_id}?token=${tokenRef.current}`
-  )}`;
+  const loadPreview = async () => {
+    try {
+      console.log('Starting to load PDF preview...');
+      
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_proposal_pdf`,
+        {
+          bid_id: sharedState.object_id,
+          extra_instructions: "",
+          datasets: []
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenRef.current}`,
+          },
+          responseType: 'blob'
+        }
+      );
 
-  console.log(previewUrl);
+      console.log('Response received:', {
+        size: response.data.size,
+        type: response.data.type,
+        status: response.status
+      });
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      setPdfUrl(url);
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Preview loading error:', err);
+      setError('Failed to load the proposal preview');
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Set loading to false after a brief delay to allow iframe to load
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
+    loadPreview();
+    return () => {
+      if (pdfUrl) {
+        window.URL.revokeObjectURL(pdfUrl);
+      }
+    };
   }, [sharedState.object_id]);
 
-  const handleDownload = async () => {
+  const handlePdfDownload = () => {
+    if (pdfUrl) {
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `proposal_${sharedState.bidInfo || 'document'}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleWordDownload = async () => {
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/get_proposal`,
@@ -56,16 +100,16 @@ const ProposalPreview = () => {
         type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
       });
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `proposal_${sharedState.bidInfo}.docx`;
-      document.body.appendChild(a);
-      a.click();
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `proposal_${sharedState.bidInfo || 'document'}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
     } catch (err) {
-      console.error('Download error:', err);
-      setError('Failed to download the proposal. Please try again.');
+      console.error('Word download error:', err);
+      displayAlert('Failed to download Word document', 'error');
     }
   };
 
@@ -85,13 +129,22 @@ const ProposalPreview = () => {
                   <DescriptionIcon />
                   <h3 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Proposal Preview</h3>
                 </div>
-                <Button
-                  variant="outlined"
-                  onClick={handleDownload}
-                  startIcon={<FileDownloadIcon />}
-                >
-                  Download
-                </Button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <Button
+                    variant="outlined"
+                    onClick={handleWordDownload}
+                    startIcon={<ArticleIcon />}
+                  >
+                    Download Word
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={handlePdfDownload}
+                    startIcon={<FileDownloadIcon />}
+                  >
+                    Download PDF
+                  </Button>
+                </div>
               </div>
 
               {error && (
@@ -114,14 +167,26 @@ const ProposalPreview = () => {
                   }}>
                     <CircularProgress />
                   </div>
-                ) : (
-                  <iframe
-                    src={previewUrl}
+                ) : pdfUrl ? (
+                  <embed 
+                    src={`${pdfUrl}#toolbar=0`}
+                    type="application/pdf"
                     width="100%"
                     height="100%"
-                    title="Proposal Preview"
-                    frameBorder="0"
+                    style={{ border: 'none' }}
                   />
+                ) : (
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    height: '100%',
+                    backgroundColor: '#f5f5f5',
+                    padding: '20px',
+                    textAlign: 'center'
+                  }}>
+                    <p>Unable to load preview. Please use the download buttons to view the document.</p>
+                  </div>
                 )}
               </div>
             </CardContent>
@@ -132,4 +197,4 @@ const ProposalPreview = () => {
   );
 };
 
-export default ProposalPreview;
+export default withAuth(ProposalPreview);

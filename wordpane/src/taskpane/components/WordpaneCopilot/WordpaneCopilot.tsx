@@ -222,17 +222,16 @@ const WordpaneCopilot = () => {
       | "End"
   ) => {
     Word.run(async (context) => {
-      const range = context.document.getSelection();
-      range.paragraphs.load("items");
+      const selection = context.document.getSelection();
+      selection.paragraphs.load("items");
       return context
         .sync()
         .then(async function () {
-          const par = range.paragraphs.items[0];
           if (type === "image") {
-            const newPar = par.insertParagraph("", "After");
-            newPar.insertInlinePictureFromBase64(value.split(",")[1], insertLocation);
+            const newSelection = selection.insertParagraph("", "After");
+            newSelection.insertInlinePictureFromBase64(value.split(",")[1], insertLocation);
           } else if (type === "text") {
-            par.insertText(htmlToPlainText(value), insertLocation);
+            selection.insertText(htmlToPlainText(value), insertLocation);
           }
           return await context.sync();
         })

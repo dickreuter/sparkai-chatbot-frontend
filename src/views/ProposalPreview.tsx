@@ -1,18 +1,18 @@
-import React, { useContext, useRef, useState, useEffect } from 'react';
-import { Alert, Button, Card, CardContent } from '@mui/material';
-import { useAuthUser } from 'react-auth-kit';
-import { BidContext } from './BidWritingStateManagerView';
-import { API_URL, HTTP_PREFIX } from '../helper/Constants';
-import axios from 'axios';
-import DescriptionIcon from '@mui/icons-material/Description';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import ArticleIcon from '@mui/icons-material/Article';
-import ErrorIcon from '@mui/icons-material/Error';
-import BidNavbar from '../routes/BidNavbar';
-import SideBarSmall from '../routes/SidebarSmall';
-import CircularProgress from '@mui/material/CircularProgress';
-import { displayAlert } from '../helper/Alert';
-import withAuth from '../routes/withAuth';
+import React, { useContext, useRef, useState, useEffect } from "react";
+import { Alert, Button, Card, CardContent } from "@mui/material";
+import { useAuthUser } from "react-auth-kit";
+import { BidContext } from "./BidWritingStateManagerView";
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import axios from "axios";
+import DescriptionIcon from "@mui/icons-material/Description";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import ArticleIcon from "@mui/icons-material/Article";
+import ErrorIcon from "@mui/icons-material/Error";
+import BidNavbar from "../routes/BidNavbar";
+import SideBarSmall from "../routes/SidebarSmall";
+import CircularProgress from "@mui/material/CircularProgress";
+import { displayAlert } from "../helper/Alert";
+import withAuth from "../routes/withAuth";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -25,8 +25,8 @@ const ProposalPreview = () => {
 
   const loadPreview = async () => {
     try {
-      console.log('Starting to load PDF preview...');
-      
+      console.log("Starting to load PDF preview...");
+
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/get_proposal_pdf`,
         {
@@ -36,25 +36,25 @@ const ProposalPreview = () => {
         },
         {
           headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
+            Authorization: `Bearer ${tokenRef.current}`
           },
-          responseType: 'blob'
+          responseType: "blob"
         }
       );
 
-      console.log('Response received:', {
+      console.log("Response received:", {
         size: response.data.size,
         type: response.data.type,
         status: response.status
       });
 
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
       setPdfUrl(url);
       setIsLoading(false);
     } catch (err) {
-      console.error('Preview loading error:', err);
-      setError('Failed to load the proposal preview');
+      console.error("Preview loading error:", err);
+      setError("Failed to load the proposal preview");
       setIsLoading(false);
     }
   };
@@ -70,9 +70,9 @@ const ProposalPreview = () => {
 
   const handlePdfDownload = () => {
     if (pdfUrl) {
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = pdfUrl;
-      link.download = `proposal_${sharedState.bidInfo || 'document'}.pdf`;
+      link.download = `proposal_${sharedState.bidInfo || "document"}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -90,26 +90,26 @@ const ProposalPreview = () => {
         },
         {
           headers: {
-            'Authorization': `Bearer ${tokenRef.current}`,
+            Authorization: `Bearer ${tokenRef.current}`
           },
-          responseType: 'blob'
+          responseType: "blob"
         }
       );
 
-      const blob = new Blob([response.data], { 
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `proposal_${sharedState.bidInfo || 'document'}.docx`;
+      link.download = `proposal_${sharedState.bidInfo || "document"}.docx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Word download error:', err);
-      displayAlert('Failed to download Word document', 'error');
+      console.error("Word download error:", err);
+      displayAlert("Failed to download Word document", "error");
     }
   };
 
@@ -117,19 +117,54 @@ const ProposalPreview = () => {
     <div className="chatpage">
       <SideBarSmall />
       <div className="lib-container">
-        <div className="scroll-container">
-          <BidNavbar 
-            showViewOnlyMessage={() => displayAlert("You only have permission to view this bid.", "danger")}
+        <div
+          className="scroll-container"
+          style={{ height: "100vh", display: "flex", flexDirection: "column" }}
+        >
+          <BidNavbar
+            showViewOnlyMessage={() =>
+              displayAlert(
+                "You only have permission to view this bid.",
+                "danger"
+              )
+            }
             initialBidName={"initialBidName"}
           />
-          <Card sx={{ width: '100%', mt: 2 }}>
-            <CardContent sx={{ p: 3 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Card
+            sx={{
+              width: "100%",
+              mt: 2,
+              flex: 1,
+              display: "flex",
+              flexDirection: "column"
+            }}
+          >
+            <CardContent
+              sx={{ p: 3, flex: 1, display: "flex", flexDirection: "column" }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "1rem"
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem"
+                  }}
+                >
                   <DescriptionIcon />
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>Proposal Preview</h3>
+                  <h3
+                    style={{ fontSize: "1.2rem", fontWeight: 600, margin: 0 }}
+                  >
+                    Proposal Preview
+                  </h3>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+                <div style={{ display: "flex", gap: "1rem" }}>
                   <Button
                     variant="outlined"
                     onClick={handleWordDownload}
@@ -149,43 +184,62 @@ const ProposalPreview = () => {
 
               {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem"
+                    }}
+                  >
                     <ErrorIcon />
                     {error}
                   </div>
                 </Alert>
               )}
 
-              <div style={{ height: '600px', border: '1px solid #e0e0e0', borderRadius: '4px' }}>
+              <div
+                style={{
+                  flex: 1,
+                  border: "1px solid #e0e0e0",
+                  borderRadius: "4px"
+                }}
+              >
                 {isLoading ? (
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    height: '100%',
-                    backgroundColor: '#f5f5f5'
-                  }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                      backgroundColor: "#f5f5f5"
+                    }}
+                  >
                     <CircularProgress />
                   </div>
                 ) : pdfUrl ? (
-                  <embed 
+                  <embed
                     src={`${pdfUrl}#toolbar=0`}
                     type="application/pdf"
                     width="100%"
                     height="100%"
-                    style={{ border: 'none' }}
+                    style={{ border: "none" }}
                   />
                 ) : (
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    height: '100%',
-                    backgroundColor: '#f5f5f5',
-                    padding: '20px',
-                    textAlign: 'center'
-                  }}>
-                    <p>Unable to load preview. Please use the download buttons to view the document.</p>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                      backgroundColor: "#f5f5f5",
+                      padding: "20px",
+                      textAlign: "center"
+                    }}
+                  >
+                    <p>
+                      Unable to load preview. Please use the download buttons to
+                      view the document.
+                    </p>
                   </div>
                 )}
               </div>

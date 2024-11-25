@@ -104,13 +104,13 @@ const SideBarSmall = () => {
           <FontAwesomeIcon icon={faCircleQuestion} />
           <span>Q&A Generator</span>
         </Link>
-        <Link
+        {/*<Link
           to="/howto"
           className={`sidebarsmalllink ${isActive("/howto") ? "sidebarsmalllink-active" : ""}`}
         >
           <FontAwesomeIcon icon={faCircleQuestion} />
           <span>How To Guide</span>
-        </Link>
+        </Link> */}
       </div>
       <div className="signout-container">
         <Link

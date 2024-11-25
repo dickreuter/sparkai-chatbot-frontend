@@ -369,7 +369,7 @@ const Library = () => {
           error
         );
         displayAlert(
-          `Error creating ${parentFolder ? "subfolder" : "folder"}`,
+          `Error, ${parentFolder ? "subfolder" : "folder"} limit reached. Try using a shorter folder name...`,
           "danger"
         );
       }

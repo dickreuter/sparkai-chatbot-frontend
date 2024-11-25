@@ -109,7 +109,6 @@ const ProposalPreview = () => {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Word download error:", err);
-      displayAlert("Failed to download Word document", "error");
     }
   };
 
@@ -119,7 +118,7 @@ const ProposalPreview = () => {
       <div className="lib-container">
         <div
           className="scroll-container"
-          style={{ height: "100vh", display: "flex", flexDirection: "column" }}
+
         >
           <BidNavbar
             showViewOnlyMessage={() =>
@@ -182,20 +181,7 @@ const ProposalPreview = () => {
                 </div>
               </div>
 
-              {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem"
-                    }}
-                  >
-                    <ErrorIcon />
-                    {error}
-                  </div>
-                </Alert>
-              )}
+              
 
               <div
                 style={{
@@ -240,8 +226,7 @@ const ProposalPreview = () => {
                     }}
                   >
                     <p>
-                      Unable to load preview. Please use the download buttons to
-                      view the document.
+                    Generate a Proposal to preview it here.
                     </p>
                   </div>
                 )}

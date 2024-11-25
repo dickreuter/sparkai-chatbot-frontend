@@ -69,25 +69,39 @@ const UploadPDF = ({
   const handleFiles = (newFiles) => {
     const allowedTypes = [
       'application/pdf',
-      'application/msword',
+      'application/msword', 
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/vnd.ms-excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ];
-
-    const validFiles = newFiles.filter((file) =>
-      allowedTypes.includes(file.type)
+  
+    const invalidTypeFiles = newFiles.filter(file => !allowedTypes.includes(file.type));
+    const invalidLengthFiles = newFiles.filter(file => {
+      const fileName = file.name.split('.').slice(0, -1).join('.');
+      return !(/^[a-zA-Z0-9_-]{3,63}$/.test(fileName));
+    });
+  
+    const validFiles = newFiles.filter(file => 
+      allowedTypes.includes(file.type) && 
+      /^[a-zA-Z0-9_-]{3,63}$/.test(file.name.split('.').slice(0, -1).join('.'))
     );
+  
     setSelectedFiles((prevFiles) => [...prevFiles, ...validFiles]);
-
-    if (validFiles.length !== newFiles.length) {
+  
+    if (invalidTypeFiles.length > 0) {
       displayAlert(
-        "Some files were not added. Please select valid PDF, Word, or Excel files.",
-        "warning"
+        "Some files were not added due to invalid file type. Please select PDF, Word, or Excel files only.",
+        "danger"
+      );
+    }
+  
+    if (invalidLengthFiles.length > 0) {
+      displayAlert(
+        "Some files were not added due to invalid file names. File names must be between 3-63 characters and contain only letters, numbers, underscores, or dashes.",
+        "danger"
       );
     }
   };
-
   const uploadFile = async (file) => {
     const mode = getFileMode(file.type);
     if (!mode) {
@@ -98,6 +112,16 @@ const UploadPDF = ({
     formData.append("file", file);
     formData.append("profile_name", folder || "");
     formData.append("mode", mode);
+
+    if (!/^[a-zA-Z0-9_-]{3,63}$/.test(folder)) {
+      displayAlert(
+        "File name should be 3-63 characters long and contain only alphanumeric characters, underscores, or dashes",
+        "warning"
+      );
+      setIsUploading(false);
+      return;
+    }
+
 
     try {
       const response = await axios.post(

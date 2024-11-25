@@ -43,18 +43,17 @@ const UploadText = ({ folder, get_collections, onClose }) => {
     formData.append("profile_name", formattedProfileName);
     formData.append("mode", textFormat);
 
-    if (!/^[a-zA-Z0-9_-]{3,}$/.test(formattedProfileName)) {
+    if (!/^[a-zA-Z0-9_-]{3,63}$/.test(formattedProfileName)) {
       displayAlert(
-        "Folder name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long",
+        "Folder name should be 3-63 characters long and contain only alphanumeric characters, underscores, or dashes",
         "warning"
       );
       setIsUploading(false);
       return;
     }
-
-    if (!/^[a-zA-Z0-9_-]{3,}$/.test(formattedFileName)) {
+    if (!/^[a-zA-Z0-9_-]{3,63}$/.test(formattedFileName)) {
       displayAlert(
-        "File name should only contain alphanumeric characters, underscores, dashes and be at least 3 characters long",
+        "File name should be 3-63 characters long and contain only alphanumeric characters, underscores, or dashes",
         "warning"
       );
       setIsUploading(false);

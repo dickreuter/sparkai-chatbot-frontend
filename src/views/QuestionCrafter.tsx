@@ -860,27 +860,7 @@ const QuestionCrafter = () => {
                 {answerSections.length > 0 ? (
                   <div className="proposal-header mb-2">
                     <h2 className="heavy mt-4 text-center">Subsections</h2>
-                    <Button
-                      onClick={handleMarkAsComplete}
-                      disabled={isCompleting || !canUserEdit}
-                      className="upload-button mt-3"
-                    >
-                      {isCompleting ? (
-                        <>
-                          <Spinner
-                            as="span"
-                            animation="border"
-                            size="sm"
-                            role="status"
-                            aria-hidden="true"
-                            className="me-2"
-                          />
-                          Marking as Complete...
-                        </>
-                      ) : (
-                        'Mark as Complete'
-                      )}
-                    </Button>
+                      
                   </div>
                 ) : (
                   <div>

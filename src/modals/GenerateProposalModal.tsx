@@ -128,6 +128,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
     try {
       setIsGeneratingProposal(true);
       startProgressBar();
+      console.log(sharedState.selectedFolders);
 
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/generate_proposal`,

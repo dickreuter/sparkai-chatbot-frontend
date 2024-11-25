@@ -319,7 +319,7 @@ const ProposalPlan = () => {
                       <th className="py-3 px-4 text-center" style={{width: '9%'}}>Subsections</th>
                       <th className="py-3 px-4 text-center" style={{width: '6.5%'}}>Words</th>
                       <th className="py-3 px-4 text-center" style={{width: '10%'}}>Completed</th>
-                      <th className="py-3 px-4 text-center" style={{width: '6%'}}>Delete</th>
+                      <th className="py-3 px-4 text-center" style={{width: '6.5%'}}>Delete</th>
                     </tr>
                   </thead>
                   <tbody>

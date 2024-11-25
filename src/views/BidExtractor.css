@@ -18,7 +18,7 @@
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 1420px;
+    max-width: 1350px;
     position: relative;
     cursor: pointer;
 }
@@ -28,7 +28,7 @@
     position: relative;
     flex: 1;
     min-width: 0;
-    max-width: 1420px;
+    max-width: 1350px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

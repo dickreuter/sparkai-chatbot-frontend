@@ -256,7 +256,7 @@ const QuestionCrafter = () => {
     const extraInstructions = getPlainTextFromEditorState(editorState);
     
     // Get the current word count for this subheading
-    const wordCount = sectionWordCounts[subheadingId] || 250;
+    const wordCount = sectionWordCounts[subheadingId] || 100;
 
     // Call the debounced update function
     debouncedUpdateSubheading(
@@ -284,7 +284,7 @@ const QuestionCrafter = () => {
           title: section.title,
           // Format combined text to maintain clear separation between title and instructions
           combinedText: `###${section.title}!!!Context & Requirements: ${extraInstructions || ''}!!!###`,
-          wordCount: sectionWordCounts[section.subheading_id] || 250
+          wordCount: sectionWordCounts[section.subheading_id] || 100
         };
       });
   
@@ -369,7 +369,7 @@ const QuestionCrafter = () => {
         // Set default word count if not provided
         setSectionWordCounts(prev => ({
           ...prev,
-          [sh.subheading_id]: sh.word_count || 250
+          [sh.subheading_id]: sh.word_count || 100
         }));
   
         // Create editor state with existing instructions or empty string
@@ -505,7 +505,7 @@ const QuestionCrafter = () => {
       setSelectedChoices([...selectedChoices, selectedChoice]);
       setWordAmounts((prevWordAmounts) => ({
         ...prevWordAmounts,
-        [selectedChoice]: 250 // Default word amount
+        [selectedChoice]: 100 // Default word amount
       }));
     }
     updateStatus("In Progress");
@@ -719,7 +719,7 @@ const QuestionCrafter = () => {
                             <div>
                               <WordCountSelector
                                 subheadingId={answerSection.subheading_id}
-                                initialCount={sectionWordCounts[answerSection.subheading_id] || 250}
+                                initialCount={sectionWordCounts[answerSection.subheading_id] || 100}
                                 onChange={handleWordCountChange}
                                 disabled={!canUserEdit}
                               />

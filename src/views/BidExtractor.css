@@ -18,6 +18,7 @@
     display: flex;
     align-items: center;
     width: 100%;
+    max-width: 1420px;
     position: relative;
     cursor: pointer;
 }
@@ -27,6 +28,7 @@
     position: relative;
     flex: 1;
     min-width: 0;
+    max-width: 1420px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -35,9 +37,7 @@
     color: #000;
 }
 
-.bidname-header .editable {
-    outline: none;
-}
+.bidname-header .editable {}
 
 .edit-tag {
     position: relative;

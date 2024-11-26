@@ -82,21 +82,12 @@ const UploadPDFComponent = ({
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ];
 
-    // Updated regex to allow parentheses
-    const fileNameRegex = /^[\w\s()-]{3,63}$/;
-
     const invalidTypeFiles = newFiles.filter(
       (file) => !allowedTypes.includes(file.type)
     );
-    const invalidLengthFiles = newFiles.filter((file) => {
-      const fileName = file.name.split(".").slice(0, -1).join(".");
-      return !fileNameRegex.test(fileName);
-    });
 
-    const validFiles = newFiles.filter(
-      (file) =>
-        allowedTypes.includes(file.type) &&
-        fileNameRegex.test(file.name.split(".").slice(0, -1).join("."))
+    const validFiles = newFiles.filter((file) =>
+      allowedTypes.includes(file.type)
     );
 
     setSelectedFiles((prevFiles) => [...prevFiles, ...validFiles]);
@@ -118,13 +109,6 @@ const UploadPDFComponent = ({
         fileCount: invalidTypeFiles.length,
         fileTypes: invalidTypeFiles.map((f) => f.type)
       });
-    }
-
-    if (invalidLengthFiles.length > 0) {
-      displayAlert(
-        "Some files were not added due to invalid file names. File names must be between 3-63 characters and contain only letters, numbers, spaces, underscores, or dashes.",
-        "danger"
-      );
     }
   };
 

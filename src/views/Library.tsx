@@ -25,13 +25,11 @@ import {
   faQuestionCircle,
   faPlus,
   faReply,
-  faTimes,
+  faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import "./Chatbot.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  UploadButtonWithDropdown
-} from "./UploadButtonWithDropdown.tsx";
+import { UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
 import { Menu, MenuItem } from "@mui/material";
 import FileContentModal from "../components/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
@@ -509,7 +507,7 @@ const Library = () => {
     const formData = new FormData();
     formData.append("file_name", fileName);
     formData.append("profile_name", folderName);
-  
+
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/show_file_content`,
@@ -520,11 +518,10 @@ const Library = () => {
           }
         }
       );
-  
+
       setModalContent(response.data);
       setCurrentFileId(unique_id);
       setCurrentFileName(fileName);
-      
     } catch (error) {
       console.error("Error viewing file:", error);
       displayAlert("Error loading document", "danger");
@@ -540,7 +537,7 @@ const Library = () => {
     const formData = new FormData();
     formData.append("file_name", fileName);
     formData.append("profile_name", folderName);
-  
+
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/show_file_content_pdf_format`,
@@ -552,12 +549,11 @@ const Library = () => {
           responseType: "blob"
         }
       );
-  
+
       const fileURL = URL.createObjectURL(
         new Blob([response.data], { type: "application/pdf" })
       );
       setPdfUrl(fileURL);
-      
     } catch (error) {
       console.error("Error viewing PDF file:", error);
       if (error.response && error.response.status === 404) {
@@ -1068,7 +1064,7 @@ const Library = () => {
                           icon={faPlus}
                           style={{ marginRight: "8px" }}
                         />
-                        New
+                        Upload
                       </Button>
                     )}
                   </div>
@@ -1091,7 +1087,7 @@ const Library = () => {
                     className="styled-menu-item"
                   >
                     <i className="fas fa-file-pdf styled-menu-item-icon"></i>
-                    Upload PDF/Word/Excel 
+                    Upload PDF/Word/Excel
                   </MenuItem>
                   <MenuItem
                     onClick={() => handleMenuItemClick("text")}
@@ -1212,7 +1208,7 @@ const Library = () => {
             <div className="pdf-viewer-modal" onClick={closeModal}>
               <div className="pdf-viewer-modal-content" ref={modalRef}>
                 {isLoading && (
-                  <div 
+                  <div
                     style={{
                       position: "absolute",
                       top: 0,
@@ -1226,8 +1222,8 @@ const Library = () => {
                       zIndex: 1000
                     }}
                   >
-                    <Spinner 
-                      animation="border" 
+                    <Spinner
+                      animation="border"
                       style={{
                         width: "2rem",
                         height: "2rem",

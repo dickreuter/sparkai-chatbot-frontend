@@ -18,7 +18,7 @@ import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import GenerateProposalModal from "../modals/GenerateProposalModal.tsx";
 import SectionMenu from "../components/SectionMenu.tsx";
 import { MenuItem, Select } from "@mui/material";
-
+import posthog from "posthog-js";
 
 const EditableCell = ({
   value: initialValue,
@@ -57,34 +57,34 @@ const EditableCell = ({
 
 const selectStyle = {
   fontFamily: '"ClashDisplay", sans-serif',
-  fontSize: '0.875rem',
-  minWidth: '220px',
-  '& .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#ced4da',
+  fontSize: "0.875rem",
+  minWidth: "220px",
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#ced4da"
   },
-  '&:hover .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#86b7fe',
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#86b7fe"
   },
-  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#86b7fe',
-    borderWidth: '1px',
-  },
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#86b7fe",
+    borderWidth: "1px"
+  }
 };
 
 const menuStyle = {
-  fontSize: '0.875rem',
+  fontSize: "0.875rem"
 };
 
-const ReviewerDropdown = ({ 
-  value, 
+const ReviewerDropdown = ({
+  value,
   onChange,
   onBlur,
   contributors
-}: { 
-  value: string,
-  onChange: (value: string) => void,
-  onBlur: () => void,
-  contributors: Record<string, string>
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onBlur: () => void;
+  contributors: Record<string, string>;
 }) => {
   const handleChange = (event: SelectChangeEvent<string>) => {
     onChange(event.target.value as string);
@@ -92,7 +92,7 @@ const ReviewerDropdown = ({
 
   return (
     <Select
-      value={value || ''}
+      value={value || ""}
       onChange={handleChange}
       onBlur={onBlur}
       size="small"
@@ -109,11 +109,7 @@ const ReviewerDropdown = ({
       </MenuItem>
       {Object.entries(contributors).length > 0 ? (
         Object.entries(contributors).map(([email, role], index) => (
-          <MenuItem 
-            key={index} 
-            value={email}
-            style={menuStyle}
-          >
+          <MenuItem key={index} value={email} style={menuStyle}>
             {email} ({role})
           </MenuItem>
         ))
@@ -490,8 +486,12 @@ const ProposalPlan = () => {
                           <td className="py-2 px-4">
                             <ReviewerDropdown
                               value={section.reviewer}
-                              onChange={(value) => handleSectionChange(index, 'reviewer', value)}
-                              onBlur={() => updateSection(outline[index], index)}
+                              onChange={(value) =>
+                                handleSectionChange(index, "reviewer", value)
+                              }
+                              onBlur={() =>
+                                updateSection(outline[index], index)
+                              }
                               contributors={contributors}
                             />
                           </td>

@@ -14,11 +14,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { displayAlert } from "../helper/Alert";
 import withAuth from "../routes/withAuth";
 import posthog from "posthog-js";
+import mammoth from "mammoth";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pdfUrl, setPdfUrl] = useState(null);
+  const [htmlContent, setHtmlContent] = useState<string | null>(null);
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -26,10 +27,10 @@ const ProposalPreview = () => {
 
   const loadPreview = async () => {
     try {
-      console.log("Starting to load PDF preview...");
+      console.log("Starting to load Word preview...");
 
       const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_proposal_pdf`,
+        `http${HTTP_PREFIX}://${API_URL}/get_proposal`,
         {
           bid_id: sharedState.object_id,
           extra_instructions: "",
@@ -43,15 +44,9 @@ const ProposalPreview = () => {
         }
       );
 
-      console.log("Response received:", {
-        size: response.data.size,
-        type: response.data.type,
-        status: response.status
-      });
-
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-      setPdfUrl(url);
+      const arrayBuffer = await response.data.arrayBuffer();
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+      setHtmlContent(result.value);
       setIsLoading(false);
     } catch (err) {
       console.error("Preview loading error:", err);
@@ -63,26 +58,11 @@ const ProposalPreview = () => {
   useEffect(() => {
     loadPreview();
     return () => {
-      if (pdfUrl) {
-        window.URL.revokeObjectURL(pdfUrl);
+      if (htmlContent) {
+        window.URL.revokeObjectURL(htmlContent);
       }
     };
   }, [sharedState.object_id]);
-
-  const handlePdfDownload = () => {
-    if (pdfUrl) {
-      posthog.capture("proposal_pdf_downloaded", {
-        bidId: sharedState.object_id,
-        bidName: sharedState.bidInfo
-      });
-      const link = document.createElement("a");
-      link.href = pdfUrl;
-      link.download = `proposal_${sharedState.bidInfo || "document"}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
 
   const handleWordDownload = async () => {
     try {
@@ -141,11 +121,18 @@ const ProposalPreview = () => {
               mt: 2,
               flex: 1,
               display: "flex",
-              flexDirection: "column"
+              flexDirection: "column",
+              height: "calc(100vh - 120px)"
             }}
           >
             <CardContent
-              sx={{ p: 3, flex: 1, display: "flex", flexDirection: "column" }}
+              sx={{
+                p: 3,
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden"
+              }}
             >
               <div
                 style={{
@@ -169,29 +156,24 @@ const ProposalPreview = () => {
                     Proposal Preview
                   </h3>
                 </div>
-                <div style={{ display: "flex", gap: "1rem" }}>
-                  <Button
-                    variant="outlined"
-                    onClick={handleWordDownload}
-                    startIcon={<ArticleIcon />}
-                  >
-                    Download Word
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={handlePdfDownload}
-                    startIcon={<FileDownloadIcon />}
-                  >
-                    Download PDF
-                  </Button>
-                </div>
+                <Button
+                  variant="outlined"
+                  onClick={handleWordDownload}
+                  startIcon={<ArticleIcon />}
+                >
+                  Download Word
+                </Button>
               </div>
 
               <div
                 style={{
                   flex: 1,
                   border: "1px solid #e0e0e0",
-                  borderRadius: "4px"
+                  borderRadius: "4px",
+                  overflow: "hidden",
+                  backgroundColor: "#ffffff",
+                  display: "flex",
+                  flexDirection: "column"
                 }}
               >
                 {isLoading ? (
@@ -206,17 +188,22 @@ const ProposalPreview = () => {
                   >
                     <CircularProgress />
                   </div>
-                ) : pdfUrl ? (
-                  <embed
-                    src={`${pdfUrl}#toolbar=0&zoom=100&view=FitH`}
-                    type="application/pdf"
-                    width="100%"
-                    height="100%"
+                ) : htmlContent ? (
+                  <div
                     style={{
-                      border: "none",
-                      overflow: "auto"
+                      flex: 1,
+                      overflow: "auto",
+                      padding: "20px"
                     }}
-                  />
+                  >
+                    <div
+                      dangerouslySetInnerHTML={{ __html: htmlContent }}
+                      style={{
+                        maxWidth: "800px",
+                        margin: "0 auto"
+                      }}
+                    />
+                  </div>
                 ) : (
                   <div
                     style={{

@@ -414,15 +414,16 @@ const ProposalPlan = () => {
           ) : (
             <div>
               <div className="table-responsive mt-3">
-                <table className="outline-table w-100">
-                  <thead>
+                <table
+                  className="outline-table"
+                  style={{ tableLayout: "fixed" }}
+                >
+                  <thead style={{ width: "100%" }}>
                     <tr>
                       <th className="py-3 px-4" style={{ width: "50%" }}>
                         Section
                       </th>
-                      <th className="py-3 px-4" style={{ width: "15%" }}>
-                        Reviewer
-                      </th>
+                      <th className="py-3 px-4">Reviewer</th>
                       <th
                         className="py-3 px-4 text-center"
                         style={{ width: "9%" }}
@@ -452,7 +453,7 @@ const ProposalPlan = () => {
                   <tbody>
                     {isLoading ? (
                       <tr>
-                        <td colSpan={7} className="text-center py-4">
+                        <td colSpan={6} className="text-center py-4">
                           <Spinner
                             animation="border"
                             size="sm"

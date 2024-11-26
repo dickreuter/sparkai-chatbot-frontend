@@ -739,7 +739,7 @@ const BidExtractor = () => {
           </div>
         </div>
       </div>
-      <BidExtractorWizard />
+      {/*<BidExtractorWizard />*/}
     </div>
   );
 };

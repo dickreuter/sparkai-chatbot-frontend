@@ -123,7 +123,7 @@ const Proposal = () => {
           </Row>
         </div>
       </div>
-      <BidCompilerWizard />
+      {/* <BidCompilerWizard /> */}
     </div>
   );
 };

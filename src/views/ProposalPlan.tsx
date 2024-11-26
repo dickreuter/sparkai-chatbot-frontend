@@ -10,15 +10,13 @@ import './BidExtractor.css';
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import './ProposalPlan.css';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import StatusMenu, { Section } from "../components/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import GenerateProposalModal from "../modals/GenerateProposalModal.tsx";
 import SectionMenu from "../components/SectionMenu.tsx";
-
-
 
 
 const EditableCell = ({ 
@@ -313,9 +311,7 @@ const ProposalPlan = () => {
                   <thead>
                     <tr>
                       <th className="py-3 px-4" style={{width: '50%'}}>Section</th>
-                     
                       <th className="py-3 px-4" style={{width: '15%'}}>Reviewer</th>
-                      <th className="py-3 px-4 text-center" style={{width: '12%'}}>Add Subsection</th>
                       <th className="py-3 px-4 text-center" style={{width: '9%'}}>Subsections</th>
                       <th className="py-3 px-4 text-center" style={{width: '6.5%'}}>Words</th>
                       <th className="py-3 px-4 text-center" style={{width: '10%'}}>Completed</th>
@@ -337,11 +333,16 @@ const ProposalPlan = () => {
                           className="hover:bg-gray-50"
                         >
                           <td className="py-2 px-4">
-                            <EditableCell
-                                value={section.heading}
-                                onChange={(value) => handleSectionChange(index, 'heading', value)}
-                                onBlur={() => updateSection(outline[index], index)}
-                            />
+                            <Link
+                              to="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleEditClick(section);
+                              }}
+                              style={{ cursor: 'pointer', textDecoration: 'none' }}
+                            >
+                              {section.heading}
+                            </Link>
                           </td>
                           <td className="py-2 px-4">
                             <EditableCell
@@ -349,20 +350,6 @@ const ProposalPlan = () => {
                               onChange={(value) => handleSectionChange(index, 'reviewer', value)}
                               onBlur={() => updateSection(outline[index], index)}
                             />
-                          </td>
-                          <td className="py-2 px-4 text-center">
-                            <div className="d-flex justify-content-center">
-                              <button
-                                onClick={() => handleEditClick(section)}
-                                className="upload-button"
-                                title="Edit section"
-                              >
-            
-                                <FontAwesomeIcon icon={faPencil} size="sm" className="pr-2" />
-                                Edit
-                              </button>
-    
-                            </div>
                           </td>
                           <td className="py-2 px-4 text-center">
                               {section.subsections}

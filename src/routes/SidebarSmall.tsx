@@ -128,7 +128,7 @@ const SideBarSmall = () => {
           <FontAwesomeIcon icon={faFileWord} />
           <span>Wordpane</span>
         </Link>
-        <Link
+         {/* <Link
           to="#"
           className="sidebarsmalllink"
           onClick={handleShowTips}
@@ -136,7 +136,7 @@ const SideBarSmall = () => {
         >
           <FontAwesomeIcon icon={faCircleExclamation} />
           <span>Show Tips</span>
-        </Link>
+        </Link>  */}
         <Link
           to="/logout"
           className={`sidebarsmalllink ${isActive("/logout") ? "sidebarsmalllink-active" : ""}`}

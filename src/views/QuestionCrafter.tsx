@@ -876,7 +876,7 @@ const QuestionCrafter = () => {
           </div>
         </div>
       </div>
-      <QuestionCrafterWizard />
+      {/* <QuestionCrafterWizard /> */}
     </div>
   );
 };

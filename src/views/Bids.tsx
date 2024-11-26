@@ -517,7 +517,7 @@ const Bids = () => {
               )
             )}
           </div>
-          <DashboardWizard />
+          {/* <DashboardWizard /> */}
         </div>
         <Modal
           show={showModal}

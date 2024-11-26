@@ -1665,7 +1665,7 @@ const QAGenerator = () => {
           </div>
         </div>
       </div>
-      <QuestionCrafterWizard />
+      {/* <QuestionCrafterWizard /> */}
     </div>
   );
 };

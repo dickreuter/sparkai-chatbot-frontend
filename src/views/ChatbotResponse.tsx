@@ -221,7 +221,7 @@ const ChatbotResponse = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <QuickQuestionWizard />
+      {/* <QuickQuestionWizard /> */}
     </div>
   );
 };

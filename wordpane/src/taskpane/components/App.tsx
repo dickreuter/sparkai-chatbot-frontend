@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createMemoryRouter, RouterProvider, Outlet } from "react-router-dom";
-import { AuthProvider } from "react-auth-kit";
+import { AuthProvider, useAuthUser } from "react-auth-kit";
 import { makeStyles } from "@fluentui/react-components";
 import WordpaneCopilot from "./WordpaneCopilot/WordpaneCopilot";
 import SignInComponent from "../components/auth/SignIn";
@@ -17,8 +17,6 @@ import posthog from "posthog-js";
 posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
   api_host: "https://eu.i.posthog.com",
   person_profiles: "identified_only",
-  // Add default properties for all events from the Word add-in
-  property_denylist: [],
   bootstrap: {
     distinctID: "unknown_user",
     isIdentifiedID: false,
@@ -27,12 +25,23 @@ posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
   },
   autocapture: false,
   loaded: (posthog) => {
-    // Add default properties to all events from the Word add-in
-    posthog.register({
-      app_type: "word_add_in",
-      platform: "microsoft_office",
-      client: "word",
-    });
+    // Check for authenticated user immediately after loading
+    const authState = JSON.parse(localStorage.getItem("_auth_state") || "{}");
+    if (authState.email) {
+      posthog.identify(authState.email, {
+        email: authState.email,
+        app_type: "word_add_in",
+        platform: "microsoft_office",
+        client: "word",
+      });
+    } else {
+      // Only register default properties if user is not identified
+      posthog.register({
+        app_type: "word_add_in",
+        platform: "microsoft_office",
+        client: "word",
+      });
+    }
   },
 });
 
@@ -51,19 +60,26 @@ const useStyles = makeStyles({
 });
 
 const Layout: React.FC<{ title: string }> = ({ title }) => {
+  const getAuth = useAuthUser();
+  const auth = getAuth();
+
   // Track when the add-in is loaded and identify user if logged in
   React.useEffect(() => {
-    const authState = JSON.parse(localStorage.getItem("_auth_state") || "{}");
-    if (authState.email) {
-      posthog.identify(authState.email);
+    if (auth?.email) {
+      posthog.identify(auth.email, {
+        email: auth.email,
+        app_type: "word_add_in",
+        platform: "microsoft_office",
+        client: "word",
+      });
     }
 
     posthog.capture("word_addin_loaded", {
       title,
       environment: "microsoft_word",
-      email: authState.email || "unknown_user",
+      email: auth?.email || "unknown_user",
     });
-  }, []);
+  }, [auth?.email]);
 
   return (
     <ThemeProvider>

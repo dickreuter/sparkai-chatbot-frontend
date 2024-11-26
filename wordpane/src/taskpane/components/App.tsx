@@ -11,6 +11,30 @@ import "./Proposal.css";
 import "./Upload.css";
 import "bootstrap/dist/css/bootstrap.css";
 import ThemeProvider from "../providers/ThemeProvider";
+import posthog from "posthog-js";
+
+// Initialize PostHog with Word Add-in specific configuration
+posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
+  api_host: "https://eu.i.posthog.com",
+  person_profiles: "identified_only",
+  // Add default properties for all events from the Word add-in
+  property_denylist: [],
+  bootstrap: {
+    distinctID: "unknown_user",
+    isIdentifiedID: false,
+    featureFlags: {},
+    featureFlagPayloads: {},
+  },
+  autocapture: false,
+  loaded: (posthog) => {
+    // Add default properties to all events from the Word add-in
+    posthog.register({
+      app_type: "word_add_in",
+      platform: "microsoft_office",
+      client: "word",
+    });
+  },
+});
 
 interface AppProps {
   title: string;
@@ -27,6 +51,14 @@ const useStyles = makeStyles({
 });
 
 const Layout: React.FC<{ title: string }> = ({ title }) => {
+  // Track when the add-in is loaded
+  React.useEffect(() => {
+    posthog.capture("word_addin_loaded", {
+      title,
+      environment: "microsoft_word",
+    });
+  }, []);
+
   return (
     <ThemeProvider>
       <div className="content-scaler">

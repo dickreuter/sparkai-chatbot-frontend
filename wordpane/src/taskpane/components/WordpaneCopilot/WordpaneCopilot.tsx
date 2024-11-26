@@ -22,6 +22,7 @@ import {
 } from "./helper";
 import Welcome from "./Welcome";
 import useShowWelcome from "../../hooks/useShowWelcome";
+import posthog from "posthog-js";
 
 const WordpaneCopilot = () => {
   const getAuth = useAuthUser();
@@ -141,6 +142,12 @@ const WordpaneCopilot = () => {
   }, [showOptions]);
 
   const handleClickMessageShortcut = (action: IShortcutType, message: IMessage) => {
+    posthog.capture("word_addin_message_shortcut_clicked", {
+      action,
+      messageType: message.type,
+      client_type: "word_add_in",
+    });
+
     if (action === "refine") {
       setCurrentRefine({ tab: selectedTab, message });
     } else if (action === "insert") {
@@ -221,27 +228,60 @@ const WordpaneCopilot = () => {
       | "Start"
       | "End"
   ) => {
+    posthog.capture("word_addin_insert_started", {
+      contentType: type,
+      insertLocation,
+      client_type: "word_add_in",
+    });
+
     Word.run(async (context) => {
-      const selection = context.document.getSelection();
-      selection.paragraphs.load("items");
-      return context
-        .sync()
-        .then(async function () {
-          if (type === "image") {
-            const newSelection = selection.insertParagraph("", "After");
-            newSelection.insertInlinePictureFromBase64(value.split(",")[1], insertLocation);
-          } else if (type === "text") {
-            selection.insertText(htmlToPlainText(value), insertLocation);
-          }
-          return await context.sync();
-        })
-        .catch((error) => {
-          console.error("Error: ", error);
+      try {
+        const selection = context.document.getSelection();
+        selection.paragraphs.load("items");
+        return context
+          .sync()
+          .then(async function () {
+            if (type === "image") {
+              const newSelection = selection.insertParagraph("", "After");
+              newSelection.insertInlinePictureFromBase64(value.split(",")[1], insertLocation);
+            } else if (type === "text") {
+              selection.insertText(htmlToPlainText(value), insertLocation);
+            }
+            await context.sync();
+
+            posthog.capture("word_addin_insert_succeeded", {
+              contentType: type,
+              insertLocation,
+              client_type: "word_add_in",
+            });
+          })
+          .catch((error) => {
+            console.error("Error: ", error);
+            posthog.capture("word_addin_insert_failed", {
+              contentType: type,
+              insertLocation,
+              error: error.message,
+              client_type: "word_add_in",
+            });
+          });
+      } catch (error) {
+        posthog.capture("word_addin_insert_error", {
+          contentType: type,
+          insertLocation,
+          error: error.message,
+          client_type: "word_add_in",
         });
+      }
     });
   };
 
   const handleClickMenuItem = (item: { id: IPromptType; title: string }) => () => {
+    posthog.capture("word_addin_menu_item_clicked", {
+      itemId: item.id,
+      itemTitle: item.title,
+      client_type: "word_add_in",
+    });
+
     if (item.id === "Custom Prompt") {
       setIsCustomPrompt(true);
       setSelectedTab("library-chat");
@@ -280,6 +320,14 @@ const WordpaneCopilot = () => {
 
   const handleClickSubmitButton = () => {
     setShowWelcome(false);
+    posthog.capture("word_addin_submit_clicked", {
+      isRefine,
+      isCustomPrompt,
+      selectedTab,
+      hasSelectedText: !!selectedText.trim(),
+      client_type: "word_add_in",
+    });
+
     if (isRefine) {
       if (currentRefine.tab === "library-chat") {
         const refine = refineResponse(inputValue, currentRefine.message, libraryChatMessages);
@@ -345,6 +393,12 @@ const WordpaneCopilot = () => {
 
   const handleLibraryChatMessage = (request: IMessageRequest) => {
     if (request.instructionText.trim() !== "") {
+      posthog.capture("word_addin_library_chat_message_sent", {
+        isRefine: request.isRefine,
+        hasHighlightedText: !!request.highlightedText,
+        client_type: "word_add_in",
+      });
+
       setLibraryChatMessages([
         ...request.messages,
         withId({
@@ -357,11 +411,22 @@ const WordpaneCopilot = () => {
         }),
         withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false, request }),
       ]);
+
       askLibraryChatQuestion(tokenRef.current, request)
         .then((message) => {
           setLibraryChatMessages((messages) => [...messages.slice(0, -1), message]);
+          posthog.capture("word_addin_library_chat_response_received", {
+            messageType: message.type,
+            client_type: "word_add_in",
+          });
         })
-        .catch(console.log);
+        .catch((error) => {
+          console.log(error);
+          posthog.capture("word_addin_library_chat_error", {
+            error: error.message,
+            client_type: "word_add_in",
+          });
+        });
       setInputValue("");
     }
   };
@@ -426,6 +491,23 @@ const WordpaneCopilot = () => {
     if (type === "refine" && currentRefine?.message?.id !== message.id) return "enabled";
     return "hidden";
   };
+
+  // Track tab changes
+  useEffect(() => {
+    posthog.capture("word_addin_tab_changed", {
+      newTab: selectedTab,
+      client_type: "word_add_in",
+    });
+  }, [selectedTab]);
+
+  // Track welcome screen visibility
+  useEffect(() => {
+    if (!showWelcome) {
+      posthog.capture("word_addin_welcome_closed", {
+        client_type: "word_add_in",
+      });
+    }
+  }, [showWelcome]);
 
   return (
     <Box display="flex" flexDirection="column" height="100%" padding={"3px"}>

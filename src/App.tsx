@@ -9,8 +9,15 @@ import ReactGA4 from "react-ga4";
 import "./Widget.css";
 import SupportChat from "./components/SupportChat.tsx";
 import AutoLogout from "./components/auth/AutoLogout.tsx";
+import posthog from "posthog-js";
 
 ReactGA4.initialize("G-X8S1ZMRM3C");
+
+// Initialize PostHog at the app level
+posthog.init("phc_bdUxtNoJmZWNnu1Ar29zUtusFQ4bvU91fZpLw5v4Y3e", {
+  api_host: "https://eu.i.posthog.com",
+  person_profiles: "identified_only"
+});
 
 const Layout = () => {
   const location = useLocation();
@@ -20,6 +27,10 @@ const Layout = () => {
   useEffect(() => {
     if (auth?.token) {
       console.log("User authenticated");
+      // Identify user in PostHog when authenticated
+      posthog.identify(auth.email, {
+        email: auth.email
+      });
     }
   }, [auth?.token]);
 
@@ -38,7 +49,7 @@ const Layout = () => {
     "/calculator",
     "/question-answer",
     "/proposal-preview",
-    "/",
+    "/"
   ];
   const shouldShowNavBar = showNavBarPaths.includes(location.pathname);
 

@@ -56,6 +56,7 @@
     "moment": "^2.29.4",
     "mui": "^0.0.1",
     "pdfjs-dist": "^4.6.82",
+    "posthog-js": "^1.188.1",
     "react": "^17.0.2",
     "react-auth-kit": "^2.12.7",
     "react-bootstrap": "^2.9.1",

@@ -11,8 +11,9 @@ import {
   faCheck,
   faSpinner
 } from "@fortawesome/free-solid-svg-icons";
+import posthog from "posthog-js";
 
-const UploadPDF = ({
+const UploadPDFComponent = ({
   folder,
   get_collections,
   onClose,
@@ -29,14 +30,20 @@ const UploadPDF = ({
   const fileInputRef = useRef(null);
 
   const getFileMode = (fileType) => {
-    if (fileType === 'application/pdf') {
-      return 'pdf';
-    } else if (fileType === 'application/msword' || 
-               fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-      return 'word';
-    } else if (fileType === 'application/vnd.ms-excel' || 
-               fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-      return 'excel';
+    if (fileType === "application/pdf") {
+      return "pdf";
+    } else if (
+      fileType === "application/msword" ||
+      fileType ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      return "word";
+    } else if (
+      fileType === "application/vnd.ms-excel" ||
+      fileType ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ) {
+      return "excel";
     }
     return null;
   };
@@ -68,36 +75,51 @@ const UploadPDF = ({
 
   const handleFiles = (newFiles) => {
     const allowedTypes = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ];
-  
+
     // Updated regex to allow spaces
     const fileNameRegex = /^[a-zA-Z0-9_\s-]{3,63}$/;
-  
-    const invalidTypeFiles = newFiles.filter(file => !allowedTypes.includes(file.type));
-    const invalidLengthFiles = newFiles.filter(file => {
-      const fileName = file.name.split('.').slice(0, -1).join('.');
+
+    const invalidTypeFiles = newFiles.filter(
+      (file) => !allowedTypes.includes(file.type)
+    );
+    const invalidLengthFiles = newFiles.filter((file) => {
+      const fileName = file.name.split(".").slice(0, -1).join(".");
       return !fileNameRegex.test(fileName);
     });
-  
-    const validFiles = newFiles.filter(file =>
-      allowedTypes.includes(file.type) &&
-      fileNameRegex.test(file.name.split('.').slice(0, -1).join('.'))
+
+    const validFiles = newFiles.filter(
+      (file) =>
+        allowedTypes.includes(file.type) &&
+        fileNameRegex.test(file.name.split(".").slice(0, -1).join("."))
     );
-  
+
     setSelectedFiles((prevFiles) => [...prevFiles, ...validFiles]);
-  
+
+    if (validFiles.length > 0) {
+      posthog.capture("pdf_upload_files_selected", {
+        fileCount: validFiles.length,
+        fileTypes: validFiles.map((f) => f.type),
+        folder
+      });
+    }
+
     if (invalidTypeFiles.length > 0) {
       displayAlert(
         "Some files were not added due to invalid file type. Please select PDF, Word, or Excel files only.",
         "danger"
       );
+      posthog.capture("pdf_upload_invalid_file_types", {
+        fileCount: invalidTypeFiles.length,
+        fileTypes: invalidTypeFiles.map((f) => f.type)
+      });
     }
-  
+
     if (invalidLengthFiles.length > 0) {
       displayAlert(
         "Some files were not added due to invalid file names. File names must be between 3-63 characters and contain only letters, numbers, spaces, underscores, or dashes.",
@@ -105,24 +127,30 @@ const UploadPDF = ({
       );
     }
   };
-  
+
   const uploadFile = async (file) => {
+    posthog.capture("pdf_upload_started", {
+      fileName: file.name,
+      fileType: file.type,
+      folder
+    });
+
     const mode = getFileMode(file.type);
     if (!mode) {
       throw new Error("Unsupported file type");
     }
-  
+
     // Updated regex to allow spaces
     const fileNameRegex = /^[a-zA-Z0-9_\s-]{3,63}$/;
-  
+
     const formData = new FormData();
     formData.append("file", file);
-    
+
     // If folder name contains spaces, encode it for the API
     const encodedFolder = folder ? encodeURIComponent(folder) : "";
     formData.append("profile_name", encodedFolder);
     formData.append("mode", mode);
-  
+
     if (!fileNameRegex.test(folder)) {
       displayAlert(
         "File name should be 3-63 characters long and contain only alphanumeric characters, spaces, underscores, or dashes",
@@ -131,7 +159,7 @@ const UploadPDF = ({
       setIsUploading(false);
       return;
     }
-  
+
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/uploadfile/`,
@@ -143,9 +171,20 @@ const UploadPDF = ({
           }
         }
       );
+      posthog.capture("pdf_upload_succeeded", {
+        fileName: file.name,
+        fileType: file.type,
+        folder
+      });
       setUploadedFiles((prev) => ({ ...prev, [file.name]: true }));
       return response.data;
     } catch (error) {
+      posthog.capture("pdf_upload_failed", {
+        fileName: file.name,
+        fileType: file.type,
+        folder,
+        error: error.message
+      });
       console.error("Error uploading file:", error);
       throw error;
     }
@@ -175,6 +214,11 @@ const UploadPDF = ({
 
     if (successCount > 0) {
       displayAlert(`Successfully uploaded ${successCount} file(s)`, "success");
+      posthog.capture("pdf_upload_batch_completed", {
+        successCount,
+        failCount,
+        totalFiles: selectedFiles.length
+      });
     }
     if (failCount > 0) {
       displayAlert(`Failed to upload ${failCount} file(s)`, "danger");
@@ -224,9 +268,10 @@ const UploadPDF = ({
           style={{ marginBottom: "10px", color: "#ff7f50" }}
         />
         <p>
-          Drag and drop your PDF, Word, or Excel documents here or click to select files
+          Drag and drop your PDF, Word, or Excel documents here or click to
+          select files
         </p>
-      
+
         {selectedFiles.length > 0 && (
           <div
             style={{ textAlign: "center", maxWidth: "400px", margin: "0 auto" }}
@@ -279,4 +324,5 @@ const UploadPDF = ({
   );
 };
 
+const UploadPDF = UploadPDFComponent;
 export default withAuth(UploadPDF);

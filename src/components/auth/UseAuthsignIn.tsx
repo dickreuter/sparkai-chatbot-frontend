@@ -4,6 +4,7 @@ import axios from "axios";
 import { useSignIn } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
+import posthog from "posthog-js";
 
 const useAuthSignIn = () => {
   const signIn = useSignIn();
@@ -47,6 +48,12 @@ const useAuthSignIn = () => {
         navigate("/bids");
 
         //localStorage.clear();
+
+        posthog.identify(res.data.email);
+        posthog.capture("user_active", {
+          distinct_id: res.data.email,
+          timestamp: new Date().toISOString()
+        });
 
         return { success: true, message: "Log in successful!" };
       } else {

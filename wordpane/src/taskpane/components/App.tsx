@@ -59,12 +59,26 @@ const useStyles = makeStyles({
   },
 });
 
+const REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
 const Layout: React.FC<{ title: string }> = ({ title }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
 
   // Track when the add-in is loaded and identify user if logged in
   React.useEffect(() => {
+    // Check last refresh time
+    const lastRefresh = localStorage.getItem("lastAddinRefresh");
+    const now = Date.now();
+
+    if (!lastRefresh || now - parseInt(lastRefresh) > REFRESH_INTERVAL) {
+      // Store new refresh time
+      localStorage.setItem("lastAddinRefresh", now.toString());
+
+      // Force refresh the page
+      window.location.reload();
+    }
+
     if (auth?.email) {
       posthog.identify(auth.email, {
         email: auth.email,

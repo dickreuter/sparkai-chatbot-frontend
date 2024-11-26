@@ -140,25 +140,13 @@ const UploadPDFComponent = ({
       throw new Error("Unsupported file type");
     }
 
-    // Updated regex to allow parentheses
-    const fileNameRegex = /^[\w\s()-]{3,63}$/;
-
     const formData = new FormData();
     formData.append("file", file);
 
-    // If folder name contains spaces, encode it for the API
+    // Only apply regex validation to folder names
     const encodedFolder = folder ? encodeURIComponent(folder) : "";
     formData.append("profile_name", encodedFolder);
     formData.append("mode", mode);
-
-    if (!fileNameRegex.test(folder)) {
-      displayAlert(
-        "File name should be 3-63 characters long and contain only alphanumeric characters, spaces, underscores, or dashes",
-        "warning"
-      );
-      setIsUploading(false);
-      return;
-    }
 
     try {
       const response = await axios.post(

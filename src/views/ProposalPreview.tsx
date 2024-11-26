@@ -13,6 +13,7 @@ import SideBarSmall from "../routes/SidebarSmall";
 import CircularProgress from "@mui/material/CircularProgress";
 import { displayAlert } from "../helper/Alert";
 import withAuth from "../routes/withAuth";
+import posthog from "posthog-js";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -70,6 +71,10 @@ const ProposalPreview = () => {
 
   const handlePdfDownload = () => {
     if (pdfUrl) {
+      posthog.capture("proposal_pdf_downloaded", {
+        bidId: sharedState.object_id,
+        bidName: sharedState.bidInfo
+      });
       const link = document.createElement("a");
       link.href = pdfUrl;
       link.download = `proposal_${sharedState.bidInfo || "document"}.pdf`;
@@ -81,6 +86,10 @@ const ProposalPreview = () => {
 
   const handleWordDownload = async () => {
     try {
+      posthog.capture("proposal_word_downloaded", {
+        bidId: sharedState.object_id,
+        bidName: sharedState.bidInfo
+      });
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/get_proposal`,
         {
@@ -116,10 +125,7 @@ const ProposalPreview = () => {
     <div className="chatpage">
       <SideBarSmall />
       <div className="lib-container">
-        <div
-          className="scroll-container"
-
-        >
+        <div className="scroll-container">
           <BidNavbar
             showViewOnlyMessage={() =>
               displayAlert(
@@ -181,8 +187,6 @@ const ProposalPreview = () => {
                 </div>
               </div>
 
-              
-
               <div
                 style={{
                   flex: 1,
@@ -225,9 +229,7 @@ const ProposalPreview = () => {
                       textAlign: "center"
                     }}
                   >
-                    <p>
-                    Generate a Proposal to preview it here.
-                    </p>
+                    <p>Generate a Proposal to preview it here.</p>
                   </div>
                 )}
               </div>

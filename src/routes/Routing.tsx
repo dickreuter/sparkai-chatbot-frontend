@@ -21,8 +21,21 @@ import ForgotPassword from "../views/ForgotPassword.tsx";
 import ProposalPlan from "../views/ProposalPlan.tsx";
 import QAGenerator from "../views/Q&AGenerator.tsx";
 import ProposalPreview from "../views/ProposalPreview.tsx";
+import posthog from "posthog-js";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 function Routing() {
+  const location = useLocation();
+
+  // Track page views
+  useEffect(() => {
+    posthog.capture("$pageview", {
+      path: location.pathname,
+      search: location.search
+    });
+  }, [location]);
+
   return (
     <div>
       <Routes>

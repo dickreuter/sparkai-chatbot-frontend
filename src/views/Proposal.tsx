@@ -19,6 +19,8 @@ import "./Proposal.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { TabProvider } from "../routes/TabProvider.tsx";
 import BidCompilerWizard from "../wizards/BidCompilerWizard.tsx";
+import posthog from "posthog-js";
+import { displayAlert } from "../helper/Alert.tsx";
 
 const Proposal = () => {
   const getAuth = useAuthUser();
@@ -40,6 +42,10 @@ const Proposal = () => {
     currentUserPermission === "admin" || currentUserPermission === "editor";
 
   const exportToDocx = (editorState) => {
+    posthog.capture("proposal_export_to_word", {
+      bidId: sharedState.object_id,
+      bidName: bidInfo
+    });
     if (!editorState) {
       console.error("No editor state available");
       return;
@@ -73,11 +79,30 @@ const Proposal = () => {
 
   const handleSaveProposal = async () => {
     setIsLoading(true);
+    posthog.capture("proposal_save_started", {
+      bidId: sharedState.object_id,
+      bidName: bidInfo
+    });
+
     setIsSaved(false);
-    await saveProposal();
+    try {
+      await saveProposal();
+      displayAlert("Proposal saved successfully", "success");
+      posthog.capture("proposal_save_succeeded", {
+        bidId: sharedState.object_id,
+        bidName: bidInfo
+      });
+    } catch (error) {
+      displayAlert("Failed to save proposal", "danger");
+      posthog.capture("proposal_save_failed", {
+        bidId: sharedState.object_id,
+        bidName: bidInfo,
+        error: error.message
+      });
+    }
     setIsLoading(false);
     setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 3000); // Reset after 3 seconds
+    setTimeout(() => setIsSaved(false), 3000);
   };
 
   return (

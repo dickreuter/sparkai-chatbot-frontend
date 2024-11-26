@@ -31,16 +31,23 @@ import FileContentModal from "../components/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import UploadText from "../views/UploadText.tsx";
 import InterrogateTenderModal from "./InterrogateTenderModal.tsx";
+import posthog from "posthog-js";
 
 const getFileMode = (fileType) => {
-  if (fileType === 'application/pdf') {
-    return 'pdf';
-  } else if (fileType === 'application/msword' || 
-             fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-    return 'word';
-  } else if (fileType === 'application/vnd.ms-excel' || 
-             fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-    return 'excel';
+  if (fileType === "application/pdf") {
+    return "pdf";
+  } else if (
+    fileType === "application/msword" ||
+    fileType ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ) {
+    return "word";
+  } else if (
+    fileType === "application/vnd.ms-excel" ||
+    fileType ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  ) {
+    return "excel";
   }
   return null;
 };
@@ -90,6 +97,7 @@ const TenderLibrary = ({ object_id }) => {
 
   const handleDeleteFileClick = (event, filename) => {
     event.stopPropagation();
+    posthog.capture("tender_library_delete_file_clicked", { filename });
     setFileToDelete({ filename });
     setShowDeleteFileModal(true);
   };
@@ -159,6 +167,10 @@ const TenderLibrary = ({ object_id }) => {
 
   const viewFile = async (fileName) => {
     try {
+      posthog.capture("tender_library_view_file", {
+        fileName,
+        fileType: fileName.split(".").pop().toLowerCase()
+      });
       const formData = new FormData();
       formData.append("bid_id", object_id);
       formData.append("file_name", fileName);
@@ -301,18 +313,16 @@ const TenderLibrary = ({ object_id }) => {
       e.preventDefault();
       e.stopPropagation();
       setDragActive(false);
+      console.log("Drop event triggered");
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        handleFiles(Array.from(e.dataTransfer.files));
-      }
-    };
-
-    const handleFileSelect = (e) => {
-      if (e.target.files && e.target.files.length > 0) {
-        handleFiles(Array.from(e.target.files));
+        const droppedFiles = Array.from(e.dataTransfer.files);
+        console.log("Dropped files:", droppedFiles);
+        handleFiles(droppedFiles);
       }
     };
 
     const handleFiles = (newFiles) => {
+      console.log("handleFiles called with:", newFiles);
       const allowedTypes = [
         "application/pdf",
         "application/msword",
@@ -322,18 +332,49 @@ const TenderLibrary = ({ object_id }) => {
       ];
 
       const validFiles = newFiles.filter((file) => {
+        console.log("Checking file:", file.name, file.type);
         const isAllowedType = allowedTypes.includes(file.type);
         const mode = getFileMode(file.type);
-        return isAllowedType && mode !== null;
+        if (!isAllowedType || !mode) {
+          displayAlert(
+            `File "${file.name}" was not added. Only PDF, Word, and Excel documents are allowed.`,
+            "warning"
+          );
+          return false;
+        }
+        return true;
       });
 
-      setFiles((prevFiles) => [...prevFiles, ...validFiles]);
+      console.log("Valid files:", validFiles);
 
-      if (validFiles.length !== newFiles.length) {
-        displayAlert(
-          "Some files were not added. Only PDF, Word, and Excel documents are allowed.",
-          "warning"
-        );
+      if (validFiles.length > 0) {
+        setFiles((prevFiles) => {
+          const updatedFiles = [...prevFiles];
+          validFiles.forEach((file) => {
+            const exists = updatedFiles.some(
+              (existingFile) => existingFile.name === file.name
+            );
+            if (!exists) {
+              updatedFiles.push(file);
+            }
+          });
+          console.log("Updated files state:", updatedFiles);
+          return updatedFiles;
+        });
+      }
+    };
+
+    const handleFileSelect = (e) => {
+      console.log("File select triggered");
+      const selectedFiles = e.target.files;
+      if (selectedFiles && selectedFiles.length > 0) {
+        console.log("Selected files:", selectedFiles);
+        const filesArray = Array.from(selectedFiles);
+        handleFiles(filesArray);
+      }
+      // Reset the input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
       }
     };
 
@@ -396,6 +437,11 @@ const TenderLibrary = ({ object_id }) => {
           "success"
         );
         setDocumentListVersion((prev) => prev + 1);
+        posthog.capture("tender_library_files_uploaded", {
+          successCount,
+          failCount,
+          fileTypes: files.map((f) => f.type)
+        });
       }
       if (failCount > 0) {
         displayAlert(`Failed to upload ${failCount} file(s)`, "danger");
@@ -443,6 +489,7 @@ const TenderLibrary = ({ object_id }) => {
               onChange={handleFileSelect}
               style={{ display: "none" }}
               multiple
+              key={files.length}
             />
             <FontAwesomeIcon
               icon={faCloudUploadAlt}
@@ -450,8 +497,8 @@ const TenderLibrary = ({ object_id }) => {
               style={{ marginBottom: "10px", color: "#ff7f50" }}
             />
             <p>
-              Drag and drop your PDF, Word, or Excel documents here or click to select
-              files
+              Drag and drop your PDF, Word, or Excel documents here or click to
+              select files
             </p>
             {files.length > 0 && (
               <div
@@ -545,9 +592,10 @@ const TenderLibrary = ({ object_id }) => {
               <Table striped bordered hover responsive>
                 <thead>
                   <tr>
-                    {sheetData[0] && sheetData[0].map((header, index) => (
-                      <th key={index}>{header}</th>
-                    ))}
+                    {sheetData[0] &&
+                      sheetData[0].map((header, index) => (
+                        <th key={index}>{header}</th>
+                      ))}
                   </tr>
                 </thead>
                 <tbody>

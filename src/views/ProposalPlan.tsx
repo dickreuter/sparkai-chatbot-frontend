@@ -17,7 +17,8 @@ import StatusMenu, { Section } from "../components/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import GenerateProposalModal from "../modals/GenerateProposalModal.tsx";
 import SectionMenu from "../components/SectionMenu.tsx";
-import posthog from "posthog-js";
+import { MenuItem, Select } from "@mui/material";
+
 
 const EditableCell = ({
   value: initialValue,
@@ -51,6 +52,77 @@ const EditableCell = ({
       className="editable-cell"
       placeholder="-"
     />
+  );
+};
+
+const selectStyle = {
+  fontFamily: '"ClashDisplay", sans-serif',
+  fontSize: '0.875rem',
+  minWidth: '220px',
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#ced4da',
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#86b7fe',
+  },
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    borderColor: '#86b7fe',
+    borderWidth: '1px',
+  },
+};
+
+const menuStyle = {
+  fontSize: '0.875rem',
+};
+
+const ReviewerDropdown = ({ 
+  value, 
+  onChange,
+  onBlur,
+  contributors
+}: { 
+  value: string,
+  onChange: (value: string) => void,
+  onBlur: () => void,
+  contributors: Record<string, string>
+}) => {
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    onChange(event.target.value as string);
+  };
+
+  return (
+    <Select
+      value={value || ''}
+      onChange={handleChange}
+      onBlur={onBlur}
+      size="small"
+      style={selectStyle}
+      displayEmpty
+      MenuProps={{
+        PaperProps: {
+          style: menuStyle
+        }
+      }}
+    >
+      <MenuItem value="" style={menuStyle}>
+        <em>Select Reviewer</em>
+      </MenuItem>
+      {Object.entries(contributors).length > 0 ? (
+        Object.entries(contributors).map(([email, role], index) => (
+          <MenuItem 
+            key={index} 
+            value={email}
+            style={menuStyle}
+          >
+            {email} ({role})
+          </MenuItem>
+        ))
+      ) : (
+        <MenuItem disabled value="" style={menuStyle}>
+          No Contributors Available
+        </MenuItem>
+      )}
+    </Select>
   );
 };
 
@@ -416,14 +488,11 @@ const ProposalPlan = () => {
                             </Link>
                           </td>
                           <td className="py-2 px-4">
-                            <EditableCell
+                            <ReviewerDropdown
                               value={section.reviewer}
-                              onChange={(value) =>
-                                handleSectionChange(index, "reviewer", value)
-                              }
-                              onBlur={() =>
-                                updateSection(outline[index], index)
-                              }
+                              onChange={(value) => handleSectionChange(index, 'reviewer', value)}
+                              onBlur={() => updateSection(outline[index], index)}
+                              contributors={contributors}
                             />
                           </td>
                           <td className="py-2 px-4 text-center">

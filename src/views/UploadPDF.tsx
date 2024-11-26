@@ -69,21 +69,24 @@ const UploadPDF = ({
   const handleFiles = (newFiles) => {
     const allowedTypes = [
       'application/pdf',
-      'application/msword', 
+      'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/vnd.ms-excel',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ];
   
+    // Updated regex to allow spaces
+    const fileNameRegex = /^[a-zA-Z0-9_\s-]{3,63}$/;
+  
     const invalidTypeFiles = newFiles.filter(file => !allowedTypes.includes(file.type));
     const invalidLengthFiles = newFiles.filter(file => {
       const fileName = file.name.split('.').slice(0, -1).join('.');
-      return !(/^[a-zA-Z0-9_-]{3,63}$/.test(fileName));
+      return !fileNameRegex.test(fileName);
     });
   
-    const validFiles = newFiles.filter(file => 
-      allowedTypes.includes(file.type) && 
-      /^[a-zA-Z0-9_-]{3,63}$/.test(file.name.split('.').slice(0, -1).join('.'))
+    const validFiles = newFiles.filter(file =>
+      allowedTypes.includes(file.type) &&
+      fileNameRegex.test(file.name.split('.').slice(0, -1).join('.'))
     );
   
     setSelectedFiles((prevFiles) => [...prevFiles, ...validFiles]);
@@ -97,32 +100,38 @@ const UploadPDF = ({
   
     if (invalidLengthFiles.length > 0) {
       displayAlert(
-        "Some files were not added due to invalid file names. File names must be between 3-63 characters and contain only letters, numbers, underscores, or dashes.",
+        "Some files were not added due to invalid file names. File names must be between 3-63 characters and contain only letters, numbers, spaces, underscores, or dashes.",
         "danger"
       );
     }
   };
+  
   const uploadFile = async (file) => {
     const mode = getFileMode(file.type);
     if (!mode) {
       throw new Error("Unsupported file type");
     }
-
+  
+    // Updated regex to allow spaces
+    const fileNameRegex = /^[a-zA-Z0-9_\s-]{3,63}$/;
+  
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("profile_name", folder || "");
+    
+    // If folder name contains spaces, encode it for the API
+    const encodedFolder = folder ? encodeURIComponent(folder) : "";
+    formData.append("profile_name", encodedFolder);
     formData.append("mode", mode);
-
-    if (!/^[a-zA-Z0-9_-]{3,63}$/.test(folder)) {
+  
+    if (!fileNameRegex.test(folder)) {
       displayAlert(
-        "File name should be 3-63 characters long and contain only alphanumeric characters, underscores, or dashes",
+        "File name should be 3-63 characters long and contain only alphanumeric characters, spaces, underscores, or dashes",
         "warning"
       );
       setIsUploading(false);
       return;
     }
-
-
+  
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/uploadfile/`,

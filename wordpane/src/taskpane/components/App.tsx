@@ -51,11 +51,17 @@ const useStyles = makeStyles({
 });
 
 const Layout: React.FC<{ title: string }> = ({ title }) => {
-  // Track when the add-in is loaded
+  // Track when the add-in is loaded and identify user if logged in
   React.useEffect(() => {
+    const authState = JSON.parse(localStorage.getItem("_auth_state") || "{}");
+    if (authState.email) {
+      posthog.identify(authState.email);
+    }
+
     posthog.capture("word_addin_loaded", {
       title,
       environment: "microsoft_word",
+      email: authState.email || "unknown_user",
     });
   }, []);
 

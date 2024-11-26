@@ -82,8 +82,8 @@ const UploadPDFComponent = ({
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ];
 
-    // Updated regex to allow spaces
-    const fileNameRegex = /^[a-zA-Z0-9_\s-]{3,63}$/;
+    // Updated regex to allow parentheses
+    const fileNameRegex = /^[\w\s()-]{3,63}$/;
 
     const invalidTypeFiles = newFiles.filter(
       (file) => !allowedTypes.includes(file.type)
@@ -140,8 +140,8 @@ const UploadPDFComponent = ({
       throw new Error("Unsupported file type");
     }
 
-    // Updated regex to allow spaces
-    const fileNameRegex = /^[a-zA-Z0-9_\s-]{3,63}$/;
+    // Updated regex to allow parentheses
+    const fileNameRegex = /^[\w\s()-]{3,63}$/;
 
     const formData = new FormData();
     formData.append("file", file);

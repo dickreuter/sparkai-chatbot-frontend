@@ -114,7 +114,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
         clearInterval(messageRotationInterval);
         if (!isGeneratingProposal) {
           setProgress(100);
-          setLoadingMessage("Proposal ready!");
+          setLoadingMessage("Finalising proposal.... Please wait...");
         } else {
           setProgress(98);
         }

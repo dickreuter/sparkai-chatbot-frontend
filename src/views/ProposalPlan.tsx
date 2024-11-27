@@ -17,8 +17,9 @@ import StatusMenu, { Section } from "../components/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import GenerateProposalModal from "../modals/GenerateProposalModal.tsx";
 import SectionMenu from "../components/SectionMenu.tsx";
-import { MenuItem, Select } from "@mui/material";
+import { MenuItem, Select, Skeleton } from "@mui/material";
 import posthog from "posthog-js";
+import { Padding } from "@mui/icons-material";
 
 const EditableCell = ({
   value: initialValue,
@@ -72,7 +73,8 @@ const selectStyle = {
 };
 
 const menuStyle = {
-  fontSize: "0.875rem"
+  fontSize: "12px",
+  fontFamily: '"ClashDisplay", sans-serif'
 };
 
 const ReviewerDropdown = ({
@@ -121,6 +123,29 @@ const ReviewerDropdown = ({
     </Select>
   );
 };
+
+const SkeletonRow = () => (
+  <tr className="hover:bg-gray-50">
+    <td className="py-2 px-4">
+      <Skeleton variant="text" />
+    </td>
+    <td className="py-2 px-4">
+      <Skeleton variant="rectangular" />
+    </td>
+    <td className="py-2 px-4 text-center">
+      <Skeleton variant="text" />
+    </td>
+    <td className="py-2 px-4 text-center">
+      <Skeleton variant="text" width={40} style={{ margin: "0 auto" }} />
+    </td>
+    <td className="py-2 px-4 text-center">
+      <Skeleton variant="rectangular" style={{ margin: "0 auto" }} />
+    </td>
+    <td className="py-2 px-4 text-center">
+      <Skeleton width={16} style={{ margin: "0 auto" }} />
+    </td>
+  </tr>
+);
 
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
@@ -420,112 +445,94 @@ const ProposalPlan = () => {
                 >
                   <thead style={{ width: "100%" }}>
                     <tr>
-                      <th className="py-3 px-4" style={{ width: "50%" }}>
+                      <th className="" style={{ width: "45%" }}>
                         Section
                       </th>
-                      <th className="py-3 px-4">Reviewer</th>
-                      <th
-                        className="py-3 px-4 text-center"
-                        style={{ width: "9%" }}
-                      >
+                      <th className="" style={{ width: "13.5%" }}>
+                        Reviewer
+                      </th>
+                      <th className=" text-center" style={{ width: "8%" }}>
                         Subsections
                       </th>
-                      <th
-                        className="py-3 px-4 text-center"
-                        style={{ width: "6.5%" }}
-                      >
+                      <th className=" text-center" style={{ width: "6.5%" }}>
                         Words
                       </th>
-                      <th
-                        className="py-3 px-4 text-center"
-                        style={{ width: "10%" }}
-                      >
+                      <th className=" text-center" style={{ width: "8%" }}>
                         Completed
                       </th>
-                      <th
-                        className="py-3 px-4 text-center"
-                        style={{ width: "6.5%" }}
-                      >
+                      <th className=" text-center" style={{ width: "6%" }}>
                         Delete
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {isLoading ? (
-                      <tr>
-                        <td colSpan={6} className="text-center py-4">
-                          <Spinner
-                            animation="border"
-                            size="sm"
-                            className="me-2"
-                          />{" "}
-                          Loading Sections...
-                        </td>
-                      </tr>
-                    ) : (
-                      outline.map((section, index) => (
-                        <tr
-                          key={index}
-                          onContextMenu={(e) => handleContextMenu(e, index)}
-                          className="hover:bg-gray-50"
-                        >
-                          <td className="py-2 px-4">
-                            <Link
-                              to="#"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleEditClick(section);
-                              }}
-                              style={{
-                                cursor: "pointer",
-                                textDecoration: "none"
-                              }}
-                            >
-                              {section.heading}
-                            </Link>
-                          </td>
-                          <td className="py-2 px-4">
-                            <ReviewerDropdown
-                              value={section.reviewer}
-                              onChange={(value) =>
-                                handleSectionChange(index, "reviewer", value)
-                              }
-                              onBlur={() =>
-                                updateSection(outline[index], index)
-                              }
-                              contributors={contributors}
-                            />
-                          </td>
-                          <td className="py-2 px-4 text-center">
-                            {section.subsections}
-                          </td>
-                          <td className="py-2 px-4 text-center">
-                            {section.word_count}
-                          </td>
-                          <td className="py-2 px-4 text-center">
-                            <StatusMenu
-                              value={section.status}
-                              onChange={(value) =>
-                                handleSectionChange(index, "status", value)
-                              }
-                            />
-                          </td>
-                          <td className="py-2 px-4 text-center">
-                            <div className="d-flex justify-content-center">
-                              <button
-                                onClick={() =>
-                                  handleDeleteClick(section, index)
-                                }
-                                className="bg-transparent border-0 cursor-pointer text-black"
-                                title="Delete section"
+                    {isLoading
+                      ? // Show 5 skeleton rows while loading
+                        [...Array(15)].map((_, index) => (
+                          <SkeletonRow key={index} />
+                        ))
+                      : outline.map((section, index) => (
+                          <tr
+                            key={index}
+                            onContextMenu={(e) => handleContextMenu(e, index)}
+                            className="hover:bg-gray-50"
+                          >
+                            <td className="">
+                              <Link
+                                to="#"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleEditClick(section);
+                                }}
+                                style={{
+                                  cursor: "pointer",
+                                  textDecoration: "none"
+                                }}
                               >
-                                <FontAwesomeIcon icon={faTrash} size="sm" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
+                                {section.heading}
+                              </Link>
+                            </td>
+                            <td className="">
+                              <ReviewerDropdown
+                                value={section.reviewer}
+                                onChange={(value) =>
+                                  handleSectionChange(index, "reviewer", value)
+                                }
+                                onBlur={() =>
+                                  updateSection(outline[index], index)
+                                }
+                                contributors={contributors}
+                              />
+                            </td>
+                            <td className="text-center">
+                              {section.subsections}
+                            </td>
+                            <td className="text-center">
+                              {section.word_count}
+                            </td>
+                            <td className="text-center">
+                              <StatusMenu
+                                value={section.status}
+                                onChange={(value) =>
+                                  handleSectionChange(index, "status", value)
+                                }
+                              />
+                            </td>
+                            <td className="text-center">
+                              <div className="d-flex justify-content-center">
+                                <button
+                                  onClick={() =>
+                                    handleDeleteClick(section, index)
+                                  }
+                                  className="bg-transparent border-0 cursor-pointer text-black"
+                                  title="Delete section"
+                                >
+                                  <FontAwesomeIcon icon={faTrash} size="sm" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
                   </tbody>
                 </table>
               </div>

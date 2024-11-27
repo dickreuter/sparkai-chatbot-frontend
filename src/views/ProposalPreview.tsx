@@ -199,7 +199,7 @@ const ProposalPreview = () => {
                     <div
                       dangerouslySetInnerHTML={{ __html: htmlContent }}
                       style={{
-                        maxWidth: "800px",
+                        maxWidth: "1400px",
                         margin: "0 auto"
                       }}
                     />

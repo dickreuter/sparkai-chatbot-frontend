@@ -514,9 +514,15 @@ const ProposalPlan = () => {
                             <td className="text-center">
                               <StatusMenu
                                 value={section.status}
-                                onChange={(value) =>
-                                  handleSectionChange(index, "status", value)
-                                }
+                                onChange={(value) => {
+                                  handleSectionChange(index, "status", value);
+                                  // Create updated section with new status
+                                  const updatedSection = {
+                                    ...outline[index],
+                                    status: value
+                                  };
+                                  updateSection(updatedSection, index);
+                                }}
                               />
                             </td>
                             <td className="text-center">

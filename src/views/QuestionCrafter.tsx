@@ -25,6 +25,7 @@ import {
   faChevronRight,
   faTimes
 } from "@fortawesome/free-solid-svg-icons";
+import SectionTitle from "../components/SectionTitle.tsx";
 
 const QuestionCrafter = () => {
   interface Subheading {
@@ -58,10 +59,6 @@ const QuestionCrafter = () => {
   const currentUserPermission = contributors[auth.email] || "viewer"; // Default to 'viewer' if not found
   const canUserEdit =
     currentUserPermission === "admin" || currentUserPermission === "editor";
-
-  const showViewOnlyMessage = () => {
-    displayAlert("You only have permission to view this bid.", "danger");
-  };
 
   /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -114,6 +111,11 @@ const QuestionCrafter = () => {
     if (currentSectionIndex < outline.length - 1) {
       navigateToSection(outline[currentSectionIndex + 1]);
     }
+  };
+
+  const showViewOnlyMessage = () => {
+    console.log(currentUserPermission);
+    displayAlert("You only have permission to view this bid.", "danger");
   };
 
   // Add this utility function to convert EditorState to plain text
@@ -754,14 +756,23 @@ const QuestionCrafter = () => {
             ></Row>
 
             <Col md={12}>
-              <div className="proposal-header mt-3">
-                <h2 className="heavy mb-4">{section.heading}</h2>
+              <div className="proposal-header mt-3 mb-3">
+                <SectionTitle
+                  canUserEdit={canUserEdit}
+                  displayAlert={displayAlert}
+                  showViewOnlyMessage={showViewOnlyMessage}
+                  sectiontitle={section.heading}
+                  section={section}
+                  sectionIndex={currentSectionIndex}
+                  bid_id={bid_id}
+                  tokenRef={tokenRef}
+                />
                 <StatusMenu
                   value={sectionStatus} // Use the local state instead of section.status
                   onChange={(value) => updateStatus(value)}
                 />
               </div>
-              <div className="d-flex align-items-center">
+              <div className="d-flex align-items-center mb-2">
                 <h1 className="lib-title me-2" id="question-section">
                   Question
                 </h1>
@@ -799,7 +810,7 @@ const QuestionCrafter = () => {
                 Word Count: {inputText.split(/\s+/).filter(Boolean).length}
               </div>
               <Button
-                className="upload-button mt-3"
+                className="upload-button mt-2"
                 onClick={sendQuestionToChatbot}
                 disabled={inputText.trim() === ""}
               >

@@ -1,0 +1,45 @@
+.sectionname-header {
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.sectionname-header h1 {
+  margin: 0;
+  padding: 0;
+  font-weight: 600;
+  position: relative;
+  min-height: 30px;
+  font-size: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.sectionname-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1550px;
+  position: relative;
+  cursor: pointer;
+}
+
+.sectionname-header span {
+  display: block;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  max-width: 1550px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  direction: ltr;
+  color: #000;
+}
+
+.sectionname-header .editable {
+  outline: none;
+  border: 2px solid #86b7fe;
+  border-radius: 4px;
+}

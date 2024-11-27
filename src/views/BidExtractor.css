@@ -1,526 +1,530 @@
 .bidname-header {
-    width: 100%;
-    max-width: 100%;
-    overflow: visible;
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
 }
 
 .bidname-header h1 {
-    margin: 0;
-    padding: 0;
-    font-weight: 600;
-    position: relative;
-    min-height: 36px;
-    display: flex;
-    align-items: center;
+  margin: 0;
+  padding: 0;
+  font-weight: 600;
+  position: relative;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
 }
 
 .bidname-wrapper {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 1350px;
-    position: relative;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1350px;
+  position: relative;
+  cursor: pointer;
 }
 
 .bidname-header span {
-    display: block;
-    position: relative;
-    flex: 1;
-    min-width: 0;
-    max-width: 1350px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: left;
-    direction: ltr;
-    color: #000;
+  display: block;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  max-width: 1350px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  direction: ltr;
+  color: #000;
 }
 
-.bidname-header .editable {}
+.bidname-header .editable {
+  outline: none;
+  border: 2px solid #86b7fe;
+  border-radius: 4px;
+}
 
 .edit-tag {
-    position: relative;
-    font-size: 14px;
-    background: none;
-    border: none;
-    color: #007bff;
-    cursor: pointer;
-    font-weight: 600;
-    padding: 4px 8px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    /* Prevents button from shrinking */
-    margin-left: 8px;
+  position: relative;
+  font-size: 14px;
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  /* Prevents button from shrinking */
+  margin-left: 8px;
 }
 
 .edit-tag:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .title-container {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .info-icon {
-    margin-right: 10px;
-    color: white;
-    background-color: black;
-    border-radius: 50%;
-    font-size: 16px;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    position: relative;
-    cursor: pointer;
+  margin-right: 10px;
+  color: white;
+  background-color: black;
+  border-radius: 50%;
+  font-size: 16px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
 }
 
 .info-icon::after {
-    content: attr(title);
-    position: absolute;
-    width: 150px;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 125%;
-    background-color: black;
-    color: white;
-    text-align: center;
-    padding: 5px;
-    border-radius: 5px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-    white-space: nowrap;
+  content: attr(title);
+  position: absolute;
+  width: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 125%;
+  background-color: black;
+  color: white;
+  text-align: center;
+  padding: 5px;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
 .info-icon:hover::after {
-    opacity: 1;
+  opacity: 1;
 }
 
 .upload-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    max-width: 410px;
-    /* Maximum size */
-    max-height: 350px;
-    /* Maximum size */
-    border: 2px solid orange;
-    background-color: #f2f2f2;
-    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
-    margin: 0;
-    margin-left: 0;
-    /* Center the component */
-    box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  max-width: 410px;
+  /* Maximum size */
+  max-height: 350px;
+  /* Maximum size */
+  border: 2px solid orange;
+  background-color: #f2f2f2;
+  box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.2);
+  margin: 0;
+  margin-left: 0;
+  /* Center the component */
+  box-sizing: border-box;
 }
 
 .upload-rfp {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 350px;
-    width: 100%;
-    padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 350px;
+  width: 100%;
+  padding: 0;
 }
 
 .upload-cross {
-    font-size: 40px;
-    color: gray;
+  font-size: 40px;
+  color: gray;
 }
 
 .col-3-5 {
-    flex: 0 0 28%;
-    max-width: 28%;
+  flex: 0 0 28%;
+  max-width: 28%;
 }
 
 .col-8-5 {
-    flex: 0 0 72%;
-    max-width: 72%;
+  flex: 0 0 72%;
+  max-width: 72%;
 }
 
 @media (min-width: 1600px) {
-    .col-3-5 {
-        flex: 0 0 22%;
-        max-width: 22%;
-    }
-    .col-8-5 {
-        flex: 0 0 78%;
-        max-width: 78%;
-    }
+  .col-3-5 {
+    flex: 0 0 22%;
+    max-width: 22%;
+  }
+  .col-8-5 {
+    flex: 0 0 78%;
+    max-width: 78%;
+  }
 }
 
 .question-extractor-flex {
-    width: 100%;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #ced4da;
-    background-color: #fff;
-    transition: all 0.35s ease;
-    word-wrap: break-word;
-    height: 350px;
-    font-weight: 450;
-    overflow-y: auto;
+  width: 100%;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ced4da;
+  background-color: #fff;
+  transition: all 0.35s ease;
+  word-wrap: break-word;
+  height: 350px;
+  font-weight: 450;
+  overflow-y: auto;
 }
 
 .question-extractor {
-    flex: 1;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #ced4da;
-    background-color: #fff;
-    padding: 10px;
-    transition: all 0.35s ease;
-    margin: 0;
-    word-wrap: break-word;
-    height: 250px;
-    font-weight: 450;
-    padding-top: 0;
-    /* Ensure children start at the top */
+  flex: 1;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ced4da;
+  background-color: #fff;
+  padding: 10px;
+  transition: all 0.35s ease;
+  margin: 0;
+  word-wrap: break-word;
+  height: 250px;
+  font-weight: 450;
+  padding-top: 0;
+  /* Ensure children start at the top */
 }
 
 .card-textarea {
-    border: none;
-    padding: 10px;
-    font-size: 16px;
-    background-color: white;
-    color: black;
-    resize: none;
-    overflow: auto;
-    width: 100%;
-    height: 100%;
-    font-weight: 450;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  background-color: white;
+  color: black;
+  resize: none;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  font-weight: 450;
 }
 
 .card-textarea:focus {
-    outline: none;
+  outline: none;
 }
 
 .card-input {
-    width: 100%;
-    border: none;
-    padding: 10px;
-    font-size: 16px;
-    background-color: white;
-    color: black;
-    flex: 1;
-    display: flex;
-    align-items: flex-start;
-    /* Align text to start at the top */
+  width: 100%;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  background-color: white;
+  color: black;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  /* Align text to start at the top */
 }
 
 .question-list {
-    max-height: 400px;
+  max-height: 400px;
 }
 
 .question-item-default {
-    padding: 12px;
-    border-bottom: 1px solid #ccc;
+  padding: 12px;
+  border-bottom: 1px solid #ccc;
 }
 
 .question-item {
-    padding: 5px 10px;
-    border-bottom: 1px solid #ccc;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  padding: 5px 10px;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .remove-question-button {
-    background-color: transparent;
-    border: none;
-    color: black;
-    cursor: pointer;
-    font-size: 30px;
+  background-color: transparent;
+  border: none;
+  color: black;
+  cursor: pointer;
+  font-size: 30px;
 }
 
 .card-title-container {
-    display: flex;
-    align-items: baseline;
+  display: flex;
+  align-items: baseline;
 }
 
 .tooltip-container {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 30px;
-    margin-left: 1.2%;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 30px;
+  margin-left: 1.2%;
 }
 
 .tooltip-text {
-    visibility: hidden;
-    width: 500px;
-    background-color: #dbd9d9;
-    color: #4d4d4d;
-    border-radius: 6px;
-    padding: 8px;
-    position: absolute;
-    z-index: 10;
-    font-size: 14px;
-    bottom: 120%;
-    left: 50%;
-    transform: translateX(-95%);
-    margin-bottom: 5px;
-    font-weight: 400 !important;
+  visibility: hidden;
+  width: 500px;
+  background-color: #dbd9d9;
+  color: #4d4d4d;
+  border-radius: 6px;
+  padding: 8px;
+  position: absolute;
+  z-index: 10;
+  font-size: 14px;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-95%);
+  margin-bottom: 5px;
+  font-weight: 400 !important;
 }
 
 .tooltip-text-cd {
-    visibility: hidden;
-    width: 550px;
-    background-color: #dbd9d9;
-    color: #4d4d4d;
-    border-radius: 6px;
-    padding: 8px;
-    position: absolute;
-    z-index: 1000000000000000;
-    font-size: 14px;
-    bottom: 120%;
-    margin-bottom: 5px;
-    transform: translateX(-50%);
-    font-weight: 400 !important;
+  visibility: hidden;
+  width: 550px;
+  background-color: #dbd9d9;
+  color: #4d4d4d;
+  border-radius: 6px;
+  padding: 8px;
+  position: absolute;
+  z-index: 1000000000000000;
+  font-size: 14px;
+  bottom: 120%;
+  margin-bottom: 5px;
+  transform: translateX(-50%);
+  font-weight: 400 !important;
 }
 
 .tooltip-container:hover .tooltip-text-cd {
-    visibility: visible;
+  visibility: visible;
 }
 
 .tooltip-container:hover .tooltip-text {
-    visibility: visible;
+  visibility: visible;
 }
 
 .tooltip-icon-container {
-    background-color: #dbd9d9;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
+  background-color: #dbd9d9;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
 }
 
 .tooltip-icon {
-    font-size: 10px;
-    color: #4d4d4d;
-    z-index: 1;
+  font-size: 10px;
+  color: #4d4d4d;
+  z-index: 1;
 }
 
 .card-effect-input-box {
-    flex: 1;
-    background-color: #fff;
-    padding: 5px;
-    padding-left: 10px;
-    margin: 0;
-    word-wrap: break-word;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ced4da;
+  flex: 1;
+  background-color: #fff;
+  padding: 5px;
+  padding-left: 10px;
+  margin: 0;
+  word-wrap: break-word;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ced4da;
 }
 
 .inputbox-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .inputbox-title {
-    font-size: 16px;
-    font-weight: 550;
-    margin-right: 10px;
-    margin-top: 10px;
-    /* Adjust the space between title and input */
+  font-size: 16px;
+  font-weight: 550;
+  margin-right: 10px;
+  margin-top: 10px;
+  /* Adjust the space between title and input */
 }
 
 .inputbox-textarea {
-    flex: 1;
-    border: none;
-    font-size: 16px;
-    background-color: white;
-    color: black;
-    resize: none;
-    overflow: hidden;
-    /* Hide any text that overflows the textarea */
-    height: 28px;
-    white-space: nowrap;
-    /* Prevent text from wrapping to a new line */
-    text-overflow: ellipsis;
-    font-weight: 450;
-    /* Show ellipsis when text overflows */
+  flex: 1;
+  border: none;
+  font-size: 16px;
+  background-color: white;
+  color: black;
+  resize: none;
+  overflow: hidden;
+  /* Hide any text that overflows the textarea */
+  height: 28px;
+  white-space: nowrap;
+  /* Prevent text from wrapping to a new line */
+  text-overflow: ellipsis;
+  font-weight: 450;
+  /* Show ellipsis when text overflows */
 }
 
 .inputbox-textarea:focus {
-    outline: none;
+  outline: none;
 }
 
 .beta-label {
-    display: inline-block;
-    background-color: orange;
-    color: #fff;
-    padding: 2px 6px;
-    font-size: 12px;
-    border-radius: 3px;
-    vertical-align: middle;
-    margin-left: 5px;
+  display: inline-block;
+  background-color: orange;
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 12px;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-left: 5px;
 }
 
 .beta-label {
-    display: inline-block;
-    background-color: orange;
-    /* Use a distinctive color */
-    color: #fff;
-    padding: 2px 6px;
-    font-size: 12px;
-    border-radius: 3px;
-    vertical-align: middle;
-    margin-left: 5px;
+  display: inline-block;
+  background-color: orange;
+  /* Use a distinctive color */
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 12px;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-left: 5px;
 }
 
 .paste-modal {
-    max-width: 800px;
-    /* Adjust the width as needed */
+  max-width: 800px;
+  /* Adjust the width as needed */
 }
 
 .paste-modal .modal-content {
-    width: 100%;
-    /* Ensure the content takes full width */
+  width: 100%;
+  /* Ensure the content takes full width */
 }
 
 .same-height-card {
-    height: 80px;
-    /* Remove the border from here */
-    /* Adjust the height as needed */
+  height: 80px;
+  /* Remove the border from here */
+  /* Adjust the height as needed */
 }
 
 .same-height-card .card-header,
 .custom-grey-border .card-header {
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    border-bottom: 1px solid lightgray;
-    /* Keep the bottom border */
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid lightgray;
+  /* Keep the bottom border */
 }
 
 .same-height-card .card-body,
 .custom-grey-border .card-body {
-    border: none;
-    /* Remove any internal borders */
+  border: none;
+  /* Remove any internal borders */
 }
 
 .same-height-card {
-    border: 1px solid lightgray !important;
-    overflow: hidden;
+  border: 1px solid lightgray !important;
+  overflow: hidden;
 }
 
 .custom-grey-border {
-    border: 1px solid lightgray !important;
-    /* Adjust the color code as needed */
-    overflow: hidden;
+  border: 1px solid lightgray !important;
+  /* Adjust the color code as needed */
+  overflow: hidden;
 }
 
 .single-line-textarea {
-    height: 10px;
-    /* Adjust to fit one line of text */
-    overflow: hidden;
-    /* Hide extra content */
-    resize: none;
-    /* Prevent resizing */
-    margin: 0;
-    outline: none;
-    border: none;
-    /* Ensure border is also removed if not needed */
+  height: 10px;
+  /* Adjust to fit one line of text */
+  overflow: hidden;
+  /* Hide extra content */
+  resize: none;
+  /* Prevent resizing */
+  margin: 0;
+  outline: none;
+  border: none;
+  /* Ensure border is also removed if not needed */
 }
 
 .single-line-textarea:focus {
-    outline: none;
-    /* Remove blue outline on focus */
-    box-shadow: none;
-    /* Remove any box-shadow */
-    border: none;
-    /* Ensure no border is applied on focus */
+  outline: none;
+  /* Remove blue outline on focus */
+  box-shadow: none;
+  /* Remove any box-shadow */
+  border: none;
+  /* Ensure no border is applied on focus */
 }
 
 .single-line-textarea:disabled,
 .date-textarea:disabled,
 .requirements-textarea:disabled {
-    background-color: white;
+  background-color: white;
 }
 
 .date-textarea {
-    overflow: hidden;
-    /* Hide extra content */
-    resize: none;
-    /* Prevent resizing */
-    margin: 0;
-    outline: none;
-    border: none;
-    /* Ensure border is also removed if not needed */
+  overflow: hidden;
+  /* Hide extra content */
+  resize: none;
+  /* Prevent resizing */
+  margin: 0;
+  outline: none;
+  border: none;
+  /* Ensure border is also removed if not needed */
 }
 
 .date-textarea:focus {
-    outline: none;
-    /* Remove blue outline on focus */
-    box-shadow: none;
-    /* Remove any box-shadow */
-    border: none;
-    /* Ensure no border is applied on focus */
+  outline: none;
+  /* Remove blue outline on focus */
+  box-shadow: none;
+  /* Remove any box-shadow */
+  border: none;
+  /* Ensure no border is applied on focus */
 }
 
 .requirements-textarea {
-    height: 550px;
-    /* Adjust to fit one line of text */
-    overflow: hidden;
-    /* Hide extra content */
-    resize: none;
-    margin: 0;
-    outline: none;
-    border: none;
-    padding-left: 18px;
-    /* Prevent resizing */
+  height: 550px;
+  /* Adjust to fit one line of text */
+  overflow: hidden;
+  /* Hide extra content */
+  resize: none;
+  margin: 0;
+  outline: none;
+  border: none;
+  padding-left: 18px;
+  /* Prevent resizing */
 }
 
 .requirements-textarea:focus {
-    outline: none;
-    /* Remove blue outline on focus */
-    box-shadow: none;
-    /* Remove any box-shadow */
-    border: none;
-    /* Ensure no border is applied on focus */
+  outline: none;
+  /* Remove blue outline on focus */
+  box-shadow: none;
+  /* Remove any box-shadow */
+  border: none;
+  /* Ensure no border is applied on focus */
 }
 
 .requirements-title {
-    font-size: 18px;
-    font-weight: 550 !important;
-    transform: translateY(5px);
+  font-size: 18px;
+  font-weight: 550 !important;
+  transform: translateY(5px);
 }
 
 .dark-grey-header {
-    background-color: #f0f0f0;
-    z-index: 1;
-    /* You can adjust this color to your preferred shade of dark grey */
-    /* This ensures the text is visible on the dark background */
+  background-color: #f0f0f0;
+  z-index: 1;
+  /* You can adjust this color to your preferred shade of dark grey */
+  /* This ensures the text is visible on the dark background */
 }
 
 .contributor-box {
-    transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .contributor-box:hover {
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .contributors-button {
-    width: 20px;
-    height: 20px;
-    margin-right: 2px;
+  width: 20px;
+  height: 20px;
+  margin-right: 2px;
 }
 
 .contributors-button:hover {
-    color: #696969 !important;
+  color: #696969 !important;
 }
 
 .wide-modal {
-    max-width: 800px;
-    width: 100%;
+  max-width: 800px;
+  width: 100%;
 }

@@ -12,7 +12,7 @@ import { Editor, EditorState, convertToRaw, ContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { displayAlert } from "../helper/Alert.tsx";
 import WordCountSelector from "../components/WordCountSelector.tsx";
 import { debounce } from "lodash";
@@ -20,7 +20,11 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import StatusMenu, { Section } from "../components/StatusMenu.tsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronLeft,
+  faChevronRight,
+  faTimes
+} from "@fortawesome/free-solid-svg-icons";
 
 const QuestionCrafter = () => {
   interface Subheading {
@@ -35,7 +39,10 @@ const QuestionCrafter = () => {
   const tokenRef = useRef(auth?.token || "default");
 
   const location = useLocation();
-  const { section, bid_id } = location.state;
+  const { section, bid_id, state_outline } = location.state;
+
+  const [outline, setOutline] = useState<Section[]>(state_outline);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
 
   const { sharedState, setSharedState, getBackgroundInfo } =
     useContext(BidContext);
@@ -77,7 +84,37 @@ const QuestionCrafter = () => {
   const [sectionWordCounts, setSectionWordCounts] = useState<
     Record<string, number>
   >({});
-  const [isCompleting, setIsCompleting] = useState(false);
+
+  const navigate = useNavigate();
+
+  // Set initial section index from the passed section
+  useEffect(() => {
+    const index = outline.findIndex((s) => s.section_id === section.section_id);
+    setCurrentSectionIndex(index !== -1 ? index : 0);
+  }, [section.section_id, outline]);
+
+  // Add navigation functions
+  const navigateToSection = (section: Section) => {
+    navigate("/question-crafter", {
+      state: {
+        section,
+        bid_id: bid_id,
+        state_outline: outline
+      }
+    });
+  };
+
+  const handlePreviousSection = () => {
+    if (currentSectionIndex > 0) {
+      navigateToSection(outline[currentSectionIndex - 1]);
+    }
+  };
+
+  const handleNextSection = () => {
+    if (currentSectionIndex < outline.length - 1) {
+      navigateToSection(outline[currentSectionIndex + 1]);
+    }
+  };
 
   // Add this utility function to convert EditorState to plain text
   const getPlainTextFromEditorState = (editorState) => {
@@ -258,70 +295,6 @@ const QuestionCrafter = () => {
       extraInstructions,
       wordCount
     );
-  };
-
-  const handleMarkAsComplete = async () => {
-    if (isCompleting) return;
-
-    setIsCompleting(true);
-    try {
-      // Get sections in consistent order and combine each title with its instructions
-      const orderedSections = answerSections.map((section) => {
-        const extraInstructions = getPlainTextFromEditorState(
-          section.editorState
-        );
-
-        // Create array with proper order of instructions for each section
-        return {
-          id: section.subheading_id,
-          title: section.title,
-          // Format combined text to maintain clear separation between title and instructions
-          combinedText: `###${section.title}!!!Context & Requirements: ${extraInstructions || ""}!!!###`,
-          wordCount: sectionWordCounts[section.subheading_id] || 100
-        };
-      });
-
-      console.log("Preparing section data:", orderedSections);
-
-      const request = {
-        bid_id: bid_id,
-        section_id: section.section_id,
-        choice: "3b",
-        broadness: broadness,
-        input_text: inputText,
-        extra_instructions: backgroundInfo, // General background info
-        // Use combinedText array that maintains title-instruction relationships
-        selected_choices: orderedSections.map((s) => s.combinedText),
-        datasets: sharedState.selectedFolders,
-        word_amounts: orderedSections.map((s) => s.wordCount)
-      };
-
-      console.log("Sending request to mark section complete:", request);
-
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/mark_section_as_complete`,
-        request,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-
-      setSectionAnswer(response.data);
-      updateStatus("Completed");
-      displayAlert("Section marked as complete successfully!", "success");
-    } catch (error) {
-      console.error("Error completing section:", error);
-      if (error.response) {
-        console.error("Error response:", error.response.data);
-        console.error("Error status:", error.response.status);
-      }
-      displayAlert("Failed to mark section as complete", "danger");
-    } finally {
-      setIsCompleting(false);
-    }
   };
 
   // Update the fetchSubheadings function to handle references after setting state
@@ -788,10 +761,26 @@ const QuestionCrafter = () => {
                   onChange={(value) => updateStatus(value)}
                 />
               </div>
-              <div className="proposal-header mb-2">
-                <h1 className="lib-title" id="question-section">
+              <div className="d-flex align-items-center">
+                <h1 className="lib-title me-2" id="question-section">
                   Question
                 </h1>
+                <div className="d-flex justify-content-between align-items-center gap-1 mb-2">
+                  <button
+                    onClick={handlePreviousSection}
+                    disabled={currentSectionIndex === 0}
+                    className="navigation-button"
+                  >
+                    <FontAwesomeIcon icon={faChevronLeft} />
+                  </button>
+                  <button
+                    onClick={handleNextSection}
+                    disabled={currentSectionIndex === outline.length - 1}
+                    className="navigation-button"
+                  >
+                    <FontAwesomeIcon icon={faChevronRight} />
+                  </button>
+                </div>
               </div>
 
               <div className="question-answer-box">

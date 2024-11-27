@@ -262,7 +262,8 @@ const ProposalPlan = () => {
     navigate("/question-crafter", {
       state: {
         section,
-        bid_id: object_id
+        bid_id: object_id,
+        state_outline: outline
       }
     });
   };

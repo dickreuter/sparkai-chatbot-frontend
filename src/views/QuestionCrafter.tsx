@@ -773,6 +773,9 @@ const QuestionCrafter = () => {
                   >
                     <FontAwesomeIcon icon={faChevronLeft} />
                   </button>
+                  <div className="text-muted">
+                    Section {currentSectionIndex + 1} of {outline.length}
+                  </div>
                   <button
                     onClick={handleNextSection}
                     disabled={currentSectionIndex === outline.length - 1}

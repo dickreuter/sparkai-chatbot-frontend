@@ -730,20 +730,21 @@
 }
 
 .navigation-button {
-  color: #fff;
-  background-color: #000;
-  border: 1px solid #000;
+  color: black;
+  background-color: transparent;
+  border: none;
   padding: 2px 6px;
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
-.navigation-button:hover {
-  background-color: #333;
+.navigation-button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-.navigation-button.active {
-  background-color: #333;
+.navigation-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

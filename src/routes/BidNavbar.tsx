@@ -46,9 +46,11 @@ const BidNavbar = ({
   }, [getAuth]);
 
   useEffect(() => {
-    // Update active tab based on current location
-    setActiveTab(location.pathname);
-    localStorage.setItem("lastActiveTab", location.pathname);
+    if (location.pathname !== "/question-crafter") {
+      // Update active tab based on current location
+      setActiveTab(location.pathname);
+      localStorage.setItem("lastActiveTab", location.pathname);
+    }
 
     // Update user permission when bidInfo and auth changes
     if (auth && auth.email) {
@@ -151,7 +153,7 @@ const BidNavbar = ({
           </NavLink>
           <NavLink
             to="/proposal-planner"
-            className={`bidnav-item ${activeTab === "/proposal-planner" ? "active" : ""}`}
+            className={`bidnav-item ${activeTab === "/proposal-planner" || activeTab === "/question-crafter" ? "active" : ""}`}
             onClick={() => handleTabClick("/proposal-planner")}
           >
             Proposal Planner

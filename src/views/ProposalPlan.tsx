@@ -142,7 +142,12 @@ const SkeletonRow = () => (
       <Skeleton variant="rectangular" style={{ margin: "0 auto" }} />
     </td>
     <td className="py-2 px-4 text-center">
-      <Skeleton width={16} style={{ margin: "0 auto" }} />
+      <Skeleton
+        variant="rounded"
+        width={20}
+        height={20}
+        style={{ marginLeft: "22px" }}
+      />
     </td>
   </tr>
 );

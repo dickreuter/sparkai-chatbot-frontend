@@ -74,7 +74,7 @@ const MessageBox = ({ messages, showShortcuts, handleClickShortcut, shortcutVisi
   }, [messages]);
 
   const getActionText = (message: IMessage) => {
-    if (message.createdBy === "user") {
+    if (message.createdBy === "bot") {
       return "";
     }
     if (message.isRefine) {

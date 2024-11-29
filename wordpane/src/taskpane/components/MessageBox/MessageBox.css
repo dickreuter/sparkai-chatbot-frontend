@@ -28,9 +28,12 @@ div.MuiGrid-root.shortcuts {
 
 .message-body__content {
   position: relative;
+  --color-canvas-default: white !important;
 }
 
-.message-body__content_action {
-  position: absolute;
-  line-height: 1.5;
+.message-body__content_text li,
+.message-body__content_text ol,
+.message-body__content_text ul {
+  padding-left: 5px !important;
+  padding-right: 5px !important;
 }

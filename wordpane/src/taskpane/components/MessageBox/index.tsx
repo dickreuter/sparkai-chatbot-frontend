@@ -9,6 +9,8 @@ import {
 import Creator from "./Creator";
 
 import "./MessageBox.css";
+import MarkdownPreview from "@uiw/react-markdown-preview";
+import "@uiw/react-markdown-preview/markdown.css";
 
 interface MessageBoxProps {
   messages: IMessage[];
@@ -42,6 +44,22 @@ const shortcuts: {
 const MessageBox = ({ messages, showShortcuts, handleClickShortcut, shortcutVisible }: MessageBoxProps) => {
   const actionRef = useRef(null);
   const [actionWidth, setActionWidth] = useState<{ [key: string]: number }>({});
+
+  const onClickShortcut = (type: IShortcutType, message: IMessage) => {
+    if (handleClickShortcut) {
+      if (message.type == "text" && ["insert", "replace"].includes(type)) {
+        const element = document.querySelector(`.markdown-preview-${message.id}`);
+        if (element) {
+          const text = element.innerHTML;
+          handleClickShortcut(type, { ...message, value: text });
+        } else {
+          console.log("###", "Element not found");
+        }
+      } else {
+        handleClickShortcut(type, message);
+      }
+    }
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -84,24 +102,21 @@ const MessageBox = ({ messages, showShortcuts, handleClickShortcut, shortcutVisi
               ) : message.type === "image" ? (
                 <img src={message.value} alt="option" style={{ maxWidth: "100%" }} />
               ) : (
-                <div style={{ position: "relative" }} className="message-body__content">
+                <div style={{ position: "relative" }} className="message-body__content" data-color-mode="light">
                   {!!actionText && (
                     <Typography
                       variant="subtitle1"
-                      style={{ position: "absolute", lineHeight: 1.5 }}
                       className="message-body__content_action"
                       ref={actionRef}
                       id={message.id}
                       fontWeight="bold"
                     >
-                      {actionText}:
+                      {actionText}
                     </Typography>
                   )}
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: message.value,
-                    }}
-                    style={{ textIndent: !!actionText ? `${actionWidth[message.id] + 4}px` : 0 }}
+                  <MarkdownPreview
+                    source={message.value}
+                    className={`message-body__content_text markdown-preview-${message.id}`}
                   />
                 </div>
               )}
@@ -113,7 +128,7 @@ const MessageBox = ({ messages, showShortcuts, handleClickShortcut, shortcutVisi
                     return (
                       <Grid item key={idx}>
                         <Button
-                          onClick={() => handleClickShortcut && handleClickShortcut(shortcut.type, message)}
+                          onClick={() => onClickShortcut(shortcut.type, message)}
                           variant="outlined"
                           color="inherit"
                           startIcon={shortcut.icon}

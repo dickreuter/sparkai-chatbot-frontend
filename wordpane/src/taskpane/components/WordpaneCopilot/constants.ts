@@ -31,3 +31,29 @@ export const customPrompts: { id: IPromptType; title: string }[] = [
 
 export const BID_PILOT_CHOICE = "2";
 export const BID_PILOT_BROADNESS = "4";
+
+export const ALLOWED_TAGS = [
+  "div",
+  "p",
+  "ol",
+  "li",
+  "strong",
+  "ul",
+  "pre",
+  "code",
+  "span",
+  "svg",
+  "path",
+  "br",
+  "em",
+  "h1",
+];
+export const ALLOWED_ATTRIBUTES = {
+  span: ["style"],
+  font: ["color", "weight", "style"],
+  li: [],
+  ul: [],
+  ol: [],
+  code: ["style"],
+  strong: [],
+};

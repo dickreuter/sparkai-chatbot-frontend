@@ -71,6 +71,9 @@
     "react-router-dom": "^6.27.0",
     "react-tooltip": "^5.25.0",
     "regenerator-runtime": "^0.14.1",
+    "sanitize-html": "^2.13.1",
+    "showdown": "^2.1.0",
+    "typewriter-effect": "^2.21.0",
     "uuid": "^11.0.2"
   },
   "devDependencies": {
@@ -80,6 +83,8 @@
     "@types/office-runtime": "^1.0.35",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
+    "@types/sanitize-html": "^2.13.0",
+    "@types/showdown": "^2.0.6",
     "@types/webpack": "^5.28.5",
     "acorn": "^8.11.3",
     "babel-loader": "^9.1.3",

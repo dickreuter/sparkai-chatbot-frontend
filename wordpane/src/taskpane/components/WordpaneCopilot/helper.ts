@@ -3,7 +3,17 @@ import { v4 } from "uuid";
 import { getBase64FromBlob } from "../../helper/file";
 import { apiURL } from "../../helper/urls";
 import axios from "axios";
-import { BID_PILOT_BROADNESS, BID_PILOT_CHOICE, LOCAL_STORAGE_CACHE_VERSION } from "./constants";
+import {
+  ALLOWED_ATTRIBUTES,
+  ALLOWED_TAGS,
+  BID_PILOT_BROADNESS,
+  BID_PILOT_CHOICE,
+  LOCAL_STORAGE_CACHE_VERSION,
+} from "./constants";
+import sanitizeHtml from "sanitize-html";
+import showdown from "showdown";
+
+const converter = new showdown.Converter();
 
 export const getPromptWithHistory = (prompt: string, history: IMessage[]) => {
   return `Chat history: ${JSON.stringify(history)}\n\n; Prompt: ${prompt}`;
@@ -85,10 +95,9 @@ export const askLibraryChatQuestion = async (token: string, request: IMessageReq
       }
     );
 
-    const formattedResponse = formatResponse(result.data);
     return withId({
       type: "text",
-      value: formattedResponse,
+      value: result.data,
       createdBy: "bot",
       action: "default",
       isRefine: request.isRefine,
@@ -254,8 +263,13 @@ export const setCacheVersion = () => {
   localStorage.setItem("version", LOCAL_STORAGE_CACHE_VERSION);
 };
 
-export const htmlToPlainText = (html) => {
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = html;
-  return tempDiv.textContent || tempDiv.innerText || "";
+export const markdownToHTML = (markdown: string) => {
+  return converter.makeHtml(markdown);
+};
+
+export const formatHTML = (html: string) => {
+  return sanitizeHtml(html, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: ALLOWED_ATTRIBUTES,
+  });
 };

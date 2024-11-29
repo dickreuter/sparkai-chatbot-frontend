@@ -31,6 +31,8 @@ module.exports = async (env, options) => {
       fallback: {
         promise: require.resolve("es6-promise"),
         crypto: false,
+        "react/jsx-runtime": "react/jsx-runtime.js",
+        "react/jsx-dev-runtime": "react/jsx-dev-runtime.js",
       },
     },
     module: {

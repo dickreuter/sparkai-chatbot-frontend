@@ -59,7 +59,7 @@
   margin-top: 12px;
   margin-bottom: 8px;
   background-color: #262626 !important;
-  color: white;
+  color: white !important;
 }
 
 .login-button:hover {

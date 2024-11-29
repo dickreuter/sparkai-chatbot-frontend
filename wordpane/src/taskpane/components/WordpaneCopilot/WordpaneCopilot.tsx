@@ -23,6 +23,7 @@ import {
 import Welcome from "./Welcome";
 import useShowWelcome from "../../hooks/useShowWelcome";
 import posthog from "posthog-js";
+import SignoutFab from "./components/SignoutFab/SignoutFab";
 
 const WordpaneCopilot = () => {
   const getAuth = useAuthUser();
@@ -511,7 +512,7 @@ const WordpaneCopilot = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100%" padding={"3px"}>
-      <Box>
+      <Box position="relative">
         <Tabs
           variant="fullWidth"
           onChange={(_e, value) => isLoading || setSelectedTab(value)}
@@ -525,6 +526,7 @@ const WordpaneCopilot = () => {
           />
           <Tab label="Internet Research" value="internet-search" />
         </Tabs>
+        <SignoutFab />
       </Box>
       <Box
         sx={{

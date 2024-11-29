@@ -654,3 +654,31 @@ button.chat-send-button {
 .chat-input.custom-prompt:focus {
   outline: none;
 }
+
+button.fab__btn-signout {
+  position: absolute;
+  top: 6px;
+  right: -80px;
+  transition: all 0.3s ease;
+  background-color: #e6e6e6 !important;
+  box-shadow: none !important;
+}
+
+button.fab__btn-signout.open {
+  right: 30px;
+}
+
+button.fab {
+  position: absolute;
+  top: 5px;
+  right: -5px;
+}
+
+.fab__btn-narrow {
+  color: #979797;
+  transition: all 0.3s ease;
+}
+
+.fab__btn-narrow.forward {
+  transform: rotate(180deg);
+}

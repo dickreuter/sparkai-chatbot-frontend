@@ -4,5 +4,7 @@
   "trailingComma": "none",
   "tabWidth": 2,
   "endOfLine": "crlf",
-  "bracketSpacing": true
+  "bracketSpacing": true,
+  "insertSpaces": false,
+  "operatorLinebreak": "before"
 }

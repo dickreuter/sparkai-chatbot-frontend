@@ -47,7 +47,24 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
     "Finalizing implementation approach...",
     "Double-checking all requirements...",
     "Polishing final draft...",
-    "Getting ready for download..."
+    "Downloading additional information...",
+    "Resolving any remaining issues...",
+    "Analyzing market positioning...",
+    "Refining unique selling points...",
+    "Strengthening past performance examples...",
+    "Enhancing capability statements...",
+    "Optimizing resource allocation plans...",
+    "Validating delivery timelines...",
+    "Incorporating sustainability measures...",
+    "Detailing quality assurance processes...",
+    "Enhancing innovation descriptions...",
+    "Polishing methodology sections...",
+    "Refining cost breakdowns...",
+    "Adding social value elements...",
+    "Strengthening local content details...",
+    "Validating certification requirements...",
+    "Enhancing team credentials...",
+    "Optimizing project schedules..."
   ];
 
   const incompleteSections =

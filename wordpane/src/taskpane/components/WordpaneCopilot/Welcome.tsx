@@ -6,7 +6,7 @@ const Welcome = () => {
   useEffect(() => {
     if (!welcomeRef.current) return;
     var typewriter = new Typewriter(welcomeRef.current, {
-      loop: true,
+      loop: false,
       delay: 75,
     });
 

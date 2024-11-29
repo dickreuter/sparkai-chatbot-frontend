@@ -14,11 +14,11 @@ import {
   askInternetQuestion,
   askLibraryChatQuestion,
   getDefaultMessage,
-  htmlToPlainText,
+  formatHTML,
   refineResponse,
-  removeDoubleBr,
   setCacheVersion,
   withId,
+  markdownToHTML,
 } from "./helper";
 import Welcome from "./Welcome";
 import useShowWelcome from "../../hooks/useShowWelcome";
@@ -246,7 +246,7 @@ const WordpaneCopilot = () => {
               const newSelection = selection.insertParagraph("", "After");
               newSelection.insertInlinePictureFromBase64(value.split(",")[1], insertLocation);
             } else if (type === "text") {
-              selection.insertText(htmlToPlainText(value), insertLocation);
+              selection.insertHtml(formatHTML(value), insertLocation);
             }
             await context.sync();
 
@@ -456,6 +456,7 @@ const WordpaneCopilot = () => {
   };
 
   const handleCustomPromptMessage = (request: IMessageRequest) => {
+    setShowWelcome(false);
     setSelectedTab("library-chat");
     if (request.highlightedText.trim()) {
       setLibraryChatMessages([

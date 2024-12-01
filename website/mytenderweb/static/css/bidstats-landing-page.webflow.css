@@ -1022,8 +1022,8 @@ figcaption {
 .partner-logo {
   opacity: 0.4;
   object-fit: contain;
-  max-width: 180px;
-  height: 40px;
+  max-width: 200px;
+  height: 100px;
 }
 
 .hero-dashboard-wrapper {
@@ -1075,6 +1075,17 @@ figcaption {
 .circle-angle-background.is-bottom-left {
   transform-origin: 0 100%;
   inset: auto auto 0% 0%;
+}
+
+.bidstats-partner-logo {
+  max-width: 250px;
+  /* Adjust this value to match your heading size */
+  height: auto;
+  vertical-align: middle;
+  /* Aligns the image with the text */
+  margin: 0 0.5rem;
+  margin-bottom: 1.2rem;
+  /* Adds some spacing on both sides of the image */
 }
 
 .anchor-wrapper {
@@ -2227,7 +2238,7 @@ figcaption {
 
 .video-container {
   width: 100%;
-  max-width: 920px;
+  max-width: 960px;
   margin: 2rem auto 0;
 }
 

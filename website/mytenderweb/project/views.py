@@ -1,8 +1,9 @@
 import logging
 import os
+from pyexpat.errors import messages
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
-from .forms import CalculatorForm, ContactForm, GuideForm
+from .forms import CalculatorForm, ContactForm, GuideForm, TrialSignupForm
 import io
 from io import BytesIO
 from django.conf import settings
@@ -27,6 +28,77 @@ from django.shortcuts import render, redirect, reverse
 from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
+
+
+def trial_signup(request):
+    print("testing")
+    if request.method == 'POST':
+        form = TrialSignupForm(request.POST)
+        print("post")
+        if form.is_valid():
+            try:
+                # Get cleaned data
+                data = form.cleaned_data
+                
+                # Generate trial coupon/credentials here
+                # This is a placeholder - implement your actual trial creation logic
+                trial_code = "BIDSTATS2024"
+                print(f"Trial form submitted: {data['email']}")
+                
+                # Send welcome email with trial credentials
+                welcome_message = f"""
+                Hi {data['first_name']},
+
+                Thank you for signing up for a free trial of mytender.io!
+
+                Your trial code is: {trial_code}
+                
+                You can activate your trial by entering the discount code in your stripe checkout.
+
+                Your trial will be valid for 14 days.
+
+                If you have any questions, please contact us at info@mytender.io.
+
+                Best regards,
+                The mytender.io Team
+                """
+                
+                send_mail(
+                    subject="Welcome to mytender.io - Your Free Trial",
+                    message=welcome_message,
+                    from_email="sam@mytender.io",
+                    recipient_list=[data['email']],
+                    fail_silently=False,
+                )
+                
+                # Log the signup
+                logger.info(f"New trial signup: {data['email']} - Company Size: {data['company_size']}")
+                
+                # Optional: Add to your CRM/marketing system
+                try:
+                    pass
+                    #add_to_marketing_system(data)  # You'll need to implement this
+                except Exception as e:
+                    logger.error(f"Failed to add user to marketing system: {e}")
+                
+                messages.success(request, "Thank you! Your trial credentials have been sent to your email.")
+                return redirect('trial_success')  # Create this template/view
+                
+            except Exception as e:
+                logger.error(f"Error processing trial signup: {e}")
+                messages.error(request, "Sorry, there was an error processing your request. Please try again.")
+                
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = TrialSignupForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'oxygenFinanceLandingPage.html', context)
+
+
 
 def home(request):
 
@@ -205,7 +277,7 @@ stripe.api_key = os.getenv('STRIPE_SECRET_KEY_LIVE')
 
 
 def cancel(request) -> HttpResponse:
-    return render(request, 'index.html')
+    return render(request, 'oxygenFinanceLandingPage.html')
 
 
 def success(request) -> HttpResponse:

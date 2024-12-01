@@ -50,3 +50,66 @@ class CalculatorForm(forms.Form):
     
 class GuideForm(forms.Form):
     email = forms.EmailField(label='Email', max_length=100)
+
+
+
+class TrialSignupForm(forms.Form):
+    first_name = forms.CharField(
+        max_length=256,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input w-input',
+            'placeholder': 'John',
+        })
+    )
+    
+    last_name = forms.CharField(
+        max_length=256,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input w-input',
+            'placeholder': 'Doe',
+        })
+    )
+    
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'form-input w-input',
+            'placeholder': 'johndoe@email.com',
+        })
+    )
+    
+    COMPANY_SIZE_CHOICES = [
+        ('', 'Select company size'),  # Add empty default choice
+        ('25-50', '25-50'),
+        ('50-100', '50-100'),
+        ('100-1000', '100-1000'),
+        ('1000+', '1000+'),
+    ]
+    
+    company_size = forms.ChoiceField(
+        choices=COMPANY_SIZE_CHOICES,
+        widget=forms.Select(attrs={
+            'class': 'form-input is-select w-select',
+        })
+    )
+    
+    MAIN_USE_CHOICES = [
+        ('', 'Select main use'),  # Add empty default choice
+        ('Product Performance', 'Product Performance'),
+        ('Marketing Tracking', 'Marketing Tracking'),
+        ('Financial Reporting', 'Financial Reporting'),
+        ('Customer Insights', 'Customer Insights'),
+    ]
+    
+    main_use = forms.ChoiceField(
+        choices=MAIN_USE_CHOICES,
+        widget=forms.Select(attrs={
+            'class': 'form-input is-select w-select',
+        })
+    )
+    
+    privacy_policy = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'w-checkbox-input checkbox',
+        })
+    )

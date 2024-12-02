@@ -93,12 +93,14 @@ class TrialSignupForm(forms.Form):
     )
     
     MAIN_USE_CHOICES = [
-        ('', 'Select main use'),  # Add empty default choice
-        ('Product Performance', 'Product Performance'),
-        ('Marketing Tracking', 'Marketing Tracking'),
-        ('Financial Reporting', 'Financial Reporting'),
-        ('Customer Insights', 'Customer Insights'),
-    ]
+    ('', 'Select main use'),
+    ('Time_Reduction', 'Reduce Bid Writing Time by 40%'),
+    ('Process_Automation', 'Automate Repetitive Bid Tasks'),
+    ('Quality_Improvement', 'Improve Bid Quality & Consistency'),
+    ('Resource_Optimization', 'Optimize Team Resources & Workload'),
+    ('Success_Rate', 'Increase Bid Win Rate'),
+    ('Cost_Reduction', 'Reduce Bid Production Costs')
+]
     
     main_use = forms.ChoiceField(
         choices=MAIN_USE_CHOICES,

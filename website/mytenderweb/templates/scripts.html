@@ -93,18 +93,24 @@
 
     // Main initialization
     // Main initialization
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', () => {
         console.log('DOM Content Loaded');
         
         const swiper = initializeSwiper();
         setupSwiperNavigation(swiper);
         initializeSlackChat();
-
-        const observer = new IntersectionObserver(handleIntersection, {
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    handleIntersection(entry);
+                }
+            });
+        }, {
             threshold: 0.1,
             rootMargin: '50px'
         });
-
+    
         const counterSection = document.getElementById('counter');
         console.log('Counter section found:', counterSection);
         
@@ -112,12 +118,45 @@
             observer.observe(counterSection);
             console.log('Observer started watching counter section');
             
-            // Debug: Check if section is already visible
             const rect = counterSection.getBoundingClientRect();
             console.log('Counter section position:', rect);
             console.log('Window height:', window.innerHeight);
             console.log('Is counter already in viewport:', rect.top < window.innerHeight);
         }
+    
+        const buttons = document.querySelectorAll('.feature-button');
+        const slides = document.querySelectorAll('.feature-slide');
+        let currentSlide = 0;
+
+        function goToSlide(index) {
+            // Remove active states
+            slides.forEach(slide => {
+                slide.style.transform = 'translateX(100%)';
+                slide.classList.remove('active');
+            });
+            buttons.forEach(btn => btn.classList.remove('w--current'));
+            
+            currentSlide = index;
+            
+            // Set new active slide
+            slides[currentSlide].style.transform = 'translateX(0)';
+            slides[currentSlide].classList.add('active');
+            buttons[currentSlide].classList.add('w--current');
+        }
+
+        // Set correct data-index values
+        slides.forEach((slide, index) => {
+            slide.dataset.index = index;
+        });
+
+        buttons.forEach((btn, index) => {
+            btn.dataset.slide = index;
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                goToSlide(index);
+            });
+        });
+        
     });
 </script>
 

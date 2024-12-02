@@ -580,7 +580,7 @@ figcaption {
 
 .section.is-hero {
   background-color: var(--color--background-light);
-  margin-top: -150px;
+  margin-top: -140px;
   padding-top: 188px;
   overflow: clip;
 }
@@ -653,7 +653,7 @@ figcaption {
 
 .banner-text {
   margin: 0;
-  font-size: 26px !important;
+  font-size: 16px !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -663,12 +663,13 @@ figcaption {
 }
 
 .bidstats-partner-logo-banner {
-  height: 22px;
-  /* Increased from 20px */
+  height: 14px;
   width: auto;
   vertical-align: middle;
   object-fit: contain;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
+  filter: brightness(1.5) contrast(1.2);
+  /* Makes the image lighter while maintaining clarity */
 }
 
 @keyframes scroll {
@@ -901,7 +902,7 @@ figcaption {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 150px;
+  height: 140px;
   display: flex;
   position: sticky;
   top: 0;
@@ -1015,18 +1016,19 @@ figcaption {
 }
 
 .advantages-wrapper {
-  grid-column-gap: 40px;
-  grid-row-gap: 40px;
+  grid-column-gap: 20px;
+  grid-row-gap: 0px;
   flex-flow: wrap;
   justify-content: center;
   align-items: flex-start;
   display: flex;
   margin-bottom: 20px;
+  margin-top: -10px;
 }
 
 .advantage {
-  grid-column-gap: 8px;
-  grid-row-gap: 8px;
+  grid-column-gap: 10px;
+  grid-row-gap: 0px;
   flex-flow: wrap;
   justify-content: center;
   align-items: center;
@@ -1162,7 +1164,7 @@ figcaption {
   /* Adds some spacing on both sides of the image */
 }
 
-.anchor-wrapper {
+.feature-wrapper {
   z-index: 99;
   grid-column-gap: 32px;
   grid-row-gap: 32px;
@@ -1172,11 +1174,9 @@ figcaption {
   align-items: center;
   height: 100px;
   display: flex;
-  position: sticky;
-  top: 150px;
 }
 
-.anchor-button {
+.feature-button {
   grid-column-gap: 12px;
   grid-row-gap: 12px;
   border-radius: var(--radius--radius-full);
@@ -1190,20 +1190,21 @@ figcaption {
   font-weight: 600;
   text-decoration: none;
   display: flex;
+  cursor: pointer;
 }
 
-.anchor-button.w--current {
+.feature-button.w--current {
   background-color: #212529;
   color: var(--color--white);
 }
 
-.anchor-button-icon {
+.feature-button-icon {
   max-width: 24px;
   height: 24px;
 }
 
 .features-grid {
-  padding-top: var(--width--section-padding-desktop);
+  padding-top: 100px;
   grid-column-gap: var(--width--section-padding-desktop);
   grid-row-gap: var(--width--section-padding-desktop);
   grid-template-rows: auto;
@@ -1811,7 +1812,7 @@ figcaption {
   }
   .hero-dashboard-wrapper {
     margin-top: var(--width--section-padding-tablet);
-    margin-bottom: 150px;
+    margin-bottom: 140px;
   }
   .section-heading-horizontal {
     margin-bottom: var(--width--section-padding-tablet);
@@ -2460,3 +2461,55 @@ figcaption {
   /* adjust size of arrow icons */
   height: 20px;
 }
+
+.feature-carousel {
+  position: relative;
+  overflow: hidden;
+  height: 400px;
+  /* Set appropriate height */
+}
+
+.feature-slide {
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.5s ease-in-out;
+  visibility: hidden;
+}
+
+.feature-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  visibility: visible;
+}
+
+/* Add initial state for first slide */
+
+.feature-slide:first-child {
+  opacity: 1;
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.feature-nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.feature-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.feature-btn.active {
+  background-color: var(--brand-color);
+  color: white;
+}
+
+/* Add JavaScript to handle button clicks and slide changes */

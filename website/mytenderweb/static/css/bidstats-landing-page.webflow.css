@@ -164,20 +164,20 @@ body {
 }
 
 h1 {
-  font-family: var(--font--headings) !important;
-  font-size: var(--font-size-desktop--heading-1) !important;
+  font-family: var(--font--headings);
+  font-size: var(--font-size-desktop--heading-1);
   margin-top: 0;
   margin-bottom: 24px;
-  font-weight: 600 !important;
+  font-weight: 600;
   line-height: 1.2;
 }
 
 h2 {
-  font-family: var(--font--headings) !important;
-  font-size: var(--font-size-desktop--heading-2) !important;
+  font-family: var(--font--headings);
+  font-size: var(--font-size-desktop--heading-2);
   margin-top: 0;
   margin-bottom: 24px;
-  font-weight: 600 !important;
+  font-weight: 600;
   line-height: 1.2;
 }
 
@@ -580,7 +580,7 @@ figcaption {
 
 .section.is-hero {
   background-color: var(--color--background-light);
-  margin-top: -100px;
+  margin-top: -150px;
   padding-top: 188px;
   overflow: clip;
 }
@@ -627,6 +627,79 @@ figcaption {
   justify-content: space-between;
   align-items: center;
   display: grid;
+  padding: 10px;
+}
+
+.scrolling-banner {
+  width: 100%;
+  background-color: #212529;
+  overflow: hidden;
+  position: relative;
+  padding: 20px 0;
+  /* Increased from 10px */
+  border-bottom: 1px solid #eee;
+}
+
+.banner-content {
+  display: flex;
+  animation: scroll 20s linear infinite;
+  white-space: nowrap;
+}
+
+.banner-item {
+  flex-shrink: 0;
+  padding: 0 20px;
+}
+
+.banner-text {
+  margin: 0;
+  font-size: 26px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fff;
+  /* Changed to white for better contrast on dark background */
+}
+
+.bidstats-partner-logo-banner {
+  height: 22px;
+  /* Increased from 20px */
+  width: auto;
+  vertical-align: middle;
+  object-fit: contain;
+  margin-bottom: 2px;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Hide scrollbar */
+
+.scrolling-banner::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive styles */
+
+@media (max-width: 768px) {
+  .banner-text {
+    font-size: 14px;
+  }
+  .bidstats-partner-logo-banner {
+    height: 20px;
+    /* Adjusted for mobile */
+  }
+  .scrolling-banner {
+    padding: 15px 0;
+    /* Slightly reduced padding for mobile */
+  }
 }
 
 .styleguide-label {
@@ -828,7 +901,7 @@ figcaption {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100px;
+  height: 150px;
   display: flex;
   position: sticky;
   top: 0;
@@ -1020,10 +1093,11 @@ figcaption {
 }
 
 .partner-logo {
-  opacity: 0.4;
+  opacity: 0.7;
   object-fit: contain;
-  max-width: 200px;
+  max-width: 100px;
   height: 100px;
+  filter: brightness(105%) sepia(100%) saturate(400%) hue-rotate(300deg);
 }
 
 .hero-dashboard-wrapper {
@@ -1099,7 +1173,7 @@ figcaption {
   height: 100px;
   display: flex;
   position: sticky;
-  top: 100px;
+  top: 150px;
 }
 
 .anchor-button {
@@ -1242,7 +1316,7 @@ figcaption {
 .services-tab-link.w--current {
   background-color: var(--color--transparent);
   opacity: 1;
-  border-left-color: #212529;
+  border-left-color: #f58218;
 }
 
 .services-tabs-content {

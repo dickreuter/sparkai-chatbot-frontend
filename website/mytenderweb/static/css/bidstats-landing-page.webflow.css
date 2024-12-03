@@ -636,19 +636,32 @@ figcaption {
   overflow: hidden;
   position: relative;
   padding: 20px 0;
-  /* Increased from 10px */
   border-bottom: 1px solid #eee;
+  min-height: 60px;
+  /* Add minimum height */
+  display: flex;
+  /* Add flex display */
+  align-items: center;
+  /* Center content vertically */
 }
 
 .banner-content {
   display: flex;
   animation: scroll 20s linear infinite;
   white-space: nowrap;
+  min-height: 20px;
+  /* Ensure content has minimum height */
 }
 
 .banner-item {
   flex-shrink: 0;
   padding: 0 20px;
+  min-height: 20px;
+  /* Match content height */
+  display: flex;
+  /* Add flex display */
+  align-items: center;
+  /* Center content vertically */
 }
 
 .banner-text {
@@ -659,7 +672,17 @@ figcaption {
   justify-content: center;
   gap: 10px;
   color: #fff;
-  /* Changed to white for better contrast on dark background */
+  line-height: 1.2;
+  /* Add line height for better text rendering */
+}
+
+/* Add media query for smaller screens */
+
+@media screen and (max-width: 768px) {
+  .bidstats-partner-logo-banner {
+    height: 14px !important;
+    /* Makes the image lighter while maintaining clarity */
+  }
 }
 
 .bidstats-partner-logo-banner {
@@ -667,8 +690,7 @@ figcaption {
   width: auto;
   vertical-align: middle;
   object-fit: contain;
-  margin-bottom: 3px;
-  filter: brightness(1.5) contrast(1.2);
+  margin-bottom: 2px;
   /* Makes the image lighter while maintaining clarity */
 }
 
@@ -1095,11 +1117,9 @@ figcaption {
 }
 
 .partner-logo {
-  opacity: 0.7;
   object-fit: contain;
-  max-width: 100px;
-  height: 100px;
-  filter: brightness(105%) sepia(100%) saturate(400%) hue-rotate(300deg);
+  max-width: 120px;
+  height: 120px;
 }
 
 .hero-dashboard-wrapper {
@@ -1164,6 +1184,14 @@ figcaption {
   /* Adds some spacing on both sides of the image */
 }
 
+/* Hide on mobile devices */
+
+@media screen and (max-width: 991px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
 .feature-wrapper {
   z-index: 99;
   grid-column-gap: 32px;
@@ -1201,14 +1229,6 @@ figcaption {
 .feature-button-icon {
   max-width: 24px;
   height: 24px;
-}
-
-.features-grid {
-  padding-top: 100px;
-  grid-column-gap: var(--width--section-padding-desktop);
-  grid-row-gap: var(--width--section-padding-desktop);
-  grid-template-rows: auto;
-  place-items: center stretch;
 }
 
 .icon-wrapper {
@@ -1822,29 +1842,40 @@ figcaption {
     width: 300px;
     height: 300px;
   }
-  .anchor-wrapper {
+  .feature-wrapper {
     top: 80px;
     overflow: auto;
   }
-  .anchor-button {
+  .feature-button {
     flex: none;
     font-size: 16px;
   }
   .features-grid {
-    grid-column-gap: var(--width--section-padding-tablet);
-    grid-row-gap: var(--width--section-padding-tablet);
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+    /* Reduced from tablet padding value */
     grid-template-columns: 1fr;
+    border: dotted;
   }
   .feature-image-wrapper {
-    aspect-ratio: 16 / 9;
-    justify-content: center;
-    align-items: center;
-    min-height: auto;
-    display: flex;
+    padding: 24px;
+    /* Reduced padding on mobile */
+    margin-bottom: 0;
+    /* Remove any bottom margin */
+    min-height: 50px;
+    /* Set a reasonable min-height */
+    aspect-ratio: auto;
+    border: dotted;
+    /* Remove the forced aspect ratio */
   }
   .feature-image {
     max-width: 90%;
-    height: 90%;
+    height: auto;
+    /* Changed from 90% to auto */
+    object-fit: contain;
+    /* Ensure image scales properly */
+    position: relative;
+    /* Remove any absolute positioning */
     right: auto;
   }
   .services-tabs {
@@ -2029,7 +2060,7 @@ figcaption {
     padding-bottom: var(--width--section-padding-mobile);
   }
   .section.is-hero {
-    margin-top: -64px;
+    margin-top: -40px;
     padding-top: 104px;
   }
   .container {
@@ -2072,7 +2103,7 @@ figcaption {
     grid-row-gap: 24px;
   }
   .navbar {
-    height: 64px;
+    height: 124px;
   }
   .logo {
     height: 24px;
@@ -2124,7 +2155,7 @@ figcaption {
     width: 200px;
     height: 200px;
   }
-  .anchor-wrapper {
+  .feature-wrapper {
     padding-right: var(--width--container-padding-mobile);
     padding-left: var(--width--container-padding-mobile);
     grid-column-gap: 16px;
@@ -2134,7 +2165,7 @@ figcaption {
     margin-right: -16px;
     top: 64px;
   }
-  .anchor-button {
+  .feature-button {
     padding: 12px 16px;
     font-size: 15px;
   }
@@ -2465,7 +2496,7 @@ figcaption {
 .feature-carousel {
   position: relative;
   overflow: hidden;
-  height: 400px;
+  height: 580px;
   /* Set appropriate height */
 }
 
@@ -2476,6 +2507,14 @@ figcaption {
   transform: translateX(100%);
   transition: all 0.5s ease-in-out;
   visibility: hidden;
+}
+
+.features-grid {
+  grid-column-gap: var(--width--section-padding-desktop);
+  grid-row-gap: var(--width--section-padding-desktop);
+  grid-template-rows: auto;
+  place-items: center stretch;
+  /* Add padding to prevent button cutoff */
 }
 
 .feature-slide.active {

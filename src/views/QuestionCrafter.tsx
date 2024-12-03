@@ -26,6 +26,7 @@ import {
   faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import SectionTitle from "../components/SectionTitle.tsx";
+import { updateSection } from "../utilityfunctions/updateSection.tsx";
 
 const QuestionCrafter = () => {
   interface Subheading {
@@ -90,8 +91,23 @@ const QuestionCrafter = () => {
     setCurrentSectionIndex(index !== -1 ? index : 0);
   }, [section.section_id, outline]);
 
+  useEffect(() => {
+    if (section?.question !== undefined) {
+      setInputText(section.question || "");
+    }
+  }, [section]);
+
   // Add navigation functions
   const navigateToSection = (section: Section) => {
+    if (canUserEdit && inputText !== section.question) {
+      // Save current section before navigating
+      const updatedSection = {
+        ...section,
+        question: inputText
+      };
+      updateSection(updatedSection, currentSectionIndex, bid_id);
+    }
+
     navigate("/question-crafter", {
       state: {
         section,
@@ -116,6 +132,26 @@ const QuestionCrafter = () => {
   const showViewOnlyMessage = () => {
     console.log(currentUserPermission);
     displayAlert("You only have permission to view this bid.", "danger");
+  };
+
+  const debouncedUpdateSection = debounce((updatedSection, index, bidId) => {
+    updateSection(updatedSection, index, bidId, tokenRef);
+  }, 1000);
+
+  // Modify the input text change handler
+  const handleInputTextChange = (e) => {
+    const newText = e.target.value;
+    setInputText(newText);
+
+    if (canUserEdit) {
+      // Create updated section object with new question
+      const updatedSection = {
+        ...section,
+        question: newText
+      };
+
+      debouncedUpdateSection(updatedSection, currentSectionIndex, bid_id);
+    }
   };
 
   // Add this utility function to convert EditorState to plain text
@@ -802,7 +838,7 @@ const QuestionCrafter = () => {
                   className="card-textarea"
                   placeholder="Enter question here..."
                   value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
+                  onChange={handleInputTextChange}
                   disabled={!canUserEdit}
                 ></textarea>
               </div>

@@ -5,6 +5,7 @@ import { Button } from "react-bootstrap";
 export interface Section {
   section_id: string;
   heading: string;
+  question: string;
   word_count: number;
   reviewer: string;
   status: "Not Started" | "In Progress" | "Completed";

@@ -1,5 +1,5 @@
 export interface IMessage {
-  type: "text" | "image" | "loading" | "typing";
+  type: "text" | "image" | "loading";
   value: string;
   createdBy: "user" | "bot";
   action: "default" | IPromptType;

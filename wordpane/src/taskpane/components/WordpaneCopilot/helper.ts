@@ -247,10 +247,7 @@ export const getDefaultMessage = (type: "library-chat" | "internet-search", useC
       const filtered: IMessage[] = [];
       for (let i = 0; i < parsedMessages.length; i++) {
         const message = parsedMessages[i];
-        if (
-          (message.createdBy === "user" && parsedMessages?.[i + 1]?.type === "loading") ||
-          parsedMessages?.[i + 1]?.type === "typing"
-        ) {
+        if (message.createdBy === "user" && parsedMessages?.[i + 1]?.type === "loading") {
           break;
         }
         filtered.push(message);

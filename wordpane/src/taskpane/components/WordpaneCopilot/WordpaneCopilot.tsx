@@ -18,12 +18,12 @@ import {
   refineResponse,
   setCacheVersion,
   withId,
+  markdownToHTML,
 } from "./helper";
 import Welcome from "./Welcome";
 import useShowWelcome from "../../hooks/useShowWelcome";
 import posthog from "posthog-js";
 import SignoutFab from "./components/SignoutFab/SignoutFab";
-import { addMessage } from "../../helper";
 
 const WordpaneCopilot = () => {
   const getAuth = useAuthUser();
@@ -55,15 +55,12 @@ const WordpaneCopilot = () => {
   const isInternetSearchTab = useMemo(() => selectedTab === "internet-search", [selectedTab]);
 
   const isLiveChatLoading = useMemo(
-    () =>
-      isLibraryChatTab && libraryChatMessages.find((item) => ["loading", "typing"].includes(item.type)) !== undefined,
+    () => isLibraryChatTab && libraryChatMessages.find((item) => item.type === "loading") !== undefined,
     [isLibraryChatTab, libraryChatMessages]
   );
 
   const isInternetSearchLoading = useMemo(
-    () =>
-      isInternetSearchTab &&
-      internetResearchMessages.find((item) => ["loading", "typing"].includes(item.type)) !== undefined,
+    () => isInternetSearchTab && internetResearchMessages.find((item) => item.type === "loading") !== undefined,
     [isInternetSearchTab, internetResearchMessages]
   );
 
@@ -86,14 +83,6 @@ const WordpaneCopilot = () => {
       textInputRef.current.focus();
     }
   }, [isLoading]);
-
-  useEffect(() => {
-    if (responseMessageBoxRef?.current) {
-      const scrollBox = responseMessageBoxRef.current.querySelector(".mini-messages");
-      if (scrollBox.scrollHeight - scrollBox.scrollTop < 800 && new Date().getTime() % 10 == 0)
-        scrollBox.scrollTop = scrollBox.scrollHeight;
-    }
-  }, [libraryChatMessages, internetResearchMessages]);
 
   const toggleCustomPromptMenuVisible: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     setTimeout(() => {
@@ -425,8 +414,8 @@ const WordpaneCopilot = () => {
       ]);
 
       askLibraryChatQuestion(tokenRef.current, request)
-        .then(async (message) => {
-          await addMessage(setLibraryChatMessages, message);
+        .then((message) => {
+          setLibraryChatMessages((messages) => [...messages.slice(0, -1), message]);
           posthog.capture("word_addin_library_chat_response_received", {
             messageType: message.type,
             client_type: "word_add_in",
@@ -458,8 +447,8 @@ const WordpaneCopilot = () => {
         withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false, request }),
       ]);
       askInternetQuestion(tokenRef.current, request)
-        .then(async (message) => {
-          await addMessage(setInternetResearchMessages, message);
+        .then((message) => {
+          setInternetResearchMessages((messages) => [...messages.slice(0, -1), message]);
         })
         .catch(console.log);
       setInputValue("");
@@ -483,8 +472,8 @@ const WordpaneCopilot = () => {
         withId({ type: "loading", createdBy: "bot", value: "loading", action: "default", isRefine: false, request }),
       ]);
       askCustomPrompt(request)
-        .then(async (message) => {
-          await addMessage(setLibraryChatMessages, message);
+        .then((message) => {
+          setLibraryChatMessages((messages) => [...messages.slice(0, -1), message]);
         })
         .catch(console.log);
       setInputValue("");

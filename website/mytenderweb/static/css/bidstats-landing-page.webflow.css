@@ -941,6 +941,10 @@ figcaption {
   padding-left: 0;
 }
 
+.max {
+  max-width: 800px;
+}
+
 .navbar-link {
   opacity: 0.6;
   color: var(--color--text-color);

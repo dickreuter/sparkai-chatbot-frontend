@@ -8,6 +8,7 @@ export interface Section {
   question: string;
   word_count: number;
   reviewer: string;
+  choice: string;
   status: "Not Started" | "In Progress" | "Completed";
   weighting?: string;
   page_limit?: string;

@@ -17,7 +17,7 @@ import StatusMenu, { Section } from "../components/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import GenerateProposalModal from "../modals/GenerateProposalModal.tsx";
 import SectionMenu from "../components/SectionMenu.tsx";
-import { MenuItem, Select, Skeleton } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent, Skeleton } from "@mui/material";
 import posthog from "posthog-js";
 import { Padding } from "@mui/icons-material";
 
@@ -124,10 +124,59 @@ const ReviewerDropdown = ({
   );
 };
 
+const QuestionTypeDropdown = ({
+  value,
+  onChange,
+  onBlur
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onBlur: () => void;
+}) => {
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    onChange(event.target.value as string);
+  };
+
+  return (
+    <Select
+      value={value || "3b"}
+      onChange={handleChange}
+      onBlur={onBlur}
+      size="small"
+      style={selectStyle}
+      displayEmpty
+      MenuProps={{
+        PaperProps: {
+          style: menuStyle
+        }
+      }}
+    >
+      <MenuItem value="3b" style={menuStyle}>
+        <em>Generic</em>
+      </MenuItem>
+      <MenuItem value="3b_case_study" style={menuStyle}>
+        <em>Case Study</em>
+      </MenuItem>
+      <MenuItem value="3b_commercial" style={menuStyle}>
+        <em>Commercial</em>
+      </MenuItem>
+      <MenuItem value="3b_personnel" style={menuStyle}>
+        <em>Personnel</em>
+      </MenuItem>
+      <MenuItem value="3b_technical" style={menuStyle}>
+        <em>Technical</em>
+      </MenuItem>
+    </Select>
+  );
+};
+
 const SkeletonRow = () => (
   <tr className="hover:bg-gray-50">
     <td className="py-2 px-4">
       <Skeleton variant="text" />
+    </td>
+    <td className="py-2 px-4">
+      <Skeleton variant="rectangular" />
     </td>
     <td className="py-2 px-4">
       <Skeleton variant="rectangular" />
@@ -457,6 +506,9 @@ const ProposalPlan = () => {
                       <th className="" style={{ width: "13.5%" }}>
                         Reviewer
                       </th>
+                      <th className="" style={{ width: "13.5%" }}>
+                        Question Type
+                      </th>
                       <th className=" text-center" style={{ width: "8%" }}>
                         Subsections
                       </th>
@@ -508,6 +560,17 @@ const ProposalPlan = () => {
                                   updateSection(outline[index], index)
                                 }
                                 contributors={contributors}
+                              />
+                            </td>
+                            <td className="">
+                              <QuestionTypeDropdown
+                                value={section.choice}
+                                onChange={(value) =>
+                                  handleSectionChange(index, "choice", value)
+                                }
+                                onBlur={() =>
+                                  updateSection(outline[index], index)
+                                }
                               />
                             </td>
                             <td className="text-center">

@@ -263,7 +263,7 @@ stripe.api_key = os.getenv('STRIPE_SECRET_KEY_LIVE')
 
 
 def cancel(request) -> HttpResponse:
-    return render(request, 'oxygenFinanceLandingPage.html')
+    return render(request, 'enrollmentTesting.html')
 
 
 def success(request) -> HttpResponse:
@@ -338,11 +338,14 @@ def create_checkout_session(request) -> HttpResponse:
                 cancel_url=DOMAIN + reverse('cancel')
             )
         else:
-            # Regular checkout without discount
+            # Regular checkout with 14-day free trial
             checkout_session = stripe.checkout.Session.create(
                 line_items=line_items,
                 mode='subscription',
                 allow_promotion_codes=True,
+                subscription_data={
+                    'trial_period_days': 14
+                },
                 success_url=DOMAIN + reverse('success') + '?session_id={CHECKOUT_SESSION_ID}',
                 cancel_url=DOMAIN + reverse('cancel')
             )

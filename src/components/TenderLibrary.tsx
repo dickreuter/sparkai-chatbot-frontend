@@ -347,29 +347,26 @@ const TenderLibrary = ({ object_id }) => {
 
       console.log("Valid files:", validFiles);
 
-      if (validFiles.length > 0) {
-        setFiles((prevFiles) => {
-          const updatedFiles = [...prevFiles];
-          validFiles.forEach((file) => {
-            const exists = updatedFiles.some(
-              (existingFile) => existingFile.name === file.name
-            );
-            if (!exists) {
-              updatedFiles.push(file);
-            }
-          });
-          console.log("Updated files state:", updatedFiles);
-          return updatedFiles;
+      setFiles((prevFiles) => {
+        const updatedFiles = [...prevFiles];
+        validFiles.forEach((file) => {
+          const exists = updatedFiles.some(
+            (existingFile) => existingFile.name === file.name
+          );
+          if (!exists) {
+            updatedFiles.push(file);
+          }
         });
-      }
+        console.log("Updated files state:", updatedFiles);
+        return updatedFiles;
+      });
     };
 
     const handleFileSelect = (e) => {
       console.log("File select triggered");
-      const selectedFiles = e.target.files;
-      if (selectedFiles && selectedFiles.length > 0) {
-        console.log("Selected files:", selectedFiles);
-        const filesArray = Array.from(selectedFiles);
+      if (e.target.files && e.target.files.length > 0) {
+        console.log("Selected files:", e.target.files);
+        const filesArray = Array.from(e.target.files);
         handleFiles(filesArray);
       }
       // Reset the input

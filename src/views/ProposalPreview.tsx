@@ -52,13 +52,14 @@ const ProposalPreview = () => {
           "p[style-name='Normal'] => p.normal-text:fresh",
           "p[style-name='Heading 1'] => h1.main-header:fresh",
           "p[style-name='Heading 2'] => h2.sub-header:fresh",
-          "b => strong"
+          "p[font-size='13pt'] => p.subsection-text:fresh",
+          "b => strong:fresh",
+          "strong => strong:fresh"
         ]
       };
 
       const result = await mammoth.convertToHtml(options);
-      console.log("Conversion result:", result);
-      console.log("Warnings:", result.messages);
+      console.log("Mammoth conversion result HTML:", result.value);
 
       const styledContent = `
         <style>
@@ -78,21 +79,34 @@ const ProposalPreview = () => {
             color: #444 !important;
           }
           
-          div[class*="proposal-preview"] p.normal-text {
+          div[class*="proposal-preview"] p {
             font-size: 14px !important;
             line-height: 1.6 !important;
             margin-bottom: 12px !important;
             color: #555 !important;
           }
-          
-          div[class*="proposal-preview"] strong {
+
+          /* Target paragraphs that contain only a strong tag with subsection numbering */
+          div[class*="proposal-preview"] p > strong:only-child {
+            font-size: 16px !important;
             font-weight: bold !important;
+            color: #444 !important;
+            display: block !important;
+            margin-top: 16px !important;
+            margin-bottom: 8px !important;
+          }
+
+          /* Regular strong tags within paragraphs */
+          div[class*="proposal-preview"] p > strong:not(:only-child) {
+            font-weight: bold !important;
+            font-size: inherit !important;
           }
         </style>
         ${result.value}
       `;
 
       setHtmlContent(styledContent);
+      console.log("Final styled content:", styledContent);
       setIsLoading(false);
     } catch (err) {
       console.error("Preview loading error:", err);

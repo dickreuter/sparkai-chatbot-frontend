@@ -5,12 +5,7 @@ import React, {
   useRef,
   useCallback
 } from "react";
-import {
-  EditorState,
-  convertFromRaw,
-  convertToRaw,
-  ContentState
-} from "draft-js";
+import { EditorState } from "draft-js";
 import { Outlet } from "react-router-dom";
 import axios from "axios";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
@@ -21,6 +16,28 @@ export interface Document {
   name: string;
   editorState: EditorState;
   type: "qa sheet" | "execSummary" | "coverLetter";
+}
+
+export interface Subheading {
+  subheading_id: string;
+  title: string;
+  extra_instructions: string;
+  word_count_count: 100;
+}
+
+export interface Section {
+  section_id: string;
+  heading: string;
+  question: string;
+  word_count: number;
+  answer: string;
+  reviewer: string;
+  status: "Not Started" | "In Progress" | "Completed";
+  weighting?: string;
+  page_limit?: string;
+  subsections: number;
+  subheadings: Subheading[];
+  choice: string;
 }
 
 export interface Contributor {
@@ -43,9 +60,8 @@ export interface SharedState {
   isLoading: boolean;
   saveSuccess: boolean | null;
   object_id: string | null;
-  documents: Document[];
-  currentDocumentIndex: number;
   selectedFolders: string[];
+  outline: Section[];
 }
 
 export interface BidContextType {
@@ -53,9 +69,6 @@ export interface BidContextType {
   setSharedState: React.Dispatch<React.SetStateAction<SharedState>>;
   saveProposal: () => void;
   getBackgroundInfo: () => string;
-  addDocument: () => void;
-  removeDocument: (index: number) => void;
-  selectDocument: (index: number) => void;
 }
 
 const defaultState: BidContextType = {
@@ -75,22 +88,12 @@ const defaultState: BidContextType = {
     isLoading: false,
     saveSuccess: null,
     object_id: null,
-    documents: [
-      {
-        name: "Q&A Sheet",
-        editorState: EditorState.createEmpty(),
-        type: "qa sheet"
-      }
-    ],
-    currentDocumentIndex: 0,
-    selectedFolders: ["default"]
+    selectedFolders: ["default"],
+    outline: []
   },
   setSharedState: () => {},
   saveProposal: () => {},
-  getBackgroundInfo: () => "",
-  addDocument: () => {},
-  removeDocument: (index: number) => {},
-  selectDocument: (index: number) => {}
+  getBackgroundInfo: () => ""
 };
 
 export const BidContext = createContext<BidContextType>(defaultState);
@@ -103,15 +106,6 @@ const BidManagement: React.FC = () => {
       const parsedState = JSON.parse(savedState);
       return {
         ...parsedState,
-        documents: parsedState.documents.map((doc) => ({
-          ...doc,
-          editorState: doc.editorState
-            ? EditorState.createWithContent(
-                convertFromRaw(JSON.parse(doc.editorState))
-              )
-            : EditorState.createEmpty(),
-          type: doc.type || "qa sheet"
-        })),
         contributors: parsedState.contributors || {},
         original_creator: parsedState.original_creator || "",
         isSaved: false,
@@ -119,11 +113,10 @@ const BidManagement: React.FC = () => {
         saveSuccess: null,
         object_id: parsedState.object_id || null,
         currentDocumentIndex: parsedState.currentDocumentIndex || 0,
-        selectedFolders: parsedState.selectedFolders || ["default"], // Add this line
+        selectedFolders: parsedState.selectedFolders || ["default"] // Add this line
       };
     }
     return defaultState.sharedState;
-
   });
 
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
@@ -137,139 +130,6 @@ const BidManagement: React.FC = () => {
 
   const getBackgroundInfo = () => {
     return `${sharedState.opportunity_information}\n${sharedState.compliance_requirements}`;
-  };
-
-  const addDocument = async (
-    name: string,
-    type: "qa sheet" | "execSummary" | "coverLetter"
-  ) => {
-    setSharedState((prevState) => ({
-      ...prevState,
-      isLoading: true
-    }));
-
-    try {
-      const editorState = await getInitialEditorState(type);
-      setSharedState((prevState) => {
-        const newDocument = {
-          name: name || `Document ${prevState.documents.length + 1}`,
-          editorState,
-          type
-        };
-        //console.log('Adding new document:', newDocument);
-        return {
-          ...prevState,
-          documents: [...prevState.documents, newDocument],
-          currentDocumentIndex: prevState.documents.length,
-          isLoading: false
-        };
-      });
-    } catch (error) {
-      //console.error("Error adding document:", error);
-      setSharedState((prevState) => ({
-        ...prevState,
-        isLoading: false
-      }));
-      displayAlert("Failed to add document. Please try again.", "error");
-    }
-  };
-
-  const getInitialEditorState = async (
-    type: "qa sheet" | "execSummary" | "coverLetter"
-  ) => {
-    let template = "";
-    console.log("get initial editor state");
-    const makeApiCall = async (endpoint: string) => {
-      if (!sharedState.object_id) {
-        throw new Error("No bid ID available. Please save the bid first.");
-      }
-
-      const formData = new FormData();
-      formData.append("bid_id", sharedState.object_id);
-
-      try {
-        const result = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/${endpoint}`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`,
-              "Content-Type": "multipart/form-data"
-            }
-          }
-        );
-        console.log(`API response for ${endpoint}:`, result.data);
-        return result.data;
-      } catch (error) {
-        console.error(`Error fetching ${endpoint}:`, error);
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
-          throw new Error(
-            "No documents found in the tender library. Please upload documents before generating content."
-          );
-        }
-        throw error;
-      }
-    };
-    try {
-      switch (type) {
-        case "execSummary":
-          const execSummaryData = await makeApiCall("generate_exec_summary");
-          template = execSummaryData.exec_summary;
-          break;
-        case "coverLetter":
-          const coverLetterData = await makeApiCall("generate_cover_letter");
-          template = coverLetterData.cover_letter;
-          break;
-        case "qa sheet":
-        default:
-          template = `Question 1: [Copy the exact question from the tender document]
-  
-  Answer: [Provide a clear, concise, and specific answer. Use bullet points or numbered lists where appropriate. Include relevant examples or case studies if possible.]
-  
-  Question 2: [Next question from the tender document]
-  
-  Answer: [Answer to question 2. Remember to:
-  - Address all parts of the question
-  - Highlight your strengths and unique selling points
-  - Provide evidence to support your claims
-  - Use industry-specific terminology appropriately]
-  
-  [Continue with additional Question/Answer pairs as needed]`;
-      }
-    } catch (error) {
-      const errorMessage = `Error generating ${type}. Please try again.`;
-      displayAlert(
-        `Failed to generate ${type}. Using default template.`,
-        "warning"
-      );
-      template = errorMessage;
-    }
-
-    return EditorState.createWithContent(ContentState.createFromText(template));
-  };
-
-  const removeDocument = (index) => {
-    setSharedState((prevState) => {
-      const updatedDocuments = prevState.documents.filter(
-        (_, docIndex) => docIndex !== index
-      );
-      const newIndex = Math.min(
-        prevState.currentDocumentIndex,
-        updatedDocuments.length - 1
-      );
-      return {
-        ...prevState,
-        documents: updatedDocuments,
-        currentDocumentIndex: newIndex
-      };
-    });
-  };
-
-  const selectDocument = (index) => {
-    setSharedState((prevState) => ({
-      ...prevState,
-      currentDocumentIndex: index
-    }));
   };
 
   const canUserSave = useCallback((): boolean => {
@@ -291,7 +151,6 @@ const BidManagement: React.FC = () => {
       bidInfo,
       compliance_requirements,
       opportunity_information,
-      documents,
       bid_qualification_result,
       client_name,
       opportunity_owner,
@@ -322,7 +181,6 @@ const BidManagement: React.FC = () => {
     };
 
     appendFormData("bid_title", bidInfo);
-    appendFormData("text", "Sample text");
     appendFormData("status", "ongoing");
     appendFormData("contract_information", backgroundInfo);
     appendFormData("compliance_requirements", compliance_requirements);
@@ -335,16 +193,6 @@ const BidManagement: React.FC = () => {
     appendFormData("submission_deadline", submission_deadline);
     appendFormData("questions", questions);
     appendFormData("original_creator", original_creator);
-
-    const documentsFormatted = documents.map((doc) => {
-      return {
-        name: doc.name,
-        text: doc.editorState.getCurrentContent().getPlainText(),
-        type: doc.type
-      };
-    });
-    //console.log('Formatted documents:', documentsFormatted); // Debug log
-    formData.append("documents", JSON.stringify(documentsFormatted));
 
     if (object_id) {
       appendFormData("object_id", object_id);
@@ -410,17 +258,7 @@ const BidManagement: React.FC = () => {
 
   useEffect(() => {
     const stateToSave = {
-      ...sharedState,
-      documents: sharedState.documents.map((doc) => {
-        //console.log('Preparing document for localStorage:', doc); // Debug log
-        return {
-          ...doc,
-          editorState: JSON.stringify(
-            convertToRaw(doc.editorState.getCurrentContent())
-          ),
-          type: doc.type
-        };
-      })
+      ...sharedState
     };
     //console.log('State being saved to localStorage:', stateToSave); // Debug log
     localStorage.setItem("bidState", JSON.stringify(stateToSave));
@@ -453,10 +291,10 @@ const BidManagement: React.FC = () => {
     sharedState.submission_deadline,
     sharedState.bid_manager,
     sharedState.contributors,
-    sharedState.documents,
     sharedState.original_creator,
     sharedState.selectedFolders,
-    canUserSave // Add canUserSave to the dependency array
+    sharedState.outline,
+    canUserSave
   ]);
 
   return (
@@ -465,11 +303,7 @@ const BidManagement: React.FC = () => {
         sharedState,
         setSharedState,
         saveProposal,
-        getBackgroundInfo,
-        addDocument,
-        removeDocument,
-        selectDocument,
-        canUserSave
+        getBackgroundInfo
       }}
     >
       <Outlet />

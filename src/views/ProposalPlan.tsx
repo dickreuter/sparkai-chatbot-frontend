@@ -4,22 +4,19 @@ import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
-import { Button, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./BidExtractor.css";
-import { BidContext } from "./BidWritingStateManagerView.tsx";
+import { BidContext, Section } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
 import "./ProposalPlan.css";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
-import StatusMenu, { Section } from "../components/StatusMenu.tsx";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import StatusMenu from "../components/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
-import GenerateProposalModal from "../modals/GenerateProposalModal.tsx";
 import SectionMenu from "../components/SectionMenu.tsx";
 import { MenuItem, Select, SelectChangeEvent, Skeleton } from "@mui/material";
 import posthog from "posthog-js";
-import { Padding } from "@mui/icons-material";
 
 const EditableCell = ({
   value: initialValue,
@@ -207,13 +204,11 @@ const ProposalPlan = () => {
   const navigate = useNavigate();
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState, setSharedState } = useContext(BidContext);
-  const [outline, setOutline] = useState<Section[]>([]);
   const [outlinefetched, setOutlineFetched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { object_id, contributors } = sharedState;
+  const { object_id, contributors, outline } = sharedState;
 
-  const [isGeneratingOutline, setIsGeneratingOutline] = useState(false);
   const currentUserPermission = contributors[auth.email] || "viewer";
   const [showModal, setShowModal] = useState(false);
 
@@ -265,12 +260,17 @@ const ProposalPlan = () => {
         }
       );
 
-      const updatedOutline = [...outline];
+      const updatedOutline = [...sharedState.outline];
       updatedOutline.splice(selectedRowIndex, 0, {
         ...newSection,
         section_id: response.data.section_id
       });
-      setOutline(updatedOutline);
+
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: updatedOutline
+      }));
+
       displayAlert("Section added successfully", "success");
     } catch (err) {
       console.error("Error adding section:", err);
@@ -326,13 +326,6 @@ const ProposalPlan = () => {
     displayAlert("You only have permission to view this bid.", "danger");
   };
 
-  const isAllSectionsComplete = () => {
-    return (
-      outline.length > 0 &&
-      outline.every((section) => section.status === "Completed")
-    );
-  };
-
   useEffect(() => {
     if (outline.length === 0 && outlinefetched === true) {
       setShowModal(true);
@@ -342,49 +335,6 @@ const ProposalPlan = () => {
   const handleRegenerateClick = () => {
     setShowModal(true);
   };
-
-  const fetchOutline = async () => {
-    if (!object_id) return;
-    const formData = new FormData();
-    formData.append("bid_id", object_id);
-    setIsLoading(true);
-    try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_bid_outline`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "multipart/form-data"
-          }
-        }
-      );
-      // Map the response data and preserve or set the status field
-      const outlineWithStatus = response.data.map((section: any) => ({
-        ...section,
-        // If status exists in the response, use it; otherwise convert from completed boolean
-        status:
-          section.status ||
-          (section.completed
-            ? "Completed"
-            : section.in_progress
-              ? "In Progress"
-              : "Not Started")
-      }));
-      setOutline(outlineWithStatus);
-    } catch (err) {
-      console.error("Error fetching outline:", err);
-      displayAlert("Failed to fetch outline", "danger");
-    } finally {
-      setIsLoading(false);
-      setOutlineFetched(true);
-    }
-  };
-
-  useEffect(() => {
-    if (!object_id) return;
-    fetchOutline();
-  }, [object_id]);
 
   const updateSection = async (section: Section, sectionIndex: number) => {
     try {
@@ -424,9 +374,14 @@ const ProposalPlan = () => {
         }
       );
 
-      // Update the local state after successful deletion
-      const newOutline = outline.filter((_, index) => index !== sectionIndex);
-      setOutline(newOutline);
+      const newOutline = sharedState.outline.filter(
+        (_, index) => index !== sectionIndex
+      );
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: newOutline
+      }));
+
       displayAlert("Section deleted successfully", "success");
     } catch (err) {
       console.error("Error deleting section:", err);
@@ -449,18 +404,17 @@ const ProposalPlan = () => {
     field: keyof Section,
     value: any
   ) => {
-    const newOutline = [...outline];
-
-    // Update the section with the new value
+    const newOutline = [...sharedState.outline];
     newOutline[index] = {
       ...newOutline[index],
       [field]: value
     };
 
-    // Update local state
-    setOutline(newOutline);
+    setSharedState((prevState) => ({
+      ...prevState,
+      outline: newOutline
+    }));
 
-    // For status changes, update immediately
     if (field === "status") {
       posthog.capture("proposal_section_status_changed", {
         bidId: object_id,
@@ -469,6 +423,48 @@ const ProposalPlan = () => {
       });
     }
   };
+
+  const fetchOutline = async () => {
+    if (!object_id) return;
+    const formData = new FormData();
+    formData.append("bid_id", object_id);
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_bid_outline`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      const outlineWithStatus = response.data.map((section: any) => ({
+        ...section,
+        status:
+          section.status ||
+          (section.completed
+            ? "Completed"
+            : section.in_progress
+              ? "In Progress"
+              : "Not Started")
+      }));
+
+      setSharedState((prevState) => ({
+        ...prevState,
+        outline: outlineWithStatus
+      }));
+    } catch (err) {
+      console.error("Error fetching outline:", err);
+      displayAlert("Failed to fetch outline", "danger");
+    } finally {
+      setIsLoading(false);
+      setOutlineFetched(true);
+    }
+  };
+
   return (
     <div className="chatpage">
       <SideBarSmall />

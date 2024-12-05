@@ -2,18 +2,6 @@ import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
 import { Button } from "react-bootstrap";
 
-export interface Section {
-  section_id: string;
-  heading: string;
-  question: string;
-  word_count: number;
-  reviewer: string;
-  choice: string;
-  status: "Not Started" | "In Progress" | "Completed";
-  weighting?: string;
-  page_limit?: string;
-}
-
 const StatusMenu = ({
   value,
   onChange

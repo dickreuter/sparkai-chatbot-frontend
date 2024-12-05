@@ -26,7 +26,10 @@ import {
   faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import SectionTitle from "../components/SectionTitle.tsx";
-import { updateSection } from "../utilityfunctions/updateSection.tsx";
+import {
+  fetchOutline,
+  updateSection
+} from "../utilityfunctions/updateSection.tsx";
 
 const QuestionCrafter = () => {
   interface Subheading {
@@ -98,34 +101,39 @@ const QuestionCrafter = () => {
   }, [section]);
 
   // Add navigation functions
-  const navigateToSection = (section: Section) => {
+  const navigateToSection = async (section: Section) => {
     if (canUserEdit && inputText !== section.question) {
       // Save current section before navigating
       const updatedSection = {
         ...section,
         question: inputText
       };
-      updateSection(updatedSection, currentSectionIndex, bid_id);
+      await updateSection(
+        updatedSection,
+        currentSectionIndex,
+        bid_id,
+        tokenRef
+      );
     }
-
+    const updated_outline = await fetchOutline(bid_id, tokenRef);
     navigate("/question-crafter", {
       state: {
         section,
         bid_id: bid_id,
-        state_outline: outline
+        state_outline: updated_outline
       }
     });
   };
 
-  const handlePreviousSection = () => {
+  const handlePreviousSection = async () => {
     if (currentSectionIndex > 0) {
-      navigateToSection(outline[currentSectionIndex - 1]);
+      await navigateToSection(outline[currentSectionIndex - 1]);
     }
   };
 
-  const handleNextSection = () => {
+  const handleNextSection = async () => {
     if (currentSectionIndex < outline.length - 1) {
-      navigateToSection(outline[currentSectionIndex + 1]);
+      await navigateToSection(outline[currentSectionIndex + 1]);
     }
   };
 

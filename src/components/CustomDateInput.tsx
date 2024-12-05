@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import "./CustomDateInput.css";
 
 const CustomDateInput = ({ value, onChange, disabled }) => {
   const dateInputRef = useRef(null);
@@ -26,11 +27,11 @@ const CustomDateInput = ({ value, onChange, disabled }) => {
   };
 
   const handleDateChange = (e) => {
-    const newValue = e.target.value; // This will be in YYYY-MM-DD format
+    const newValue = e.target.value;
     const date = new Date(newValue);
     if (!isNaN(date.getTime())) {
       setDisplayValue(formatDate(date));
-      onChange(newValue); // Keep the onChange value in YYYY-MM-DD format
+      onChange(newValue);
     }
   };
 
@@ -56,37 +57,6 @@ const CustomDateInput = ({ value, onChange, disabled }) => {
         className="fas fa-calendar-alt calendar-icon"
         onClick={handleIconClick}
       ></i>
-
-      <style jsx>{`
-        .custom-date-input {
-          position: relative;
-          display: inline-block;
-          width: 100%;
-        }
-        .calendar-icon {
-          position: absolute;
-          right: 16px;
-          top: 50%;
-          transform: translateY(-50%);
-          cursor: pointer;
-          color: #6c757d;
-          z-index: 1;
-        }
-        .date-input {
-          padding-right: 30px;
-          width: 100%;
-          cursor: pointer;
-        }
-        .hidden-date-input {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          opacity: 0;
-          cursor: pointer;
-        }
-      `}</style>
     </div>
   );
 };

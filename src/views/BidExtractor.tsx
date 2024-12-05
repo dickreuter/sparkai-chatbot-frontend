@@ -1,24 +1,27 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { API_URL, HTTP_PREFIX } from '../helper/Constants';
-import axios from 'axios';
-import withAuth from '../routes/withAuth';
-import { useAuthUser } from 'react-auth-kit';
-import SideBarSmall from '../routes/SidebarSmall.tsx';
-import { useLocation } from 'react-router-dom';
+import { API_URL, HTTP_PREFIX } from "../helper/Constants";
+import axios from "axios";
+import withAuth from "../routes/withAuth";
+import { useAuthUser } from "react-auth-kit";
+import SideBarSmall from "../routes/SidebarSmall.tsx";
+import { useLocation } from "react-router-dom";
 import { Button, Card, Col, Row, Spinner } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./BidExtractor.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
-import { EditorState, ContentState } from 'draft-js';
-import { displayAlert } from '../helper/Alert';
+import { EditorState, ContentState } from "draft-js";
+import { displayAlert } from "../helper/Alert";
 import { FormControl } from "@mui/material";
 import ContributorModal from "../components/ContributorModal.tsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {  faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
+import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import CustomDateInput from "../components/CustomDateInput.tsx";
 import BidExtractorWizard from "../wizards/BidExtractorWizard.tsx";
-import { StyledSelect, StyledMenuItem } from '../components/StyledMuiComponents';
+import {
+  StyledSelect,
+  StyledMenuItem
+} from "../components/StyledMuiComponents";
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
@@ -34,8 +37,6 @@ const BidExtractor = () => {
     contributors,
     object_id
   } = sharedState;
-
-  
 
   const location = useLocation();
   const bidData = location.state?.bid || "";
@@ -306,20 +307,6 @@ const BidExtractor = () => {
       console.log("from bids table");
       console.log(bidData);
 
-      const parsedDocuments = bidData?.documents?.map((doc) => ({
-        name: doc.name,
-        editorState: doc.text
-          ? EditorState.createWithContent(ContentState.createFromText(doc.text))
-          : EditorState.createEmpty(),
-        type: doc.type || "qa sheet" // Use the type from the document, default to 'qa sheet' if not present
-      })) || [
-        {
-          name: "Q&A Sheet",
-          editorState: EditorState.createEmpty(),
-          type: "qa sheet"
-        }
-      ];
-
       setSharedState((prevState) => {
         const original_creator = bidData?.original_creator || auth.email;
         let contributors = bidData?.contributors || {};
@@ -351,8 +338,7 @@ const BidExtractor = () => {
           contributors: contributors,
           original_creator: original_creator,
           object_id: bidData?._id || "",
-          documents: parsedDocuments,
-          currentDocumentIndex: 0
+          outline: bidData?.outline || []
         };
       });
 
@@ -371,8 +357,6 @@ const BidExtractor = () => {
     window.dispatchEvent(new CustomEvent("bidUpdated", { detail: updatedBid }));
   }, [location, bidData, setSharedState, initialBidName, auth.email]);
 
-
-  
   useEffect(() => {
     if (questions.length > 0) {
       console.log("Questions updated:", questions);
@@ -435,7 +419,6 @@ const BidExtractor = () => {
     }));
   };
 
- 
   const clientNameRef = useRef(null);
   const submissionDeadlineRef = useRef(null);
   const bidManagerRef = useRef(null);
@@ -486,16 +469,15 @@ const BidExtractor = () => {
     };
   }, [canUserEdit]);
 
-
   return (
     <div className="chatpage">
       <SideBarSmall />
       <div className="lib-container">
         <div className="scroll-container">
-        <BidNavbar 
-          showViewOnlyMessage={showViewOnlyMessage} 
-          initialBidName={initialBidName} 
-        />
+          <BidNavbar
+            showViewOnlyMessage={showViewOnlyMessage}
+            initialBidName={initialBidName}
+          />
           <div>
             <div className="input-container mt-3">
               <Row className="no-gutters mx-n2">

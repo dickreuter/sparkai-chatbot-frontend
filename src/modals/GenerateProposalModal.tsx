@@ -110,7 +110,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
   }
 
   const startProgressBar = () => {
-    const duration = 90000; // 1:30 minutes in ms
+    const duration = 180000; // 3:00 minutes in ms
     const interval = 100; // Update every 100ms
     const steps = duration / interval;
     const increment = 98 / steps;

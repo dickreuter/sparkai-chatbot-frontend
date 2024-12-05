@@ -45,8 +45,54 @@ const ProposalPreview = () => {
       );
 
       const arrayBuffer = await response.data.arrayBuffer();
-      const result = await mammoth.convertToHtml({ arrayBuffer });
-      setHtmlContent(result.value);
+
+      const options = {
+        arrayBuffer,
+        styleMap: [
+          "p[style-name='Normal'] => p.normal-text:fresh",
+          "p[style-name='Heading 1'] => h1.main-header:fresh",
+          "p[style-name='Heading 2'] => h2.sub-header:fresh",
+          "b => strong"
+        ]
+      };
+
+      const result = await mammoth.convertToHtml(options);
+      console.log("Conversion result:", result);
+      console.log("Warnings:", result.messages);
+
+      const styledContent = `
+        <style>
+          div[class*="proposal-preview"] h1.main-header {
+            font-size: 24px !important;
+            font-weight: bold !important;
+            margin-top: 24px !important;
+            margin-bottom: 12px !important;
+            color: #333 !important;
+          }
+          
+          div[class*="proposal-preview"] h2.sub-header {
+            font-size: 18px !important;
+            font-weight: bold !important;
+            margin-top: 18px !important;
+            margin-bottom: 9px !important;
+            color: #444 !important;
+          }
+          
+          div[class*="proposal-preview"] p.normal-text {
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+            margin-bottom: 12px !important;
+            color: #555 !important;
+          }
+          
+          div[class*="proposal-preview"] strong {
+            font-weight: bold !important;
+          }
+        </style>
+        ${result.value}
+      `;
+
+      setHtmlContent(styledContent);
       setIsLoading(false);
     } catch (err) {
       console.error("Preview loading error:", err);
@@ -200,8 +246,11 @@ const ProposalPreview = () => {
                       dangerouslySetInnerHTML={{ __html: htmlContent }}
                       style={{
                         maxWidth: "1400px",
-                        margin: "0 auto"
+                        margin: "0 auto",
+                        fontFamily: "Calibri, sans-serif",
+                        padding: "20px"
                       }}
+                      className="proposal-preview-container"
                     />
                   </div>
                 ) : (

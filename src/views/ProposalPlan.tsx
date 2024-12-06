@@ -57,13 +57,13 @@ const selectStyle = {
   fontFamily: '"ClashDisplay", sans-serif',
   fontSize: "0.875rem",
   minWidth: "220px",
-  "& .MuiOutlinedInput-notchedOutline": {
+  "& MuiOutlinedInputNotchedOutline": {
     borderColor: "#ced4da"
   },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
+  "&:hover MuiOutlinedInputNotchedOutline": {
     borderColor: "#86b7fe"
   },
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+  "&.MuiFocused MuiOutlinedInputNotchedOutline": {
     borderColor: "#86b7fe",
     borderWidth: "1px"
   }
@@ -204,7 +204,6 @@ const ProposalPlan = () => {
   const navigate = useNavigate();
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState, setSharedState } = useContext(BidContext);
-  const [outlinefetched, setOutlineFetched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const { object_id, contributors, outline } = sharedState;
@@ -327,10 +326,12 @@ const ProposalPlan = () => {
   };
 
   useEffect(() => {
-    if (outline.length === 0 && outlinefetched === true) {
+    console.log(outline.lengths);
+
+    if (outline.length === 0) {
       setShowModal(true);
     }
-  }, [outline.length, outlinefetched]);
+  }, [outline.length]);
 
   const handleRegenerateClick = () => {
     setShowModal(true);
@@ -461,7 +462,6 @@ const ProposalPlan = () => {
       displayAlert("Failed to fetch outline", "danger");
     } finally {
       setIsLoading(false);
-      setOutlineFetched(true);
     }
   };
 
@@ -474,7 +474,6 @@ const ProposalPlan = () => {
             showViewOnlyMessage={showViewOnlyMessage}
             initialBidName={"initialBidName"}
             outline={outline}
-            outlinefetched={outlinefetched}
             object_id={object_id}
             handleRegenerateClick={handleRegenerateClick}
           />
@@ -485,7 +484,7 @@ const ProposalPlan = () => {
             fetchOutline={fetchOutline}
           />
 
-          {outline.length === 0 && outlinefetched === true ? (
+          {outline.length === 0 ? (
             <div></div>
           ) : (
             <div>

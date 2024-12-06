@@ -10,15 +10,14 @@ import BidNavbar from "../routes/BidNavbar.tsx";
 import "./QuestionsCrafter.css";
 import { Editor, EditorState, convertToRaw, ContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
-import { BidContext } from "./BidWritingStateManagerView.tsx";
+import { BidContext, Section } from "./BidWritingStateManagerView.tsx";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { displayAlert } from "../helper/Alert.tsx";
 import WordCountSelector from "../components/WordCountSelector.tsx";
-import { debounce } from "lodash";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import StatusMenu, { Section } from "../components/StatusMenu.tsx";
+import StatusMenu from "../components/StatusMenu.tsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
@@ -26,10 +25,6 @@ import {
   faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import SectionTitle from "../components/SectionTitle.tsx";
-import {
-  fetchOutline,
-  updateSection
-} from "../utilityfunctions/updateSection.tsx";
 
 const QuestionCrafter = () => {
   interface Subheading {
@@ -44,14 +39,15 @@ const QuestionCrafter = () => {
   const tokenRef = useRef(auth?.token || "default");
 
   const location = useLocation();
-  const { section, bid_id, state_outline } = location.state;
-
-  const [outline, setOutline] = useState<Section[]>(state_outline);
+  const { section, bid_id } = location.state;
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
-
   const { sharedState, setSharedState, getBackgroundInfo } =
     useContext(BidContext);
-  const { contributors } = sharedState;
+  const { contributors, outline } = sharedState;
+
+  const [sectionWordCounts, setSectionWordCounts] = useState<
+    Record<string, number>
+  >({});
 
   const backgroundInfo = getBackgroundInfo();
 
@@ -82,10 +78,6 @@ const QuestionCrafter = () => {
   const [sectionStatus, setSectionStatus] = useState(section.status);
   const [isLoadingSubheadings, setIsLoadingSubheadings] = useState(false);
 
-  const [sectionWordCounts, setSectionWordCounts] = useState<
-    Record<string, number>
-  >({});
-
   const navigate = useNavigate();
 
   // Set initial section index from the passed section
@@ -101,26 +93,22 @@ const QuestionCrafter = () => {
   }, [section]);
 
   // Add navigation functions
-  const navigateToSection = async (section: Section) => {
+  const navigateToSection = async (targetSection: Section) => {
     if (canUserEdit && inputText !== section.question) {
-      // Save current section before navigating
-      const updatedSection = {
-        ...section,
-        question: inputText
-      };
-      await updateSection(
-        updatedSection,
-        currentSectionIndex,
-        bid_id,
-        tokenRef
+      const updatedOutline = outline.map((s) =>
+        s.section_id === section.section_id ? { ...s, question: inputText } : s
       );
+
+      setSharedState((prev) => ({
+        ...prev,
+        outline: updatedOutline
+      }));
     }
-    const updated_outline = await fetchOutline(bid_id, tokenRef);
+
     navigate("/question-crafter", {
       state: {
-        section,
-        bid_id: bid_id,
-        state_outline: updated_outline
+        section: targetSection,
+        bid_id: bid_id
       }
     });
   };
@@ -142,23 +130,21 @@ const QuestionCrafter = () => {
     displayAlert("You only have permission to view this bid.", "danger");
   };
 
-  const debouncedUpdateSection = debounce((updatedSection, index, bidId) => {
-    updateSection(updatedSection, index, bidId, tokenRef);
-  }, 1000);
-
   // Modify the input text change handler
   const handleInputTextChange = (e) => {
     const newText = e.target.value;
     setInputText(newText);
 
     if (canUserEdit) {
-      // Create updated section object with new question
-      const updatedSection = {
-        ...section,
-        question: newText
-      };
+      // Update shared state
+      const updatedOutline = outline.map((s) =>
+        s.section_id === section.section_id ? { ...s, question: newText } : s
+      );
 
-      debouncedUpdateSection(updatedSection, currentSectionIndex, bid_id);
+      setSharedState((prev) => ({
+        ...prev,
+        outline: updatedOutline
+      }));
     }
   };
 
@@ -169,28 +155,21 @@ const QuestionCrafter = () => {
     return rawContent.blocks.map((block) => block.text).join("\n");
   };
 
-  const updateStatus = async (status: String) => {
+  const updateStatus = async (status: string) => {
     try {
-      await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/update_status`,
-        {
-          bid_id: sharedState.object_id,
-          section_id: section.section_id,
-          status: status
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "application/json"
-          }
-        }
+      // Update both local and shared state
+      setSectionStatus(status);
+
+      const updatedOutline = outline.map((s) =>
+        s.section_id === section.section_id ? { ...s, status } : s
       );
 
-      // Update the local state after successful API call
-      setSectionStatus(status);
+      setSharedState((prev) => ({
+        ...prev,
+        outline: updatedOutline
+      }));
     } catch (err) {
-      console.error("Error updating section:", err);
-      // Revert to previous status if update fails
+      console.error("Error updating status:", err);
       setSectionStatus(section.status);
       displayAlert("Failed to update status", "danger");
     }
@@ -201,78 +180,65 @@ const QuestionCrafter = () => {
     setSectionStatus(section.status);
   }, [section.status]);
 
-  const deleteSubheading = async (
-    bid_id: string,
-    section_id: string,
-    subheading_id: string
-  ) => {
+  const deleteSubheading = async (subheading_id: string) => {
     try {
-      console.log(bid_id);
-      console.log(section_id);
-      console.log(subheading_id);
-      await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/delete_subheading`,
-        {
-          bid_id,
-          section_id,
-          subheading_id
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "application/json"
-          }
+      // Update shared state to remove the subheading
+      const updatedOutline = outline.map((s) => {
+        if (s.section_id === section.section_id) {
+          return {
+            ...s,
+            subheadings: s.subheadings.filter(
+              (sh) => sh.subheading_id !== subheading_id
+            )
+          };
         }
-      );
-      console.log("Successfully deleted subheading:", subheading_id);
+        return s;
+      });
+
+      setSharedState((prev) => ({
+        ...prev,
+        outline: updatedOutline
+      }));
+
       updateStatus("In Progress");
-      fetchSubheadings();
-      // Fetch updated subheadings after successful update
     } catch (error) {
-      console.error("Error updating subheading:", error);
+      console.error("Error deleting subheading:", error);
+      displayAlert("Failed to delete subheading", "danger");
     }
   };
 
   // Add this function to handle the API call
   const updateSubheading = async (
-    bid_id: string,
-    section_id: string,
     subheading_id: string,
     extra_instructions: string,
     word_count: number
   ) => {
     try {
-      console.log("updating subheadings");
-      await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/update_subheading`,
-        {
-          bid_id,
-          section_id,
-          subheading_id,
-          extra_instructions,
-          word_count
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "application/json"
-          }
+      // Update shared state
+      const updatedOutline = outline.map((s) => {
+        if (s.section_id === section.section_id) {
+          return {
+            ...s,
+            subheadings: s.subheadings.map((sh) =>
+              sh.subheading_id === subheading_id
+                ? { ...sh, extra_instructions, word_count }
+                : sh
+            )
+          };
         }
-      );
-      console.log("Successfully updated subheading:", subheading_id);
+        return s;
+      });
+
+      setSharedState((prev) => ({
+        ...prev,
+        outline: updatedOutline
+      }));
+
       updateStatus("In Progress");
-      // Fetch updated subheadings after successful update
     } catch (error) {
       console.error("Error updating subheading:", error);
     }
   };
-
-  // Create a debounced version of the update function
-  const debouncedUpdateSubheading = debounce((...args) => {
-    updateSubheading(...args).catch((error) => {
-      console.error("Error in debounced update:", error);
-    });
-  }, 1000);
 
   const handleWordCountChange = (subheadingId: string, newCount: number) => {
     setSectionWordCounts((prev) => ({
@@ -290,13 +256,7 @@ const QuestionCrafter = () => {
         currentSection.editorState
       );
 
-      debouncedUpdateSubheading(
-        bid_id,
-        section.section_id,
-        subheadingId,
-        extraInstructions,
-        newCount
-      );
+      updateSubheading(subheadingId, extraInstructions, newCount);
     }
   };
 
@@ -333,54 +293,37 @@ const QuestionCrafter = () => {
     const wordCount = sectionWordCounts[subheadingId] || 100;
 
     // Call the debounced update function
-    debouncedUpdateSubheading(
-      tokenRef,
-      bid_id,
-      section.section_id,
-      subheadingId,
-      extraInstructions,
-      wordCount
-    );
+    updateSubheading(subheadingId, extraInstructions, wordCount);
   };
 
   // Update the fetchSubheadings function to handle references after setting state
-  const fetchSubheadings = async () => {
-    console.log("fetching subheadings");
+  const fetchSubheadings = () => {
     setIsLoadingSubheadings(true);
     try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_subheadings`,
-        {
-          bid_id: bid_id,
-          section_id: section.section_id
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "application/json"
-          }
-        }
+      // Find current section in the outline
+      const currentSection = outline.find(
+        (s) => s.section_id === section.section_id
       );
 
-      // Validate that response.data.subheadings exists and is an array
-      const subheadingsData = response.data.subheadings || [];
+      // Get subheadings from the current section
+      const subheadingsData = currentSection?.subheadings || [];
 
-      // Filter out any null values and validate subheading objects
+      // Filter out any invalid subheadings
       const validSubheadings = subheadingsData.filter(
         (sh) => sh && typeof sh === "object" && sh.subheading_id && sh.title
       );
 
       setSubheadings(validSubheadings);
 
-      // Initialize answer sections only for valid subheadings
+      // Initialize answer sections for valid subheadings
       const newAnswerSections = validSubheadings.map((sh) => {
-        // Set default word count if not provided
+        // Set default word count
         setSectionWordCounts((prev) => ({
           ...prev,
           [sh.subheading_id]: sh.word_count || 100
         }));
 
-        // Create editor state with existing instructions or empty string
+        // Create editor state with existing instructions
         const initialState = EditorState.createWithContent(
           ContentState.createFromText(sh.extra_instructions || "")
         );
@@ -393,20 +336,20 @@ const QuestionCrafter = () => {
       });
 
       console.log(
-        "Setting new answer sections with updated content:",
+        "Setting answer sections from shared state:",
         newAnswerSections
       );
       setAnswerSections(newAnswerSections);
     } catch (error) {
-      console.error("Error fetching subheadings:", error);
-      // Set empty arrays as fallback
+      console.error("Error processing subheadings from shared state:", error);
       setSubheadings([]);
       setAnswerSections([]);
-      displayAlert("Failed to fetch subheadings", "danger");
+      displayAlert("Failed to process subheadings", "danger");
     } finally {
       setIsLoadingSubheadings(false);
     }
   };
+
   // Fetch subheadings when component mounts or when section changes
   useEffect(() => {
     if (section?.section_id) {
@@ -578,10 +521,6 @@ const QuestionCrafter = () => {
     try {
       console.log("Starting submitSelections with choices:", selectedChoices);
 
-      const word_amounts = selectedChoices.map((choice) =>
-        String(wordAmounts[choice] || "100")
-      );
-
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/add_section_subheadings`,
         {
@@ -711,11 +650,7 @@ const QuestionCrafter = () => {
                           <div className="section-header">
                             <button
                               onClick={() =>
-                                deleteSubheading(
-                                  sharedState.object_id,
-                                  section.section_id,
-                                  answerSection.subheading_id
-                                )
+                                deleteSubheading(answerSection.subheading_id)
                               }
                               className="p-2 delete-cross"
                             >

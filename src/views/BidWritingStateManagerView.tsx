@@ -22,7 +22,7 @@ export interface Subheading {
   subheading_id: string;
   title: string;
   extra_instructions: string;
-  word_count_count: 100;
+  word_count: number;
 }
 
 export interface Section {
@@ -113,7 +113,8 @@ const BidManagement: React.FC = () => {
         saveSuccess: null,
         object_id: parsedState.object_id || null,
         currentDocumentIndex: parsedState.currentDocumentIndex || 0,
-        selectedFolders: parsedState.selectedFolders || ["default"] // Add this line
+        selectedFolders: parsedState.selectedFolders || ["default"], // Add this line
+        outline: parsedState.outline || []
       };
     }
     return defaultState.sharedState;
@@ -159,7 +160,8 @@ const BidManagement: React.FC = () => {
       contributors,
       questions,
       object_id,
-      original_creator
+      original_creator,
+      outline
     } = sharedState;
 
     if (!bidInfo || bidInfo.trim() === "") {
@@ -193,6 +195,7 @@ const BidManagement: React.FC = () => {
     appendFormData("submission_deadline", submission_deadline);
     appendFormData("questions", questions);
     appendFormData("original_creator", original_creator);
+    formData.append("outline", JSON.stringify(outline));
 
     if (object_id) {
       appendFormData("object_id", object_id);

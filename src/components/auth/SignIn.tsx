@@ -74,7 +74,7 @@ const FullScreenTwoCards = () => {
 
   const inputProps = {
     style: {
-      "&:-webkit-autofill": {
+      "&:WebkitAutofill": {
         WebkitBoxShadow: "0 0 0 1000px white inset",
         WebkitTextFillColor: "#000"
       }

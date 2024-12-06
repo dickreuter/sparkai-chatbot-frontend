@@ -22,7 +22,6 @@ const BidNavbar = ({
   showViewOnlyMessage = () => {},
   initialBidName = "",
   outline = [], // default value
-  outlinefetched = false,
   object_id = null,
   handleRegenerateClick = () => {}
 }) => {
@@ -187,7 +186,7 @@ const BidNavbar = ({
             ) : null}
           </div> */}
         </div>
-        {outline.length === 0 && outlinefetched === false ? (
+        {outline.length === 0 ? (
           <div></div>
         ) : (
           <div>

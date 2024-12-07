@@ -1,25 +1,22 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
-import { Alert, Button, Card, CardContent } from "@mui/material";
+import { Button, Card, CardContent } from "@mui/material";
 import { useAuthUser } from "react-auth-kit";
 import { BidContext } from "./BidWritingStateManagerView";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import DescriptionIcon from "@mui/icons-material/Description";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import ArticleIcon from "@mui/icons-material/Article";
-import ErrorIcon from "@mui/icons-material/Error";
 import BidNavbar from "../routes/BidNavbar";
 import SideBarSmall from "../routes/SidebarSmall";
 import CircularProgress from "@mui/material/CircularProgress";
 import { displayAlert } from "../helper/Alert";
 import withAuth from "../routes/withAuth";
-import posthog from "posthog-js";
 import mammoth from "mammoth";
 
 const ProposalPreview = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [htmlContent, setHtmlContent] = useState<string | null>(null);
+  const [docUrl, setDocUrl] = useState<string | null>(null);
+  const [htmlContent, setHtmlContent] = useState<string>("");
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -27,8 +24,6 @@ const ProposalPreview = () => {
 
   const loadPreview = async () => {
     try {
-      console.log("Starting to load Word preview...");
-
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/get_proposal`,
         {
@@ -46,71 +41,41 @@ const ProposalPreview = () => {
 
       const arrayBuffer = await response.data.arrayBuffer();
 
+      // Add style mapping options for mammoth
       const options = {
-        arrayBuffer,
         styleMap: [
-          "p[style-name='Normal'] => p.normal-text:fresh",
-          "p[style-name='Heading 1'] => h1.main-header:fresh",
-          "p[style-name='Heading 2'] => h2.sub-header:fresh",
-          "p[font-size='13pt'] => p.subsection-text:fresh",
-          "b => strong:fresh",
-          "strong => strong:fresh"
+          "p[style-name='Title'] => h1.document-title",
+          "p[style-name='Subtitle'] => p.document-subtitle",
+          "p[style-name='Heading 1'] => h1",
+          "p[style-name='Heading 2'] => h2"
         ]
       };
 
-      const result = await mammoth.convertToHtml(options);
-      console.log("Mammoth conversion result HTML:", result.value);
-
-      const styledContent = `
+      const result = await mammoth.convertToHtml({ arrayBuffer }, options);
+      setHtmlContent(`
         <style>
-          div[class*="proposal-preview"] h1.main-header {
-            font-size: 24px !important;
-            font-weight: bold !important;
-            margin-top: 24px !important;
-            margin-bottom: 12px !important;
-            color: #333 !important;
+          h1.document-title {
+            font-size: 42px;
+            font-weight: normal;
+            text-align: left;
+            margin-bottom: 24px;
+            font-family: Arial, sans-serif;
           }
-          
-          div[class*="proposal-preview"] h2.sub-header {
-            font-size: 18px !important;
-            font-weight: bold !important;
-            margin-top: 18px !important;
-            margin-bottom: 9px !important;
-            color: #444 !important;
+          p.document-subtitle {
+            font-size: 24px;
+            margin-bottom: 40px;
           }
-          
-          div[class*="proposal-preview"] p {
-            font-size: 14px !important;
-            line-height: 1.6 !important;
-            margin-bottom: 12px !important;
-            color: #555 !important;
-          }
-
-          /* Target paragraphs that contain only a strong tag with subsection numbering */
-          div[class*="proposal-preview"] p > strong:only-child {
-            font-size: 16px !important;
-            font-weight: bold !important;
-            color: #444 !important;
-            display: block !important;
-            margin-top: 16px !important;
-            margin-bottom: 8px !important;
-          }
-
-          /* Regular strong tags within paragraphs */
-          div[class*="proposal-preview"] p > strong:not(:only-child) {
-            font-weight: bold !important;
-            font-size: inherit !important;
-          }
+          h1 { font-size: 24px; margin-top: 24px; margin-bottom: 16px; }
+          h2 { font-size: 18px; margin-top: 20px; margin-bottom: 12px; }
         </style>
         ${result.value}
-      `;
+      `);
 
-      setHtmlContent(styledContent);
-      console.log("Final styled content:", styledContent);
+      const url = URL.createObjectURL(response.data);
+      setDocUrl(url);
       setIsLoading(false);
     } catch (err) {
       console.error("Preview loading error:", err);
-      setError("Failed to load the proposal preview");
       setIsLoading(false);
     }
   };
@@ -118,46 +83,20 @@ const ProposalPreview = () => {
   useEffect(() => {
     loadPreview();
     return () => {
-      if (htmlContent) {
-        window.URL.revokeObjectURL(htmlContent);
+      if (docUrl) {
+        URL.revokeObjectURL(docUrl);
       }
     };
   }, [sharedState.object_id]);
 
   const handleWordDownload = async () => {
-    try {
-      posthog.capture("proposal_word_downloaded", {
-        bidId: sharedState.object_id,
-        bidName: sharedState.bidInfo
-      });
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/get_proposal`,
-        {
-          bid_id: sharedState.object_id,
-          extra_instructions: "",
-          datasets: []
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
-          },
-          responseType: "blob"
-        }
-      );
-
-      const blob = new Blob([response.data], {
-        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      });
-      const url = window.URL.createObjectURL(blob);
+    if (docUrl) {
       const link = document.createElement("a");
-      link.href = url;
+      link.href = docUrl;
       link.download = `proposal_${sharedState.bidInfo || "document"}.docx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Word download error:", err);
     }
   };
 
@@ -230,10 +169,9 @@ const ProposalPreview = () => {
                   flex: 1,
                   border: "1px solid #e0e0e0",
                   borderRadius: "4px",
-                  overflow: "hidden",
+                  overflow: "auto",
                   backgroundColor: "#ffffff",
-                  display: "flex",
-                  flexDirection: "column"
+                  padding: "2rem 3rem"
                 }}
               >
                 {isLoading ? (
@@ -250,23 +188,15 @@ const ProposalPreview = () => {
                   </div>
                 ) : htmlContent ? (
                   <div
+                    dangerouslySetInnerHTML={{ __html: htmlContent }}
                     style={{
-                      flex: 1,
-                      overflow: "auto",
-                      padding: "20px"
+                      fontFamily: "Calibri, sans-serif",
+                      fontSize: "11pt",
+                      lineHeight: "1.5",
+                      width: "100%",
+                      margin: "0"
                     }}
-                  >
-                    <div
-                      dangerouslySetInnerHTML={{ __html: htmlContent }}
-                      style={{
-                        maxWidth: "1400px",
-                        margin: "0 auto",
-                        fontFamily: "Calibri, sans-serif",
-                        padding: "20px"
-                      }}
-                      className="proposal-preview-container"
-                    />
-                  </div>
+                  />
                 ) : (
                   <div
                     style={{

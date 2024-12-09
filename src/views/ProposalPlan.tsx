@@ -149,16 +149,16 @@ const QuestionTypeDropdown = ({
       }}
     >
       <MenuItem value="3b" style={menuStyle}>
-        <em>Generic</em>
+        <em>General</em>
       </MenuItem>
       <MenuItem value="3b_case_study" style={menuStyle}>
         <em>Case Study</em>
       </MenuItem>
       <MenuItem value="3b_commercial" style={menuStyle}>
-        <em>Commercial</em>
+        <em>Compliance</em>
       </MenuItem>
       <MenuItem value="3b_personnel" style={menuStyle}>
-        <em>Personnel</em>
+        <em>Team</em>
       </MenuItem>
       <MenuItem value="3b_technical" style={menuStyle}>
         <em>Technical</em>

@@ -25,6 +25,7 @@ import {
   faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import SectionTitle from "../components/SectionTitle.tsx";
+import { fetchOutline } from "../utilityfunctions/updateSection.tsx";
 
 const QuestionCrafter = () => {
   interface Subheading {
@@ -94,23 +95,35 @@ const QuestionCrafter = () => {
 
   // Add navigation functions
   const navigateToSection = async (targetSection: Section) => {
-    if (canUserEdit && inputText !== section.question) {
-      const updatedOutline = outline.map((s) =>
-        s.section_id === section.section_id ? { ...s, question: inputText } : s
-      );
+    try {
+      if (canUserEdit && inputText !== section.question) {
+        // Save current section's question before navigation
+        const updatedOutline = outline.map((s) =>
+          s.section_id === section.section_id
+            ? { ...s, question: inputText }
+            : s
+        );
 
-      setSharedState((prev) => ({
-        ...prev,
-        outline: updatedOutline
-      }));
-    }
-
-    navigate("/question-crafter", {
-      state: {
-        section: targetSection,
-        bid_id: bid_id
+        setSharedState((prev) => ({
+          ...prev,
+          outline: updatedOutline
+        }));
       }
-    });
+
+      // Reset local state before navigation
+      setSectionStatus(targetSection.status);
+      setInputText(targetSection.question || "");
+
+      navigate("/question-crafter", {
+        state: {
+          section: targetSection,
+          bid_id: bid_id
+        }
+      });
+    } catch (error) {
+      console.error("Error navigating to section:", error);
+      displayAlert("Failed to navigate to section", "danger");
+    }
   };
 
   const handlePreviousSection = async () => {
@@ -353,9 +366,10 @@ const QuestionCrafter = () => {
   // Fetch subheadings when component mounts or when section changes
   useEffect(() => {
     if (section?.section_id) {
+      setSectionStatus(section.status);
       fetchSubheadings();
     }
-  }, [section]);
+  }, [section]); // Ad
 
   useEffect(() => {
     let timer;
@@ -520,6 +534,8 @@ const QuestionCrafter = () => {
     setElapsedTime(0);
     try {
       console.log("Starting submitSelections with choices:", selectedChoices);
+      console.log(sharedState.object_id);
+      console.log(section.section_id);
 
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/add_section_subheadings`,
@@ -558,6 +574,7 @@ const QuestionCrafter = () => {
       setApiChoices([]);
       setSelectedChoices([]);
       setWordAmounts({});
+      fetchOutline(bid_id, tokenRef, setSharedState);
     } catch (error) {
       console.error("Error submitting selections:", error);
       displayAlert("Error generating responses", "danger");

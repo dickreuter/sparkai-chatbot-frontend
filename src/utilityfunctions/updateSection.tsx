@@ -2,7 +2,7 @@ import axios from "axios";
 import { MutableRefObject, useRef } from "react";
 import { useAuthUser } from "react-auth-kit";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
-import { Section } from "../components/StatusMenu";
+import { Section } from "../views/BidWritingStateManagerView";
 
 export const updateSection = (
   section: Section,
@@ -19,13 +19,12 @@ export const updateSection = (
 
 export const fetchOutline = async (
   bid_id: string,
-  tokenRef: MutableRefObject<any>
-): Promise<any[]> => {
-  if (!bid_id) return [];
-
+  tokenRef: MutableRefObject<string>,
+  setSharedState: React.Dispatch<React.SetStateAction<any>>
+): Promise<void> => {
+  if (!bid_id) return;
   const formData = new FormData();
   formData.append("bid_id", bid_id);
-
   try {
     const response = await axios.post(
       `http${HTTP_PREFIX}://${API_URL}/get_bid_outline`,
@@ -38,9 +37,22 @@ export const fetchOutline = async (
       }
     );
 
-    return response.data.outline || [];
+    const outlineWithStatus = response.data.map((section: any) => ({
+      ...section,
+      status:
+        section.status ||
+        (section.completed
+          ? "Completed"
+          : section.in_progress
+            ? "In Progress"
+            : "Not Started")
+    }));
+
+    setSharedState((prevState) => ({
+      ...prevState,
+      outline: outlineWithStatus
+    }));
   } catch (err) {
     console.error("Error fetching outline:", err);
-    return [];
   }
 };

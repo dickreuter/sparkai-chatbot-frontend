@@ -99,48 +99,74 @@ const defaultState: BidContextType = {
 export const BidContext = createContext<BidContextType>(defaultState);
 
 const BidManagement: React.FC = () => {
-  // In BidManagement.tsx, modify the state initialization:
+  // Create a separate ref to track if we're currently saving
+  const isSavingRef = useRef(false);
+
+  // Initialize shared state from localStorage or use default state
   const [sharedState, setSharedState] = useState<SharedState>(() => {
-    const savedState = localStorage.getItem("bidState");
-    if (savedState) {
-      const parsedState = JSON.parse(savedState);
-      return {
-        ...parsedState,
-        contributors: parsedState.contributors || {},
-        original_creator: parsedState.original_creator || "",
-        isSaved: false,
-        isLoading: false,
-        saveSuccess: null,
-        object_id: parsedState.object_id || null,
-        currentDocumentIndex: parsedState.currentDocumentIndex || 0,
-        selectedFolders: parsedState.selectedFolders || ["default"], // Add this line
-        outline: parsedState.outline || []
-      };
+    try {
+      const savedState = localStorage.getItem("bidState");
+      if (savedState) {
+        const parsedState = JSON.parse(savedState);
+        // Ensure outline is properly structured when loading from localStorage
+        const validatedOutline = Array.isArray(parsedState.outline)
+          ? parsedState.outline
+          : [];
+
+        // Combine default state with saved state, ensuring all required fields exist
+        return {
+          ...defaultState.sharedState, // Start with default state
+          ...parsedState, // Override with saved state
+          outline: validatedOutline, // Use validated outline
+          contributors: parsedState.contributors || {},
+          original_creator: parsedState.original_creator || "",
+          isSaved: false,
+          isLoading: false,
+          saveSuccess: null,
+          object_id: parsedState.object_id || null,
+          selectedFolders: parsedState.selectedFolders || ["default"]
+        };
+      }
+      return defaultState.sharedState;
+    } catch (error) {
+      console.error("Error loading state from localStorage:", error);
+      return defaultState.sharedState;
     }
-    return defaultState.sharedState;
   });
 
+  // Debounce timer for auto-save functionality
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
     null
   );
+
+  // Store current user's email for permission checks
   const [currentUserEmail, setCurrentUserEmail] = useState<string>("");
 
+  // Get auth token and store in ref to avoid unnecessary re-renders
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
+  // Utility function to combine background information
   const getBackgroundInfo = () => {
     return `${sharedState.opportunity_information}\n${sharedState.compliance_requirements}`;
   };
 
+  // Check if current user has permission to save changes
   const canUserSave = useCallback((): boolean => {
-    console.log(currentUserEmail);
-    //login
     const userPermission = sharedState.contributors[auth.email];
     return userPermission === "admin" || userPermission === "editor";
   }, [sharedState.contributors, currentUserEmail]);
 
+  // Main save function that sends data to the server
   const saveProposal = async () => {
+    // Prevent concurrent saves
+    if (isSavingRef.current) {
+      console.log("Save already in progress, skipping");
+      return;
+    }
+
+    // Check user permissions before proceeding
     if (!canUserSave()) {
       console.log(
         "User does not have permission to save. Skipping save operation."
@@ -148,63 +174,74 @@ const BidManagement: React.FC = () => {
       return;
     }
 
-    const {
-      bidInfo,
-      compliance_requirements,
-      opportunity_information,
-      bid_qualification_result,
-      client_name,
-      opportunity_owner,
-      submission_deadline,
-      bid_manager,
-      contributors,
-      questions,
-      object_id,
-      original_creator,
-      outline
-    } = sharedState;
-
-    if (!bidInfo || bidInfo.trim() === "") {
-      displayAlert("Please type in a bid name...", "warning");
-      return;
-    }
-
-    setSharedState((prevState) => ({
-      ...prevState,
-      isLoading: true,
-      saveSuccess: null
-    }));
-
-    const backgroundInfo = getBackgroundInfo();
-
-    const formData = new FormData();
-    const appendFormData = (key, value) => {
-      formData.append(key, value && value.trim() !== "" ? value : " ");
-    };
-
-    appendFormData("bid_title", bidInfo);
-    appendFormData("status", "ongoing");
-    appendFormData("contract_information", backgroundInfo);
-    appendFormData("compliance_requirements", compliance_requirements);
-    appendFormData("opportunity_information", opportunity_information);
-    appendFormData("client_name", client_name);
-    appendFormData("bid_qualification_result", bid_qualification_result);
-    appendFormData("opportunity_owner", opportunity_owner);
-    appendFormData("bid_manager", bid_manager);
-    formData.append("contributors", JSON.stringify(contributors));
-    appendFormData("submission_deadline", submission_deadline);
-    appendFormData("questions", questions);
-    appendFormData("original_creator", original_creator);
-    formData.append("outline", JSON.stringify(outline));
-
-    if (object_id) {
-      appendFormData("object_id", object_id);
-    }
-
-    // console.log(formData);
-
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      isSavingRef.current = true;
+
+      // Deep copy state to prevent mutations during save operation
+      const stateCopy = JSON.parse(JSON.stringify(sharedState));
+
+      // Validate outline structure before proceeding
+      if (!Array.isArray(stateCopy.outline)) {
+        console.error("Invalid outline structure");
+        return;
+      }
+
+      const {
+        bidInfo,
+        compliance_requirements,
+        opportunity_information,
+        bid_qualification_result,
+        client_name,
+        opportunity_owner,
+        submission_deadline,
+        bid_manager,
+        contributors,
+        questions,
+        object_id,
+        original_creator,
+        outline
+      } = stateCopy;
+
+      if (!bidInfo || bidInfo.trim() === "") {
+        displayAlert("Please type in a bid name...", "warning");
+        return;
+      }
+
+      setSharedState((prev) => ({
+        ...prev,
+        isLoading: true,
+        saveSuccess: null
+      }));
+
+      const backgroundInfo = getBackgroundInfo();
+
+      const formData = new FormData();
+      const appendFormData = (key: string, value: string) => {
+        formData.append(key, value && value.trim() !== "" ? value : " ");
+      };
+
+      console.log("First section heading:", outline[0].heading);
+      console.log("First section subheadings:", outline[0].subheadings);
+
+      appendFormData("bid_title", bidInfo);
+      appendFormData("status", "ongoing");
+      appendFormData("contract_information", backgroundInfo);
+      appendFormData("compliance_requirements", compliance_requirements);
+      appendFormData("opportunity_information", opportunity_information);
+      appendFormData("client_name", client_name);
+      appendFormData("bid_qualification_result", bid_qualification_result);
+      appendFormData("opportunity_owner", opportunity_owner);
+      appendFormData("bid_manager", bid_manager);
+      formData.append("contributors", JSON.stringify(contributors));
+      appendFormData("submission_deadline", submission_deadline);
+      appendFormData("questions", questions);
+      appendFormData("original_creator", original_creator);
+      formData.append("outline", JSON.stringify(outline));
+
+      if (object_id) {
+        appendFormData("object_id", object_id);
+      }
+
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/upload_bids`,
         formData,
@@ -218,26 +255,89 @@ const BidManagement: React.FC = () => {
 
       const { bid_id } = response.data;
 
-      setSharedState((prevState) => ({
-        ...prevState,
+      setSharedState((prev) => ({
+        ...prev,
         isSaved: true,
         isLoading: false,
         saveSuccess: true,
         object_id: bid_id
       }));
+
+      // Update localStorage with the latest state
+      localStorage.setItem(
+        "bidState",
+        JSON.stringify({
+          ...stateCopy,
+          object_id: bid_id,
+          isSaved: true,
+          isLoading: false,
+          saveSuccess: true
+        })
+      );
+
+      // Reset isSaved after 3 seconds
       setTimeout(
-        () => setSharedState((prevState) => ({ ...prevState, isSaved: false })),
+        () => setSharedState((prev) => ({ ...prev, isSaved: false })),
         3000
       );
     } catch (error) {
       console.error("Error saving proposal:", error);
-      setSharedState((prevState) => ({
-        ...prevState,
+      setSharedState((prev) => ({
+        ...prev,
         isLoading: false,
         saveSuccess: false
       }));
+    } finally {
+      isSavingRef.current = false;
     }
   };
+
+  useEffect(() => {
+    // Skip if already saving
+    if (isSavingRef.current) {
+      return;
+    }
+
+    // Immediately save current state to localStorage
+    const stateToSave = {
+      ...sharedState,
+      outline: Array.isArray(sharedState.outline) ? sharedState.outline : []
+    };
+
+    localStorage.setItem("bidState", JSON.stringify(stateToSave));
+
+    // Clear any existing save timer
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    // Set new timer for auto-save
+    // This creates a 2-second debounce to prevent too frequent saves
+    setTypingTimeout(
+      setTimeout(() => {
+        if (canUserSave() && !isSavingRef.current) {
+          saveProposal();
+        }
+      }, 2000)
+    );
+  }, [
+    // Dependencies that trigger auto-save when changed
+    sharedState.bidInfo,
+    sharedState.opportunity_information,
+    sharedState.compliance_requirements,
+    sharedState.questions,
+    sharedState.client_name,
+    sharedState.bid_qualification_result,
+    sharedState.opportunity_owner,
+    sharedState.submission_deadline,
+    sharedState.bid_manager,
+    sharedState.contributors,
+    sharedState.original_creator,
+    sharedState.selectedFolders,
+    // Triggers on deep changes to outline
+    JSON.stringify(sharedState.outline),
+    canUserSave
+  ]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -258,47 +358,6 @@ const BidManagement: React.FC = () => {
 
     fetchUserData();
   }, [tokenRef]);
-
-  useEffect(() => {
-    const stateToSave = {
-      ...sharedState
-    };
-    //console.log('State being saved to localStorage:', stateToSave); // Debug log
-    localStorage.setItem("bidState", JSON.stringify(stateToSave));
-
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
-    }
-
-    // Start the timer for all users
-    setTypingTimeout(
-      setTimeout(() => {
-        // Only perform the save operation if the user has permission
-        if (canUserSave()) {
-          saveProposal();
-        } else {
-          console.log(
-            "Auto-save skipped: User does not have permission to save."
-          );
-        }
-      }, 2000)
-    );
-  }, [
-    sharedState.bidInfo,
-    sharedState.opportunity_information,
-    sharedState.compliance_requirements,
-    sharedState.questions,
-    sharedState.client_name,
-    sharedState.bid_qualification_result,
-    sharedState.opportunity_owner,
-    sharedState.submission_deadline,
-    sharedState.bid_manager,
-    sharedState.contributors,
-    sharedState.original_creator,
-    sharedState.selectedFolders,
-    sharedState.outline,
-    canUserSave
-  ]);
 
   return (
     <BidContext.Provider

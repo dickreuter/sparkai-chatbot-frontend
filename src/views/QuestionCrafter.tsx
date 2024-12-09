@@ -10,8 +10,11 @@ import BidNavbar from "../routes/BidNavbar.tsx";
 import "./QuestionsCrafter.css";
 import { Editor, EditorState, convertToRaw, ContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
-import { BidContext, Section } from "./BidWritingStateManagerView.tsx";
-import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
+import {
+  BidContext,
+  Section,
+  Subheading
+} from "./BidWritingStateManagerView.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { displayAlert } from "../helper/Alert.tsx";
 import WordCountSelector from "../components/WordCountSelector.tsx";
@@ -28,33 +31,27 @@ import SectionTitle from "../components/SectionTitle.tsx";
 import { fetchOutline } from "../utilityfunctions/updateSection.tsx";
 
 const QuestionCrafter = () => {
-  interface Subheading {
-    subheading_id: string;
-    title: string;
-    extra_instructions: string;
-    word_count: number;
-  }
-
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
 
   const location = useLocation();
-  const { section, bid_id } = location.state;
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const { bid_id, section: locationSection } = location.state || {};
   const { sharedState, setSharedState, getBackgroundInfo } =
     useContext(BidContext);
   const { contributors, outline } = sharedState;
 
-  const [sectionWordCounts, setSectionWordCounts] = useState<
-    Record<string, number>
-  >({});
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  const [section, setCurrentSection] = useState(() => {
+    const sectionId = locationSection?.section_id;
+    return outline.find((s) => s.section_id === sectionId) || locationSection;
+  });
 
   const backgroundInfo = getBackgroundInfo();
-
   const [inputText, setInputText] = useState(section.question || "");
 
-  console.log("selectedfolders:", sharedState.selectedFolders);
+  //console.log("selectedfolders:", sharedState.selectedFolders);
+  const [subheadings, setSubheadings] = useState(section.subheadings || []);
   const [contentLoaded, setContentLoaded] = useState(true); // Set to true initially
   const [sectionAnswer, setSectionAnswer] = useState(null); // the answer generated for the subheadings
   const currentUserPermission = contributors[auth.email] || "viewer"; // Default to 'viewer' if not found
@@ -73,13 +70,26 @@ const QuestionCrafter = () => {
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [apiChoices, setApiChoices] = useState([]);
   const [wordAmounts, setWordAmounts] = useState({});
-
-  const [subheadings, setSubheadings] = useState<Subheading[]>([]);
-  const [answerSections, setAnswerSections] = useState<AnswerSection[]>([]);
   const [sectionStatus, setSectionStatus] = useState(section.status);
   const [isLoadingSubheadings, setIsLoadingSubheadings] = useState(false);
 
   const navigate = useNavigate();
+
+  //timer for adding new subesections
+  useEffect(() => {
+    let timer;
+    if (isLoading && startTime) {
+      timer = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        setElapsedTime(elapsed);
+      }, 100); // Update every 100ms
+    }
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
+  }, [isLoading, startTime]);
 
   // Set initial section index from the passed section
   useEffect(() => {
@@ -87,33 +97,65 @@ const QuestionCrafter = () => {
     setCurrentSectionIndex(index !== -1 ? index : 0);
   }, [section.section_id, outline]);
 
+  // Add this useEffect to update local subheadings when outline changes
   useEffect(() => {
-    if (section?.question !== undefined) {
-      setInputText(section.question || "");
+    const currentSection = outline.find(
+      (s) => s.section_id === section.section_id
+    );
+    if (currentSection) {
+      setSubheadings(currentSection.subheadings || []);
     }
-  }, [section]);
+  }, [outline, section.section_id]);
 
-  // Add navigation functions
   const navigateToSection = async (targetSection: Section) => {
     try {
+      // If the user has edit permissions AND the current section's question has changed,
+      // we need to save those changes before navigating away
       if (canUserEdit && inputText !== section.question) {
-        // Save current section's question before navigation
+        // Create a new outline array where we update the current section's question
+        // with the latest input text, leaving all other sections unchanged
         const updatedOutline = outline.map((s) =>
           s.section_id === section.section_id
             ? { ...s, question: inputText }
             : s
         );
 
-        setSharedState((prev) => ({
-          ...prev,
-          outline: updatedOutline
-        }));
+        // Update the shared state with the new outline
+        // We wrap this in a Promise to ensure the state update completes
+        // before proceeding with navigation
+        await new Promise<void>((resolve) => {
+          setSharedState((prev) => {
+            resolve(); // Signal that the state update is complete
+            return {
+              ...prev,
+              outline: updatedOutline
+            };
+          });
+        });
       }
 
-      // Reset local state before navigation
-      setSectionStatus(targetSection.status);
-      setInputText(targetSection.question || "");
+      // Update the local state to reflect the target section we're navigating to
+      setCurrentSection(targetSection);
 
+      // Reset all section-specific states for the new section:
+      // - Set the status display to match the target section
+      setSectionStatus(targetSection.status);
+      // - Update the input field with the target section's question
+      setInputText(targetSection.question || "");
+      // - Load the subheadings for the target section
+      setSubheadings(targetSection.subheadings || []);
+
+      // Find the index of the target section in the overall outline
+      // This is used for navigation between sections (prev/next)
+      const newIndex = outline.findIndex(
+        (s) => s.section_id === targetSection.section_id
+      );
+      if (newIndex !== -1) {
+        setCurrentSectionIndex(newIndex);
+      }
+
+      // Finally, use React Router to navigate to the question-crafter page
+      // Pass the target section and bid_id as state for the new route
       navigate("/question-crafter", {
         state: {
           section: targetSection,
@@ -121,6 +163,8 @@ const QuestionCrafter = () => {
         }
       });
     } catch (error) {
+      // If anything goes wrong during the navigation process,
+      // log the error and show an alert to the user
       console.error("Error navigating to section:", error);
       displayAlert("Failed to navigate to section", "danger");
     }
@@ -188,35 +232,73 @@ const QuestionCrafter = () => {
     }
   };
 
-  // Add useEffect to initialize status from section prop
-  useEffect(() => {
-    setSectionStatus(section.status);
-  }, [section.status]);
-
   const deleteSubheading = async (subheading_id: string) => {
     try {
-      // Update shared state to remove the subheading
-      const updatedOutline = outline.map((s) => {
-        if (s.section_id === section.section_id) {
-          return {
-            ...s,
-            subheadings: s.subheadings.filter(
-              (sh) => sh.subheading_id !== subheading_id
-            )
-          };
-        }
-        return s;
+      console.log("Starting deletion for subheading:", subheading_id);
+      console.log("Current outline before deletion:", outline);
+
+      // First, find the current section in the outline
+      const currentSectionIndex = outline.findIndex(
+        (s) => s.section_id === section.section_id
+      );
+
+      if (currentSectionIndex === -1) {
+        throw new Error("Section not found in outline");
+      }
+
+      console.log(
+        "Current section subheadings:",
+        outline[currentSectionIndex].subheadings
+      );
+
+      // Create a new outline with the updated subheadings
+      const updatedOutline = outline.map((s) =>
+        s.section_id === section.section_id
+          ? {
+              ...s,
+              subheadings: s.subheadings.filter(
+                (sh) => sh.subheading_id !== subheading_id
+              )
+            }
+          : s
+      );
+
+      console.log(
+        "Updated section subheadings:",
+        updatedOutline[currentSectionIndex].subheadings
+      );
+
+      // Update local subheadings state for immediate UI feedback
+      setSubheadings((prev) => {
+        const updated = prev.filter((sh) => sh.subheading_id !== subheading_id);
+        console.log("Updated local subheadings:", updated);
+        return updated;
       });
 
+      // Get the updated section from the new outline
+      const updatedSection = updatedOutline[currentSectionIndex];
+
+      // Update the current section with the new data
+      setCurrentSection(updatedSection);
+
+      // Force a refresh of the outline in shared state to ensure it propagates
       setSharedState((prev) => ({
         ...prev,
         outline: updatedOutline
       }));
-
+      // Update status to reflect changes
       updateStatus("In Progress");
+
+      // Log final state
+      console.log(
+        "Final outline after deletion:",
+        updatedOutline[currentSectionIndex].subheadings
+      );
     } catch (error) {
       console.error("Error deleting subheading:", error);
       displayAlert("Failed to delete subheading", "danger");
+      // Rollback local state if there's an error
+      setSubheadings(section.subheadings);
     }
   };
 
@@ -254,19 +336,14 @@ const QuestionCrafter = () => {
   };
 
   const handleWordCountChange = (subheadingId: string, newCount: number) => {
-    setSectionWordCounts((prev) => ({
-      ...prev,
-      [subheadingId]: newCount
-    }));
-
     // Find the current extra instructions for this subheading
-    const currentSection = answerSections.find(
+    const section = section.subheadings.find(
       (section) => section.subheading_id === subheadingId
     );
 
-    if (currentSection) {
+    if (section) {
       const extraInstructions = getPlainTextFromEditorState(
-        currentSection.editorState
+        section.editorState
       );
 
       updateSubheading(subheadingId, extraInstructions, newCount);
@@ -276,115 +353,19 @@ const QuestionCrafter = () => {
   // Update the handleAnswerChange function
   const handleAnswerChange = (
     editorState: EditorState,
-    subheadingId: string
+    subheadingId: string,
+    word_count: number
   ) => {
     console.log(
       `Updating editor state for section ${subheadingId}`,
       editorState
     );
-
-    setAnswerSections((prev) => {
-      const updatedSections = prev.map((section) => {
-        if (section.subheading_id === subheadingId) {
-          console.log(
-            `Found matching section, updating content for ${section.title}`
-          );
-          return {
-            ...section,
-            editorState
-          };
-        }
-        return section;
-      });
-      return updatedSections;
-    });
-
     // Get the plain text content from the editor state
     const extraInstructions = getPlainTextFromEditorState(editorState);
-
-    // Get the current word count for this subheading
-    const wordCount = sectionWordCounts[subheadingId] || 100;
 
     // Call the debounced update function
     updateSubheading(subheadingId, extraInstructions, wordCount);
   };
-
-  // Update the fetchSubheadings function to handle references after setting state
-  const fetchSubheadings = () => {
-    setIsLoadingSubheadings(true);
-    try {
-      // Find current section in the outline
-      const currentSection = outline.find(
-        (s) => s.section_id === section.section_id
-      );
-
-      // Get subheadings from the current section
-      const subheadingsData = currentSection?.subheadings || [];
-
-      // Filter out any invalid subheadings
-      const validSubheadings = subheadingsData.filter(
-        (sh) => sh && typeof sh === "object" && sh.subheading_id && sh.title
-      );
-
-      setSubheadings(validSubheadings);
-
-      // Initialize answer sections for valid subheadings
-      const newAnswerSections = validSubheadings.map((sh) => {
-        // Set default word count
-        setSectionWordCounts((prev) => ({
-          ...prev,
-          [sh.subheading_id]: sh.word_count || 100
-        }));
-
-        // Create editor state with existing instructions
-        const initialState = EditorState.createWithContent(
-          ContentState.createFromText(sh.extra_instructions || "")
-        );
-
-        return {
-          subheading_id: sh.subheading_id,
-          title: sh.title,
-          editorState: initialState
-        };
-      });
-
-      console.log(
-        "Setting answer sections from shared state:",
-        newAnswerSections
-      );
-      setAnswerSections(newAnswerSections);
-    } catch (error) {
-      console.error("Error processing subheadings from shared state:", error);
-      setSubheadings([]);
-      setAnswerSections([]);
-      displayAlert("Failed to process subheadings", "danger");
-    } finally {
-      setIsLoadingSubheadings(false);
-    }
-  };
-
-  // Fetch subheadings when component mounts or when section changes
-  useEffect(() => {
-    if (section?.section_id) {
-      setSectionStatus(section.status);
-      fetchSubheadings();
-    }
-  }, [section]); // Ad
-
-  useEffect(() => {
-    let timer;
-    if (isLoading && startTime) {
-      timer = setInterval(() => {
-        const elapsed = (Date.now() - startTime) / 1000;
-        setElapsedTime(elapsed);
-      }, 100); // Update every 100ms
-    }
-    return () => {
-      if (timer) {
-        clearInterval(timer);
-      }
-    };
-  }, [isLoading, startTime]);
 
   const sendQuestionToChatbot = async () => {
     handleGAEvent("Chatbot", "Submit Question", "Submit Button");
@@ -553,24 +534,6 @@ const QuestionCrafter = () => {
 
       console.log("Received response from question_multistep:", result.data);
 
-      if (result.data.section) {
-        // Update answer sections from the response
-        const newAnswerSections = result.data.section.subheadings.map((sh) => {
-          const initialState = EditorState.createWithContent(
-            ContentState.createFromText(sh.extra_instructions || "")
-          );
-          // Make references bold immediately when creating new sections
-          return {
-            subheading_id: sh.subheading_id,
-            title: sh.title,
-            editorState: initialState
-          };
-        });
-
-        console.log("Setting new answer sections after submission");
-        setAnswerSections(newAnswerSections);
-      }
-
       setApiChoices([]);
       setSelectedChoices([]);
       setWordAmounts({});
@@ -593,21 +556,36 @@ const QuestionCrafter = () => {
 
   // Add this handler to your component
   const onDragEnd = (result) => {
-    // dropped outside the list
     if (!result.destination) {
       return;
     }
 
-    const reorderedSections = reorder(
-      answerSections,
+    const reorderedSubheadings = reorder(
+      subheadings,
       result.source.index,
       result.destination.index
     );
 
-    setAnswerSections(reorderedSections);
+    // Update local state immediately
+    setSubheadings(reorderedSubheadings);
+
+    // Update the outline with the reordered subheadings
+    const updatedOutline = outline.map((s) =>
+      s.section_id === section.section_id
+        ? { ...s, subheadings: reorderedSubheadings }
+        : s
+    );
+
+    // Update shared state
+    setSharedState((prev) => ({
+      ...prev,
+      outline: updatedOutline
+    }));
+
+    updateStatus("In Progress");
   };
 
-  const renderAnswerSections = () => {
+  const renderSubheadings = () => {
     if (isLoadingSubheadings) {
       return <div></div>;
     }
@@ -620,15 +598,15 @@ const QuestionCrafter = () => {
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="droppable-container" // Add this class here
+                className="droppable-container"
                 style={{
                   minHeight: "100px"
                 }}
               >
-                {answerSections.map((answerSection, index) => (
+                {subheadings.map((subheading, index) => (
                   <Draggable
-                    key={answerSection.subheading_id}
-                    draggableId={answerSection.subheading_id}
+                    key={subheading.subheading_id}
+                    draggableId={subheading.subheading_id}
                     index={index}
                   >
                     {(provided, snapshot) => (
@@ -640,14 +618,13 @@ const QuestionCrafter = () => {
                           ...provided.draggableProps.style,
                           transform: provided.draggableProps.style?.transform,
                           transformOrigin: "0 0",
-                          width: "100%" // Ensure consistent width
+                          width: "100%"
                         }}
                       >
                         <div
                           {...provided.dragHandleProps}
                           className="drag-handle"
                           style={{
-                            // Prevent the drag handle from jumping
                             touchAction: "none",
                             userSelect: "none"
                           }}
@@ -667,29 +644,25 @@ const QuestionCrafter = () => {
                           <div className="section-header">
                             <button
                               onClick={() =>
-                                deleteSubheading(answerSection.subheading_id)
+                                deleteSubheading(subheading.subheading_id)
                               }
                               className="p-2 delete-cross"
                             >
                               <FontAwesomeIcon
                                 icon={faTimes}
-                                className="w-5 h-5 "
+                                className="w-5 h-5"
                               />
                             </button>
                             <h3
                               className="section-title"
-                              title={answerSection.title}
+                              title={subheading.title}
                             >
-                              {answerSection.title}
+                              {subheading.title}
                             </h3>
                             <div>
                               <WordCountSelector
-                                subheadingId={answerSection.subheading_id}
-                                initialCount={
-                                  sectionWordCounts[
-                                    answerSection.subheading_id
-                                  ] || 100
-                                }
+                                subheadingId={subheading.subheading_id}
+                                initialCount={subheading.word_count || 100}
                                 onChange={handleWordCountChange}
                                 disabled={!canUserEdit}
                               />
@@ -699,11 +672,16 @@ const QuestionCrafter = () => {
 
                           <div className="editor-container">
                             <Editor
-                              editorState={answerSection.editorState}
+                              editorState={EditorState.createWithContent(
+                                ContentState.createFromText(
+                                  subheading.extra_instructions || ""
+                                )
+                              )}
                               onChange={(newState) =>
                                 handleAnswerChange(
                                   newState,
-                                  answerSection.subheading_id
+                                  subheading.subheading_id,
+                                  subheading.word_count
                                 )
                               }
                               customStyleMap={{
@@ -726,16 +704,6 @@ const QuestionCrafter = () => {
       </div>
     );
   };
-  // Force a re-render after updating the sections
-  useEffect(() => {
-    if (contentLoaded) {
-      console.log("Content loaded, current answer sections:", answerSections);
-      const timeoutId = setTimeout(() => {
-        setAnswerSections((prev) => [...prev]);
-      }, 100);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [contentLoaded]);
 
   return (
     <div className="chatpage">
@@ -852,7 +820,7 @@ const QuestionCrafter = () => {
               </div>
             ) : (
               <>
-                {answerSections.length > 0 ? (
+                {section.subheadings.length > 0 ? (
                   <div className="proposal-header mb-2">
                     <h2 className="heavy mt-4 text-center">Subsections</h2>
                   </div>
@@ -861,7 +829,7 @@ const QuestionCrafter = () => {
                 )}
               </>
             )}
-            {renderAnswerSections()}
+            {renderSubheadings()}
             <p>{sectionAnswer}</p>
           </div>
         </div>

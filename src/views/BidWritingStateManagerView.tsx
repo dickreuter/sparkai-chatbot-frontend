@@ -61,6 +61,7 @@ export interface SharedState {
   saveSuccess: boolean | null;
   object_id: string | null;
   selectedFolders: string[];
+  lastUpdated?: number;
   outline: Section[];
 }
 
@@ -298,6 +299,11 @@ const BidManagement: React.FC = () => {
       return;
     }
 
+    console.log("autosave triggered by:", {
+      outline: sharedState.outline,
+      lastUpdated: sharedState.lastUpdated
+    });
+
     // Immediately save current state to localStorage
     const stateToSave = {
       ...sharedState,
@@ -312,7 +318,6 @@ const BidManagement: React.FC = () => {
     }
 
     // Set new timer for auto-save
-    // This creates a 2-second debounce to prevent too frequent saves
     setTypingTimeout(
       setTimeout(() => {
         if (canUserSave() && !isSavingRef.current) {
@@ -334,6 +339,14 @@ const BidManagement: React.FC = () => {
     sharedState.contributors,
     sharedState.original_creator,
     sharedState.selectedFolders,
+    sharedState.lastUpdated,
+    JSON.stringify(
+      sharedState.outline.map((s) => ({
+        id: s.section_id,
+        subheadingsCount: s.subheadings.length,
+        subheadingsIds: s.subheadings.map((sh) => sh.subheading_id).join(",")
+      }))
+    ),
     // Triggers on deep changes to outline
     JSON.stringify(sharedState.outline),
     canUserSave

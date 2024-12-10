@@ -29,6 +29,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import SectionTitle from "../components/SectionTitle.tsx";
 import { fetchOutline } from "../utilityfunctions/updateSection.tsx";
+import ExtraInstructionsEditor from "../components/ExtraInstructionsEditor.tsx";
 
 const QuestionCrafter = () => {
   const getAuth = useAuthUser();
@@ -92,12 +93,7 @@ const QuestionCrafter = () => {
   }, [isLoading, startTime]);
 
   // Set initial section index from the passed section
-  useEffect(() => {
-    const index = outline.findIndex((s) => s.section_id === section.section_id);
-    setCurrentSectionIndex(index !== -1 ? index : 0);
-  }, [section.section_id, outline]);
-
-  // Add this useEffect to update local subheadings when outline changes
+  // Modify this useEffect
   useEffect(() => {
     const currentSection = outline.find(
       (s) => s.section_id === section.section_id
@@ -105,7 +101,7 @@ const QuestionCrafter = () => {
     if (currentSection) {
       setSubheadings(currentSection.subheadings || []);
     }
-  }, [outline, section.section_id]);
+  }, [section.section_id]); // Only depend on section.section_id, not outline
 
   const navigateToSection = async (targetSection: Section) => {
     try {
@@ -235,65 +231,53 @@ const QuestionCrafter = () => {
   const deleteSubheading = async (subheading_id: string) => {
     try {
       console.log("Starting deletion for subheading:", subheading_id);
-      console.log("Current outline before deletion:", outline);
 
-      // First, find the current section in the outline
-      const currentSectionIndex = outline.findIndex(
-        (s) => s.section_id === section.section_id
+      // First update the local state immediately for UI responsiveness
+      setSubheadings((prev) =>
+        prev.filter((sh) => sh.subheading_id !== subheading_id)
       );
 
-      if (currentSectionIndex === -1) {
-        throw new Error("Section not found in outline");
-      }
-
-      console.log(
-        "Current section subheadings:",
-        outline[currentSectionIndex].subheadings
-      );
-
-      // Create a new outline with the updated subheadings
-      const updatedOutline = outline.map((s) =>
-        s.section_id === section.section_id
-          ? {
-              ...s,
-              subheadings: s.subheadings.filter(
-                (sh) => sh.subheading_id !== subheading_id
-              )
-            }
-          : s
-      );
-
-      console.log(
-        "Updated section subheadings:",
-        updatedOutline[currentSectionIndex].subheadings
-      );
-
-      // Update local subheadings state for immediate UI feedback
-      setSubheadings((prev) => {
-        const updated = prev.filter((sh) => sh.subheading_id !== subheading_id);
-        console.log("Updated local subheadings:", updated);
-        return updated;
+      // Create a completely new outline array to ensure React detects the change
+      const newOutline = outline.map((s) => {
+        if (s.section_id === section.section_id) {
+          // Create a new section object with filtered subheadings
+          return {
+            ...s,
+            subheadings: s.subheadings.filter(
+              (sh) => sh.subheading_id !== subheading_id
+            )
+          };
+        }
+        return s;
       });
 
-      // Get the updated section from the new outline
-      const updatedSection = updatedOutline[currentSectionIndex];
-
-      // Update the current section with the new data
-      setCurrentSection(updatedSection);
-
-      // Force a refresh of the outline in shared state to ensure it propagates
-      setSharedState((prev) => ({
-        ...prev,
-        outline: updatedOutline
-      }));
-      // Update status to reflect changes
-      updateStatus("In Progress");
-
-      // Log final state
-      console.log(
-        "Final outline after deletion:",
-        updatedOutline[currentSectionIndex].subheadings
+      // Update current section with new data
+      const updatedSection = newOutline.find(
+        (s) => s.section_id === section.section_id
       );
+      if (updatedSection) {
+        setCurrentSection(updatedSection);
+      }
+
+      // Force a new object reference for the entire state
+      setSharedState((prevState) => {
+        const newState = {
+          ...prevState,
+          outline: newOutline,
+          lastUpdated: new Date().getTime() // Add a timestamp to force change detection
+        };
+        return newState;
+      });
+
+      // Log the update to verify
+      console.log("Outline updated, new length:", newOutline.length);
+      console.log(
+        "Section subheadings updated:",
+        newOutline.find((s) => s.section_id === section.section_id)?.subheadings
+      );
+
+      // Update status last to ensure all other updates are processed
+      updateStatus("In Progress");
     } catch (error) {
       console.error("Error deleting subheading:", error);
       displayAlert("Failed to delete subheading", "danger");
@@ -309,25 +293,41 @@ const QuestionCrafter = () => {
     word_count: number
   ) => {
     try {
-      // Update shared state
+      // Create updated subheadings
+      const updatedSubheadings = subheadings.map((sh) =>
+        sh.subheading_id === subheading_id
+          ? { ...sh, extra_instructions, word_count }
+          : sh
+      );
+
+      // Create updated outline
       const updatedOutline = outline.map((s) => {
         if (s.section_id === section.section_id) {
           return {
             ...s,
-            subheadings: s.subheadings.map((sh) =>
-              sh.subheading_id === subheading_id
-                ? { ...sh, extra_instructions, word_count }
-                : sh
-            )
+            subheadings: updatedSubheadings
           };
         }
         return s;
       });
 
-      setSharedState((prev) => ({
-        ...prev,
-        outline: updatedOutline
-      }));
+      // Wait for state updates to complete
+      await Promise.all([
+        new Promise<void>((resolve) => {
+          setSubheadings(updatedSubheadings);
+          resolve();
+        }),
+        new Promise<void>((resolve) => {
+          setSharedState((prev) => {
+            resolve();
+            return {
+              ...prev,
+              outline: updatedOutline,
+              lastUpdated: Date.now()
+            };
+          });
+        })
+      ]);
 
       updateStatus("In Progress");
     } catch (error) {
@@ -335,36 +335,49 @@ const QuestionCrafter = () => {
     }
   };
 
-  const handleWordCountChange = (subheadingId: string, newCount: number) => {
-    // Find the current extra instructions for this subheading
-    const section = section.subheadings.find(
-      (section) => section.subheading_id === subheadingId
-    );
+  const handleWordCountChange = async (
+    subheadingId: string,
+    newCount: number
+  ) => {
+    try {
+      console.log("Word count change:", { subheadingId, newCount });
 
-    if (section) {
-      const extraInstructions = getPlainTextFromEditorState(
-        section.editorState
+      const currentSubheading = subheadings.find(
+        (sh) => sh.subheading_id === subheadingId
       );
 
-      updateSubheading(subheadingId, extraInstructions, newCount);
+      if (!currentSubheading) {
+        console.error("Subheading not found:", subheadingId);
+        return;
+      }
+
+      await updateSubheading(
+        subheadingId,
+        currentSubheading.extra_instructions || "",
+        newCount
+      );
+    } catch (error) {
+      console.error("Error updating word count:", error);
+      displayAlert("Failed to update word count", "danger");
     }
   };
 
-  // Update the handleAnswerChange function
-  const handleAnswerChange = (
-    editorState: EditorState,
+  const handleExtraInstructionsChange = async (
+    plainText: string,
     subheadingId: string,
-    word_count: number
+    wordCount: number
   ) => {
-    console.log(
-      `Updating editor state for section ${subheadingId}`,
-      editorState
-    );
-    // Get the plain text content from the editor state
-    const extraInstructions = getPlainTextFromEditorState(editorState);
+    try {
+      console.log(
+        `Updating editor state for section ${subheadingId}`,
+        plainText
+      );
 
-    // Call the debounced update function
-    updateSubheading(subheadingId, extraInstructions, wordCount);
+      await updateSubheading(subheadingId, plainText, wordCount);
+    } catch (error) {
+      console.error("Error updating instructions:", error);
+      displayAlert("Failed to update instructions", "danger");
+    }
   };
 
   const sendQuestionToChatbot = async () => {
@@ -671,24 +684,14 @@ const QuestionCrafter = () => {
                           </div>
 
                           <div className="editor-container">
-                            <Editor
-                              editorState={EditorState.createWithContent(
-                                ContentState.createFromText(
-                                  subheading.extra_instructions || ""
-                                )
-                              )}
-                              onChange={(newState) =>
-                                handleAnswerChange(
-                                  newState,
-                                  subheading.subheading_id,
-                                  subheading.word_count
-                                )
+                            <ExtraInstructionsEditor
+                              initialContent={
+                                subheading.extra_instructions || ""
                               }
-                              customStyleMap={{
-                                BOLD: { fontWeight: "bold" }
-                              }}
+                              subheadingId={subheading.subheading_id}
+                              wordCount={subheading.word_count}
+                              onChange={handleExtraInstructionsChange}
                               readOnly={!canUserEdit}
-                              placeholder="Add extra information here about what you want to write about..."
                             />
                           </div>
                         </Card>

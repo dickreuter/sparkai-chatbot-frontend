@@ -691,7 +691,8 @@ figcaption {
   vertical-align: middle;
   object-fit: contain;
   margin-bottom: 2px;
-  /* Makes the image lighter while maintaining clarity */
+  filter: brightness(0) saturate(100%) invert(35%) sepia(45%) saturate(1500%)
+    hue-rotate(246deg) brightness(100%) contrast(98%);
 }
 
 @keyframes scroll {

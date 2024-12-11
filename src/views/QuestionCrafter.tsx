@@ -598,116 +598,6 @@ const QuestionCrafter = () => {
     updateStatus("In Progress");
   };
 
-  const renderSubheadings = () => {
-    if (isLoadingSubheadings) {
-      return <div></div>;
-    }
-
-    return (
-      <div style={{ marginLeft: "40px" }}>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="droppable">
-            {(provided, snapshot) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className="droppable-container"
-                style={{
-                  minHeight: "100px"
-                }}
-              >
-                {subheadings.map((subheading, index) => (
-                  <Draggable
-                    key={subheading.subheading_id}
-                    draggableId={subheading.subheading_id}
-                    index={index}
-                  >
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        className={`draggable-section ${snapshot.isDragging ? "dragging" : ""}`}
-                        style={{
-                          ...provided.draggableProps.style,
-                          transform: provided.draggableProps.style?.transform,
-                          transformOrigin: "0 0",
-                          width: "100%"
-                        }}
-                      >
-                        <div
-                          {...provided.dragHandleProps}
-                          className="drag-handle"
-                          style={{
-                            touchAction: "none",
-                            userSelect: "none"
-                          }}
-                        >
-                          <DragIndicatorIcon
-                            style={{
-                              fontSize: "35px",
-                              color: "#6c757d",
-                              display: "block",
-                              pointerEvents: "none",
-                              touchAction: "none"
-                            }}
-                          />
-                        </div>
-
-                        <Card className="section-card mb-4">
-                          <div className="section-header">
-                            <button
-                              onClick={() =>
-                                deleteSubheading(subheading.subheading_id)
-                              }
-                              className="p-2 delete-cross"
-                            >
-                              <FontAwesomeIcon
-                                icon={faTimes}
-                                className="w-5 h-5"
-                              />
-                            </button>
-                            <h3
-                              className="section-title"
-                              title={subheading.title}
-                            >
-                              {subheading.title}
-                            </h3>
-                            <div>
-                              <WordCountSelector
-                                subheadingId={subheading.subheading_id}
-                                initialCount={subheading.word_count || 100}
-                                onChange={handleWordCountChange}
-                                disabled={!canUserEdit}
-                              />
-                            </div>
-                            <div></div>
-                          </div>
-
-                          <div className="editor-container">
-                            <ExtraInstructionsEditor
-                              initialContent={
-                                subheading.extra_instructions || ""
-                              }
-                              subheadingId={subheading.subheading_id}
-                              wordCount={subheading.word_count}
-                              onChange={handleExtraInstructionsChange}
-                              readOnly={!canUserEdit}
-                            />
-                          </div>
-                        </Card>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </div>
-    );
-  };
-
   return (
     <div className="chatpage">
       <SideBarSmall />
@@ -773,67 +663,12 @@ const QuestionCrafter = () => {
                   disabled={!canUserEdit}
                 ></textarea>
               </div>
-              <div className="text-muted mt-2">
+              <div className="text-muted mt-3">
                 Word Count: {inputText.split(/\s+/).filter(Boolean).length}
               </div>
-              <Button
-                className="upload-button mt-2"
-                onClick={sendQuestionToChatbot}
-                disabled={inputText.trim() === ""}
-              >
-                Add Subsections
-              </Button>
 
-              <Row>
-                <div className="" style={{ textAlign: "left" }}>
-                  {isLoading && (
-                    <div className="my-3">
-                      <Spinner animation="border" />
-                      <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
-                    </div>
-                  )}
-                  {choice === "3" && apiChoices.length > 0 && (
-                    <div>
-                      {renderChoices()}
-                      <Button
-                        variant="primary"
-                        onClick={submitSelections}
-                        className="upload-button mt-3"
-                        disabled={selectedChoices.length === 0}
-                      >
-                        Generate answers for selected subsections
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </Row>
+              <p>{sectionAnswer}</p>
             </Col>
-
-            {isLoadingSubheadings ? (
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                <Spinner></Spinner>
-              </div>
-            ) : (
-              <>
-                {section.subheadings.length > 0 ? (
-                  <div className="proposal-header mb-2">
-                    <h2 className="heavy mt-4 text-center">Subsections</h2>
-                  </div>
-                ) : (
-                  <div></div>
-                )}
-              </>
-            )}
-            {renderSubheadings()}
-            <p>{sectionAnswer}</p>
           </div>
         </div>
       </div>

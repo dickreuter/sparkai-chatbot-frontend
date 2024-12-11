@@ -11,7 +11,11 @@ import { displayAlert } from "../helper/Alert.tsx";
 import "./ProposalPlan.css";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronRight, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronDown,
+  faChevronRight,
+  faTrash
+} from "@fortawesome/free-solid-svg-icons";
 import StatusMenu from "../components/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import SectionMenu from "../components/SectionMenu.tsx";
@@ -77,12 +81,10 @@ const menuStyle = {
 const ReviewerDropdown = ({
   value,
   onChange,
-  onBlur,
   contributors
 }: {
   value: string;
   onChange: (value: string) => void;
-  onBlur: () => void;
   contributors: Record<string, string>;
 }) => {
   const handleChange = (event: SelectChangeEvent<string>) => {
@@ -93,7 +95,6 @@ const ReviewerDropdown = ({
     <Select
       value={value || ""}
       onChange={handleChange}
-      onBlur={onBlur}
       size="small"
       style={selectStyle}
       displayEmpty
@@ -123,12 +124,10 @@ const ReviewerDropdown = ({
 
 const QuestionTypeDropdown = ({
   value,
-  onChange,
-  onBlur
+  onChange
 }: {
   value: string;
   onChange: (value: string) => void;
-  onBlur: () => void;
 }) => {
   const handleChange = (event: SelectChangeEvent<string>) => {
     onChange(event.target.value as string);
@@ -138,7 +137,6 @@ const QuestionTypeDropdown = ({
     <Select
       value={value || "3b"}
       onChange={handleChange}
-      onBlur={onBlur}
       size="small"
       style={selectStyle}
       displayEmpty
@@ -198,6 +196,38 @@ const SkeletonRow = () => (
   </tr>
 );
 
+const DebouncedTextArea = ({ value, onChange, placeholder }) => {
+  const [localValue, setLocalValue] = useState(value || "");
+  const debouncedCallback = useRef(null);
+
+  useEffect(() => {
+    setLocalValue(value || "");
+  }, [value]);
+
+  const handleChange = (e) => {
+    const newValue = e.target.value;
+    setLocalValue(newValue);
+
+    // Clear previous timeout
+    if (debouncedCallback.current) {
+      clearTimeout(debouncedCallback.current);
+    }
+
+    // Set new timeout for the parent update
+    debouncedCallback.current = setTimeout(() => {
+      onChange(newValue);
+    }, 300);
+  };
+
+  return (
+    <textarea
+      className="writingplan-text-area"
+      value={localValue}
+      onChange={handleChange}
+      placeholder={placeholder}
+    />
+  );
+};
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -214,12 +244,13 @@ const ProposalPlan = () => {
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
 
-
-  const [expandedSections, setExpandedSections] = useState<Set<number>>(new Set());
+  const [expandedSections, setExpandedSections] = useState<Set<number>>(
+    new Set()
+  );
 
   // Add this function to handle toggling sections
   const toggleSection = (index: number) => {
-    setExpandedSections(prev => {
+    setExpandedSections((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(index)) {
         newSet.delete(index);
@@ -351,27 +382,6 @@ const ProposalPlan = () => {
     setShowModal(true);
   };
 
-  const updateSection = async (section: Section, sectionIndex: number) => {
-    try {
-      await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/update_section`,
-        {
-          bid_id: object_id,
-          section: section,
-          section_index: sectionIndex
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-    } catch (err) {
-      console.error("Error updating section:", err);
-    }
-  };
-
   const deleteSection = async (sectionId: string, sectionIndex: number) => {
     try {
       await axios.post(
@@ -416,27 +426,29 @@ const ProposalPlan = () => {
 
   const handleDeleteSubheading = (sectionIndex, subheadingIndex) => {
     const newOutline = [...outline];
-    newOutline[sectionIndex].subheadings = newOutline[sectionIndex].subheadings.filter((_, idx) => idx !== subheadingIndex);
-    
-    setSharedState(prevState => ({
+    newOutline[sectionIndex].subheadings = newOutline[
+      sectionIndex
+    ].subheadings.filter((_, idx) => idx !== subheadingIndex);
+
+    setSharedState((prevState) => ({
       ...prevState,
       outline: newOutline
     }));
-    
-    updateSection(newOutline[sectionIndex], sectionIndex);
   };
-  
 
   const handleSectionChange = (
     index: number,
     field: keyof Section,
     value: any
   ) => {
+    // Create new outline immediately for local state
     const newOutline = [...sharedState.outline];
     newOutline[index] = {
       ...newOutline[index],
       [field]: value
     };
+
+    // Debounce the setState call
 
     setSharedState((prevState) => ({
       ...prevState,
@@ -511,246 +523,329 @@ const ProposalPlan = () => {
             fetchOutline={fetchOutline}
           />
 
-{outline.length === 0 ? (
-  <div></div>
-) : (
-  <div>
-    <div className="table-responsive mt-3">
-      <table className="outline-table" style={{ tableLayout: "fixed" }}>
-        <thead style={{ width: "100%" }}>
-          <tr>
-            <th className="" style={{ width: "45%" }}>
-              Section
-            </th>
-            <th className="" style={{ width: "14%" }}>
-              Reviewer
-            </th>
-            <th className="" style={{ width: "14%" }}>
-              Question Type
-            </th>
-            <th className=" text-center" style={{ width: "8%" }}>
-              Completed
-            </th>
-            <th className=" text-center" style={{ width: "8%" }}>
-              Subsections
-            </th>
-            <th className=" text-center" style={{ width: "6.5%" }}>
-              Words
-            </th>
-          
-            <th className=" text-center" style={{ width: "6%" }}>
-              Delete
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-        {isLoading ? (
-            [...Array(15)].map((_, index) => <SkeletonRow key={index} />)
+          {outline.length === 0 ? (
+            <div></div>
           ) : (
-            outline.map((section, index) => {
-              const isExpanded = expandedSections.has(index);
-              return (
-                <React.Fragment key={index}>
-                  <tr
-                    onContextMenu={(e) => handleContextMenu(e, index)}
-                    className="hover:bg-gray-50"
-                  >
-                    <td className="">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => toggleSection(index)}  // Use toggleSection here
-                          className="bg-transparent border-0 cursor-pointer text-black me-2"
-                        >
-                          <FontAwesomeIcon 
-                            icon={isExpanded ? faChevronDown : faChevronRight} 
-                            size="sm" 
-                          />
-                        </button>
-                        <Link
-                          to="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleEditClick(section);
-                          }}
-                          style={{
-                            cursor: "pointer",
-                            textDecoration: "none"
-                          }}
-                        >
-                          {section.heading}
-                        </Link>
-                      </div>
-                    </td>
-                    <td className="">
-                      <ReviewerDropdown
-                        value={section.reviewer}
-                        onChange={(value) =>
-                          handleSectionChange(index, "reviewer", value)
-                        }
-                        onBlur={() => updateSection(outline[index], index)}
-                        contributors={contributors}
-                      />
-                    </td>
-                    <td className="">
-                      <QuestionTypeDropdown
-                        value={section.choice}
-                        onChange={(value) =>
-                          handleSectionChange(index, "choice", value)
-                        }
-                        onBlur={() => updateSection(outline[index], index)}
-                      />
-                    </td>
-                    <td className="text-center">
-                      <StatusMenu
-                        value={section.status}
-                        onChange={(value) => {
-                          handleSectionChange(index, "status", value);
-                          const updatedSection = {
-                            ...outline[index],
-                            status: value
-                          };
-                          updateSection(updatedSection, index);
-                        }}
-                      />
-                    </td>
-                    <td className="text-center">{section.subsections}</td>
-                    <td className="text-center">{section.word_count}</td>
-                  
-                    <td className="text-center">
-                      <div className="d-flex justify-content-center">
-                        <button
-                          onClick={() => handleDeleteClick(section, index)}
-                          className="bg-transparent border-0 cursor-pointer text-black"
-                          title="Delete section"
-                        >
-                          <FontAwesomeIcon icon={faTrash} size="sm" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  {isExpanded && (
-                    <>
-                     <tr className="writingplan-box">
-                        <td colSpan={7} className="py-3 px-4">
-                          <div style={{
-                            display: 'flex',
-                            gap: '16px',
-                            width: '100%'
-                          }}>
-                            <div style={{
-                              flex: '1',
-                              width: '50%',
-                              maxWidth: '50%'
-                            }}>
-                              <div style={{ fontWeight: '500', marginBottom: '8px' }}>Question:</div>
-                              <textarea
-                                className="writingplan-text-area"
-                                value={section.question || "What is your management policy?"}
-                                onChange={(e) => handleSectionChange(index, "question", e.target.value)}
-                                onBlur={() => updateSection(outline[index], index)}
-                              />
-                            </div>
-                            <div style={{
-                              flex: '1',
-                              width: '50%',
-                              maxWidth: '50%'
-                            }}>
-                              <div style={{ fontWeight: '500', marginBottom: '8px' }}>Writing Plan:</div>
-                              <textarea
-                                className="writingplan-text-area"
-                                value={section.writingplan || "Please write in a formative tone where you mention our strategy of how we will manage this project"}
-                                onChange={(e) => handleSectionChange(index, "writingplan", e.target.value)}
-                                onBlur={() => updateSection(outline[index], index)}
-                              />
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      {section.subheadings?.map((subheading, subIndex) => (
-                      <tr
-                        key={`${index}-${subIndex}`}
-                        className="bg-gray-50 hover:bg-gray-100"
-                      >
-                        <td className="">
-                          <div className="ms-2">
-                            <EditableCell
-                              value={subheading.title}
-                              onChange={(value) => {
-                                const newSubheadings = [...section.subheadings];
-                                newSubheadings[subIndex] = {
-                                  ...newSubheadings[subIndex],
-                                  title: value
-                                };
-                                handleSectionChange(index, "subheadings", newSubheadings);
-                              }}
-                              onBlur={() => updateSection(outline[index], index)}
-                            />
-                          </div>
-                        </td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td className="text-center">
-                        <input
-                        type="number"
-                        value={subheading.word_count || 0}
-                        min="0"
-                        className="form-control d-inline-block word-count-input"
-                        style={{ width: '60px', textAlign: 'center' }}
-                        onChange={(e) => {
-                          // First, create a new array of subheadings with the updated word count
-                          const newSubheadings = section.subheadings.map((sub, i) => {
-                            if (i === subIndex) {
-                              return {
-                                ...sub,
-                                word_count: parseInt(e.target.value) || 0
-                              };
-                            }
-                            return sub;
-                          });
+            <div>
+              <div className="table-responsive mt-3">
+                <table
+                  className="outline-table"
+                  style={{ tableLayout: "fixed" }}
+                >
+                  <thead style={{ width: "100%" }}>
+                    <tr>
+                      <th className="" style={{ width: "45%" }}>
+                        Section
+                      </th>
+                      <th className="" style={{ width: "14%" }}>
+                        Reviewer
+                      </th>
+                      <th className="" style={{ width: "14%" }}>
+                        Question Type
+                      </th>
+                      <th className=" text-center" style={{ width: "8%" }}>
+                        Completed
+                      </th>
+                      <th className=" text-center" style={{ width: "8%" }}>
+                        Subsections
+                      </th>
+                      <th className=" text-center" style={{ width: "6.5%" }}>
+                        Words
+                      </th>
 
-                          // Update the subheadings first
-                          handleSectionChange(index, "subheadings", newSubheadings);
+                      <th className=" text-center" style={{ width: "6%" }}>
+                        Delete
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {isLoading
+                      ? [...Array(15)].map((_, index) => (
+                          <SkeletonRow key={index} />
+                        ))
+                      : outline.map((section, index) => {
+                          const isExpanded = expandedSections.has(index);
+                          return (
+                            <React.Fragment key={index}>
+                              <tr
+                                onContextMenu={(e) =>
+                                  handleContextMenu(e, index)
+                                }
+                                className="hover:bg-gray-50"
+                              >
+                                <td className="">
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => toggleSection(index)} // Use toggleSection here
+                                      className="bg-transparent border-0 cursor-pointer text-black me-2"
+                                    >
+                                      <FontAwesomeIcon
+                                        icon={
+                                          isExpanded
+                                            ? faChevronDown
+                                            : faChevronRight
+                                        }
+                                        size="sm"
+                                      />
+                                    </button>
+                                    <Link
+                                      to="#"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleEditClick(section);
+                                      }}
+                                      style={{
+                                        cursor: "pointer",
+                                        textDecoration: "none"
+                                      }}
+                                    >
+                                      {section.heading}
+                                    </Link>
+                                  </div>
+                                </td>
+                                <td className="">
+                                  <ReviewerDropdown
+                                    value={section.reviewer}
+                                    onChange={(value) =>
+                                      handleSectionChange(
+                                        index,
+                                        "reviewer",
+                                        value
+                                      )
+                                    }
+                                    contributors={contributors}
+                                  />
+                                </td>
+                                <td className="">
+                                  <QuestionTypeDropdown
+                                    value={section.choice}
+                                    onChange={(value) =>
+                                      handleSectionChange(
+                                        index,
+                                        "choice",
+                                        value
+                                      )
+                                    }
+                                  />
+                                </td>
+                                <td className="text-center">
+                                  <StatusMenu
+                                    value={section.status}
+                                    onChange={(value) => {
+                                      handleSectionChange(
+                                        index,
+                                        "status",
+                                        value
+                                      );
+                                    }}
+                                  />
+                                </td>
+                                <td className="text-center">
+                                  {section.subsections}
+                                </td>
+                                <td className="text-center">
+                                  {section.word_count}
+                                </td>
 
-                         
-                        }}
-                        onBlur={() => updateSection(outline[index], index)}
-                      />
-                        </td>
-                        <td className="text-center">
-                          <div className="d-flex justify-content-center">
-                            <button
-                              onClick={() => handleDeleteSubheading(index, subIndex)}
-                              className="bg-transparent border-0 cursor-pointer text-black"
-                              title="Delete subheading"
-                            >
-                              <FontAwesomeIcon icon={faTrash} size="sm" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    </>
-                  )}
-                </React.Fragment>
-              );
-            })
+                                <td className="text-center">
+                                  <div className="d-flex justify-content-center">
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteClick(section, index)
+                                      }
+                                      className="bg-transparent border-0 cursor-pointer text-black"
+                                      title="Delete section"
+                                    >
+                                      <FontAwesomeIcon
+                                        icon={faTrash}
+                                        size="sm"
+                                      />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                              {isExpanded && (
+                                <>
+                                  <tr className="writingplan-box">
+                                    <td colSpan={7} className="py-3 px-4">
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          gap: "16px",
+                                          width: "100%"
+                                        }}
+                                      >
+                                        <div
+                                          style={{
+                                            flex: "1",
+                                            width: "50%",
+                                            maxWidth: "50%"
+                                          }}
+                                        >
+                                          <div
+                                            style={{
+                                              fontWeight: "500",
+                                              marginBottom: "8px"
+                                            }}
+                                          >
+                                            Question:
+                                          </div>
+                                          <DebouncedTextArea
+                                            value={section.question}
+                                            onChange={(value) =>
+                                              handleSectionChange(
+                                                index,
+                                                "question",
+                                                value
+                                              )
+                                            }
+                                            placeholder={
+                                              "What is your management policy?"
+                                            }
+                                          />
+                                        </div>
+                                        <div
+                                          style={{
+                                            flex: "1",
+                                            width: "50%",
+                                            maxWidth: "50%"
+                                          }}
+                                        >
+                                          <div
+                                            style={{
+                                              fontWeight: "500",
+                                              marginBottom: "8px"
+                                            }}
+                                          >
+                                            Writing Plan:
+                                          </div>
+
+                                          <DebouncedTextArea
+                                            value={section.writingplan}
+                                            onChange={(value) =>
+                                              handleSectionChange(
+                                                index,
+                                                "writingplan",
+                                                value
+                                              )
+                                            }
+                                            placeholder={
+                                              "Please write in a formative tone where you mention our strategy of how we will manage this project"
+                                            }
+                                          />
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                  {section.subheadings?.map(
+                                    (subheading, subIndex) => (
+                                      <tr
+                                        key={`${index}-${subIndex}`}
+                                        className="bg-gray-50 hover:bg-gray-100"
+                                      >
+                                        <td className="">
+                                          <div className="ms-2">
+                                            <EditableCell
+                                              value={subheading.title}
+                                              onChange={(value) => {
+                                                const newSubheadings = [
+                                                  ...section.subheadings
+                                                ];
+                                                newSubheadings[subIndex] = {
+                                                  ...newSubheadings[subIndex],
+                                                  title: value
+                                                };
+                                                handleSectionChange(
+                                                  index,
+                                                  "subheadings",
+                                                  newSubheadings
+                                                );
+                                              }}
+                                            />
+                                          </div>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td className="text-center">
+                                          <input
+                                            type="number"
+                                            value={subheading.word_count || 0}
+                                            min="0"
+                                            className="form-control d-inline-block word-count-input"
+                                            style={{
+                                              width: "60px",
+                                              textAlign: "center"
+                                            }}
+                                            onChange={(e) => {
+                                              // First, create a new array of subheadings with the updated word count
+                                              const newSubheadings =
+                                                section.subheadings.map(
+                                                  (sub, i) => {
+                                                    if (i === subIndex) {
+                                                      return {
+                                                        ...sub,
+                                                        word_count:
+                                                          parseInt(
+                                                            e.target.value
+                                                          ) || 0
+                                                      };
+                                                    }
+                                                    return sub;
+                                                  }
+                                                );
+
+                                              // Update the subheadings first
+                                              handleSectionChange(
+                                                index,
+                                                "subheadings",
+                                                newSubheadings
+                                              );
+                                            }}
+                                          />
+                                        </td>
+                                        <td className="text-center">
+                                          <div className="d-flex justify-content-center">
+                                            <button
+                                              onClick={() =>
+                                                handleDeleteSubheading(
+                                                  index,
+                                                  subIndex
+                                                )
+                                              }
+                                              className="bg-transparent border-0 cursor-pointer text-black"
+                                              title="Delete subheading"
+                                            >
+                                              <FontAwesomeIcon
+                                                icon={faTrash}
+                                                size="sm"
+                                              />
+                                            </button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    )
+                                  )}
+                                </>
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                  </tbody>
+                </table>
+              </div>
+              {contextMenu && (
+                <SectionMenu
+                  x={contextMenu.x}
+                  y={contextMenu.y}
+                  onClose={() => setContextMenu(null)}
+                  onAddSection={handleAddSection}
+                  onDeleteSection={handleDeleteSection}
+                />
+              )}
+            </div>
           )}
-        </tbody>
-      </table>
-    </div>
-    {contextMenu && (
-      <SectionMenu
-        x={contextMenu.x}
-        y={contextMenu.y}
-        onClose={() => setContextMenu(null)}
-        onAddSection={handleAddSection}
-        onDeleteSection={handleDeleteSection}
-      />
-    )}
-  </div>
-)}
         </div>
       </div>
     </div>

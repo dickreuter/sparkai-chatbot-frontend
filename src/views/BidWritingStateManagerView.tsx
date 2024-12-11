@@ -38,6 +38,7 @@ export interface Section {
   subsections: number;
   subheadings: Subheading[];
   choice: string;
+  writingplan: string;
 }
 
 export interface Contributor {

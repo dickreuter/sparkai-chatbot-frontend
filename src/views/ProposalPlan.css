@@ -49,10 +49,28 @@
     border-bottom: 1px solid #ddd;
 }
 
+.writingplan-box {
+    background-color: #f2f2f2;
+    font-weight: 500;
+    color: black;
+}
+
+.writingplan-text-area {
+    width: 100%;
+    background-color: white;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    height: 100px;
+    resize: none;
+    color: black;
+    border-radius: 8px;
+}
+
 
 /* Add left margin to the first column */
 
-.outline-table td:first-child,
+.outline-table td:first-child;
 .outline-table th:first-child {
     padding-left: 20px;
 }
@@ -124,4 +142,8 @@
 
 .group:hover {
     background-color: rgba(0, 0, 0, 0.02);
+}
+
+background-color: rgba(0, 0, 0, 0.02);
+
 }

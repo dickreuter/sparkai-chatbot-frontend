@@ -370,12 +370,25 @@ const ProfilePage = () => {
                 <Card.Body>
                   <div className="proposal-header ">
                     <Card.Title>Admin Panel</Card.Title>
-                    <Button
-                      onClick={() => setShowModal(true)}
-                      className="upload-button"
-                    >
-                      Add New User
-                    </Button>
+                    <div>
+                      <Button
+                        onClick={() => setShowModal(true)}
+                        className="upload-button"
+                      >
+                        Add New User
+                      </Button>
+                      <button
+                        className="orange-button ms-2"
+                        onClick={() =>
+                          window.open(
+                            "https://billing.stripe.com/p/login/00g6p52WPfRG22I8ww",
+                            "_blank"
+                          )
+                        }
+                      >
+                        Stripe Invoices
+                      </button>
+                    </div>
                   </div>
                   <Card.Text>Licenses available: {formData.licences}</Card.Text>
 
@@ -401,9 +414,9 @@ const ProfilePage = () => {
               </Card>
               <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
-                  <Modal.Title>Invite New User</Modal.Title>
+                  <Modal.Title className="px-2">Invite New User</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body className="p-4">
                   {inviteError && <p style={{ color: "red" }}>{inviteError}</p>}
                   {inviteSuccess && (
                     <p style={{ color: "green" }}>{inviteSuccess}</p>

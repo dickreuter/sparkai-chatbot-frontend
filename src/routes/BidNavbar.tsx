@@ -190,15 +190,15 @@ const BidNavbar = ({
           <div></div>
         ) : (
           <div>
-            <GenerateProposalModal bid_id={object_id} outline={outline} />
             <button
               onClick={handleRegenerateClick}
-              className="upload-button ms-2"
+              className="upload-button me-2"
               style={{ minWidth: "fit-content" }}
             >
               <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon>
               New Outline
             </button>
+            <GenerateProposalModal bid_id={object_id} outline={outline} />
           </div>
         )}
       </div>

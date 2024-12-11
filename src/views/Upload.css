@@ -8,6 +8,25 @@
   font-family: "ClashDisplay", sans-serif;
 }
 
+.orange-button {
+  background-color: #ff9900;
+  color: black;
+  padding: 8px 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 550;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  outline: none !important;
+  /* Ensure no focus outline */
+  box-shadow: none !important;
+  min-width: fit-content; /* Ensure no box-shadow */
+}
+
+.orange-button:hover {
+  background-color: #ff8800 !important;
+}
+
 .upload-button {
   background-color: #262626;
   color: white;

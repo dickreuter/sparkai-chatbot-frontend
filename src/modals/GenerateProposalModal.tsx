@@ -5,7 +5,11 @@ import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
-import { faSpinner, faWarning } from "@fortawesome/free-solid-svg-icons";
+import {
+  faRocket,
+  faSpinner,
+  faWarning
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import { LinearProgress, Typography, Box } from "@mui/material";
@@ -276,17 +280,10 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
 
   return (
     <>
-      <Button
-        className="upload-button"
-        onClick={handleShow}
-        style={{
-          minWidth: "fit-content",
-          backgroundColor: "#ff9900",
-          color: "black"
-        }}
-      >
+      <button className="orange-button" onClick={handleShow}>
+        <FontAwesomeIcon icon={faRocket} className="pr-2"></FontAwesomeIcon>
         Generate Proposal
-      </Button>
+      </button>
       <Modal show={show} onHide={handleClose} size="lg" centered>
         <Modal.Header className="p-4">
           <Modal.Title>{getHeaderTitle()}</Modal.Title>

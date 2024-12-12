@@ -144,6 +144,31 @@
     background-color: rgba(0, 0, 0, 0.02);
 }
 
-background-color: rgba(0, 0, 0, 0.02);
 
+/* Add this to your BidExtractor.css or ProposalPlan.css file */
+
+.preview-button {
+    background-color: #f0f0f0;
+    color: #333333;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.preview-button:hover {
+    background-color: #e0e0e0;
+}
+
+.preview-button:active {
+    background-color: #d5d5d5;
+}
+
+.preview-button:disabled {
+    background-color: #f5f5f5;
+    color: #999999;
+    cursor: not-allowed;
 }

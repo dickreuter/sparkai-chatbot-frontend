@@ -847,6 +847,7 @@ const ProposalPlan = () => {
                                         maxWidth: "50%"
                                       }}
                                     >
+                                      <div style={{display: "flex", alignItems:"center"}}>
                                       <div
                                         style={{
                                           fontWeight: "500",
@@ -855,6 +856,17 @@ const ProposalPlan = () => {
                                       >
                                         Question
                                       </div>
+                                      <button
+                                        onClick={() => handleEditClick(section)}
+                                        className="preview-button ms-2"
+                                        style={{
+                                          fontWeight: "500",
+                                          marginBottom: "8px"
+                                        }}
+                                      >
+                                        Preview Response
+                                      </button> </div>
+
                                       <DebouncedTextArea
                                         value={section.question}
                                         onChange={(value) =>
@@ -879,7 +891,8 @@ const ProposalPlan = () => {
                                       <div
                                         style={{
                                           fontWeight: "500",
-                                          marginBottom: "8px"
+                                        
+                                          marginBottom: "16px"
                                         }}
                                       >
                                         Writing Plan
@@ -901,13 +914,7 @@ const ProposalPlan = () => {
                                     </div>
                                   </div>
                                   <div className="flex justify-end mt-2">
-                                    {/* <button
-                                        onClick={() => handleEditClick(section)}
-                                        className="upload-button"
-                                      >
-                                        Preview Response
-                                      </button> */}
-
+                                   
                                     <button
                                       className="orange-button ms-2 flex items-center gap-2"
                                       onClick={() =>

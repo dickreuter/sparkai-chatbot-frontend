@@ -18,6 +18,7 @@ import { useAuthUser } from "react-auth-kit";
 import SelectFolder from "../components/SelectFolder";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import SelectTenderLibraryFile from "../components/SelectTenderLibraryFile";
+import { LinearProgress, Typography, Box } from "@mui/material";
 
 const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
   const getAuth = useAuthUser();
@@ -32,6 +33,159 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
   const [selectedFolders, setSelectedFolders] = useState(
     sharedState.selectedFolders || []
   );
+  const [progress, setProgress] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState(
+    "Analyzing tender documents..."
+  );
+  const progressInterval = useRef(null);
+
+  const loadingMessages = [
+    // Initial Analysis
+    "Analyzing tender documents...",
+    "Extracting key requirements...",
+    "Scanning compliance criteria...",
+    "Identifying mandatory requirements...",
+
+    // Opportunity Analysis
+    "Analyzing market opportunity...",
+    "Evaluating competitive landscape...",
+    "Identifying key differentiators...",
+    "Assessing strategic advantages...",
+    "Analyzing win probability factors...",
+
+    // Compliance Processing
+    "Processing compliance matrix...",
+    "Mapping regulatory requirements...",
+    "Validating certification needs...",
+    "Checking accreditation requirements...",
+    "Analyzing quality standards...",
+    "Reviewing safety requirements...",
+    "Checking environmental compliance...",
+
+    // Structure Building
+    "Building section framework...",
+    "Organizing content hierarchy...",
+    "Structuring response format...",
+    "Creating section dependencies...",
+    "Mapping cross-references...",
+
+    // Requirements Processing
+    "Processing technical requirements...",
+    "Analyzing scope requirements...",
+    "Evaluating delivery timelines...",
+    "Mapping resource requirements...",
+    "Assessing risk factors...",
+
+    // Evaluation Criteria
+    "Analyzing evaluation criteria...",
+    "Mapping scoring elements...",
+    "Identifying critical success factors...",
+    "Processing weighted criteria...",
+    "Validating scoring mechanisms...",
+
+    // Value Proposition
+    "Analyzing value propositions...",
+    "Identifying unique selling points...",
+    "Mapping innovation opportunities...",
+    "Processing strategic benefits...",
+
+    // Documentation
+    "Structuring executive summary...",
+    "Organizing methodology sections...",
+    "Mapping past performance requirements...",
+    "Processing capability statements...",
+
+    // Quality Checks
+    "Validating section flow...",
+    "Checking requirement coverage...",
+    "Verifying compliance alignment...",
+    "Reviewing structural integrity...",
+
+    // Financial Elements
+    "Analyzing pricing requirements...",
+    "Mapping cost breakdown structure...",
+    "Reviewing payment milestones...",
+    "Checking financial criteria...",
+
+    // Social Value
+    "Processing social value requirements...",
+    "Analyzing community benefits...",
+    "Mapping sustainability requirements...",
+    "Evaluating environmental impact...",
+
+    // Final Steps
+    "Optimizing outline structure...",
+    "Finalizing section ordering...",
+    "Validating completeness...",
+    "Performing final compliance check...",
+    "Generating final outline format... Please wait a little bit longer..."
+  ];
+
+  function LinearProgressWithLabel(props) {
+    return (
+      <Box
+        sx={{ display: "flex", alignItems: "center", flexDirection: "column" }}
+      >
+        <Box sx={{ width: "100%", mr: 1 }}>
+          <LinearProgress
+            variant="determinate"
+            {...props}
+            sx={{
+              height: 10,
+              borderRadius: 5,
+              backgroundColor: "#ffd699",
+              "& .MuiLinearProgress-bar": {
+                backgroundColor: "#ff9900"
+              }
+            }}
+          />
+        </Box>
+        <Box sx={{ minWidth: 35, mt: 1, textAlign: "center" }}>
+          <Typography variant="body2" color="text.secondary">
+            {`${Math.round(props.value)}%`}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontStyle: "italic" }}
+          >
+            {props.message}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+
+  const startProgressBar = () => {
+    const duration = 60000; // 1 minute in ms
+    const interval = 100;
+    const steps = duration / interval;
+    const increment = 98 / steps;
+
+    let currentProgress = 0;
+    let messageIndex = 0;
+
+    const messageRotationInterval = setInterval(() => {
+      messageIndex = (messageIndex + 1) % loadingMessages.length;
+      setLoadingMessage(loadingMessages[messageIndex]);
+    }, 1000);
+
+    progressInterval.current = setInterval(() => {
+      currentProgress += increment;
+      if (currentProgress >= 98) {
+        clearInterval(progressInterval.current);
+        clearInterval(messageRotationInterval);
+        if (!isGeneratingOutline) {
+          setProgress(100);
+          setLoadingMessage("Finalizing outline structure...");
+        } else {
+          setProgress(98);
+        }
+      } else {
+        setProgress(currentProgress);
+      }
+    }, interval);
+  };
 
   const handleFileSelection = (files) => {
     console.log("Files selected in SelectTenderLibraryFile component:", files);
@@ -51,6 +205,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
     if (isGeneratingOutline) return;
 
     setIsGeneratingOutline(true);
+    startProgressBar();
     console.log(bid_id);
     console.log(sharedState.selectedFolders);
     console.log(selectedFiles);
@@ -247,6 +402,15 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
               initialSelectedFolders={selectedFolders}
             />
           </div>
+
+          {isGeneratingOutline && (
+            <div className="mt-4">
+              <LinearProgressWithLabel
+                value={progress}
+                message={loadingMessage}
+              />
+            </div>
+          )}
         </div>
       );
     } else if (currentStep === 4) {

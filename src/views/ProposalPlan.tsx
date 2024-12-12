@@ -248,6 +248,21 @@ const ProposalPlan = () => {
     new Set()
   );
 
+
+  const handleRowClick = (e: React.MouseEvent, index: number) => {
+    // Prevent row click if clicking on interactive elements
+    const isInteractiveElement = (
+      e.target as HTMLElement
+    ).closest(
+      'input, select, button, a, .MuiSelect-select, [role="button"], .editable-cell'
+    );
+
+    if (!isInteractiveElement) {
+      e.preventDefault();
+      toggleSection(index);
+    }
+  };
+
   // Add this function to handle toggling sections
   const toggleSection = (index: number) => {
     setExpandedSections((prev) => {
@@ -281,43 +296,41 @@ const ProposalPlan = () => {
 
   const handleAddSection = async () => {
     if (!object_id || selectedRowIndex === null) return;
-
+  
     const newSection = {
       heading: "New Section",
       word_count: 0,
       reviewer: "",
-      status: "Not Started",
-      subsections: 0
+      status: "Not Started" as const,
+      subsections: 0,
+      question: "",
+      answer: "",
+      weighting: "",
+      page_limit: "",
+      subheadings: [],
+      choice: "3b",
+      writingplan: ""
     };
-
+  
     try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/add_section`,
-        {
-          bid_id: object_id,
-          section: newSection,
-          insert_index: selectedRowIndex
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-
+      const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+      
       const updatedOutline = [...sharedState.outline];
       updatedOutline.splice(selectedRowIndex, 0, {
         ...newSection,
-        section_id: response.data.section_id
+        section_id: uuid
       });
-
+  
       setSharedState((prevState) => ({
         ...prevState,
         outline: updatedOutline
       }));
-
-      displayAlert("Section added successfully", "success");
+  
+    
     } catch (err) {
       console.error("Error adding section:", err);
       displayAlert("Failed to add section", "danger");
@@ -338,13 +351,8 @@ const ProposalPlan = () => {
 
       await deleteSection(sectionId, sectionIndex);
 
-      displayAlert("Section deleted successfully", "success");
-      posthog.capture("proposal_section_delete_succeeded", {
-        bidId: object_id,
-        sectionId
-      });
     } catch (err) {
-      displayAlert("Failed to delete section", "danger");
+      console.log(err);
       posthog.capture("proposal_section_delete_failed", {
         bidId: object_id,
         sectionId,
@@ -384,29 +392,14 @@ const ProposalPlan = () => {
 
   const deleteSection = async (sectionId: string, sectionIndex: number) => {
     try {
-      await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/delete_section`,
-        {
-          bid_id: object_id,
-          section_id: sectionId,
-          section_index: sectionIndex
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-
-      const newOutline = sharedState.outline.filter(
-        (_, index) => index !== sectionIndex
-      );
+      const updatedOutline = [...sharedState.outline];
+      updatedOutline.splice(sectionIndex, 1);
+  
       setSharedState((prevState) => ({
         ...prevState,
-        outline: newOutline
+        outline: updatedOutline
       }));
-
+      
       displayAlert("Section deleted successfully", "success");
     } catch (err) {
       console.error("Error deleting section:", err);
@@ -567,12 +560,11 @@ const ProposalPlan = () => {
                           const isExpanded = expandedSections.has(index);
                           return (
                             <React.Fragment key={index}>
-                              <tr
-                                onContextMenu={(e) =>
-                                  handleContextMenu(e, index)
-                                }
-                                className="hover:bg-gray-50"
-                              >
+                                <tr
+                                  onContextMenu={(e) => handleContextMenu(e, index)}
+                                  onClick={(e) => handleRowClick(e, index)}
+                                  className="hover:bg-gray-50 cursor-pointer"
+                                >
                                 <td className="">
                                   <div className="flex items-center gap-2">
                                     <button

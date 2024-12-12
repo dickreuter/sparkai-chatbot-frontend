@@ -77,20 +77,6 @@ const QuestionCrafter = () => {
   const navigate = useNavigate();
 
   //timer for adding new subesections
-  useEffect(() => {
-    let timer;
-    if (isLoading && startTime) {
-      timer = setInterval(() => {
-        const elapsed = (Date.now() - startTime) / 1000;
-        setElapsedTime(elapsed);
-      }, 100); // Update every 100ms
-    }
-    return () => {
-      if (timer) {
-        clearInterval(timer);
-      }
-    };
-  }, [isLoading, startTime]);
 
   // Set initial section index from the passed section
   // Modify this useEffect

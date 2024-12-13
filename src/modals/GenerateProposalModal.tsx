@@ -13,6 +13,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import { LinearProgress, Typography, Box } from "@mui/material";
+import { fetchOutline } from "../utilityfunctions/updateSection";
 
 const GenerateProposalModal = ({ bid_id, outline }) => {
   const getAuth = useAuthUser();
@@ -182,6 +183,7 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
       document.body.removeChild(link);
       setProgress(60);
       handleClose();
+      fetchOutline(bid_id, tokenRef, setSharedState);
     } catch (err) {
       console.error("Error generating proposal:", err);
     } finally {

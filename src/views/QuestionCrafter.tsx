@@ -17,9 +17,6 @@ import {
 } from "./BidWritingStateManagerView.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { displayAlert } from "../helper/Alert.tsx";
-import WordCountSelector from "../components/WordCountSelector.tsx";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import StatusMenu from "../components/StatusMenu.tsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -28,8 +25,8 @@ import {
   faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import SectionTitle from "../components/SectionTitle.tsx";
-import { fetchOutline } from "../utilityfunctions/updateSection.tsx";
-import ExtraInstructionsEditor from "../components/ExtraInstructionsEditor.tsx";
+import { IconButton, Tooltip } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 
 const QuestionCrafter = () => {
   const getAuth = useAuthUser();
@@ -51,10 +48,6 @@ const QuestionCrafter = () => {
   const backgroundInfo = getBackgroundInfo();
   const [inputText, setInputText] = useState(section.question || "");
 
-  //console.log("selectedfolders:", sharedState.selectedFolders);
-  const [subheadings, setSubheadings] = useState(section.subheadings || []);
-  const [contentLoaded, setContentLoaded] = useState(true); // Set to true initially
-  const [sectionAnswer, setSectionAnswer] = useState(null); // the answer generated for the subheadings
   const currentUserPermission = contributors[auth.email] || "viewer"; // Default to 'viewer' if not found
   const canUserEdit =
     currentUserPermission === "admin" || currentUserPermission === "editor";
@@ -64,13 +57,6 @@ const QuestionCrafter = () => {
   const [choice, setChoice] = useState("3");
   const [broadness, setBroadness] = useState("4");
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [questionAsked, setQuestionAsked] = useState(false);
-  const [startTime, setStartTime] = useState(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [selectedChoices, setSelectedChoices] = useState([]);
-  const [apiChoices, setApiChoices] = useState([]);
-  const [wordAmounts, setWordAmounts] = useState({});
   const [sectionStatus, setSectionStatus] = useState(section.status);
   const [isLoadingSubheadings, setIsLoadingSubheadings] = useState(false);
 
@@ -84,9 +70,6 @@ const QuestionCrafter = () => {
     const currentSection = outline.find(
       (s) => s.section_id === section.section_id
     );
-    if (currentSection) {
-      setSubheadings(currentSection.subheadings || []);
-    }
   }, [section.section_id]); // Only depend on section.section_id, not outline
 
   const navigateToSection = async (targetSection: Section) => {
@@ -124,8 +107,6 @@ const QuestionCrafter = () => {
       setSectionStatus(targetSection.status);
       // - Update the input field with the target section's question
       setInputText(targetSection.question || "");
-      // - Load the subheadings for the target section
-      setSubheadings(targetSection.subheadings || []);
 
       // Find the index of the target section in the overall outline
       // This is used for navigation between sections (prev/next)
@@ -184,185 +165,6 @@ const QuestionCrafter = () => {
         ...prev,
         outline: updatedOutline
       }));
-    }
-  };
-
-  // Add this utility function to convert EditorState to plain text
-  const getPlainTextFromEditorState = (editorState) => {
-    const contentState = editorState.getCurrentContent();
-    const rawContent = convertToRaw(contentState);
-    return rawContent.blocks.map((block) => block.text).join("\n");
-  };
-
-  const updateStatus = async (status: string) => {
-    try {
-      // Update both local and shared state
-      setSectionStatus(status);
-
-      const updatedOutline = outline.map((s) =>
-        s.section_id === section.section_id ? { ...s, status } : s
-      );
-
-      setSharedState((prev) => ({
-        ...prev,
-        outline: updatedOutline
-      }));
-    } catch (err) {
-      console.error("Error updating status:", err);
-      setSectionStatus(section.status);
-      displayAlert("Failed to update status", "danger");
-    }
-  };
-
-  const deleteSubheading = async (subheading_id: string) => {
-    try {
-      console.log("Starting deletion for subheading:", subheading_id);
-
-      // First update the local state immediately for UI responsiveness
-      setSubheadings((prev) =>
-        prev.filter((sh) => sh.subheading_id !== subheading_id)
-      );
-
-      // Create a completely new outline array to ensure React detects the change
-      const newOutline = outline.map((s) => {
-        if (s.section_id === section.section_id) {
-          // Create a new section object with filtered subheadings
-          return {
-            ...s,
-            subheadings: s.subheadings.filter(
-              (sh) => sh.subheading_id !== subheading_id
-            )
-          };
-        }
-        return s;
-      });
-
-      // Update current section with new data
-      const updatedSection = newOutline.find(
-        (s) => s.section_id === section.section_id
-      );
-      if (updatedSection) {
-        setCurrentSection(updatedSection);
-      }
-
-      // Force a new object reference for the entire state
-      setSharedState((prevState) => {
-        const newState = {
-          ...prevState,
-          outline: newOutline,
-          lastUpdated: new Date().getTime() // Add a timestamp to force change detection
-        };
-        return newState;
-      });
-
-      // Log the update to verify
-      console.log("Outline updated, new length:", newOutline.length);
-      console.log(
-        "Section subheadings updated:",
-        newOutline.find((s) => s.section_id === section.section_id)?.subheadings
-      );
-
-      // Update status last to ensure all other updates are processed
-      updateStatus("In Progress");
-    } catch (error) {
-      console.error("Error deleting subheading:", error);
-      displayAlert("Failed to delete subheading", "danger");
-      // Rollback local state if there's an error
-      setSubheadings(section.subheadings);
-    }
-  };
-
-  // Add this function to handle the API call
-  const updateSubheading = async (
-    subheading_id: string,
-    extra_instructions: string,
-    word_count: number
-  ) => {
-    try {
-      // Create updated subheadings
-      const updatedSubheadings = subheadings.map((sh) =>
-        sh.subheading_id === subheading_id
-          ? { ...sh, extra_instructions, word_count }
-          : sh
-      );
-
-      // Create updated outline
-      const updatedOutline = outline.map((s) => {
-        if (s.section_id === section.section_id) {
-          return {
-            ...s,
-            subheadings: updatedSubheadings
-          };
-        }
-        return s;
-      });
-
-      // Wait for state updates to complete
-      await Promise.all([
-        new Promise<void>((resolve) => {
-          setSubheadings(updatedSubheadings);
-          resolve();
-        }),
-        new Promise<void>((resolve) => {
-          setSharedState((prev) => {
-            resolve();
-            return {
-              ...prev,
-              outline: updatedOutline,
-              lastUpdated: Date.now()
-            };
-          });
-        })
-      ]);
-
-      updateStatus("In Progress");
-    } catch (error) {
-      console.error("Error updating subheading:", error);
-    }
-  };
-
-  const handleWordCountChange = async (
-    subheadingId: string,
-    newCount: number
-  ) => {
-    try {
-      console.log("Word count change:", { subheadingId, newCount });
-
-      const currentSubheading = subheadings.find(
-        (sh) => sh.subheading_id === subheadingId
-      );
-
-      if (!currentSubheading) {
-        console.error("Subheading not found:", subheadingId);
-        return;
-      }
-
-      await updateSubheading(
-        subheadingId,
-        currentSubheading.extra_instructions || "",
-        newCount
-      );
-    } catch (error) {
-      console.error("Error updating word count:", error);
-      displayAlert("Failed to update word count", "danger");
-    }
-  };
-
-  const handleExtraInstructionsChange = async (
-    plainText: string,
-    subheadingId: string,
-    wordCount: number
-  ) => {
-    try {
-      console.log(
-        `Updating editor state for section ${subheadingId}`,
-        plainText
-      );
-
-      await updateSubheading(subheadingId, plainText, wordCount);
-    } catch (error) {
-      console.error("Error updating instructions:", error);
-      displayAlert("Failed to update instructions", "danger");
     }
   };
 
@@ -433,155 +235,24 @@ const QuestionCrafter = () => {
     }
   };
 
-  const handleChoiceSelection = (selectedChoice) => {
-    if (selectedChoices.includes(selectedChoice)) {
-      setSelectedChoices(
-        selectedChoices.filter((choice) => choice !== selectedChoice)
-      );
-      setWordAmounts((prevWordAmounts) => {
-        const newWordAmounts = { ...prevWordAmounts };
-        delete newWordAmounts[selectedChoice];
-        return newWordAmounts;
-      });
-    } else {
-      setSelectedChoices([...selectedChoices, selectedChoice]);
-      setWordAmounts((prevWordAmounts) => ({
-        ...prevWordAmounts,
-        [selectedChoice]: 100 // Default word amount
-      }));
-    }
-    updateStatus("In Progress");
-  };
-
-  const renderChoices = () => {
-    return (
-      <div className="choices-container">
-        {apiChoices
-          .filter((choice) => choice && choice.trim() !== "") // Filter out empty or whitespace-only choices
-          .map((choice, index) => (
-            <div key={index} className="choice-item d-flex align-items-center">
-              <Form.Check
-                type="checkbox"
-                checked={selectedChoices.includes(choice)}
-                onChange={() => handleChoiceSelection(choice)}
-              />
-              {selectedChoices.includes(choice) ? (
-                <Form.Control
-                  type="text"
-                  value={choice}
-                  onChange={(e) => handleChoiceEdit(index, e.target.value)}
-                  className="ml-2 editable-choice"
-                  style={{ width: "70%", marginLeft: "10px" }}
-                />
-              ) : (
-                <span
-                  onClick={() => handleChoiceSelection(choice)}
-                  style={{ cursor: "pointer" }}
-                >
-                  {choice}
-                </span>
-              )}
-            </div>
-          ))}
-      </div>
-    );
-  };
-
-  const handleChoiceEdit = (index, newValue) => {
-    const updatedChoices = [...apiChoices];
-    updatedChoices[index] = newValue;
-    setApiChoices(updatedChoices);
-
-    // Update selectedChoices and wordAmounts if the edited choice was selected
-    if (selectedChoices.includes(apiChoices[index])) {
-      const updatedSelectedChoices = selectedChoices.map((choice) =>
-        choice === apiChoices[index] ? newValue : choice
-      );
-      setSelectedChoices(updatedSelectedChoices);
-
-      const updatedWordAmounts = { ...wordAmounts };
-      if (updatedWordAmounts[apiChoices[index]]) {
-        updatedWordAmounts[newValue] = updatedWordAmounts[apiChoices[index]];
-        delete updatedWordAmounts[apiChoices[index]];
-      }
-      setWordAmounts(updatedWordAmounts);
-    }
-  };
-
-  const submitSelections = async () => {
-    setIsLoading(true);
-    setStartTime(Date.now());
-    setElapsedTime(0);
+  const updateStatus = async (status: string) => {
     try {
-      console.log("Starting submitSelections with choices:", selectedChoices);
-      console.log(sharedState.object_id);
-      console.log(section.section_id);
+      // Update both local and shared state
+      setSectionStatus(status);
 
-      const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/add_section_subheadings`,
-        {
-          selected_choices: selectedChoices,
-          bid_id: sharedState.object_id,
-          section_id: section.section_id // Add section_id to the request
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
-          }
-        }
+      const updatedOutline = outline.map((s) =>
+        s.section_id === section.section_id ? { ...s, status } : s
       );
 
-      console.log("Received response from question_multistep:", result.data);
-
-      setApiChoices([]);
-      setSelectedChoices([]);
-      setWordAmounts({});
-      fetchOutline(bid_id, tokenRef, setSharedState);
-    } catch (error) {
-      console.error("Error submitting selections:", error);
-      displayAlert("Error generating responses", "danger");
-    } finally {
-      setIsLoading(false);
-      setStartTime(null);
+      setSharedState((prev) => ({
+        ...prev,
+        outline: updatedOutline
+      }));
+    } catch (err) {
+      console.error("Error updating status:", err);
+      setSectionStatus(section.status);
+      displayAlert("Failed to update status", "danger");
     }
-  };
-
-  const reorder = (list, startIndex, endIndex) => {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-    return result;
-  };
-
-  // Add this handler to your component
-  const onDragEnd = (result) => {
-    if (!result.destination) {
-      return;
-    }
-
-    const reorderedSubheadings = reorder(
-      subheadings,
-      result.source.index,
-      result.destination.index
-    );
-
-    // Update local state immediately
-    setSubheadings(reorderedSubheadings);
-
-    // Update the outline with the reordered subheadings
-    const updatedOutline = outline.map((s) =>
-      s.section_id === section.section_id
-        ? { ...s, subheadings: reorderedSubheadings }
-        : s
-    );
-
-    // Update shared state
-    setSharedState((prev) => ({
-      ...prev,
-      outline: updatedOutline
-    }));
-
-    updateStatus("In Progress");
   };
 
   return (
@@ -649,11 +320,51 @@ const QuestionCrafter = () => {
                   disabled={!canUserEdit}
                 ></textarea>
               </div>
-              <div className="text-muted mt-3">
+              <div className="text-muted mt-2">
                 Word Count: {inputText.split(/\s+/).filter(Boolean).length}
               </div>
 
-              <p>{sectionAnswer}</p>
+              <Row className="mt-4 mb-0">
+                <Col md={12}>
+                  <Card className="mb-2 custom-grey-border">
+                    <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
+                      <div style={{ display: "flex" }}>
+                        <h1 className="requirements-title">Answer Preview</h1>
+                        <Tooltip
+                          placement="top"
+                          title="This is a preview of what your answer will look like so you can decide which subheadings you want to include and make changes to your writitng plan."
+                          arrow
+                        >
+                          <IconButton
+                            size="medium"
+                            style={{
+                              padding: 0
+                              // Fine-tune vertical alignment with the header
+                            }}
+                            className="ms-1"
+                          >
+                            <InfoIcon fontSize="medium" color="action" />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+
+                      <div className="text-muted" style={{ marginBottom: "0" }}>
+                        Word Count:{" "}
+                        {section.answer.split(/\s+/).filter(Boolean).length}
+                      </div>
+                    </Card.Header>
+                    <Card.Body className="px-0 py-1">
+                      <textarea
+                        className="form-control requirements-textarea"
+                        placeholder="Click the tool icon to extract opportunity information from your tender documents..."
+                        value={section.answer}
+                        disabled={true}
+                        style={{ overflowY: "auto" }}
+                      ></textarea>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </Row>
             </Col>
           </div>
         </div>

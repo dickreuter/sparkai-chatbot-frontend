@@ -157,7 +157,6 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
         `http${HTTP_PREFIX}://${API_URL}/generate_proposal`,
         {
           bid_id: bid_id,
-          extra_instructions: "",
           datasets: sharedState.selectedFolders
         },
         {

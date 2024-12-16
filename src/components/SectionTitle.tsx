@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import "./SectionTitle.css";
+import { BidContext } from "../views/BidWritingStateManagerView";
 
 const SectionTitle = ({
   canUserEdit,
@@ -11,34 +12,31 @@ const SectionTitle = ({
   section,
   sectionIndex,
   bid_id,
-  tokenRef
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const title = sectiontitle;
   const sectionNameTempRef = useRef(title);
   const sectionNameRef = useRef(null);
+  const { sharedState, setSharedState } = useContext(BidContext);
 
-  const updateSection = async (section, sectionIndex) => {
+  const updateSection = async (updatedSection) => {
     try {
-      await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/update_section`,
-        {
-          bid_id: bid_id,
-          section: section,
-          section_index: sectionIndex
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-    } catch (err) {
-      console.error("Error updating section:", err);
+      setSharedState(prevState => ({
+        ...prevState,
+        outline: prevState.outline.map((section, idx) => 
+          idx === sectionIndex ? updatedSection : section
+        )
+      }));
+      displayAlert("Section title updated successfully", "success");
+    } catch (error) {
+      console.error("Error updating section:", error);
       displayAlert("Failed to update section title", "danger");
+      if (sectionNameRef.current) {
+        sectionNameRef.current.innerText = title;
+      }
     }
   };
+    
 
   const handleBlur = () => {
     const newTitle = sectionNameTempRef.current.trim();
@@ -55,7 +53,7 @@ const SectionTitle = ({
     };
 
     // Update the section on the server
-    updateSection(updatedSection, sectionIndex);
+    updateSection(updatedSection);
     setIsEditing(false);
   };
 

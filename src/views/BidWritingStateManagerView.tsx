@@ -39,6 +39,7 @@ export interface Section {
   subheadings: Subheading[];
   choice: string;
   writingplan: string;
+  compliance_requirements: string;
 }
 
 export interface Contributor {

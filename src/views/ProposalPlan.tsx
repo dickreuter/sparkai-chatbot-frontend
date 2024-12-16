@@ -209,13 +209,13 @@ const ProposalPlan = () => {
   const tokenRef = useRef(auth?.token || "default");
   const { sharedState, setSharedState } = useContext(BidContext);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [questionAsked, setQuestionAsked] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [apiChoices, setApiChoices] = useState([]);
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [wordAmounts, setWordAmounts] = useState({});
-  const [choice, setChoice] = useState("3");
   const [broadness, setBroadness] = useState("4");
   const [currentSectionIndex, setCurrentSectionIndex] = useState<number | null>(
     null
@@ -358,19 +358,56 @@ const ProposalPlan = () => {
     }
   };
 
-  const handleEditClick = (section: Section) => {
-    posthog.capture("proposal_section_edit", {
-      bidId: object_id,
-      sectionId: section.section_id,
-      sectionHeading: section.heading
-    });
-    navigate("/question-crafter", {
-      state: {
-        section,
-        bid_id: object_id,
-        state_outline: outline
-      }
-    });
+  const handleEditClick = async (section: Section, index: number) => {
+      try {
+            // Use preview-specific loading state
+          posthog.capture("proposal_section_edit", {
+              bidId: object_id,
+              sectionId: section.section_id,
+              sectionHeading: section.heading
+          });
+
+          const selectedChoices = section.subheadings.map(subheading => subheading.title);
+          const wordAmounts = section.subheadings.map(subheading => subheading.word_count);
+          const compliance_requirements = section.subheadings.map(subheading => section.compliance_requirements);
+
+          const answer = await sendQuestionToChatbot(
+              section.question,
+              section.writingplan || "",
+              index,
+              section.choice,
+              selectedChoices,
+              wordAmounts,
+              compliance_requirements
+          );
+
+          // Update state and wait for it to complete
+          await new Promise<void>((resolve) => {
+              setSharedState(prevState => {
+                  const newOutline = [...prevState.outline];
+                  newOutline[index] = {
+                      ...newOutline[index],
+                      answer: answer
+                  };
+                  
+                  setTimeout(resolve, 0);
+                  return {
+                      ...prevState,
+                      outline: newOutline
+                  };
+              });
+          });
+
+          navigate("/question-crafter", {
+              state: {
+                  section: sharedState.outline[index],
+                  bid_id: object_id,
+              }
+          });
+      } catch (error) {
+          console.error("Error in handleEditClick:", error);
+          displayAlert("Failed to update section", "danger");
+      } 
   };
 
   const showViewOnlyMessage = () => {
@@ -426,33 +463,54 @@ const ProposalPlan = () => {
     }));
   };
 
-  const handleSectionChange = (
+  const handleSectionChange = async (
     index: number,
     field: keyof Section,
     value: any
   ) => {
-    // Create new outline immediately for local state
-    const newOutline = [...sharedState.outline];
-    newOutline[index] = {
-      ...newOutline[index],
-      [field]: value
-    };
-
-    // Debounce the setState call
-
-    setSharedState((prevState) => ({
-      ...prevState,
-      outline: newOutline
-    }));
-
-    if (field === "status") {
-      posthog.capture("proposal_section_status_changed", {
-        bidId: object_id,
-        sectionIndex: index,
-        newStatus: value
-      });
+    try {
+      // Create new outline by properly spreading nested objects
+      const newOutline = [...sharedState.outline];
+      newOutline[index] = {
+        ...newOutline[index],
+        [field]: value
+      };
+  
+      // Update state using callback to ensure we have latest state
+      setSharedState(prevState => ({
+        ...prevState,
+        outline: newOutline
+      }));
+  
+      // Wait for state to update
+      await new Promise(resolve => setTimeout(resolve, 0));
+  
+      // Track status changes
+      if (field === "status") {
+        posthog.capture("proposal_section_status_changed", {
+          bidId: object_id,
+          sectionIndex: index,
+          newStatus: value
+        });
+      }
+  
+      // Track answer changes
+      if (field === "answer") {
+        posthog.capture("proposal_section_answer_updated", {
+          bidId: object_id,
+          sectionIndex: index,
+          answerLength: value.length
+        });
+      }
+  
+      return true; // Indicate successful update
+    } catch (error) {
+      console.error("Error updating section:", error);
+      displayAlert("Failed to update section", "danger");
+      return false;
     }
   };
+  
 
   const fetchOutline = async () => {
     if (!object_id) return;
@@ -497,15 +555,19 @@ const ProposalPlan = () => {
   const sendQuestionToChatbot = async (
     inputText: string,
     backgroundInfo: string,
-    sectionIndex: number
-  ) => {
-    setCurrentSectionIndex(sectionIndex); // Add this line
+    sectionIndex: number,
+    choice: string,
+    selectedChoices?: string[],
+    wordAmounts?: number[],
+    compliance_requirements?: string[]
+) => {
+    setCurrentSectionIndex(sectionIndex);
     setQuestionAsked(true);
     localStorage.setItem("questionAsked", "true");
-    setIsLoading(true);
     setStartTime(Date.now());
     setElapsedTime(0);
     setApiChoices([]);
+
     console.log("question");
     console.log(choice);
     console.log(broadness);
@@ -515,58 +577,80 @@ const ProposalPlan = () => {
     console.log(sharedState.object_id);
 
     try {
-      const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question`,
-        {
-          choice: choice === "3" ? "3a" : choice,
-          broadness: broadness,
-          input_text: inputText,
-          extra_instructions: backgroundInfo,
-          datasets: sharedState.selectedFolders,
-          bid_id: sharedState.object_id
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
+        // Build request body based on choice
+        const requestBody: any = {
+            choice: choice,
+            broadness: broadness,
+            input_text: inputText,
+            extra_instructions: backgroundInfo,
+            datasets: sharedState.selectedFolders,
+            bid_id: sharedState.object_id
+        };
+
+        // Only include selectedChoices and wordAmounts if choice is not "3a"
+        if (choice !== "3a") {
+            setIsPreviewLoading(true);
+            if (selectedChoices) {
+                requestBody.selected_choices = selectedChoices;
+            }
+            if (wordAmounts) {
+                requestBody.word_amounts = wordAmounts;
+            }
+            if (wordAmounts) {
+              requestBody.compliance_requirements = compliance_requirements;
+              console.log("compliance");
+              console.log(compliance_requirements);
           }
-        }
-      );
-
-      console.log("Received response:", result.data);
-
-      let choicesArray = [];
-
-      try {
-        // First, try splitting by semicolons
-        if (result.data && result.data.includes(";")) {
-          choicesArray = result.data.split(";").map((choice) => choice.trim());
+        } else {
+          setIsLoading(true);
         }
 
-        // If semicolon splitting didn't work, try parsing as a numbered list
-        if (choicesArray.length === 0 && typeof result.data === "string") {
-          choicesArray = result.data
-            .split("\n")
-            .filter((line) => /^\d+\./.test(line.trim()))
-            .map((line) => line.replace(/^\d+\.\s*/, "").trim());
+        
+
+        const result = await axios.post(
+            `http${HTTP_PREFIX}://${API_URL}/question`,
+            requestBody,
+            {
+                headers: {
+                    Authorization: `Bearer ${tokenRef.current}`
+                }
+            }
+        );
+
+        console.log("Received response:", result.data);
+
+        if (choice === "3a") {
+            let choicesArray = [];
+            try {
+                if (result.data && result.data.includes(";")) {
+                    choicesArray = result.data.split(";").map((choice) => choice.trim());
+                }
+                if (choicesArray.length === 0 && typeof result.data === "string") {
+                    choicesArray = result.data
+                        .split("\n")
+                        .filter((line) => /^\d+\./.test(line.trim()))
+                        .map((line) => line.replace(/^\d+\.\s*/, "").trim());
+                }
+                console.log("Parsed choices:", choicesArray);
+                if (choicesArray.length === 0) {
+                    throw new Error("Failed to parse API response into choices");
+                }
+            } catch (error) {
+                console.error("Error processing API response:", error);
+            }
+            setApiChoices(choicesArray);
+        } else {
+            return result.data;
         }
-
-        console.log("Parsed choices:", choicesArray);
-
-        if (choicesArray.length === 0) {
-          throw new Error("Failed to parse API response into choices");
-        }
-      } catch (error) {
-        console.error("Error processing API response:", error);
-      }
-
-      setApiChoices(choicesArray);
     } catch (error) {
-      console.error("Error sending question:", error);
+        console.error("Error sending question:", error);
+        throw error;
     } finally {
-      setIsLoading(false);
-      setStartTime(null); // Reset start time when done
+        setIsLoading(false);
+        setIsPreviewLoading(false);
+        setStartTime(null);
     }
-  };
+};
 
   const handleChoiceSelection = (selectedChoice) => {
     if (selectedChoices.includes(selectedChoice)) {
@@ -866,34 +950,38 @@ const ProposalPlan = () => {
                                       }}
                                     >
                                       <div style={{display: "flex", alignItems:"center"}}>
-                                      <div
-                                        style={{
-                                          fontWeight: "500",
-                                          marginBottom: "8px"
-                                        }}
-                                      >
-                                        Question
-                                      </div>
-                                      <OverlayTrigger
-                                        placement="top"
-                                        overlay={
-                                          <Tooltip id="preview-response-tooltip">
-                                            View AI-generated response suggestions for this section
-                                          </Tooltip>
-                                        }
-                                      >
-                                        <button
-                                          onClick={() => handleEditClick(section)}
-                                          className="preview-button ms-2"
-                                          style={{
-                                            fontWeight: "500",
-                                            marginBottom: "8px"
-                                          }}
+                                        <div
+                                            style={{
+                                                fontWeight: "500",
+                                                marginBottom: "8px"
+                                            }}
                                         >
-                                          Preview Response
+                                            Question
+                                        </div>
+                                        <button
+                                            onClick={() => handleEditClick(section, index)}
+                                            className="preview-button ms-2"
+                                            style={{
+                                                fontWeight: "500",
+                                                marginBottom: "8px"
+                                            }}
+                                            disabled={isPreviewLoading}
+                                        >
+                                            {isPreviewLoading ? (
+                                                <>
+                                                    <Spinner
+                                                        as="span"
+                                                        animation="border"
+                                                        size="sm"
+                                                        className="me-2"
+                                                    />
+                                                    <span>Generating Preview</span>
+                                                </>
+                                            ) : (
+                                                "Preview Response"
+                                            )}
                                         </button>
-                                      </OverlayTrigger>
-                                      </div>
+                                    </div>
 
                                       <DebouncedTextArea
                                         value={section.question}
@@ -943,53 +1031,45 @@ const ProposalPlan = () => {
                                   </div>
                                   <div className="flex justify-end mt-2">
                                    
-                                    <OverlayTrigger
-                                      placement="top"
-                                      overlay={
-                                        <Tooltip id="generate-subheadings-tooltip">
-                                          Use AI to generate suggested subheadings based on your question and writing plan
-                                        </Tooltip>
+                                    <button
+                                      className="orange-button ms-2 flex items-center gap-2"
+                                      onClick={() =>
+                                        sendQuestionToChatbot(
+                                          section.question,
+                                          section.writingplan || "",
+                                          index,
+                                          "3a"
+                                        )
                                       }
+                                      disabled={section.question.trim() === ""  || isPreviewLoading}
                                     >
-                                      <button
-                                        className="orange-button ms-2 flex items-center gap-2"
-                                        onClick={() =>
-                                          sendQuestionToChatbot(
-                                            section.question,
-                                            section.writingplan || "",
-                                            index
-                                          )
-                                        }
-                                        disabled={section.question.trim() === ""}
-                                      >
-                                        {isLoading ? (
-                                          <>
-                                            <Spinner
-                                              as="span"
-                                              animation="border"
-                                              size="sm"
-                                              className="me-2"
-                                            />
-                                            <span>Generating...</span>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <FontAwesomeIcon
-                                              icon={faWandMagicSparkles}
-                                              className="me-2"
-                                            />
-                                            <span>Generate Subheadings</span>
-                                          </>
-                                        )}
-                                      </button>
-                                    </OverlayTrigger>
+                                      {isLoading ? (
+                                        <>
+                                          <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            className="me-2"
+                                          />
+                                          <span>Generating...</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <FontAwesomeIcon
+                                            icon={faWandMagicSparkles}
+                                            className="me-2"
+                                          />
+                                          <span>Generate Subheadings</span>
+                                        </>
+                                      )}
+                                    </button>
 
                                     <Row>
                                       <div
                                         className=""
                                         style={{ textAlign: "left" }}
                                       >
-                                        {choice === "3" &&
+                                        {
                                           apiChoices.length > 0 && (
                                             <div>
                                               {renderChoices()}

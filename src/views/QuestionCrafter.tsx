@@ -18,12 +18,6 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { displayAlert } from "../helper/Alert.tsx";
 import StatusMenu from "../components/StatusMenu.tsx";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-  faTimes
-} from "@fortawesome/free-solid-svg-icons";
 import SectionTitle from "../components/SectionTitle.tsx";
 import { IconButton, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
@@ -39,10 +33,10 @@ const QuestionCrafter = () => {
     useContext(BidContext);
   const { contributors, outline } = sharedState;
 
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+
+  const sectionIndex = outline.findIndex((s) => s.section_id === locationSection?.section_id);
   const [section, setCurrentSection] = useState(() => {
-    const sectionId = locationSection?.section_id;
-    return outline.find((s) => s.section_id === sectionId) || locationSection;
+    return sectionIndex !== -1 ? outline[sectionIndex] : locationSection;
   });
 
   const backgroundInfo = getBackgroundInfo();
@@ -72,79 +66,7 @@ const QuestionCrafter = () => {
     );
   }, [section.section_id]); // Only depend on section.section_id, not outline
 
-  const navigateToSection = async (targetSection: Section) => {
-    try {
-      // If the user has edit permissions AND the current section's question has changed,
-      // we need to save those changes before navigating away
-      if (canUserEdit && inputText !== section.question) {
-        // Create a new outline array where we update the current section's question
-        // with the latest input text, leaving all other sections unchanged
-        const updatedOutline = outline.map((s) =>
-          s.section_id === section.section_id
-            ? { ...s, question: inputText }
-            : s
-        );
-
-        // Update the shared state with the new outline
-        // We wrap this in a Promise to ensure the state update completes
-        // before proceeding with navigation
-        await new Promise<void>((resolve) => {
-          setSharedState((prev) => {
-            resolve(); // Signal that the state update is complete
-            return {
-              ...prev,
-              outline: updatedOutline
-            };
-          });
-        });
-      }
-
-      // Update the local state to reflect the target section we're navigating to
-      setCurrentSection(targetSection);
-
-      // Reset all section-specific states for the new section:
-      // - Set the status display to match the target section
-      setSectionStatus(targetSection.status);
-      // - Update the input field with the target section's question
-      setInputText(targetSection.question || "");
-
-      // Find the index of the target section in the overall outline
-      // This is used for navigation between sections (prev/next)
-      const newIndex = outline.findIndex(
-        (s) => s.section_id === targetSection.section_id
-      );
-      if (newIndex !== -1) {
-        setCurrentSectionIndex(newIndex);
-      }
-
-      // Finally, use React Router to navigate to the question-crafter page
-      // Pass the target section and bid_id as state for the new route
-      navigate("/question-crafter", {
-        state: {
-          section: targetSection,
-          bid_id: bid_id
-        }
-      });
-    } catch (error) {
-      // If anything goes wrong during the navigation process,
-      // log the error and show an alert to the user
-      console.error("Error navigating to section:", error);
-      displayAlert("Failed to navigate to section", "danger");
-    }
-  };
-
-  const handlePreviousSection = async () => {
-    if (currentSectionIndex > 0) {
-      await navigateToSection(outline[currentSectionIndex - 1]);
-    }
-  };
-
-  const handleNextSection = async () => {
-    if (currentSectionIndex < outline.length - 1) {
-      await navigateToSection(outline[currentSectionIndex + 1]);
-    }
-  };
-
+  
   const showViewOnlyMessage = () => {
     console.log(currentUserPermission);
     displayAlert("You only have permission to view this bid.", "danger");
@@ -165,73 +87,6 @@ const QuestionCrafter = () => {
         ...prev,
         outline: updatedOutline
       }));
-    }
-  };
-
-  const sendQuestionToChatbot = async () => {
-    handleGAEvent("Chatbot", "Submit Question", "Submit Button");
-    setQuestionAsked(true);
-    localStorage.setItem("questionAsked", "true");
-    setIsLoading(true);
-    setStartTime(Date.now());
-    setElapsedTime(0);
-
-    console.log("Starting question request with:", {
-      inputText,
-      backgroundInfo
-    });
-
-    try {
-      const result = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/question`,
-        {
-          choice: choice === "3" ? "3a" : choice,
-          broadness: broadness,
-          input_text: inputText,
-          extra_instructions: backgroundInfo,
-          datasets: sharedState.selectedFolders,
-          bid_id: sharedState.object_id
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${tokenRef.current}`
-          }
-        }
-      );
-
-      console.log("Received response:", result.data);
-
-      let choicesArray = [];
-
-      try {
-        // First, try splitting by semicolons
-        if (result.data && result.data.includes(";")) {
-          choicesArray = result.data.split(";").map((choice) => choice.trim());
-        }
-
-        // If semicolon splitting didn't work, try parsing as a numbered list
-        if (choicesArray.length === 0 && typeof result.data === "string") {
-          choicesArray = result.data
-            .split("\n")
-            .filter((line) => /^\d+\./.test(line.trim()))
-            .map((line) => line.replace(/^\d+\.\s*/, "").trim());
-        }
-
-        console.log("Parsed choices:", choicesArray);
-
-        if (choicesArray.length === 0) {
-          throw new Error("Failed to parse API response into choices");
-        }
-      } catch (error) {
-        console.error("Error processing API response:", error);
-      }
-
-      setApiChoices(choicesArray);
-    } catch (error) {
-      console.error("Error sending question:", error);
-    } finally {
-      setIsLoading(false);
-      setStartTime(null); // Reset start time when done
     }
   };
 
@@ -277,9 +132,9 @@ const QuestionCrafter = () => {
                   showViewOnlyMessage={showViewOnlyMessage}
                   sectiontitle={section.heading}
                   section={section}
-                  sectionIndex={currentSectionIndex}
+                  sectionIndex={sectionIndex}
                   bid_id={bid_id}
-                  tokenRef={tokenRef}
+                  
                 />
                 <StatusMenu
                   value={sectionStatus} // Use the local state instead of section.status
@@ -290,25 +145,7 @@ const QuestionCrafter = () => {
                 <h1 className="lib-title me-2" id="question-section">
                   Question
                 </h1>
-                <div className="d-flex justify-content-between align-items-center gap-1 mb-2">
-                  <button
-                    onClick={handlePreviousSection}
-                    disabled={currentSectionIndex === 0}
-                    className="navigation-button"
-                  >
-                    <FontAwesomeIcon icon={faChevronLeft} />
-                  </button>
-                  <div className="text-muted">
-                    Section {currentSectionIndex + 1} of {outline.length}
-                  </div>
-                  <button
-                    onClick={handleNextSection}
-                    disabled={currentSectionIndex === outline.length - 1}
-                    className="navigation-button"
-                  >
-                    <FontAwesomeIcon icon={faChevronRight} />
-                  </button>
-                </div>
+               
               </div>
 
               <div className="question-answer-box">

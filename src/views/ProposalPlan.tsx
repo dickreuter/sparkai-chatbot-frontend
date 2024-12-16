@@ -367,9 +367,16 @@ const ProposalPlan = () => {
               sectionHeading: section.heading
           });
 
-          const selectedChoices = section.subheadings.map(subheading => subheading.title);
-          const wordAmounts = section.subheadings.map(subheading => subheading.word_count);
-          const compliance_requirements = section.subheadings.map(subheading => section.compliance_requirements);
+          const selectedChoices = section.subheadings.length > 0 
+            ? section.subheadings.map(subheading => subheading.title)
+            : [section.heading];
+
+          const wordAmount = section.word_count;
+          
+           // If no subheadings, use empty array for compliance requirements
+          const compliance_requirements = section.subheadings.length > 0
+            ? section.subheadings.map(subheading => section.compliance_requirements)
+            : [""];
 
           const answer = await sendQuestionToChatbot(
               section.question,
@@ -377,7 +384,7 @@ const ProposalPlan = () => {
               index,
               section.choice,
               selectedChoices,
-              wordAmounts,
+              wordAmount || 250,
               compliance_requirements
           );
 
@@ -558,7 +565,7 @@ const ProposalPlan = () => {
     sectionIndex: number,
     choice: string,
     selectedChoices?: string[],
-    wordAmounts?: number[],
+    wordAmount?: number,
     compliance_requirements?: string[]
 ) => {
     setCurrentSectionIndex(sectionIndex);
@@ -594,7 +601,7 @@ const ProposalPlan = () => {
                 requestBody.selected_choices = selectedChoices;
             }
             if (wordAmounts) {
-                requestBody.word_amounts = wordAmounts;
+                requestBody.word_amount = wordAmount;
             }
             if (wordAmounts) {
               requestBody.compliance_requirements = compliance_requirements;
@@ -905,8 +912,24 @@ const ProposalPlan = () => {
                               {section.subsections}
                             </td>
                             <td className="text-center">
-                              {section.word_count}
-                            </td>
+                            <input
+                              type="number"
+                              value={section.word_count || 0}
+                              min="0"
+                              step="50"
+                              className="form-control d-inline-block word-count-input"
+                              style={{
+                                width: "80px",
+                                textAlign: "center"
+                              }}
+                              onChange={(e) => {
+                                const value = parseInt(e.target.value);
+                                // Round to nearest 50
+                                const roundedValue = Math.max(0, Math.round(value / 50) * 50);
+                                handleSectionChange(index, "word_count", roundedValue);
+                              }}
+                            />
+                          </td>
 
                             <td className="text-center">
                               <div className="d-flex justify-content-center">
@@ -1155,41 +1178,7 @@ const ProposalPlan = () => {
                                     <td></td>
                                     <td></td>
                                     <td className="text-center">
-                                      <input
-                                        type="number"
-                                        value={subheading.word_count || 0}
-                                        min="0"
-                                        className="form-control d-inline-block word-count-input"
-                                        style={{
-                                          width: "60px",
-                                          textAlign: "center"
-                                        }}
-                                        onChange={(e) => {
-                                          // First, create a new array of subheadings with the updated word count
-                                          const newSubheadings =
-                                            section.subheadings.map(
-                                              (sub, i) => {
-                                                if (i === subIndex) {
-                                                  return {
-                                                    ...sub,
-                                                    word_count:
-                                                      parseInt(
-                                                        e.target.value
-                                                      ) || 0
-                                                  };
-                                                }
-                                                return sub;
-                                              }
-                                            );
-
-                                          // Update the subheadings first
-                                          handleSectionChange(
-                                            index,
-                                            "subheadings",
-                                            newSubheadings
-                                          );
-                                        }}
-                                      />
+                                     
                                     </td>
                                     <td className="text-center">
                                       <div className="d-flex justify-content-center">

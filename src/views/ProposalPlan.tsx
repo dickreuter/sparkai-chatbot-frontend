@@ -916,9 +916,9 @@ const ProposalPlan = () => {
                               }}
                               onChange={(e) => {
                                 const value = parseInt(e.target.value);
-                                // Round to nearest 50
-                                const roundedValue = Math.max(0, Math.round(value / 50) * 50);
-                                handleSectionChange(index, "word_count", roundedValue);
+                                if (!isNaN(value) && value >= 0) {
+                                  handleSectionChange(index, "word_count", value);
+                                }
                               }}
                             />
                           </td>

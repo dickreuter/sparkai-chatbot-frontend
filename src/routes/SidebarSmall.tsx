@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./SidebarSmall.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import {
   faBookOpen,
@@ -75,75 +76,100 @@ const SideBarSmall = () => {
   return (
     <div className="sidebarsmall">
       <div>
-        <Link
-          to="#"
-          className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor") || isActive("/question-crafter") || isActive("/proposal") ? "sidebarsmalllink-active" : ""}`}
-          onClick={handleDashboardClick}
+        <OverlayTrigger
+          placement="right"
+          overlay={<Tooltip id="dashboard-tooltip">Manage and view all your tenders</Tooltip>}
         >
-          <FontAwesomeIcon icon={faLayerGroup} />
-          <span id="bids-table">Dashboard</span>
-        </Link>
-        <Link
-          to="/library"
-          className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
+          <Link
+            to="#"
+            className={`sidebarsmalllink ${isActive("/bids") || isActive("/bid-extractor") || isActive("/question-crafter") || isActive("/proposal") ? "sidebarsmalllink-active" : ""}`}
+            onClick={handleDashboardClick}
+          >
+            <FontAwesomeIcon icon={faLayerGroup} />
+            <span id="bids-table">Dashboard</span>
+          </Link>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="right"
+          overlay={<Tooltip id="library-tooltip">Access and manage your company's content library</Tooltip>}
         >
-          <FontAwesomeIcon icon={faBookOpen} />
-          <span id="library-title">Content Library</span>
-        </Link>
-        <Link
-          to="/chatResponse"
-          className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
+          <Link
+            to="/library"
+            className={`sidebarsmalllink ${isActive("/library") ? "sidebarsmalllink-active" : ""}`}
+          >
+            <FontAwesomeIcon icon={faBookOpen} />
+            <span id="library-title">Content Library</span>
+          </Link>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="right"
+          overlay={<Tooltip id="chat-tooltip">Ask AI quick questions about your documents</Tooltip>}
         >
-          <FontAwesomeIcon icon={faComments} />
-          <span id="welcome">Quick Question</span>
-        </Link>
-        <Link
-          to="/question-answer"
-          className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
+          <Link
+            to="/chatResponse"
+            className={`sidebarsmalllink ${isActive("/chatResponse") ? "sidebarsmalllink-active" : ""}`}
+          >
+            <FontAwesomeIcon icon={faComments} />
+            <span id="welcome">Quick Question</span>
+          </Link>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="right"
+          overlay={<Tooltip id="qa-tooltip">Generate Q&A content for your proposals</Tooltip>}
         >
-          <FontAwesomeIcon icon={faCircleQuestion} />
-          <span>Q&A Generator</span>
-        </Link>
-        {/*<Link
-          to="/howto"
-          className={`sidebarsmalllink ${isActive("/howto") ? "sidebarsmalllink-active" : ""}`}
-        >
-          <FontAwesomeIcon icon={faCircleQuestion} />
-          <span>How To Guide</span>
-        </Link> */}
+          <Link
+            to="/question-answer"
+            className={`sidebarsmalllink ${isActive("/question-answer") ? "sidebarsmalllink-active" : ""}`}
+          >
+            <FontAwesomeIcon icon={faCircleQuestion} />
+            <span>Q&A Generator</span>
+          </Link>
+        </OverlayTrigger>
       </div>
+
       <div className="signout-container">
-        <Link
-          to="/profile"
-          className={`sidebarsmalllink ${isActive("/profile") ? "sidebarsmalllink-active" : ""}`}
+        <OverlayTrigger
+          placement="right"
+          overlay={<Tooltip id="profile-tooltip">View and edit your profile settings</Tooltip>}
         >
-          <FontAwesomeIcon icon={faUser} />
-          <span>Profile</span>
-        </Link>
-        <Link
-          to="#"
-          className="sidebarsmalllink"
-          onClick={handleWordAddInClick}
+          <Link
+            to="/profile"
+            className={`sidebarsmalllink ${isActive("/profile") ? "sidebarsmalllink-active" : ""}`}
+          >
+            <FontAwesomeIcon icon={faUser} />
+            <span>Profile</span>
+          </Link>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="right"
+          overlay={<Tooltip id="wordpane-tooltip">Open mytender.io Word Add-in</Tooltip>}
         >
-          <FontAwesomeIcon icon={faFileWord} />
-          <span>Wordpane</span>
-        </Link>
-         {/* <Link
-          to="#"
-          className="sidebarsmalllink"
-          onClick={handleShowTips}
-          id="showtips"
+          <Link
+            to="#"
+            className="sidebarsmalllink"
+            onClick={handleWordAddInClick}
+          >
+            <FontAwesomeIcon icon={faFileWord} />
+            <span>Wordpane</span>
+          </Link>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="right"
+          overlay={<Tooltip id="logout-tooltip">Sign out of your account</Tooltip>}
         >
-          <FontAwesomeIcon icon={faCircleExclamation} />
-          <span>Show Tips</span>
-        </Link>  */}
-        <Link
-          to="/logout"
-          className={`sidebarsmalllink ${isActive("/logout") ? "sidebarsmalllink-active" : ""}`}
-        >
-          <FontAwesomeIcon icon={faReply} />
-          <span>Logout</span>
-        </Link>
+          <Link
+            to="/logout"
+            className={`sidebarsmalllink ${isActive("/logout") ? "sidebarsmalllink-active" : ""}`}
+          >
+            <FontAwesomeIcon icon={faReply} />
+            <span>Logout</span>
+          </Link>
+        </OverlayTrigger>
       </div>
     </div>
   );

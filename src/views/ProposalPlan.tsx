@@ -28,7 +28,7 @@ import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import SectionMenu from "../components/SectionMenu.tsx";
 import { MenuItem, Select, SelectChangeEvent, Skeleton } from "@mui/material";
 import posthog from "posthog-js";
-import { Button, Form, Row, Spinner } from "react-bootstrap";
+import { Button, Form, Row, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const EditableCell = ({
   value: initialValue,
@@ -767,19 +767,28 @@ const ProposalPlan = () => {
                           >
                             <td className="">
                               <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => toggleSection(index)} // Use toggleSection here
-                                  className="bg-transparent border-0 cursor-pointer text-black me-2"
+                                <OverlayTrigger
+                                  placement="top"
+                                  overlay={
+                                    <Tooltip id="expand-section-tooltip">
+                                      {isExpanded ? "Collapse section" : "Expand section"}
+                                    </Tooltip>
+                                  }
                                 >
-                                  <FontAwesomeIcon
-                                    icon={
-                                      isExpanded
-                                        ? faChevronDown
-                                        : faChevronRight
-                                    }
-                                    size="sm"
-                                  />
-                                </button>
+                                  <button
+                                    onClick={() => toggleSection(index)}
+                                    className="bg-transparent border-0 cursor-pointer text-black me-2"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={
+                                        isExpanded
+                                          ? faChevronDown
+                                          : faChevronRight
+                                      }
+                                      size="sm"
+                                    />
+                                  </button>
+                                </OverlayTrigger>
                                 <span>{section.heading}</span>
                               </div>
                             </td>
@@ -817,15 +826,24 @@ const ProposalPlan = () => {
 
                             <td className="text-center">
                               <div className="d-flex justify-content-center">
-                                <button
-                                  onClick={() =>
-                                    handleDeleteClick(section, index)
+                                <OverlayTrigger
+                                  placement="top"
+                                  overlay={
+                                    <Tooltip id="delete-section-tooltip">
+                                      Delete this section from the outline
+                                    </Tooltip>
                                   }
-                                  className="bg-transparent border-0 cursor-pointer text-black"
-                                  title="Delete section"
                                 >
-                                  <FontAwesomeIcon icon={faTrash} size="sm" />
-                                </button>
+                                  <button
+                                    onClick={() =>
+                                      handleDeleteClick(section, index)
+                                    }
+                                    className="bg-transparent border-0 cursor-pointer text-black"
+                                    title="Delete section"
+                                  >
+                                    <FontAwesomeIcon icon={faTrash} size="sm" />
+                                  </button>
+                                </OverlayTrigger>
                               </div>
                             </td>
                           </tr>
@@ -856,16 +874,26 @@ const ProposalPlan = () => {
                                       >
                                         Question
                                       </div>
-                                      <button
-                                        onClick={() => handleEditClick(section)}
-                                        className="preview-button ms-2"
-                                        style={{
-                                          fontWeight: "500",
-                                          marginBottom: "8px"
-                                        }}
+                                      <OverlayTrigger
+                                        placement="top"
+                                        overlay={
+                                          <Tooltip id="preview-response-tooltip">
+                                            View AI-generated response suggestions for this section
+                                          </Tooltip>
+                                        }
                                       >
-                                        Preview Response
-                                      </button> </div>
+                                        <button
+                                          onClick={() => handleEditClick(section)}
+                                          className="preview-button ms-2"
+                                          style={{
+                                            fontWeight: "500",
+                                            marginBottom: "8px"
+                                          }}
+                                        >
+                                          Preview Response
+                                        </button>
+                                      </OverlayTrigger>
+                                      </div>
 
                                       <DebouncedTextArea
                                         value={section.question}
@@ -915,37 +943,46 @@ const ProposalPlan = () => {
                                   </div>
                                   <div className="flex justify-end mt-2">
                                    
-                                    <button
-                                      className="orange-button ms-2 flex items-center gap-2"
-                                      onClick={() =>
-                                        sendQuestionToChatbot(
-                                          section.question,
-                                          section.writingplan || "",
-                                          index
-                                        )
+                                    <OverlayTrigger
+                                      placement="top"
+                                      overlay={
+                                        <Tooltip id="generate-subheadings-tooltip">
+                                          Use AI to generate suggested subheadings based on your question and writing plan
+                                        </Tooltip>
                                       }
-                                      disabled={section.question.trim() === ""}
                                     >
-                                      {isLoading ? (
-                                        <>
-                                          <Spinner
-                                            as="span"
-                                            animation="border"
-                                            size="sm"
-                                            className="me-2"
-                                          />
-                                          <span>Generating...</span>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <FontAwesomeIcon
-                                            icon={faWandMagicSparkles}
-                                            className="me-2"
-                                          />
-                                          <span>Generate Subheadings</span>
-                                        </>
-                                      )}
-                                    </button>
+                                      <button
+                                        className="orange-button ms-2 flex items-center gap-2"
+                                        onClick={() =>
+                                          sendQuestionToChatbot(
+                                            section.question,
+                                            section.writingplan || "",
+                                            index
+                                          )
+                                        }
+                                        disabled={section.question.trim() === ""}
+                                      >
+                                        {isLoading ? (
+                                          <>
+                                            <Spinner
+                                              as="span"
+                                              animation="border"
+                                              size="sm"
+                                              className="me-2"
+                                            />
+                                            <span>Generating...</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <FontAwesomeIcon
+                                              icon={faWandMagicSparkles}
+                                              className="me-2"
+                                            />
+                                            <span>Generate Subheadings</span>
+                                          </>
+                                        )}
+                                      </button>
+                                    </OverlayTrigger>
 
                                     <Row>
                                       <div
@@ -956,16 +993,25 @@ const ProposalPlan = () => {
                                           apiChoices.length > 0 && (
                                             <div>
                                               {renderChoices()}
-                                              <Button
-                                                variant="primary"
-                                                onClick={submitSelections}
-                                                className="upload-button mt-3"
-                                                disabled={
-                                                  selectedChoices.length === 0
+                                              <OverlayTrigger
+                                                placement="top"
+                                                overlay={
+                                                  <Tooltip id="add-choices-tooltip">
+                                                    Add selected subheadings to your section
+                                                  </Tooltip>
                                                 }
                                               >
-                                                Add Choices
-                                              </Button>
+                                                <Button
+                                                  variant="primary"
+                                                  onClick={submitSelections}
+                                                  className="upload-button mt-3"
+                                                  disabled={
+                                                    selectedChoices.length === 0
+                                                  }
+                                                >
+                                                  Add Choices
+                                                </Button>
+                                              </OverlayTrigger>
                                             </div>
                                           )}
                                       </div>
@@ -1048,21 +1094,30 @@ const ProposalPlan = () => {
                                     </td>
                                     <td className="text-center">
                                       <div className="d-flex justify-content-center">
-                                        <button
-                                          onClick={() =>
-                                            handleDeleteSubheading(
-                                              index,
-                                              subIndex
-                                            )
+                                        <OverlayTrigger
+                                          placement="top"
+                                          overlay={
+                                            <Tooltip id="delete-subheading-tooltip">
+                                              Remove this subheading from the section
+                                            </Tooltip>
                                           }
-                                          className="bg-transparent border-0 cursor-pointer text-black"
-                                          title="Delete subheading"
                                         >
-                                          <FontAwesomeIcon
-                                            icon={faTrash}
-                                            size="sm"
-                                          />
-                                        </button>
+                                          <button
+                                            onClick={() =>
+                                              handleDeleteSubheading(
+                                                index,
+                                                subIndex
+                                              )
+                                            }
+                                            className="bg-transparent border-0 cursor-pointer text-black"
+                                            title="Delete subheading"
+                                          >
+                                            <FontAwesomeIcon
+                                              icon={faTrash}
+                                              size="sm"
+                                            />
+                                          </button>
+                                        </OverlayTrigger>
                                       </div>
                                     </td>
                                   </tr>

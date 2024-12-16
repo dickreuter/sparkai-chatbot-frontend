@@ -5,7 +5,7 @@ import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
 import { useLocation } from "react-router-dom";
-import { Button, Card, Col, Row, Spinner } from "react-bootstrap";
+import { Button, Card, Col, Row, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./BidExtractor.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
@@ -240,26 +240,35 @@ const BidExtractor = () => {
         <Card.Header className="d-flex justify-content-between align-items-center dark-grey-header">
           <h1 className="inputbox-title mb-0 mt-1">Contributors:</h1>
 
-          <Button
-            className="p-0 contributors-button"
-            variant="link"
-            id="contributors-card"
-            onClick={() => setShowContributorModal(true)}
-            style={{
-              fontSize: "1rem",
-              color: "#4a4a4a",
-              borderRadius: "50%",
-              width: "20px",
-              height: "20px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "none",
-              textDecoration: "none"
-            }}
+          <OverlayTrigger
+            placement="top"
+            overlay={
+              <Tooltip id="contributors-tooltip">
+                Add or manage contributors for this tender
+              </Tooltip>
+            }
           >
-            <i className="fas fa-plus"></i>
-          </Button>
+            <Button
+              className="p-0 contributors-button"
+              variant="link"
+              id="contributors-card"
+              onClick={() => setShowContributorModal(true)}
+              style={{
+                fontSize: "1rem",
+                color: "#4a4a4a",
+                borderRadius: "50%",
+                width: "20px",
+                height: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "none",
+                textDecoration: "none"
+              }}
+            >
+              <i className="fas fa-plus"></i>
+            </Button>
+          </OverlayTrigger>
         </Card.Header>
         <Card.Body className="py-2 px-3 d-flex">
           <div>
@@ -600,35 +609,44 @@ const BidExtractor = () => {
                     <h1 className="requirements-title">
                       Opportunity Information
                     </h1>
-                    <span
-                      onClick={
-                        canUserEdit
-                          ? generateOpportunityInformation
-                          : showViewOnlyMessage
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id="opportunity-info-tooltip">
+                          Extract opportunity information automatically from your uploaded tender documents
+                        </Tooltip>
                       }
-                      style={{
-                        cursor: canUserEdit ? "pointer" : "not-allowed",
-                        opacity: canUserEdit ? 1 : 0.5,
-                        color: "#4a4a4a", // Dark grey color
-                        fontSize: "1.2rem", // Adjust size as needed
-                        marginRight: "5px" // Add some space between the title and the icon
-                      }}
                     >
-                      {isGeneratingOpportunity ? (
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faScrewdriverWrench}
-                          id="opportunity-information-card"
-                        />
-                      )}
-                    </span>
+                      <span
+                        onClick={
+                          canUserEdit
+                            ? generateOpportunityInformation
+                            : showViewOnlyMessage
+                        }
+                        style={{
+                          cursor: canUserEdit ? "pointer" : "not-allowed",
+                          opacity: canUserEdit ? 1 : 0.5,
+                          color: "#4a4a4a",
+                          fontSize: "1.2rem",
+                          marginRight: "5px"
+                        }}
+                      >
+                        {isGeneratingOpportunity ? (
+                          <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <FontAwesomeIcon
+                            icon={faScrewdriverWrench}
+                            id="opportunity-information-card"
+                          />
+                        )}
+                      </span>
+                    </OverlayTrigger>
                   </Card.Header>
                   <Card.Body
                     className="px-0 py-1"
@@ -652,35 +670,44 @@ const BidExtractor = () => {
                       Compliance Requirements
                     </h1>
 
-                    <span
-                      onClick={
-                        canUserEdit
-                          ? generateComplianceRequirements
-                          : showViewOnlyMessage
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id="compliance-req-tooltip">
+                          Extract compliance requirements automatically from your uploaded tender documents
+                        </Tooltip>
                       }
-                      style={{
-                        cursor: canUserEdit ? "pointer" : "not-allowed",
-                        opacity: canUserEdit ? 1 : 0.5,
-                        color: "#4a4a4a", // Dark grey color
-                        fontSize: "1.2rem", // Adjust size as needed
-                        marginRight: "5px" // Add some space between the title and the icon
-                      }}
                     >
-                      {isGeneratingCompliance ? (
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <FontAwesomeIcon
-                          icon={faScrewdriverWrench}
-                          id="compliance-requirements-card"
-                        />
-                      )}
-                    </span>
+                      <span
+                        onClick={
+                          canUserEdit
+                            ? generateComplianceRequirements
+                            : showViewOnlyMessage
+                        }
+                        style={{
+                          cursor: canUserEdit ? "pointer" : "not-allowed",
+                          opacity: canUserEdit ? 1 : 0.5,
+                          color: "#4a4a4a",
+                          fontSize: "1.2rem",
+                          marginRight: "5px"
+                        }}
+                      >
+                        {isGeneratingCompliance ? (
+                          <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <FontAwesomeIcon
+                            icon={faScrewdriverWrench}
+                            id="compliance-requirements-card"
+                          />
+                        )}
+                      </span>
+                    </OverlayTrigger>
                   </Card.Header>
                   <Card.Body
                     className="px-0 py-1"

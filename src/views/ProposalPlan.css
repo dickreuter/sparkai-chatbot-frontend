@@ -38,6 +38,8 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     border: 1px solid #ced4da;
     background-color: white;
+    position: relative;
+    z-index: 1;
 }
 
 .outline-table th,
@@ -172,3 +174,65 @@
     color: #999999;
     cursor: not-allowed;
 }
+
+/* Tooltip Styles */
+.tooltip {
+    font-size: 0.875rem;
+    opacity: 0.9 !important;
+    font-family: "ClashDisplay", sans-serif;
+}
+
+.tooltip-inner {
+    max-width: 250px;
+    padding: 8px 12px;
+    background-color: #333;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1.4;
+}
+
+/* Ensure tooltips don't interfere with table interactions */
+.outline-table {
+    position: relative;
+    z-index: 1;
+}
+
+.tooltip {
+    z-index: 1070;
+}
+
+/* Tooltip arrow styles */
+.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #333;
+}
+
+.bs-tooltip-bottom .tooltip-arrow::before {
+    border-bottom-color: #333;
+}
+
+.bs-tooltip-start .tooltip-arrow::before {
+    border-left-color: #333;
+}
+
+.bs-tooltip-end .tooltip-arrow::before {
+    border-right-color: #333;
+}
+
+/* Ensure buttons remain clickable with tooltips */
+button[data-tooltip],
+.button-with-tooltip {
+    position: relative;
+    z-index: 1;
+}
+
+/* Hover state for interactive elements with tooltips */
+[data-tooltip]:hover {
+    z-index: 2;
+}
+
+/* Animation for tooltip appearance */
+.tooltip.show {
+    animation: tooltipFade 0.2s ease-in-out;
+}
+
+@

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Button, Spinner } from "react-bootstrap";
+import { Button, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import {
   faArrowLeft,
@@ -115,13 +115,18 @@ const BidNavbar = ({
       <div className="bidnav"></div>
       <div className="proposal-header">
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <button
-            className="back-arrow-button"
-            onClick={handleBackClick}
-            title="Back to Bids"
+          <OverlayTrigger
+            placement="bottom"
+            overlay={<Tooltip id="back-tooltip">Return to previous page</Tooltip>}
           >
-            <FontAwesomeIcon icon={faArrowLeft} size="xl" />
-          </button>
+            <button
+              className="back-arrow-button"
+              onClick={handleBackClick}
+              title="Back to Bids"
+            >
+              <FontAwesomeIcon icon={faArrowLeft} size="xl" />
+            </button>
+          </OverlayTrigger>
           <BidTitle
             canUserEdit={true}
             displayAlert={displayAlert}
@@ -143,27 +148,54 @@ const BidNavbar = ({
       </div>
       <div className="proposal-header">
         <div className="bidnav-section mt-3 mb-1">
-          <NavLink
-            to="/bid-extractor"
-            className={`bidnav-item ${activeTab === "/bid-extractor" ? "active" : ""}`}
-            onClick={() => handleTabClick("/bid-extractor")}
+          <OverlayTrigger
+            placement="bottom"
+            overlay={
+              <Tooltip id="bid-planner-tooltip">
+                Extract and organize key information from tender documents
+              </Tooltip>
+            }
           >
-            Bid Planner
-          </NavLink>
-          <NavLink
-            to="/proposal-planner"
-            className={`bidnav-item ${activeTab === "/proposal-planner" || activeTab === "/question-crafter" ? "active" : ""}`}
-            onClick={() => handleTabClick("/proposal-planner")}
+            <NavLink
+              to="/bid-extractor"
+              className={`bidnav-item ${activeTab === "/bid-extractor" ? "active" : ""}`}
+              onClick={() => handleTabClick("/bid-extractor")}
+            >
+              Bid Planner
+            </NavLink>
+          </OverlayTrigger>
+          <OverlayTrigger
+            placement="bottom"
+            overlay={
+              <Tooltip id="proposal-planner-tooltip">
+                Plan and structure your proposal response
+              </Tooltip>
+            }
           >
-            Proposal Planner
-          </NavLink>
-          <NavLink
-            to="/proposal-preview"
-            className={`bidnav-item ${activeTab === "/proposal-preview" ? "active" : ""}`}
-            onClick={() => handleTabClick("/proposal-preview")}
+            <NavLink
+              to="/proposal-planner"
+              className={`bidnav-item ${activeTab === "/proposal-planner" || activeTab === "/question-crafter" ? "active" : ""}`}
+              onClick={() => handleTabClick("/proposal-planner")}
+            >
+              Proposal Planner
+            </NavLink>
+          </OverlayTrigger>
+          <OverlayTrigger
+            placement="bottom"
+            overlay={
+              <Tooltip id="preview-tooltip">
+                Preview and review your complete proposal
+              </Tooltip>
+            }
           >
-            Preview Proposal
-          </NavLink>
+            <NavLink
+              to="/proposal-preview"
+              className={`bidnav-item ${activeTab === "/proposal-preview" ? "active" : ""}`}
+              onClick={() => handleTabClick("/proposal-preview")}
+            >
+              Preview Proposal
+            </NavLink>
+          </OverlayTrigger>
           {/* <div className="status-indicator mt-2">
             {isLoading ? (
               <Spinner
@@ -190,14 +222,23 @@ const BidNavbar = ({
           <div></div>
         ) : (
           <div>
-            <button
-              onClick={handleRegenerateClick}
-              className="upload-button me-2"
-              style={{ minWidth: "fit-content" }}
+            <OverlayTrigger
+              placement="bottom"
+              overlay={
+                <Tooltip id="new-outline-tooltip">
+                  Generate a new proposal outline structure
+                </Tooltip>
+              }
             >
-              <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon>
-              New Outline
-            </button>
+              <button
+                onClick={handleRegenerateClick}
+                className="upload-button me-2"
+                style={{ minWidth: "fit-content" }}
+              >
+                <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon>
+                New Outline
+              </button>
+            </OverlayTrigger>
             <GenerateProposalModal bid_id={object_id} outline={outline} />
           </div>
         )}

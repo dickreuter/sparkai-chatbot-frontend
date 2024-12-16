@@ -146,7 +146,7 @@ const BidNavbar = ({
             className={`bidnav-item ${activeTab === "/proposal-planner" || activeTab === "/question-crafter" ? "active" : ""}`}
             onClick={() => handleTabClick("/proposal-planner")}
           >
-            Proposal Planner
+            Proposal Outline
           </NavLink>
           <NavLink
             to="/proposal-preview"

@@ -958,29 +958,39 @@ const ProposalPlan = () => {
                                         >
                                             Question
                                         </div>
-                                        <button
+                                        <OverlayTrigger
+                                          placement="top"
+                                          overlay={
+                                            <Tooltip id="preview-response-tooltip">
+                                              Generate and preview the answer for this section
+                                            </Tooltip>
+                                          }
+                                        >
+                                          <button
                                             onClick={() => handleEditClick(section, index)}
                                             className="preview-button ms-2"
                                             style={{
-                                                fontWeight: "500",
-                                                marginBottom: "8px"
+                                              fontWeight: "500",
+                                              marginBottom: "8px"
                                             }}
                                             disabled={isPreviewLoading}
-                                        >
+                                          >
                                             {isPreviewLoading ? (
-                                                <>
-                                                    <Spinner
-                                                        as="span"
-                                                        animation="border"
-                                                        size="sm"
-                                                        className="me-2"
-                                                    />
-                                                    <span>Generating Preview</span>
-                                                </>
+                                              <>
+                                                <Spinner
+                                                  as="span"
+                                                  animation="border"
+                                                  size="sm"
+                                                  className="me-2"
+                                                />
+                                                <span>Generating Preview</span>
+                                              </>
                                             ) : (
-                                                "Preview Response"
+                                              "Preview Response"
                                             )}
-                                        </button>
+                                          </button>
+                                        </OverlayTrigger>
+
                                     </div>
 
                                       <DebouncedTextArea
@@ -1031,38 +1041,47 @@ const ProposalPlan = () => {
                                   </div>
                                   <div className="flex justify-end mt-2">
                                    
-                                    <button
-                                      className="orange-button ms-2 flex items-center gap-2"
-                                      onClick={() =>
-                                        sendQuestionToChatbot(
-                                          section.question,
-                                          section.writingplan || "",
-                                          index,
-                                          "3a"
-                                        )
+                                  <OverlayTrigger
+                                      placement="top"
+                                      overlay={
+                                        <Tooltip id="generate-subheadings-tooltip">
+                                          Generate AI-suggested subheadings for this section
+                                        </Tooltip>
                                       }
-                                      disabled={section.question.trim() === ""  || isPreviewLoading}
                                     >
-                                      {isLoading ? (
-                                        <>
-                                          <Spinner
-                                            as="span"
-                                            animation="border"
-                                            size="sm"
-                                            className="me-2"
-                                          />
-                                          <span>Generating...</span>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <FontAwesomeIcon
-                                            icon={faWandMagicSparkles}
-                                            className="me-2"
-                                          />
-                                          <span>Generate Subheadings</span>
-                                        </>
-                                      )}
-                                    </button>
+                                      <button
+                                        className="orange-button ms-2 flex items-center gap-2"
+                                        onClick={() =>
+                                          sendQuestionToChatbot(
+                                            section.question,
+                                            section.writingplan || "",
+                                            index,
+                                            "3a"
+                                          )
+                                        }
+                                        disabled={section.question.trim() === "" || isPreviewLoading}
+                                      >
+                                        {isLoading ? (
+                                          <>
+                                            <Spinner
+                                              as="span"
+                                              animation="border"
+                                              size="sm"
+                                              className="me-2"
+                                            />
+                                            <span>Generating...</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <FontAwesomeIcon
+                                              icon={faWandMagicSparkles}
+                                              className="me-2"
+                                            />
+                                            <span>Generate Subheadings</span>
+                                          </>
+                                        )}
+                                      </button>
+                                    </OverlayTrigger>
 
                                     <Row>
                                       <div

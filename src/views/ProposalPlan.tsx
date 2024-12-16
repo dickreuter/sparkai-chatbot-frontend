@@ -28,7 +28,7 @@ import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
 import SectionMenu from "../components/SectionMenu.tsx";
 import { MenuItem, Select, SelectChangeEvent, Skeleton } from "@mui/material";
 import posthog from "posthog-js";
-import { Button, Form, Row, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button, Form, Row, Spinner } from "react-bootstrap";
 
 const EditableCell = ({
   value: initialValue,
@@ -858,28 +858,20 @@ const ProposalPlan = () => {
                           >
                             <td className="">
                               <div className="flex items-center gap-2">
-                                <OverlayTrigger
-                                  placement="top"
-                                  overlay={
-                                    <Tooltip id="expand-section-tooltip">
-                                      {isExpanded ? "Collapse section" : "Expand section"}
-                                    </Tooltip>
-                                  }
+                                <Link
+                                  to="#"
+                                  className="bg-transparent border-0 cursor-pointer text-black me-2"
+                                  onClick={() => toggleSection(index)}
                                 >
-                                  <button
-                                    onClick={() => toggleSection(index)}
-                                    className="bg-transparent border-0 cursor-pointer text-black me-2"
-                                  >
-                                    <FontAwesomeIcon
-                                      icon={
-                                        isExpanded
-                                          ? faChevronDown
-                                          : faChevronRight
-                                      }
-                                      size="sm"
-                                    />
-                                  </button>
-                                </OverlayTrigger>
+                                  <FontAwesomeIcon
+                                    icon={
+                                      isExpanded
+                                        ? faChevronDown
+                                        : faChevronRight
+                                    }
+                                    size="sm"
+                                  />
+                                </Link>
                                 <span>{section.heading}</span>
                               </div>
                             </td>
@@ -933,24 +925,16 @@ const ProposalPlan = () => {
 
                             <td className="text-center">
                               <div className="d-flex justify-content-center">
-                                <OverlayTrigger
-                                  placement="top"
-                                  overlay={
-                                    <Tooltip id="delete-section-tooltip">
-                                      Delete this section from the outline
-                                    </Tooltip>
+                                <Link
+                                  to="#"
+                                  className="bg-transparent border-0 cursor-pointer text-black"
+                                  onClick={() =>
+                                    handleDeleteClick(section, index)
                                   }
+                                  title="Delete section"
                                 >
-                                  <button
-                                    onClick={() =>
-                                      handleDeleteClick(section, index)
-                                    }
-                                    className="bg-transparent border-0 cursor-pointer text-black"
-                                    title="Delete section"
-                                  >
-                                    <FontAwesomeIcon icon={faTrash} size="sm" />
-                                  </button>
-                                </OverlayTrigger>
+                                  <FontAwesomeIcon icon={faTrash} size="sm" />
+                                </Link>
                               </div>
                             </td>
                           </tr>
@@ -981,38 +965,30 @@ const ProposalPlan = () => {
                                         >
                                             Question
                                         </div>
-                                        <OverlayTrigger
-                                          placement="top"
-                                          overlay={
-                                            <Tooltip id="preview-response-tooltip">
-                                              Generate and preview the answer for this section
-                                            </Tooltip>
-                                          }
+                                        <Link
+                                          to="#"
+                                          className="preview-button ms-2"
+                                          onClick={() => handleEditClick(section, index)}
+                                          style={{
+                                            fontWeight: "500",
+                                            marginBottom: "8px"
+                                          }}
+                                          disabled={isPreviewLoading}
                                         >
-                                          <button
-                                            onClick={() => handleEditClick(section, index)}
-                                            className="preview-button ms-2"
-                                            style={{
-                                              fontWeight: "500",
-                                              marginBottom: "8px"
-                                            }}
-                                            disabled={isPreviewLoading}
-                                          >
-                                            {isPreviewLoading ? (
-                                              <>
-                                                <Spinner
-                                                  as="span"
-                                                  animation="border"
-                                                  size="sm"
-                                                  className="me-2"
-                                                />
-                                                <span>Generating Preview</span>
-                                              </>
-                                            ) : (
-                                              "Preview Response"
-                                            )}
-                                          </button>
-                                        </OverlayTrigger>
+                                          {isPreviewLoading ? (
+                                            <>
+                                              <Spinner
+                                                as="span"
+                                                animation="border"
+                                                size="sm"
+                                                className="me-2"
+                                              />
+                                              <span>Generating Preview</span>
+                                            </>
+                                          ) : (
+                                            "Preview Response"
+                                          )}
+                                        </Link>
 
                                     </div>
 
@@ -1064,47 +1040,39 @@ const ProposalPlan = () => {
                                   </div>
                                   <div className="flex justify-end mt-2">
                                    
-                                  <OverlayTrigger
-                                      placement="top"
-                                      overlay={
-                                        <Tooltip id="generate-subheadings-tooltip">
-                                          Generate AI-suggested subheadings for this section
-                                        </Tooltip>
+                                  <Link
+                                      to="#"
+                                      className="orange-button ms-2 flex items-center gap-2"
+                                      onClick={() =>
+                                        sendQuestionToChatbot(
+                                          section.question,
+                                          section.writingplan || "",
+                                          index,
+                                          "3a"
+                                        )
                                       }
+                                      disabled={section.question.trim() === "" || isPreviewLoading}
                                     >
-                                      <button
-                                        className="orange-button ms-2 flex items-center gap-2"
-                                        onClick={() =>
-                                          sendQuestionToChatbot(
-                                            section.question,
-                                            section.writingplan || "",
-                                            index,
-                                            "3a"
-                                          )
-                                        }
-                                        disabled={section.question.trim() === "" || isPreviewLoading}
-                                      >
-                                        {isLoading ? (
-                                          <>
-                                            <Spinner
-                                              as="span"
-                                              animation="border"
-                                              size="sm"
-                                              className="me-2"
-                                            />
-                                            <span>Generating...</span>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <FontAwesomeIcon
-                                              icon={faWandMagicSparkles}
-                                              className="me-2"
-                                            />
-                                            <span>Generate Subheadings</span>
-                                          </>
-                                        )}
-                                      </button>
-                                    </OverlayTrigger>
+                                      {isLoading ? (
+                                        <>
+                                          <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            className="me-2"
+                                          />
+                                          <span>Generating...</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <FontAwesomeIcon
+                                            icon={faWandMagicSparkles}
+                                            className="me-2"
+                                          />
+                                          <span>Generate Subheadings</span>
+                                        </>
+                                      )}
+                                    </Link>
 
                                     <Row>
                                       <div
@@ -1115,25 +1083,16 @@ const ProposalPlan = () => {
                                           apiChoices.length > 0 && (
                                             <div>
                                               {renderChoices()}
-                                              <OverlayTrigger
-                                                placement="top"
-                                                overlay={
-                                                  <Tooltip id="add-choices-tooltip">
-                                                    Add selected subheadings to your section
-                                                  </Tooltip>
+                                              <Link
+                                                to="#"
+                                                className="upload-button mt-3"
+                                                onClick={submitSelections}
+                                                disabled={
+                                                  selectedChoices.length === 0
                                                 }
                                               >
-                                                <Button
-                                                  variant="primary"
-                                                  onClick={submitSelections}
-                                                  className="upload-button mt-3"
-                                                  disabled={
-                                                    selectedChoices.length === 0
-                                                  }
-                                                >
-                                                  Add Choices
-                                                </Button>
-                                              </OverlayTrigger>
+                                                Add Choices
+                                              </Link>
                                             </div>
                                           )}
                                       </div>
@@ -1182,30 +1141,22 @@ const ProposalPlan = () => {
                                     </td>
                                     <td className="text-center">
                                       <div className="d-flex justify-content-center">
-                                        <OverlayTrigger
-                                          placement="top"
-                                          overlay={
-                                            <Tooltip id="delete-subheading-tooltip">
-                                              Remove this subheading from the section
-                                            </Tooltip>
+                                        <Link
+                                          to="#"
+                                          className="bg-transparent border-0 cursor-pointer text-black"
+                                          onClick={() =>
+                                            handleDeleteSubheading(
+                                              index,
+                                              subIndex
+                                            )
                                           }
+                                          title="Delete subheading"
                                         >
-                                          <button
-                                            onClick={() =>
-                                              handleDeleteSubheading(
-                                                index,
-                                                subIndex
-                                              )
-                                            }
-                                            className="bg-transparent border-0 cursor-pointer text-black"
-                                            title="Delete subheading"
-                                          >
-                                            <FontAwesomeIcon
-                                              icon={faTrash}
-                                              size="sm"
-                                            />
-                                          </button>
-                                        </OverlayTrigger>
+                                          <FontAwesomeIcon
+                                            icon={faTrash}
+                                            size="sm"
+                                          />
+                                        </Link>
                                       </div>
                                     </td>
                                   </tr>

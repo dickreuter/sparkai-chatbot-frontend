@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Button, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import {
   faArrowLeft,
@@ -115,18 +115,13 @@ const BidNavbar = ({
       <div className="bidnav"></div>
       <div className="proposal-header">
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <OverlayTrigger
-            placement="bottom"
-            overlay={<Tooltip id="back-tooltip">Return to previous page</Tooltip>}
+          <button
+            className="back-arrow-button"
+            onClick={handleBackClick}
+            title="Back to Bids"
           >
-            <button
-              className="back-arrow-button"
-              onClick={handleBackClick}
-              title="Back to Bids"
-            >
-              <FontAwesomeIcon icon={faArrowLeft} size="xl" />
-            </button>
-          </OverlayTrigger>
+            <FontAwesomeIcon icon={faArrowLeft} size="xl" />
+          </button>
           <BidTitle
             canUserEdit={true}
             displayAlert={displayAlert}
@@ -136,109 +131,43 @@ const BidNavbar = ({
             initialBidName={initialBidName}
           />
         </div>
-        {/* <Button
-          className="upload-button mt-2"
-          style={{ textTransform: "none" }}
-          onClick={(e) => e.preventDefault()}
-          title={permissionDetails.description}
-        >
-          <FontAwesomeIcon icon={permissionDetails.icon} className="me-1" />
-          {permissionDetails.text}
-        </Button> */}
       </div>
       <div className="proposal-header">
         <div className="bidnav-section mt-3 mb-1">
-          <OverlayTrigger
-            placement="bottom"
-            overlay={
-              <Tooltip id="bid-planner-tooltip">
-                Extract and organize key information from tender documents
-              </Tooltip>
-            }
+          <NavLink
+            to="/bid-extractor"
+            className={`bidnav-item ${activeTab === "/bid-extractor" ? "active" : ""}`}
+            onClick={() => handleTabClick("/bid-extractor")}
           >
-            <NavLink
-              to="/bid-extractor"
-              className={`bidnav-item ${activeTab === "/bid-extractor" ? "active" : ""}`}
-              onClick={() => handleTabClick("/bid-extractor")}
-            >
-              Bid Planner
-            </NavLink>
-          </OverlayTrigger>
-          <OverlayTrigger
-            placement="bottom"
-            overlay={
-              <Tooltip id="proposal-planner-tooltip">
-                Plan and structure your proposal response
-              </Tooltip>
-            }
+            Bid Planner
+          </NavLink>
+          <NavLink
+            to="/proposal-planner"
+            className={`bidnav-item ${activeTab === "/proposal-planner" || activeTab === "/question-crafter" ? "active" : ""}`}
+            onClick={() => handleTabClick("/proposal-planner")}
           >
-            <NavLink
-              to="/proposal-planner"
-              className={`bidnav-item ${activeTab === "/proposal-planner" || activeTab === "/question-crafter" ? "active" : ""}`}
-              onClick={() => handleTabClick("/proposal-planner")}
-            >
-              Proposal Planner
-            </NavLink>
-          </OverlayTrigger>
-          <OverlayTrigger
-            placement="bottom"
-            overlay={
-              <Tooltip id="preview-tooltip">
-                Preview and review your complete proposal
-              </Tooltip>
-            }
+            Proposal Planner
+          </NavLink>
+          <NavLink
+            to="/proposal-preview"
+            className={`bidnav-item ${activeTab === "/proposal-preview" ? "active" : ""}`}
+            onClick={() => handleTabClick("/proposal-preview")}
           >
-            <NavLink
-              to="/proposal-preview"
-              className={`bidnav-item ${activeTab === "/proposal-preview" ? "active" : ""}`}
-              onClick={() => handleTabClick("/proposal-preview")}
-            >
-              Preview Proposal
-            </NavLink>
-          </OverlayTrigger>
-          {/* <div className="status-indicator mt-2">
-            {isLoading ? (
-              <Spinner
-                animation="border"
-                size="lg"
-                style={{ width: "1.4rem", height: "1.4rem" }}
-              />
-            ) : saveSuccess === true ? (
-              <FontAwesomeIcon
-                icon={faCheckCircle}
-                style={{ color: "green", fontSize: "1.4rem" }}
-                title="Draft saved"
-              />
-            ) : saveSuccess === false ? (
-              <FontAwesomeIcon
-                icon={faTimesCircle}
-                style={{ color: "red", fontSize: "1.4rem" }}
-                title="Failed to save"
-              />
-            ) : null}
-          </div> */}
+            Preview Proposal
+          </NavLink>
         </div>
         {outline.length === 0 ? (
           <div></div>
         ) : (
           <div>
-            <OverlayTrigger
-              placement="bottom"
-              overlay={
-                <Tooltip id="new-outline-tooltip">
-                  Generate a new proposal outline structure
-                </Tooltip>
-              }
+            <button
+              onClick={handleRegenerateClick}
+              className="upload-button me-2"
+              style={{ minWidth: "fit-content" }}
             >
-              <button
-                onClick={handleRegenerateClick}
-                className="upload-button me-2"
-                style={{ minWidth: "fit-content" }}
-              >
-                <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon>
-                New Outline
-              </button>
-            </OverlayTrigger>
+              <FontAwesomeIcon icon={faPlus} className="pr-2"></FontAwesomeIcon>
+              New Outline
+            </button>
             <GenerateProposalModal bid_id={object_id} outline={outline} />
           </div>
         )}

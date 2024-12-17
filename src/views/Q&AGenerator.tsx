@@ -756,7 +756,7 @@ const QAGenerator = () => {
   const [bidPilotbroadness, setBidPilotBroadness] = useState("4");
   const [isBidPilotLoading, setIsBidPilotLoading] = useState(false);
 
-  const [choice, setChoice] = useState("3");
+  const [choice, setChoice] = useState("3a");
   const [broadness, setBroadness] = useState("4");
 
   const [isLoading, setIsLoading] = useState(false);
@@ -990,7 +990,7 @@ const QAGenerator = () => {
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question`,
         {
-          choice: choice === "3" ? "3a" : choice,
+          choice: choice,
           broadness: broadness,
           input_text: inputText,
           extra_instructions: "",
@@ -1003,11 +1003,11 @@ const QAGenerator = () => {
           }
         }
       );
-      if (choice != "3") {
+      if (choice != "3a") {
         const contentState = ContentState.createFromText(result.data);
         setResponseEditorState(EditorState.createWithContent(contentState));
       }
-      if (choice === "3") {
+      if (choice === "3a") {
         let choicesArray = [];
         console.log(result.data);
 
@@ -1143,7 +1143,7 @@ const QAGenerator = () => {
     try {
       console.log(selectedFolders);
       const word_amounts = selectedChoices.map((choice) =>
-        String(wordAmounts[choice] || "100")
+        String(wordAmounts[choice] || "250")
       );
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
@@ -1155,6 +1155,7 @@ const QAGenerator = () => {
           selected_choices: selectedChoices,
           datasets: selectedFolders,
           word_amounts,
+          compliance_requirements: [""],
           bid_id: ""
         },
         {
@@ -1358,7 +1359,7 @@ const QAGenerator = () => {
                       <div>Elapsed Time: {elapsedTime.toFixed(1)}s</div>
                     </div>
                   )}
-                  {choice === "3" && apiChoices.length > 0 && (
+                  {choice === "3a" && apiChoices.length > 0 && (
                     <div>
                       {renderChoices()}
                       <Button

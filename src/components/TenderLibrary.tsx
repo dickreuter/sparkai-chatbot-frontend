@@ -27,9 +27,7 @@ import {
   faSpinner
 } from "@fortawesome/free-solid-svg-icons";
 import { Menu, MenuItem } from "@mui/material";
-import FileContentModal from "../components/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
-import UploadText from "../views/UploadText.tsx";
 import InterrogateTenderModal from "./InterrogateTenderModal.tsx";
 import posthog from "posthog-js";
 
@@ -380,11 +378,11 @@ const TenderLibrary = ({ object_id }) => {
         displayAlert("Please select files to upload", "warning");
         return;
       }
-
+      
       setUploading(true);
       let successCount = 0;
       let failCount = 0;
-
+      
       for (const file of files) {
         const mode = getFileMode(file.type);
         if (!mode) {
@@ -392,14 +390,13 @@ const TenderLibrary = ({ object_id }) => {
           setUploadStatus((prev) => ({ ...prev, [file.name]: "fail" }));
           continue;
         }
-
+        
         const formData = new FormData();
         formData.append("file", file);
         formData.append("bid_id", object_id);
         formData.append("mode", mode);
-
         setUploadStatus((prev) => ({ ...prev, [file.name]: "uploading" }));
-
+        
         try {
           const response = await axios.post(
             `http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`,
@@ -411,7 +408,7 @@ const TenderLibrary = ({ object_id }) => {
               }
             }
           );
-
+          
           if (response.data.status === "success") {
             successCount++;
             setUploadStatus((prev) => ({ ...prev, [file.name]: "success" }));
@@ -423,11 +420,20 @@ const TenderLibrary = ({ object_id }) => {
           console.error("Error uploading file:", error);
           failCount++;
           setUploadStatus((prev) => ({ ...prev, [file.name]: "fail" }));
+          
+          // Extract and display the detailed error message from the backend
+          const errorMessage = error.response?.data?.detail || 
+                              error.response?.data?.message ||
+                              error.message ||
+                              'Failed to upload file';
+          
+          displayAlert(`Error uploading ${file.name}: ${errorMessage}`, "danger");
+          continue; // Continue with next file even if current one failed
         }
       }
-
+      
       setUploading(false);
-
+      
       if (successCount > 0) {
         displayAlert(
           `Successfully uploaded ${successCount} file(s)`,
@@ -440,10 +446,8 @@ const TenderLibrary = ({ object_id }) => {
           fileTypes: files.map((f) => f.type)
         });
       }
-      if (failCount > 0) {
-        displayAlert(`Failed to upload ${failCount} file(s)`, "danger");
-      }
-
+      
+      
       setTimeout(() => {
         setFiles([]);
         setUploadStatus({});

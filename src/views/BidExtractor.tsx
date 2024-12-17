@@ -355,6 +355,7 @@ const BidExtractor = () => {
     } else if (initialBidName && initialBidName !== "") {
       // Update bidInfo with the initial bid name if it's provided and not empty
       // USER CREATES A NEW BID
+      console.log("newbid created")
       setSharedState((prevState) => ({
         ...prevState,
         bidInfo: initialBidName,

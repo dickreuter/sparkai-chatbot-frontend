@@ -223,9 +223,6 @@ const BidManagement: React.FC = () => {
         formData.append(key, value && value.trim() !== "" ? value : " ");
       };
 
-      console.log("First section heading:", outline[0].heading);
-      console.log("First section subheadings:", outline[0].subheadings);
-
       appendFormData("bid_title", bidInfo);
       appendFormData("status", "ongoing");
       appendFormData("contract_information", backgroundInfo);

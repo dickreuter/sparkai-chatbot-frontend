@@ -458,12 +458,19 @@ const ProposalPlan = () => {
     }
   };
 
-  const handleDeleteSubheading = (sectionIndex, subheadingIndex) => {
+  const handleDeleteSubheading = (sectionIndex: number, subheadingIndex: number) => {
     const newOutline = [...outline];
-    newOutline[sectionIndex].subheadings = newOutline[
-      sectionIndex
-    ].subheadings.filter((_, idx) => idx !== subheadingIndex);
-
+    
+    // Filter out the deleted subheading
+    newOutline[sectionIndex].subheadings = newOutline[sectionIndex].subheadings
+      .filter((_, idx) => idx !== subheadingIndex);
+    
+    // Update the subsections count to match the new number of subheadings
+    newOutline[sectionIndex] = {
+      ...newOutline[sectionIndex],
+      subsections: newOutline[sectionIndex].subheadings.length
+    };
+  
     setSharedState((prevState) => ({
       ...prevState,
       outline: newOutline
@@ -965,8 +972,7 @@ const ProposalPlan = () => {
                                         >
                                             Question
                                         </div>
-                                        <Link
-                                          to="#"
+                                        <button
                                           className="preview-button ms-2"
                                           onClick={() => handleEditClick(section, index)}
                                           style={{
@@ -988,7 +994,7 @@ const ProposalPlan = () => {
                                           ) : (
                                             "Preview Response"
                                           )}
-                                        </Link>
+                                        </button>
 
                                     </div>
 
@@ -1040,8 +1046,7 @@ const ProposalPlan = () => {
                                   </div>
                                   <div className="flex justify-end mt-2">
                                    
-                                  <Link
-                                      to="#"
+                                  <button
                                       className="orange-button ms-2 flex items-center gap-2"
                                       onClick={() =>
                                         sendQuestionToChatbot(
@@ -1072,7 +1077,7 @@ const ProposalPlan = () => {
                                           <span>Generate Subheadings</span>
                                         </>
                                       )}
-                                    </Link>
+                                    </button>
 
                                     <Row>
                                       <div
@@ -1083,8 +1088,7 @@ const ProposalPlan = () => {
                                           apiChoices.length > 0 && (
                                             <div>
                                               {renderChoices()}
-                                              <Link
-                                                to="#"
+                                              <button
                                                 className="upload-button mt-3"
                                                 onClick={submitSelections}
                                                 disabled={
@@ -1092,7 +1096,7 @@ const ProposalPlan = () => {
                                                 }
                                               >
                                                 Add Choices
-                                              </Link>
+                                              </button>
                                             </div>
                                           )}
                                       </div>

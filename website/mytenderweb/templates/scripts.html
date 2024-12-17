@@ -17,7 +17,11 @@
 <script>
     function handleIntersection(entries, observer) {
         console.log('Intersection Observer callback fired');
-        entries.forEach(entry => {
+        
+        // Convert entries to array if it isn't one already
+        const entriesArray = Array.from(entries);
+        
+        entriesArray.forEach(entry => {
             console.log('Entry intersection status:', entry.isIntersecting);
             if (entry.isIntersecting) {
                 const counters = entry.target.querySelectorAll('.counter-value');
@@ -100,13 +104,8 @@
         setupSwiperNavigation(swiper);
         initializeSlackChat();
         
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    handleIntersection(entry);
-                }
-            });
-        }, {
+        // Create intersection observer
+        const observer = new IntersectionObserver(handleIntersection, {
             threshold: 0.1,
             rootMargin: '50px'
         });
@@ -123,7 +122,6 @@
             console.log('Window height:', window.innerHeight);
             console.log('Is counter already in viewport:', rect.top < window.innerHeight);
         }
-    
         const buttons = document.querySelectorAll('.feature-button');
         const slides = document.querySelectorAll('.feature-slide');
         let currentSlide = 0;

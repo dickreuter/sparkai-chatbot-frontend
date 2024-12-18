@@ -29,6 +29,7 @@ import SectionMenu from "../components/SectionMenu.tsx";
 import { MenuItem, Select, SelectChangeEvent, Skeleton } from "@mui/material";
 import posthog from "posthog-js";
 import { Button, Form, Row, Spinner } from "react-bootstrap";
+import ProposalSidepane from "../components/SlidingSidepane.tsx";
 
 const EditableCell = ({
   value: initialValue,
@@ -170,38 +171,6 @@ const QuestionTypeDropdown = ({
   );
 };
 
-const DebouncedTextArea = ({ value, onChange, placeholder }) => {
-  const [localValue, setLocalValue] = useState(value || "");
-  const debouncedCallback = useRef(null);
-
-  useEffect(() => {
-    setLocalValue(value || "");
-  }, [value]);
-
-  const handleChange = (e) => {
-    const newValue = e.target.value;
-    setLocalValue(newValue);
-
-    // Clear previous timeout
-    if (debouncedCallback.current) {
-      clearTimeout(debouncedCallback.current);
-    }
-
-    // Set new timeout for the parent update
-    debouncedCallback.current = setTimeout(() => {
-      onChange(newValue);
-    }, 300);
-  };
-
-  return (
-    <textarea
-      className="writingplan-text-area"
-      value={localValue}
-      onChange={handleChange}
-      placeholder={placeholder}
-    />
-  );
-};
 const ProposalPlan = () => {
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -233,30 +202,18 @@ const ProposalPlan = () => {
     new Set()
   );
 
-  useEffect(() => {
-    let timer;
-    if (isLoading && startTime) {
-      timer = setInterval(() => {
-        const elapsed = (Date.now() - startTime) / 1000;
-        setElapsedTime(elapsed);
-      }, 100); // Update every 100ms
-    }
-    return () => {
-      if (timer) {
-        clearInterval(timer);
-      }
-    };
-  }, [isLoading, startTime]);
+  const [selectedSection, setSelectedSection] = useState(null);
+  const [isSidepaneOpen, setIsSidepaneOpen] = useState(false);
 
   const handleRowClick = (e: React.MouseEvent, index: number) => {
-    // Prevent row click if clicking on interactive elements
     const isInteractiveElement = (e.target as HTMLElement).closest(
       'input, select, button, a, .MuiSelect-select, [role="button"], .editable-cell'
     );
 
     if (!isInteractiveElement) {
       e.preventDefault();
-      toggleSection(index);
+      setSelectedSection(index);
+      setIsSidepaneOpen(true);
     }
   };
 
@@ -405,12 +362,6 @@ const ProposalPlan = () => {
               });
           });
 
-          navigate("/question-crafter", {
-              state: {
-                  section: sharedState.outline[index],
-                  bid_id: object_id,
-              }
-          });
       } catch (error) {
           console.error("Error in handleEditClick:", error);
           displayAlert("Failed to update section", "danger");
@@ -702,8 +653,8 @@ const ProposalPlan = () => {
                   type="text"
                   value={choice}
                   onChange={(e) => handleChoiceEdit(index, e.target.value)}
-                  className="ml-2 editable-choice"
-                  style={{ width: "70%", marginLeft: "10px" }}
+                  className="ml-2"
+                 
                 />
               ) : (
                 <span
@@ -945,229 +896,7 @@ const ProposalPlan = () => {
                               </div>
                             </td>
                           </tr>
-                          {isExpanded && (
-                            <>
-                              <tr className="writingplan-box">
-                                <td colSpan={7} className="py-3 px-4">
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      gap: "16px",
-                                      width: "100%"
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        flex: "1",
-                                        width: "50%",
-                                        maxWidth: "50%"
-                                      }}
-                                    >
-                                      <div style={{display: "flex", alignItems:"center"}}>
-                                        <div
-                                            style={{
-                                                fontWeight: "500",
-                                                marginBottom: "8px"
-                                            }}
-                                        >
-                                            Question
-                                        </div>
-                                        <button
-                                          className="preview-button ms-2"
-                                          onClick={() => handleEditClick(section, index)}
-                                          style={{
-                                            fontWeight: "500",
-                                            marginBottom: "8px"
-                                          }}
-                                          disabled={isPreviewLoading}
-                                        >
-                                          {isPreviewLoading ? (
-                                            <>
-                                              <Spinner
-                                                as="span"
-                                                animation="border"
-                                                size="sm"
-                                                className="me-2"
-                                              />
-                                              <span>Generating Preview</span>
-                                            </>
-                                          ) : (
-                                            "Preview Response"
-                                          )}
-                                        </button>
-
-                                    </div>
-
-                                      <DebouncedTextArea
-                                        value={section.question}
-                                        onChange={(value) =>
-                                          handleSectionChange(
-                                            index,
-                                            "question",
-                                            value
-                                          )
-                                        }
-                                        placeholder={
-                                          "What is your management policy?"
-                                        }
-                                      />
-                                    </div>
-                                    <div
-                                      style={{
-                                        flex: "1",
-                                        width: "50%",
-                                        maxWidth: "50%"
-                                      }}
-                                    >
-                                      <div
-                                        style={{
-                                          fontWeight: "500",
-                                        
-                                          marginBottom: "16px"
-                                        }}
-                                      >
-                                        Writing Plan
-                                      </div>
-
-                                      <DebouncedTextArea
-                                        value={section.writingplan}
-                                        onChange={(value) =>
-                                          handleSectionChange(
-                                            index,
-                                            "writingplan",
-                                            value
-                                          )
-                                        }
-                                        placeholder={
-                                          "Please write in a formative tone where you mention our strategy of how we will manage this project"
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-                                  <div className="flex justify-end mt-2">
-                                   
-                                  <button
-                                      className="orange-button ms-2 flex items-center gap-2"
-                                      onClick={() =>
-                                        sendQuestionToChatbot(
-                                          section.question,
-                                          section.writingplan || "",
-                                          index,
-                                          "3a"
-                                        )
-                                      }
-                                      disabled={section.question.trim() === "" || isPreviewLoading}
-                                    >
-                                      {isLoading ? (
-                                        <>
-                                          <Spinner
-                                            as="span"
-                                            animation="border"
-                                            size="sm"
-                                            className="me-2"
-                                          />
-                                          <span>Generating...</span>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <FontAwesomeIcon
-                                            icon={faWandMagicSparkles}
-                                            className="me-2"
-                                          />
-                                          <span>Generate Subheadings</span>
-                                        </>
-                                      )}
-                                    </button>
-
-                                    <Row>
-                                      <div
-                                        className=""
-                                        style={{ textAlign: "left" }}
-                                      >
-                                        {
-                                          apiChoices.length > 0 && (
-                                            <div>
-                                              {renderChoices()}
-                                              <button
-                                                className="upload-button mt-3"
-                                                onClick={submitSelections}
-                                                disabled={
-                                                  selectedChoices.length === 0
-                                                }
-                                              >
-                                                Add Choices
-                                              </button>
-                                            </div>
-                                          )}
-                                      </div>
-                                    </Row>
-                                  </div>
-                                </td>
-                              </tr>
-                              {section.subheadings?.map(
-                                (subheading, subIndex) => (
-                                  <tr
-                                    key={`${index}-${subIndex}`}
-                                    className="bg-gray-50 hover:bg-gray-100"
-                                  >
-                                    <td className="">
-                                      <div className="ms-3 flex items-center">
-                                        <FontAwesomeIcon
-                                          icon={faArrowRight}
-                                          size="sm"
-                                          className="text-black me-2"
-                                        />
-                                        <EditableCell
-                                          value={subheading.title}
-                                          onChange={(value) => {
-                                            const newSubheadings = [
-                                              ...section.subheadings
-                                            ];
-                                            newSubheadings[subIndex] = {
-                                              ...newSubheadings[subIndex],
-                                              title: value
-                                            };
-                                            handleSectionChange(
-                                              index,
-                                              "subheadings",
-                                              newSubheadings
-                                            );
-                                          }}
-                                        />
-                                      </div>
-                                    </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td className="text-center">
-                                     
-                                    </td>
-                                    <td className="text-center">
-                                      <div className="d-flex justify-content-center">
-                                        <Link
-                                          to="#"
-                                          className="bg-transparent border-0 cursor-pointer text-black"
-                                          onClick={() =>
-                                            handleDeleteSubheading(
-                                              index,
-                                              subIndex
-                                            )
-                                          }
-                                          title="Delete subheading"
-                                        >
-                                          <FontAwesomeIcon
-                                            icon={faTrash}
-                                            size="sm"
-                                          />
-                                        </Link>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                )
-                              )}
-                            </>
-                          )}
+                         
                         </React.Fragment>
                       );
                     })}
@@ -1181,6 +910,27 @@ const ProposalPlan = () => {
                   onClose={() => setContextMenu(null)}
                   onAddSection={handleAddSection}
                   onDeleteSection={handleDeleteSection}
+                />
+              )}
+              {selectedSection !== null && (
+                <ProposalSidepane 
+                  section={outline[selectedSection]}
+                  index={selectedSection}
+                  isOpen={isSidepaneOpen}
+                  onClose={() => {
+                    setIsSidepaneOpen(false);
+                    setSelectedSection(null);
+                  }}
+                  isLoading={isLoading}
+                  isPreviewLoading={isPreviewLoading}
+                  handleEditClick={handleEditClick}
+                  handleSectionChange={handleSectionChange}
+                  sendQuestionToChatbot={sendQuestionToChatbot}
+                  apiChoices={apiChoices}
+                  renderChoices={renderChoices}
+                  selectedChoices={selectedChoices}
+                  submitSelections={submitSelections}
+                  handleDeleteSubheading={handleDeleteSubheading}
                 />
               )}
             </div>

@@ -11,7 +11,8 @@ import {
   faCircleQuestion,
   faUser,
   faCircleExclamation,
-  faFileWord
+  faFileWord,
+  faGraduationCap
 } from "@fortawesome/free-solid-svg-icons";
 // Import the image import sidebarIcon from '../resources/images/mytender.io_badge.png';
 
@@ -125,6 +126,15 @@ const SideBarSmall = () => {
         >
           <FontAwesomeIcon icon={faFileWord} />
           <span>Wordpane</span>
+        </Link>
+        <Link
+          to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
+          className="sidebarsmalllink"
+          target="_blank"  // Opens in new tab
+          rel="noopener noreferrer"  // Security best practice for external links
+        >
+          <FontAwesomeIcon icon={faGraduationCap} />  {/* Academic cap icon - perfect for tutorials */}
+          <span>Tutorial</span>
         </Link>
 
         <Link

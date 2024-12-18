@@ -8,8 +8,8 @@
     padding-top: 55px;
     padding-left: 185px;
     padding-right: 0px;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
     margin: 0;
     /* Use auto instead of scroll to handle both overflow cases */
 }

@@ -289,6 +289,7 @@ button[data-tooltip],
     overflow-y: auto;
     transform: translateX(500px);
     will-change: transform;
+    background-color: #f2f2f2;
 }
 
 .sidepane.open {
@@ -470,7 +471,6 @@ button[data-tooltip],
 
 .subheadings-list {
     border-radius: 4px;
-    padding: 8px;
 }
 
 .subheading-item {

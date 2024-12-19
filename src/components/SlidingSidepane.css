@@ -1,0 +1,16 @@
+.nav-button {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.nav-button:hover:not(:disabled) {
+  color: #333;
+}
+
+.nav-button:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}

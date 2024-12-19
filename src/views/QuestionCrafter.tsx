@@ -33,8 +33,9 @@ const QuestionCrafter = () => {
     useContext(BidContext);
   const { contributors, outline } = sharedState;
 
-
-  const sectionIndex = outline.findIndex((s) => s.section_id === locationSection?.section_id);
+  const sectionIndex = outline.findIndex(
+    (s) => s.section_id === locationSection?.section_id
+  );
   const [section, setCurrentSection] = useState(() => {
     return sectionIndex !== -1 ? outline[sectionIndex] : locationSection;
   });
@@ -66,7 +67,6 @@ const QuestionCrafter = () => {
     );
   }, [section.section_id]); // Only depend on section.section_id, not outline
 
-  
   const showViewOnlyMessage = () => {
     console.log(currentUserPermission);
     displayAlert("You only have permission to view this bid.", "danger");
@@ -134,7 +134,6 @@ const QuestionCrafter = () => {
                   section={section}
                   sectionIndex={sectionIndex}
                   bid_id={bid_id}
-                  
                 />
                 <StatusMenu
                   value={sectionStatus} // Use the local state instead of section.status
@@ -145,7 +144,6 @@ const QuestionCrafter = () => {
                 <h1 className="lib-title me-2" id="question-section">
                   Question
                 </h1>
-               
               </div>
 
               <div className="question-answer-box">

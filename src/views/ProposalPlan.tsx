@@ -30,6 +30,8 @@ import { MenuItem, Select, SelectChangeEvent, Skeleton } from "@mui/material";
 import posthog from "posthog-js";
 import { Button, Form, Row, Spinner } from "react-bootstrap";
 import ProposalSidepane from "../components/SlidingSidepane.tsx";
+import ReviewerDropdown from "../components/dropdowns/ReviewerDropdown.tsx";
+import QuestionTypeDropdown from "../components/dropdowns/QuestionTypeDropdown.tsx";
 
 const EditableCell = ({
   value: initialValue,
@@ -60,114 +62,6 @@ const EditableCell = ({
       className="editable-cell"
       placeholder="-"
     />
-  );
-};
-
-const selectStyle = {
-  fontFamily: '"ClashDisplay", sans-serif',
-  fontSize: "0.875rem",
-  minWidth: "220px",
-  "& MuiOutlinedInputNotchedOutline": {
-    borderColor: "#ced4da"
-  },
-  "&:hover MuiOutlinedInputNotchedOutline": {
-    borderColor: "#86b7fe"
-  },
-  "&.MuiFocused MuiOutlinedInputNotchedOutline": {
-    borderColor: "#86b7fe",
-    borderWidth: "1px"
-  }
-};
-
-const menuStyle = {
-  fontSize: "12px",
-  fontFamily: '"ClashDisplay", sans-serif'
-};
-
-const ReviewerDropdown = ({
-  value,
-  onChange,
-  contributors
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  contributors: Record<string, string>;
-}) => {
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    onChange(event.target.value as string);
-  };
-
-  return (
-    <Select
-      value={value || ""}
-      onChange={handleChange}
-      size="small"
-      style={selectStyle}
-      displayEmpty
-      MenuProps={{
-        PaperProps: {
-          style: menuStyle
-        }
-      }}
-    >
-      <MenuItem value="" style={menuStyle}>
-        <em>Select Reviewer</em>
-      </MenuItem>
-      {Object.entries(contributors).length > 0 ? (
-        Object.entries(contributors).map(([email, role], index) => (
-          <MenuItem key={index} value={email} style={menuStyle}>
-            {email} ({role})
-          </MenuItem>
-        ))
-      ) : (
-        <MenuItem disabled value="" style={menuStyle}>
-          No Contributors Available
-        </MenuItem>
-      )}
-    </Select>
-  );
-};
-
-const QuestionTypeDropdown = ({
-  value,
-  onChange
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) => {
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    onChange(event.target.value as string);
-  };
-
-  return (
-    <Select
-      value={value || "3b"}
-      onChange={handleChange}
-      size="small"
-      style={selectStyle}
-      displayEmpty
-      MenuProps={{
-        PaperProps: {
-          style: menuStyle
-        }
-      }}
-    >
-      <MenuItem value="3b" style={menuStyle}>
-        <em>General</em>
-      </MenuItem>
-      <MenuItem value="3b_case_study" style={menuStyle}>
-        <em>Case Study</em>
-      </MenuItem>
-      <MenuItem value="3b_commercial" style={menuStyle}>
-        <em>Compliance</em>
-      </MenuItem>
-      <MenuItem value="3b_personnel" style={menuStyle}>
-        <em>Team</em>
-      </MenuItem>
-      <MenuItem value="3b_technical" style={menuStyle}>
-        <em>Technical</em>
-      </MenuItem>
-    </Select>
   );
 };
 
@@ -316,56 +210,59 @@ const ProposalPlan = () => {
   };
 
   const handleEditClick = async (section: Section, index: number) => {
-      try {
-            // Use preview-specific loading state
-          posthog.capture("proposal_section_edit", {
-              bidId: object_id,
-              sectionId: section.section_id,
-              sectionHeading: section.heading
-          });
+    try {
+      // Use preview-specific loading state
+      posthog.capture("proposal_section_edit", {
+        bidId: object_id,
+        sectionId: section.section_id,
+        sectionHeading: section.heading
+      });
 
-          const selectedChoices = section.subheadings.length > 0 
-            ? section.subheadings.map(subheading => subheading.title)
-            : [section.heading];
+      const selectedChoices =
+        section.subheadings.length > 0
+          ? section.subheadings.map((subheading) => subheading.title)
+          : [section.heading];
 
-          const wordAmount = section.word_count;
-          
-           // If no subheadings, use empty array for compliance requirements
-          const compliance_requirements = section.subheadings.length > 0
-            ? section.subheadings.map(subheading => section.compliance_requirements)
-            : [""];
+      const wordAmount = section.word_count;
 
-          const answer = await sendQuestionToChatbot(
-              section.question,
-              section.writingplan || "",
-              index,
-              section.choice,
-              selectedChoices,
-              wordAmount || 250,
-              compliance_requirements
-          );
+      // If no subheadings, use empty array for compliance requirements
+      const compliance_requirements =
+        section.subheadings.length > 0
+          ? section.subheadings.map(
+              (subheading) => section.compliance_requirements
+            )
+          : [""];
 
-          // Update state and wait for it to complete
-          await new Promise<void>((resolve) => {
-              setSharedState(prevState => {
-                  const newOutline = [...prevState.outline];
-                  newOutline[index] = {
-                      ...newOutline[index],
-                      answer: answer
-                  };
-                  
-                  setTimeout(resolve, 0);
-                  return {
-                      ...prevState,
-                      outline: newOutline
-                  };
-              });
-          });
+      const answer = await sendQuestionToChatbot(
+        section.question,
+        section.writingplan || "",
+        index,
+        section.choice,
+        selectedChoices,
+        wordAmount || 250,
+        compliance_requirements
+      );
 
-      } catch (error) {
-          console.error("Error in handleEditClick:", error);
-          displayAlert("Failed to update section", "danger");
-      } 
+      // Update state and wait for it to complete
+      await new Promise<void>((resolve) => {
+        setSharedState((prevState) => {
+          const newOutline = [...prevState.outline];
+          newOutline[index] = {
+            ...newOutline[index],
+            answer: answer
+          };
+
+          setTimeout(resolve, 0);
+          return {
+            ...prevState,
+            outline: newOutline
+          };
+        });
+      });
+    } catch (error) {
+      console.error("Error in handleEditClick:", error);
+      displayAlert("Failed to update section", "danger");
+    }
   };
 
   const showViewOnlyMessage = () => {
@@ -409,19 +306,23 @@ const ProposalPlan = () => {
     }
   };
 
-  const handleDeleteSubheading = (sectionIndex: number, subheadingIndex: number) => {
+  const handleDeleteSubheading = (
+    sectionIndex: number,
+    subheadingIndex: number
+  ) => {
     const newOutline = [...outline];
-    
+
     // Filter out the deleted subheading
-    newOutline[sectionIndex].subheadings = newOutline[sectionIndex].subheadings
-      .filter((_, idx) => idx !== subheadingIndex);
-    
+    newOutline[sectionIndex].subheadings = newOutline[
+      sectionIndex
+    ].subheadings.filter((_, idx) => idx !== subheadingIndex);
+
     // Update the subsections count to match the new number of subheadings
     newOutline[sectionIndex] = {
       ...newOutline[sectionIndex],
       subsections: newOutline[sectionIndex].subheadings.length
     };
-  
+
     setSharedState((prevState) => ({
       ...prevState,
       outline: newOutline
@@ -440,16 +341,16 @@ const ProposalPlan = () => {
         ...newOutline[index],
         [field]: value
       };
-  
+
       // Update state using callback to ensure we have latest state
-      setSharedState(prevState => ({
+      setSharedState((prevState) => ({
         ...prevState,
         outline: newOutline
       }));
-  
+
       // Wait for state to update
-      await new Promise(resolve => setTimeout(resolve, 0));
-  
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
       // Track status changes
       if (field === "status") {
         posthog.capture("proposal_section_status_changed", {
@@ -458,7 +359,7 @@ const ProposalPlan = () => {
           newStatus: value
         });
       }
-  
+
       // Track answer changes
       if (field === "answer") {
         posthog.capture("proposal_section_answer_updated", {
@@ -467,7 +368,7 @@ const ProposalPlan = () => {
           answerLength: value.length
         });
       }
-  
+
       return true; // Indicate successful update
     } catch (error) {
       console.error("Error updating section:", error);
@@ -475,8 +376,19 @@ const ProposalPlan = () => {
       return false;
     }
   };
-  
 
+  const handleSectionNavigation = (direction: "prev" | "next") => {
+    console.log("clicked", selectedSection);
+    if (selectedSection === null) return; // Changed condition to check for null specifically
+
+    console.log("change section");
+    const newIndex =
+      direction === "prev" ? selectedSection - 1 : selectedSection + 1;
+
+    if (newIndex >= 0 && newIndex < outline.length) {
+      setSelectedSection(newIndex);
+    }
+  };
   const fetchOutline = async () => {
     if (!object_id) return;
     const formData = new FormData();
@@ -525,7 +437,7 @@ const ProposalPlan = () => {
     selectedChoices?: string[],
     wordAmount?: number,
     compliance_requirements?: string[]
-) => {
+  ) => {
     setCurrentSectionIndex(sectionIndex);
     setQuestionAsked(true);
     localStorage.setItem("questionAsked", "true");
@@ -542,80 +454,80 @@ const ProposalPlan = () => {
     console.log(sharedState.object_id);
 
     try {
-        // Build request body based on choice
-        const requestBody: any = {
-            choice: choice,
-            broadness: broadness,
-            input_text: inputText,
-            extra_instructions: backgroundInfo,
-            datasets: sharedState.selectedFolders,
-            bid_id: sharedState.object_id
-        };
+      // Build request body based on choice
+      const requestBody: any = {
+        choice: choice,
+        broadness: broadness,
+        input_text: inputText,
+        extra_instructions: backgroundInfo,
+        datasets: sharedState.selectedFolders,
+        bid_id: sharedState.object_id
+      };
 
-        // Only include selectedChoices and wordAmounts if choice is not "3a"
-        if (choice !== "3a") {
-            setIsPreviewLoading(true);
-            if (selectedChoices) {
-                requestBody.selected_choices = selectedChoices;
-            }
-            if (wordAmounts) {
-                requestBody.word_amount = wordAmount;
-            }
-            if (wordAmounts) {
-              requestBody.compliance_requirements = compliance_requirements;
-              console.log("compliance");
-              console.log(compliance_requirements);
+      // Only include selectedChoices and wordAmounts if choice is not "3a"
+      if (choice !== "3a") {
+        setIsPreviewLoading(true);
+        if (selectedChoices) {
+          requestBody.selected_choices = selectedChoices;
+        }
+        if (wordAmounts) {
+          requestBody.word_amount = wordAmount;
+        }
+        if (wordAmounts) {
+          requestBody.compliance_requirements = compliance_requirements;
+          console.log("compliance");
+          console.log(compliance_requirements);
+        }
+      } else {
+        setIsLoading(true);
+      }
+
+      const result = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/question`,
+        requestBody,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
           }
-        } else {
-          setIsLoading(true);
         }
+      );
 
-        
+      console.log("Received response:", result.data);
 
-        const result = await axios.post(
-            `http${HTTP_PREFIX}://${API_URL}/question`,
-            requestBody,
-            {
-                headers: {
-                    Authorization: `Bearer ${tokenRef.current}`
-                }
-            }
-        );
-
-        console.log("Received response:", result.data);
-
-        if (choice === "3a") {
-            let choicesArray = [];
-            try {
-                if (result.data && result.data.includes(";")) {
-                    choicesArray = result.data.split(";").map((choice) => choice.trim());
-                }
-                if (choicesArray.length === 0 && typeof result.data === "string") {
-                    choicesArray = result.data
-                        .split("\n")
-                        .filter((line) => /^\d+\./.test(line.trim()))
-                        .map((line) => line.replace(/^\d+\.\s*/, "").trim());
-                }
-                console.log("Parsed choices:", choicesArray);
-                if (choicesArray.length === 0) {
-                    throw new Error("Failed to parse API response into choices");
-                }
-            } catch (error) {
-                console.error("Error processing API response:", error);
-            }
-            setApiChoices(choicesArray);
-        } else {
-            return result.data;
+      if (choice === "3a") {
+        let choicesArray = [];
+        try {
+          if (result.data && result.data.includes(";")) {
+            choicesArray = result.data
+              .split(";")
+              .map((choice) => choice.trim());
+          }
+          if (choicesArray.length === 0 && typeof result.data === "string") {
+            choicesArray = result.data
+              .split("\n")
+              .filter((line) => /^\d+\./.test(line.trim()))
+              .map((line) => line.replace(/^\d+\.\s*/, "").trim());
+          }
+          console.log("Parsed choices:", choicesArray);
+          if (choicesArray.length === 0) {
+            throw new Error("Failed to parse API response into choices");
+          }
+        } catch (error) {
+          console.error("Error processing API response:", error);
         }
+        setApiChoices(choicesArray);
+      } else {
+        return result.data;
+      }
     } catch (error) {
-        console.error("Error sending question:", error);
-        throw error;
+      console.error("Error sending question:", error);
+      throw error;
     } finally {
-        setIsLoading(false);
-        setIsPreviewLoading(false);
-        setStartTime(null);
+      setIsLoading(false);
+      setIsPreviewLoading(false);
+      setStartTime(null);
     }
-};
+  };
 
   const handleChoiceSelection = (selectedChoice) => {
     if (selectedChoices.includes(selectedChoice)) {
@@ -654,7 +566,6 @@ const ProposalPlan = () => {
                   value={choice}
                   onChange={(e) => handleChoiceEdit(index, e.target.value)}
                   className="ml-2"
-                 
                 />
               ) : (
                 <span
@@ -862,24 +773,28 @@ const ProposalPlan = () => {
                               {section.subsections}
                             </td>
                             <td className="text-center">
-                            <input
-                              type="number"
-                              value={section.word_count || 0}
-                              min="0"
-                              step="50"
-                              className="form-control d-inline-block word-count-input"
-                              style={{
-                                width: "80px",
-                                textAlign: "center"
-                              }}
-                              onChange={(e) => {
-                                const value = parseInt(e.target.value);
-                                if (!isNaN(value) && value >= 0) {
-                                  handleSectionChange(index, "word_count", value);
-                                }
-                              }}
-                            />
-                          </td>
+                              <input
+                                type="number"
+                                value={section.word_count || 0}
+                                min="0"
+                                step="50"
+                                className="form-control d-inline-block word-count-input"
+                                style={{
+                                  width: "80px",
+                                  textAlign: "center"
+                                }}
+                                onChange={(e) => {
+                                  const value = parseInt(e.target.value);
+                                  if (!isNaN(value) && value >= 0) {
+                                    handleSectionChange(
+                                      index,
+                                      "word_count",
+                                      value
+                                    );
+                                  }
+                                }}
+                              />
+                            </td>
 
                             <td className="text-center">
                               <div className="d-flex justify-content-center">
@@ -896,7 +811,6 @@ const ProposalPlan = () => {
                               </div>
                             </td>
                           </tr>
-                         
                         </React.Fragment>
                       );
                     })}
@@ -913,8 +827,9 @@ const ProposalPlan = () => {
                 />
               )}
               {selectedSection !== null && (
-                <ProposalSidepane 
+                <ProposalSidepane
                   section={outline[selectedSection]}
+                  contributors={contributors}
                   index={selectedSection}
                   isOpen={isSidepaneOpen}
                   onClose={() => {
@@ -931,6 +846,8 @@ const ProposalPlan = () => {
                   selectedChoices={selectedChoices}
                   submitSelections={submitSelections}
                   handleDeleteSubheading={handleDeleteSubheading}
+                  totalSections={outline.length} // Add this
+                  onNavigate={handleSectionNavigation} // Add this
                 />
               )}
             </div>

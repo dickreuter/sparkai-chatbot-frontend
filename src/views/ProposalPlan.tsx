@@ -108,6 +108,7 @@ const ProposalPlan = () => {
       e.preventDefault();
       setSelectedSection(index);
       setIsSidepaneOpen(true);
+      setApiChoices([]);
     }
   };
 
@@ -381,6 +382,7 @@ const ProposalPlan = () => {
     console.log("clicked", selectedSection);
     if (selectedSection === null) return; // Changed condition to check for null specifically
 
+    setApiChoices([]);
     console.log("change section");
     const newIndex =
       direction === "prev" ? selectedSection - 1 : selectedSection + 1;

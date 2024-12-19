@@ -68,7 +68,7 @@ const NavBar = () => {
   }, [auth]); // Depend on auth state
 
   return (
-    <nav className="navbar navbar-expand-sm fixed-top navbar-light bg-light">
+    <nav className="navbar navbar-expand-sm fixed-top ">
       <button
         className="navbar-toggler"
         type="button"

@@ -697,7 +697,10 @@ const Library = () => {
     const foldersToRender = topLevelFolders.slice(startIndex, endIndex);
 
     return foldersToRender.map((folderName) => {
-      const displayName = formatDisplayName(folderName);
+      const displayName =
+        folderName === "default"
+          ? "Whole Content Library"
+          : formatDisplayName(folderName);
       return (
         <tr
           key={folderName}
@@ -845,7 +848,9 @@ const Library = () => {
                 }
               }}
             >
-              {formatDisplayName(part)}
+              {part === "default"
+                ? "Whole Content Library"
+                : formatDisplayName(part)}
             </span>
           </React.Fragment>
         ))}

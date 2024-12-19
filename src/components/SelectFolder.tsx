@@ -10,7 +10,7 @@ import {
   faReply
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import './SelectFolderModal.css';
+import "./SelectFolderModal.css";
 
 const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const getAuth = useAuthUser();
@@ -225,7 +225,10 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
     const foldersToRender = topLevelFolders.slice(startIndex, endIndex);
 
     return foldersToRender.map((folderName) => {
-      const displayName = formatDisplayName(folderName);
+      const displayName =
+        folderName === "default"
+          ? "Whole Content Library"
+          : formatDisplayName(folderName);
       return (
         <tr key={folderName}>
           <td

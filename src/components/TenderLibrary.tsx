@@ -268,10 +268,7 @@ const TenderLibrary = ({ object_id }) => {
         </tr>
       );
     }
-
-    const startIdx = (currentPage - 1) * rowsPerPage;
-    const endIdx = startIdx + rowsPerPage;
-    const documentsToDisplay = documents.slice(startIdx, endIdx);
+    const documentsToDisplay = documents;
 
     return documentsToDisplay.map((filename, index) => (
       <tr key={index} style={{ cursor: "pointer" }}>
@@ -670,29 +667,28 @@ const TenderLibrary = ({ object_id }) => {
                     </Menu>
                   </div>
                 </div>
-
-                <table className="library-table">
-                  <thead>
-                    <tr>
-                      <th>Documents</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>{renderDocuments()}</tbody>
-                </table>
-              </div>
-
-              <div className="pagination-controls">
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => paginate(i + 1)}
-                    disabled={currentPage === i + 1}
-                    className="pagination-button"
+                <div style={{ width: "100%", marginTop: "30px" }}>
+                  <table className="library-table">
+                    <thead>
+                      <tr>
+                        <th>Documents</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                  </table>
+                  <div
+                    style={{
+                      overflowY: "auto",
+                      maxHeight: "400px",
+                      height: "100%",
+                      width: "100%"
+                    }}
                   >
-                    {i + 1}
-                  </button>
-                ))}
+                    <table style={{ width: "100%" }} className="library-table">
+                      <tbody>{renderDocuments()}</tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             </Card.Body>
           </Card>

@@ -446,7 +446,7 @@ const Bids = () => {
             </thead>
             <tbody>
               {loading
-                ? [...Array(13)].map((_, index) => <SkeletonRow key={index} />)
+                ? [...Array(14)].map((_, index) => <SkeletonRow key={index} />)
                 : currentBids.map((bid, index) => (
                     <tr key={index}>
                       <td>

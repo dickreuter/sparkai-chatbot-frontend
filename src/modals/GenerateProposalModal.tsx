@@ -14,6 +14,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import { LinearProgress, Typography, Box } from "@mui/material";
 import { fetchOutline } from "../utilityfunctions/updateSection";
+import wordpaneImage from "../resources/images/wordpanescreenshot.png";
+import "./GenerateProposalModal.css";
 
 const GenerateProposalModal = ({ bid_id, outline }) => {
   const getAuth = useAuthUser();
@@ -234,37 +236,26 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
         <div className="px-2 py-4">
           <div className="px-3">
             <p>
-              Only sections marked as complete will be used to generate the
-              proposal. The proposal will be generated as a Word document that
-              you can then edit and format as needed.
+              This is where the magic happens! The proposal will be generated as
+              a Word document that you can then edit and format as needed. You
+              can preview the document in the Preview Proposal tab. Make sure
+              you download our{" "}
+              <a
+                href="https://appsource.microsoft.com/en-us/product/office/WA200007690?src=office&corrid=bd0c24c3-6022-e897-73ad-0dc9bdf3558b&omexanonuid=&referralurl="
+                className="text-blue-600 hover:text-blue-800 underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                wordpane
+              </a>{" "}
+              so that you can easily refine your answers.
             </p>
-            {hasIncompleteSections && (
-              <>
-                <div className="mt-3 text-warning">
-                  <FontAwesomeIcon icon={faWarning} className="me-2" />
-                  There are {incompleteSections.length} incomplete sections:
-                </div>
-                <div
-                  className="mt-2 border rounded p-3 bg-light"
-                  style={{
-                    maxHeight: "200px",
-                    overflowY: "auto"
-                  }}
-                >
-                  <ul className="list-unstyled mb-0">
-                    {incompleteSections.map((section, index) => (
-                      <li
-                        key={index}
-                        className="mb-2 d-flex justify-content-between align-items-center"
-                      >
-                        <span className="fw-medium">{section.heading}</span>
-                        <FontAwesomeIcon icon={faWarning} className="me-2" />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </>
-            )}
+            <img
+              src={wordpaneImage}
+              alt="Wordpane Preview"
+              className="wordpane-image"
+            />
+
             {isGeneratingProposal && (
               <div className="mt-4">
                 <LinearProgressWithLabel
@@ -282,18 +273,18 @@ const GenerateProposalModal = ({ bid_id, outline }) => {
   return (
     <>
       <button className="orange-button" onClick={handleShow}>
-        <FontAwesomeIcon icon={faRocket} className="pr-2"></FontAwesomeIcon>
-        Generate Proposal
+        <FontAwesomeIcon icon={faRocket} className="pr-2" />
+        <span className="modal-title">Generate Proposal</span>
       </button>
       <Modal show={show} onHide={handleClose} size="lg" centered>
-        <Modal.Header className="p-4">
+        <Modal.Header className="px-4 d-flex justify-content-between align-items-center">
           <Modal.Title>{getHeaderTitle()}</Modal.Title>
+          <button className="close-button ms-auto" onClick={handleClose}>
+            ×
+          </button>
         </Modal.Header>
         <Modal.Body className="p-0">{renderStepContent()}</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleBack}>
-            {currentStep === 1 ? "Cancel" : "Back"}
-          </Button>
           <Button
             className="upload-button"
             onClick={handleNext}

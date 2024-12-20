@@ -194,7 +194,7 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                       icon={faWandMagicSparkles}
                       className="me-2"
                     />
-                    <span>Generate Subheadings</span>
+                    <span>Generate Talking Points</span>
                   </>
                 )}
               </button>

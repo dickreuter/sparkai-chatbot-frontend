@@ -329,7 +329,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
                 <h6 className="mb-1">Select Company Library Docs</h6>
                 <p className="text-muted mb-0">
                   Select previous bids from your company library to use as
-                  Context.
+                  context.
                 </p>
               </div>
             </div>
@@ -433,43 +433,32 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
             <h5 className="text-gray-600 mb-0">Next Steps:</h5>
             <ol style={{ padding: "12px", paddingBottom: "0px" }}>
               <li>
-                <strong>Review Section Headings:</strong>
+                <strong>Review Questions:</strong>
                 <p className="text-muted mb-2">
-                  Check that all section headings match your tender
-                  requirements. You can edit these directly in the table or add
-                  new sections by hovering over a row in the table.
+                  Check that all questions extracted match your tender
+                  questions. You can edit these in the sidepane by clicking on a
+                  section or add new sections by right clicking on a row in the
+                  table.
                 </p>
               </li>
               <li>
                 <strong>Start Writing:</strong>
                 <p className="text-muted">
-                  If you want to add more detail to a section, click the edit
-                  button (pencil icon) next to any section. This will let you
-                  add specific areas you want the AI to cover in the final
-                  proposal for that section.
+                  If you want to add more detail to a section, click on the
+                  section to show the sidepane. This will let you add talking
+                  points you want the AI to cover in the final proposal for that
+                  section.
                 </p>
               </li>
               <li>
                 <strong>Create Proposal</strong>
                 <p className="text-muted mb-2">
-                  Click the Create Proposal button to generate a proposal. Only
-                  sections which you have marked as Completed will be included
-                  in the proposal.
+                  Click the Create Proposal button to generate a proposal. Once
+                  your proposal has been generated you can go to the Preview
+                  Proposal tab to download it as a word document.
                 </p>
               </li>
             </ol>
-            <div
-              className="alert alert-info mt-4"
-              style={{
-                backgroundColor: "rgba(255, 140, 0, 0.08)",
-                border: "1px solid #FF8C00",
-                color: "#FF8C00"
-              }}
-            >
-              <strong>Tip:</strong> Keep track of section completion using the
-              status dropdown. If you haven't marked a section as complete, it
-              won't be included in the final proposal.
-            </div>
           </div>
         </div>
       );
@@ -477,7 +466,11 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
   };
 
   const onCancel = () => {
-    navigate("/bid-extractor");
+    if (!sharedState.outline || sharedState.outline.length === 0) {
+      navigate("/bid-extractor");
+    } else {
+      onHide();
+    }
   };
 
   const getHeaderTitle = () => {
@@ -489,8 +482,11 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
 
   return (
     <Modal show={show} onHide={onCancel} size="lg" centered>
-      <Modal.Header className="p-6">
-        <Modal.Title className="px-4">{getHeaderTitle()}</Modal.Title>
+      <Modal.Header className="px-4 d-flex justify-content-between align-items-center">
+        <Modal.Title>{getHeaderTitle()}</Modal.Title>
+        <button className="close-button ms-auto" onClick={onCancel}>
+          ×
+        </button>
       </Modal.Header>
       <Modal.Body className="p-2">{renderStepContent()}</Modal.Body>
       <Modal.Footer>

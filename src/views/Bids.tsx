@@ -524,10 +524,13 @@ const Bids = () => {
           onHide={handleModalClose}
           className="custom-modal-newbid"
         >
-          <Modal.Header closeButton className="py-3 px-4">
+          <Modal.Header className="px-4">
             <Modal.Title>Enter Tender Name</Modal.Title>
+            <button className="close-button ms-auto" onClick={handleModalClose}>
+              ×
+            </button>
           </Modal.Header>
-          <Modal.Body className="px-4 py-4" style={{ height: "12vh" }}>
+          <Modal.Body className="px-4 py-4" style={{ height: "14vh" }}>
             <div className="content-scaler">
               <Form onSubmit={handleModalSubmit}>
                 <div className="search-input-group">

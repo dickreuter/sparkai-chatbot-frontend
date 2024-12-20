@@ -378,11 +378,11 @@ const TenderLibrary = ({ object_id }) => {
         displayAlert("Please select files to upload", "warning");
         return;
       }
-      
+
       setUploading(true);
       let successCount = 0;
       let failCount = 0;
-      
+
       for (const file of files) {
         const mode = getFileMode(file.type);
         if (!mode) {
@@ -390,13 +390,13 @@ const TenderLibrary = ({ object_id }) => {
           setUploadStatus((prev) => ({ ...prev, [file.name]: "fail" }));
           continue;
         }
-        
+
         const formData = new FormData();
         formData.append("file", file);
         formData.append("bid_id", object_id);
         formData.append("mode", mode);
         setUploadStatus((prev) => ({ ...prev, [file.name]: "uploading" }));
-        
+
         try {
           const response = await axios.post(
             `http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`,
@@ -408,7 +408,7 @@ const TenderLibrary = ({ object_id }) => {
               }
             }
           );
-          
+
           if (response.data.status === "success") {
             successCount++;
             setUploadStatus((prev) => ({ ...prev, [file.name]: "success" }));
@@ -420,20 +420,24 @@ const TenderLibrary = ({ object_id }) => {
           console.error("Error uploading file:", error);
           failCount++;
           setUploadStatus((prev) => ({ ...prev, [file.name]: "fail" }));
-          
+
           // Extract and display the detailed error message from the backend
-          const errorMessage = error.response?.data?.detail || 
-                              error.response?.data?.message ||
-                              error.message ||
-                              'Failed to upload file';
-          
-          displayAlert(`Error uploading ${file.name}: ${errorMessage}`, "danger");
+          const errorMessage =
+            error.response?.data?.detail ||
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to upload file";
+
+          displayAlert(
+            `Error uploading ${file.name}: ${errorMessage}`,
+            "danger"
+          );
           continue; // Continue with next file even if current one failed
         }
       }
-      
+
       setUploading(false);
-      
+
       if (successCount > 0) {
         displayAlert(
           `Successfully uploaded ${successCount} file(s)`,
@@ -446,8 +450,7 @@ const TenderLibrary = ({ object_id }) => {
           fileTypes: files.map((f) => f.type)
         });
       }
-      
-      
+
       setTimeout(() => {
         setFiles([]);
         setUploadStatus({});
@@ -457,10 +460,13 @@ const TenderLibrary = ({ object_id }) => {
 
     return (
       <Modal show={show} onHide={onHide} size="lg" centered>
-        <Modal.Header closeButton>
+        <Modal.Header className="px-4">
           <Modal.Title>Upload Files to Tender Library</Modal.Title>
+          <button className="close-button ms-auto" onClick={onHide}>
+            ×
+          </button>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="px-4 py-4">
           <p>
             Documents uploaded to the Tender Library will be used as context by
             our AI to generate compliance requirements and opportunity

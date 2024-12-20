@@ -42,24 +42,30 @@ const FileContentModal = ({
   };
 
   return (
-    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" >
+    <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
       <Modal.Header
-        closeButton
+        className="px-4"
         style={{
           display: "flex",
           justifyContent: "center",
           textAlign: "center"
         }}
       >
-        <div style={{ flex: "1 1 auto" }}>
-          <Modal.Title style={{ textAlign: "center" }}>
-            File Content
-          </Modal.Title>
-        </div>
+        <Modal.Title>File Content</Modal.Title>
+
+        <button
+          className="close-button ms-auto"
+          onClick={() => setShowModal(false)}
+        >
+          ×
+        </button>
       </Modal.Header>
-      <Modal.Body style={{ height: "500px", position: "relative" }}>
+      <Modal.Body
+        style={{ height: "500px", position: "relative" }}
+        className="px-4 py-4"
+      >
         {isLoading && (
-          <div 
+          <div
             style={{
               position: "absolute",
               top: 0,
@@ -73,8 +79,8 @@ const FileContentModal = ({
               zIndex: 1000
             }}
           >
-            <Spinner 
-              animation="border" 
+            <Spinner
+              animation="border"
               style={{
                 width: "2rem",
                 height: "2rem",
@@ -129,9 +135,6 @@ const FileContentModal = ({
           </>
         ) : (
           <>
-            <Button className="upload-button" onClick={handleEditClick}>
-              Edit
-            </Button>
             {fileName && fileName.endsWith(".pdf") && (
               <Button className="upload-button" onClick={handleViewPdfClick}>
                 View PDF Uploaded

@@ -77,9 +77,12 @@ const NewFolderModal = React.memo(
     };
 
     return (
-      <Modal show={show} onHide={onHide}>
-        <Modal.Header closeButton className="py-3 px-4">
+      <Modal show={show} onHide={onHide} className="custom-modal-newbid">
+        <Modal.Header className="px-4">
           <Modal.Title>{title || "Create New Folder"}</Modal.Title>
+          <button className="close-button ms-auto" onClick={onHide}>
+            ×
+          </button>
         </Modal.Header>
         <Modal.Body className="px-4 py-4">
           <Form.Group>
@@ -385,8 +388,11 @@ const Library = () => {
 
   const UploadPDFModal = ({ show, onHide, folder, get_collections }) => (
     <Modal show={show} onHide={onHide} size="lg" centered>
-      <Modal.Header closeButton lassName="py-3 px-4">
+      <Modal.Header className="px-4">
         <Modal.Title>Upload Files</Modal.Title>
+        <button className="close-button ms-auto" onClick={onHide}>
+          ×
+        </button>
       </Modal.Header>
       <Modal.Body className="px-4 py-4">
         <UploadPDF
@@ -414,10 +420,13 @@ const Library = () => {
       onClick={(e) => e.stopPropagation()}
       size="lg"
     >
-      <Modal.Header closeButton onClick={(e) => e.stopPropagation()}>
+      <Modal.Header className="px-4" onClick={(e) => e.stopPropagation()}>
         <Modal.Title>Text Uploader</Modal.Title>
+        <button className="close-button ms-auto" onClick={onHide}>
+          ×
+        </button>
       </Modal.Header>
-      <Modal.Body onClick={(e) => e.stopPropagation()}>
+      <Modal.Body className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
         <UploadText
           folder={folder}
           get_collections={get_collections}
@@ -671,30 +680,28 @@ const Library = () => {
     setShowDropdown(searchQuery.length > 0);
   }, [searchQuery]);
 
-  useEffect(() => {
-    if (activeFolder === null) {
-      const topLevelFolders = getTopLevelFolders();
-      const itemsCount = topLevelFolders.length;
-      const pages = Math.ceil(itemsCount / rowsPerPage);
-      setTotalPages(pages);
-      setCurrentPage(1);
-    } else {
-      const itemsCount = folderContents[activeFolder]?.length || 0;
-      const pages = Math.ceil(itemsCount / rowsPerPage);
-      setTotalPages(pages);
-      setCurrentPage(1); // Reset to first page when changing folders
-    }
-  }, [activeFolder, folderContents, availableCollections, rowsPerPage]);
+  // useEffect(() => {
+  //   if (activeFolder === null) {
+  //     const topLevelFolders = getTopLevelFolders();
+  //     const itemsCount = topLevelFolders.length;
+  //     const pages = Math.ceil(itemsCount / rowsPerPage);
+  //     setTotalPages(pages);
+  //     setCurrentPage(1);
+  //   } else {
+  //     const itemsCount = folderContents[activeFolder]?.length || 0;
+  //     const pages = Math.ceil(itemsCount / rowsPerPage);
+  //     setTotalPages(pages);
+  //     setCurrentPage(1); // Reset to first page when changing folders
+  //   }
+  // }, [activeFolder, folderContents, availableCollections, rowsPerPage]);
 
   const formatDisplayName = (name) => {
     return name.replace(/_/g, " ");
   };
 
-  const renderFolderStructure = (structure, path = "") => {
+  const renderFolderStructure = () => {
     const topLevelFolders = getTopLevelFolders();
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    const foldersToRender = topLevelFolders.slice(startIndex, endIndex);
+    const foldersToRender = topLevelFolders;
 
     return foldersToRender.map((folderName) => {
       const displayName =
@@ -732,9 +739,8 @@ const Library = () => {
 
   const renderFolderContents = (folderPath) => {
     const contents = folderContents[folderPath] || [];
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    const contentsToRender = contents.slice(startIndex, endIndex);
+
+    const contentsToRender = contents;
 
     return contentsToRender.map(({ filename, unique_id, isFolder }, index) => {
       const fullPath = isFolder
@@ -1112,44 +1118,44 @@ const Library = () => {
                     New Subfolder
                   </MenuItem>
                 </Menu>
-                <table className="library-table">
-                  <thead>
-                    <tr>
-                      <th>{renderBreadcrumbs()}</th>
-                      <th colSpan={3}>
-                        {activeFolder && (
-                          <div
-                            className="back-button"
-                            onClick={() => handleBackClick()}
-                            style={{ cursor: "pointer", padding: "5px" }}
-                          >
-                            <FontAwesomeIcon icon={faReply} />
-                            <span style={{ marginLeft: "10px" }}>Back</span>
-                          </div>
-                        )}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activeFolder
-                      ? renderFolderContents(activeFolder)
-                      : renderFolderStructure(folderStructure)}
-                  </tbody>
-                </table>
-              </div>
+                <div style={{ width: "100%", marginTop: "30px" }}>
+                  <table className="library-table">
+                    <thead>
+                      <tr>
+                        <th>{renderBreadcrumbs()}</th>
+                        <th colSpan={3}>
+                          {activeFolder && (
+                            <div
+                              className="back-button"
+                              onClick={() => handleBackClick()}
+                              style={{ cursor: "pointer", padding: "5px" }}
+                            >
+                              <FontAwesomeIcon icon={faReply} />
+                              <span style={{ marginLeft: "10px" }}>Back</span>
+                            </div>
+                          )}
+                        </th>
+                      </tr>
+                    </thead>
+                  </table>
 
-              <div className="pagination-controls">
-                {totalPages > 1 &&
-                  [...Array(totalPages)].map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => paginate(i + 1)}
-                      disabled={currentPage === i + 1}
-                      className="pagination-button"
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
+                  <div
+                    style={{
+                      overflowY: "auto",
+                      maxHeight: "550px",
+                      height: "100%",
+                      width: "100%"
+                    }}
+                  >
+                    <table style={{ width: "100%" }} className="library-table">
+                      <tbody>
+                        {activeFolder
+                          ? renderFolderContents(activeFolder)
+                          : renderFolderStructure()}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             </Card.Body>
           </Card>

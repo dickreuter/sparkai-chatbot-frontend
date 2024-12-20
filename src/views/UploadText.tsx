@@ -150,7 +150,7 @@ const UploadText = ({ folder, get_collections, onClose }) => {
         <button
           onClick={handleTextSubmit}
           disabled={!isFormFilled || isUploading} // Disable button if form is not filled or uploading
-          className="upload-button mb-4"
+          className="upload-button"
         >
           {isUploading ? (
             <Spinner animation="border" size="sm" /> // Display spinner while uploading

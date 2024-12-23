@@ -23,7 +23,32 @@
   height: 100%;
 }
 
-/* Animation for the main sidepane */
+.sidepane {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 650px;
+  z-index: 200;
+  height: 125vh;
+  background: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  transform: translateX(500px);
+  /* Simplified transform */
+  background-color: #faf7f7;
+  padding-top: 55px;
+  /* Remove problematic 3D properties */
+}
+
+.sidepane.open {
+  animation: slideInPane 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.sidepane:not(.open) {
+  animation: slideOutPane 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Simplified animations using translate3d */
 
 @keyframes slideInPane {
   from {
@@ -43,31 +68,7 @@
   }
 }
 
-.sidepane {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 650px;
-  z-index: 200;
-  height: 125vh;
-  background: white;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  transform: translateX(500px);
-  will-change: transform;
-  background-color: #faf7f7;
-  padding-top: 55px;
-}
-
-.sidepane.open {
-  animation: slideInPane 0.4s ease-out forwards;
-}
-
-.sidepane:not(.open) {
-  animation: slideOutPane 0.4s ease-in forwards;
-}
-
-/* Content slide animations */
+/* Simplify content animations */
 
 @keyframes slideInContent {
   0% {
@@ -80,55 +81,14 @@
   }
 }
 
-@keyframes slideOutContent {
-  0% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateX(20px);
-  }
+.sidepane-content-wrapper {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-/* Initial state for content children */
-
-.sidepane-content > * {
-  opacity: 0;
-  transform: translateX(20px);
-}
-
-/* Animation for content when sidepane is open */
-
-.sidepane.open .sidepane-content > * {
-  animation: slideInContent 0.3s ease-out forwards;
-}
-
-/* Staggered delays for children */
-
-.sidepane.open .sidepane-content > *:nth-child(1) {
-  animation-delay: 0.3s;
-}
-
-.sidepane.open .sidepane-content > *:nth-child(2) {
-  animation-delay: 0.4s;
-}
-
-.sidepane.open .sidepane-content > *:nth-child(3) {
-  animation-delay: 0.5s;
-}
-
-.sidepane.open .sidepane-content > *:nth-child(4) {
-  animation-delay: 0.6s;
-}
-
-/* Animation for content when sidepane is closing */
-
-.sidepane:not(.open) .sidepane-content > * {
-  animation: slideOutContent 0.2s ease-in forwards;
-}
-
-/* Backdrop */
+/* Update backdrop */
 
 .sidepane-backdrop {
   position: fixed;
@@ -145,6 +105,8 @@
   z-index: 199;
   overflow: hidden !important;
   margin: 0;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .sidepane-backdrop.visible {

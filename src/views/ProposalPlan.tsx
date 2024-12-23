@@ -691,28 +691,34 @@ const ProposalPlan = () => {
                   className="outline-table"
                   style={{ tableLayout: "fixed" }}
                 >
-                  <thead style={{ width: "100%" }}>
+                  <thead>
                     <tr>
-                      <th className="" style={{ width: "45%" }}>
-                        Section
-                      </th>
-                      <th className="" style={{ width: "14%" }}>
+                      <th className="section-col">Section</th>
+                      <th
+                        className="dropdown-col"
+                        style={{ width: "250px", minWidth: "250px" }}
+                      >
                         Reviewer
                       </th>
-                      <th className="" style={{ width: "14%" }}>
+                      <th
+                        className="dropdown-col"
+                        style={{ width: "250px", minWidth: "250px" }}
+                      >
                         Question Type
                       </th>
-                      <th className=" text-center" style={{ width: "8%" }}>
+                      <th
+                        className="dropdown-col text-center"
+                        style={{ width: "140px", minWidth: "140px" }}
+                      >
                         Completed
                       </th>
-                      <th className=" text-center" style={{ width: "8%" }}>
+                      <th className="text-center" style={{ width: "120px" }}>
                         Subsections
                       </th>
-                      <th className=" text-center" style={{ width: "6.5%" }}>
+                      <th className="text-center" style={{ width: "100px" }}>
                         Words
                       </th>
-
-                      <th className=" text-center" style={{ width: "6%" }}>
+                      <th className="text-center" style={{ width: "80px" }}>
                         Delete
                       </th>
                     </tr>

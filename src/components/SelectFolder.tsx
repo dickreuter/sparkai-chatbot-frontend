@@ -34,11 +34,18 @@ const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const [updateTrigger, setUpdateTrigger] = useState(0);
 
   const getTopLevelFolders = () => {
-    return availableCollections.filter(
+    const folders = availableCollections.filter(
       (collection) =>
         !collection.includes("FORWARDSLASH") &&
         !collection.startsWith("TenderLibrary_")
     );
+
+    // Sort the folders to put "default" first
+    return folders.sort((a, b) => {
+      if (a === "default") return -1;
+      if (b === "default") return 1;
+      return a.localeCompare(b);
+    });
   };
 
   const paginate = (pageNumber) => {

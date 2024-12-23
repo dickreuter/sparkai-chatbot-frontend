@@ -1,17 +1,19 @@
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 
 interface ReviewerDropdownProps {
   value: string;
   onChange: (value: string) => void;
   contributors: Record<string, string>;
-  className?: string; // Optional className prop
+  className?: string;
 }
 
 const selectStyle = {
   fontFamily: '"ClashDisplay", sans-serif',
   fontSize: "0.875rem",
   minWidth: "220px",
-  backgroundColor: "white", // Add white background
+  backgroundColor: "white",
   "& MuiOutlinedInputNotchedOutline": {
     borderColor: "#ced4da"
   },
@@ -29,11 +31,18 @@ const menuStyle = {
   fontFamily: '"ClashDisplay", sans-serif'
 };
 
+const menuItemStyle = {
+  ...menuStyle,
+  display: "flex",
+  alignItems: "center",
+  gap: "8px" // Adds space between icon and text
+};
+
 const ReviewerDropdown: React.FC<ReviewerDropdownProps> = ({
   value,
   onChange,
   contributors,
-  className // Add className to props
+  className
 }) => {
   const handleChange = (event: SelectChangeEvent<string>) => {
     onChange(event.target.value as string);
@@ -45,7 +54,7 @@ const ReviewerDropdown: React.FC<ReviewerDropdownProps> = ({
       onChange={handleChange}
       size="small"
       style={selectStyle}
-      className={className} // Apply the className
+      className={className}
       displayEmpty
       MenuProps={{
         PaperProps: {
@@ -53,17 +62,20 @@ const ReviewerDropdown: React.FC<ReviewerDropdownProps> = ({
         }
       }}
     >
-      <MenuItem value="" style={menuStyle}>
+      <MenuItem value="" style={menuItemStyle}>
+        <FontAwesomeIcon icon={faUserCircle} size="sm" className="me-2" />
         <em>Select Reviewer</em>
       </MenuItem>
       {Object.entries(contributors).length > 0 ? (
         Object.entries(contributors).map(([email, role], index) => (
-          <MenuItem key={index} value={email} style={menuStyle}>
+          <MenuItem key={index} value={email} style={menuItemStyle}>
+            <FontAwesomeIcon icon={faUserCircle} size="sm" className="me-2" />
             {email} ({role})
           </MenuItem>
         ))
       ) : (
-        <MenuItem disabled value="" style={menuStyle}>
+        <MenuItem disabled value="" style={menuItemStyle}>
+          <FontAwesomeIcon icon={faUserCircle} size="sm" className="me-2" />
           No Contributors Available
         </MenuItem>
       )}

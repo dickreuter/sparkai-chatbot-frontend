@@ -390,7 +390,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
     } else if (currentStep === 3) {
       return (
         <div className="px-4 py-2">
-          <div className="px-3">
+          <div className="">
             Select the folders below from your content library to use as context
             in your final proposal. The AI will be able to use information from
             these when generating an answer.
@@ -488,7 +488,7 @@ const OutlineInstructionsModal = ({ show, onHide, bid_id, fetchOutline }) => {
           ×
         </button>
       </Modal.Header>
-      <Modal.Body className="p-2">{renderStepContent()}</Modal.Body>
+      <Modal.Body className="px-0 py-4">{renderStepContent()}</Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleBack}>
           {currentStep === 1 ? "Cancel" : "Back"}

@@ -165,13 +165,19 @@ const Library = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const getTopLevelFolders = () => {
-    return availableCollections.filter(
+    const folders = availableCollections.filter(
       (collection) =>
         !collection.includes("FORWARDSLASH") &&
         !collection.startsWith("TenderLibrary_")
     );
-  };
 
+    // Sort the folders to put "default" first
+    return folders.sort((a, b) => {
+      if (a === "default") return -1;
+      if (b === "default") return 1;
+      return a.localeCompare(b);
+    });
+  };
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };

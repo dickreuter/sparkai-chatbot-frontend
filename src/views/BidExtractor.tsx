@@ -1,15 +1,22 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
 import { useLocation } from "react-router-dom";
-import { Button, Card, Col, Row, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  Col,
+  Row,
+  Spinner,
+  OverlayTrigger,
+  Tooltip
+} from "react-bootstrap";
 import BidNavbar from "../routes/BidNavbar.tsx";
 import "./BidExtractor.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
-import { EditorState, ContentState } from "draft-js";
 import { displayAlert } from "../helper/Alert";
 import { FormControl } from "@mui/material";
 import ContributorModal from "../components/ContributorModal.tsx";
@@ -17,7 +24,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
 import TenderLibrary from "../components/TenderLibrary.tsx";
 import CustomDateInput from "../components/CustomDateInput.tsx";
-import BidExtractorWizard from "../wizards/BidExtractorWizard.tsx";
+
 import {
   StyledSelect,
   StyledMenuItem
@@ -25,7 +32,7 @@ import {
 
 const BidExtractor = () => {
   const getAuth = useAuthUser();
-  const auth = getAuth();
+  const auth = useMemo(() => getAuth(), [getAuth]);
   const tokenRef = useRef(auth?.token || "default");
 
   const { sharedState, setSharedState } = useContext(BidContext);
@@ -162,47 +169,69 @@ const BidExtractor = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchOrganizationUsers = async () => {
-      try {
-        const response = await axios.get(
-          `http${HTTP_PREFIX}://${API_URL}/organization_users`,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`
-            }
+  const fetchOrganizationUsers = async () => {
+    try {
+      const response = await axios.get(
+        `http${HTTP_PREFIX}://${API_URL}/organization_users`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
           }
-        );
-        setOrganizationUsers(response.data);
-        console.log(contributors);
-      } catch (err) {
-        console.log("Error fetching organization users:");
-      }
-    };
+        }
+      );
+      setOrganizationUsers(response.data);
+      console.log(contributors);
+    } catch (err) {
+      console.log("Error fetching organization users:");
+    }
+  };
 
-    fetchOrganizationUsers();
-  }, [tokenRef]);
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(
+        `http${HTTP_PREFIX}://${API_URL}/profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+      setCurrentUserEmail(response.data.email);
+    } catch (err) {
+      console.log("Failed to load profile data");
+      setLoading(false);
+    }
+  };
+
+  const fetchExistingBidNames = async () => {
+    try {
+      const response = await axios.post(
+        `http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${tokenRef.current}`
+          }
+        }
+      );
+      if (response.data && response.data.bids) {
+        setExistingBidNames(response.data.bids.map((bid) => bid.bid_title));
+      }
+    } catch (error) {
+      console.error("Error fetching bid names:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(
-          `http${HTTP_PREFIX}://${API_URL}/profile`,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`
-            }
-          }
-        );
-        setCurrentUserEmail(response.data.email);
-      } catch (err) {
-        console.log("Failed to load profile data");
-        setLoading(false);
-      }
+    const fetchInitialData = async () => {
+      await Promise.all([
+        fetchUserData(),
+        fetchOrganizationUsers(),
+        fetchExistingBidNames()
+      ]);
     };
-
-    fetchUserData();
-  }, [tokenRef]);
+    fetchInitialData();
+  }, []);
 
   const handleAddContributor = (user, permission) => {
     setSharedState((prevState) => ({
@@ -281,29 +310,6 @@ const BidExtractor = () => {
   };
 
   useEffect(() => {
-    const fetchExistingBidNames = async () => {
-      try {
-        const response = await axios.post(
-          `http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${tokenRef.current}`
-            }
-          }
-        );
-        if (response.data && response.data.bids) {
-          setExistingBidNames(response.data.bids.map((bid) => bid.bid_title));
-        }
-      } catch (error) {
-        console.error("Error fetching bid names:", error);
-      }
-    };
-
-    fetchExistingBidNames();
-  }, [tokenRef]);
-
-  useEffect(() => {
     const navigatedFromBidsTable = localStorage.getItem(
       "navigatedFromBidsTable"
     );
@@ -355,7 +361,7 @@ const BidExtractor = () => {
     } else if (initialBidName && initialBidName !== "") {
       // Update bidInfo with the initial bid name if it's provided and not empty
       // USER CREATES A NEW BID
-      console.log("newbid created")
+      console.log("newbid created");
       setSharedState((prevState) => ({
         ...prevState,
         bidInfo: initialBidName,
@@ -365,13 +371,7 @@ const BidExtractor = () => {
     }
     const updatedBid = { bidData };
     window.dispatchEvent(new CustomEvent("bidUpdated", { detail: updatedBid }));
-  }, [location, bidData, setSharedState, initialBidName, auth.email]);
-
-  useEffect(() => {
-    if (questions.length > 0) {
-      console.log("Questions updated:", questions);
-    }
-  }, [questions]);
+  }, []);
 
   const handleOpportunityInformationChange = (e) => {
     const newOpportunityInformation = e.target.value;
@@ -614,7 +614,8 @@ const BidExtractor = () => {
                       placement="top"
                       overlay={
                         <Tooltip id="opportunity-info-tooltip">
-                          Extract opportunity information automatically from your uploaded tender documents
+                          Extract opportunity information automatically from
+                          your uploaded tender documents
                         </Tooltip>
                       }
                     >
@@ -675,7 +676,8 @@ const BidExtractor = () => {
                       placement="top"
                       overlay={
                         <Tooltip id="compliance-req-tooltip">
-                          Extract compliance requirements automatically from your uploaded tender documents
+                          Extract compliance requirements automatically from
+                          your uploaded tender documents
                         </Tooltip>
                       }
                     >
@@ -731,7 +733,7 @@ const BidExtractor = () => {
 
             <Row className="mb-0">
               <Col md={12}>
-                <TenderLibrary object_id={object_id} />
+                <TenderLibrary key={object_id} object_id={object_id} />
               </Col>
             </Row>
 

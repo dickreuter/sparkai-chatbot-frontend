@@ -392,7 +392,22 @@ const Library = () => {
     }
   };
 
-  const UploadPDFModal = ({ show, onHide, folder, get_collections }) => (
+  const handleOnClose = () => {
+    setShowPDFModal(false);
+    fetchFolderStructure();
+    if (uploadFolder) {
+      fetchFolderContents(uploadFolder);
+    }
+    setUpdateTrigger((prev) => prev + 1);
+  };
+
+  const UploadPDFModal = ({
+    show,
+    onHide,
+    folder,
+    get_collections,
+    onClose
+  }) => (
     <Modal show={show} onHide={onHide} size="lg" centered>
       <Modal.Header className="px-4">
         <Modal.Title>Upload Files</Modal.Title>
@@ -404,14 +419,12 @@ const Library = () => {
         <UploadPDF
           folder={folder}
           get_collections={get_collections}
-          onClose={() => {
-            onHide();
-            get_collections();
-            if (folder) {
-              fetchFolderContents(folder);
-            }
-            setUpdateTrigger((prev) => prev + 1);
-          }}
+          onClose={onClose}
+          apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile/`}
+          descriptionText="Upload previous bids here for the AI to use as context in the Q&A
+        Generator. This might take a while for large documents because we need
+        to convert the documents into a format the AI can understand so sit
+        tight!"
         />
       </Modal.Body>
     </Modal>
@@ -1202,6 +1215,7 @@ const Library = () => {
             onHide={() => setShowPDFModal(false)}
             folder={uploadFolder}
             get_collections={fetchFolderStructure}
+            onClose={handleOnClose}
           />
 
           <UploadTextModal

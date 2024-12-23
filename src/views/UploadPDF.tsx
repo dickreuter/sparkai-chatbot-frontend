@@ -13,11 +13,26 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import posthog from "posthog-js";
 
-const UploadPDFComponent = ({
+interface UploadPDFProps {
+  folder?: string;
+  bid_id?: string;
+  get_collections: () => void;
+  onClose?: () => void;
+  apiUrl: string;
+  descriptionText: string;
+}
+
+interface UploadedFiles {
+  [key: string]: boolean;
+}
+
+const UploadPDFComponent: React.FC<UploadPDFProps> = ({
   folder,
+  bid_id,
   get_collections,
   onClose,
-  usingTenderLibrary
+  apiUrl,
+  descriptionText
 }) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -96,7 +111,6 @@ const UploadPDFComponent = ({
       posthog.capture("pdf_upload_files_selected", {
         fileCount: validFiles.length,
         fileTypes: validFiles.map((f) => f.type),
-        folder
       });
     }
 
@@ -112,11 +126,10 @@ const UploadPDFComponent = ({
     }
   };
 
-  const uploadFile = async (file) => {
+  const uploadFile = async (file: File) => {
     posthog.capture("pdf_upload_started", {
       fileName: file.name,
-      fileType: file.type,
-      folder
+      fileType: file.type
     });
 
     const mode = getFileMode(file.type);
@@ -126,37 +139,28 @@ const UploadPDFComponent = ({
 
     const formData = new FormData();
     formData.append("file", file);
-
-    // Only apply regex validation to folder names
-    const encodedFolder = folder ? encodeURIComponent(folder) : "";
-    formData.append("profile_name", encodedFolder);
     formData.append("mode", mode);
 
+    if (folder) {
+      formData.append("profile_name", encodeURIComponent(folder));
+    }
+
+    if (bid_id) {
+      formData.append("bid_id", bid_id);
+    }
+
     try {
-      const response = await axios.post(
-        `http${HTTP_PREFIX}://${API_URL}/uploadfile/`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${tokenRef.current}`
-          }
+      const response = await axios.post(apiUrl, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${tokenRef.current}`
         }
-      );
-      posthog.capture("pdf_upload_succeeded", {
-        fileName: file.name,
-        fileType: file.type,
-        folder
       });
+      posthog.capture("pdf_upload_succeeded");
       setUploadedFiles((prev) => ({ ...prev, [file.name]: true }));
       return response.data;
     } catch (error) {
-      posthog.capture("pdf_upload_failed", {
-        fileName: file.name,
-        fileType: file.type,
-        folder,
-        error: error.message
-      });
+      posthog.capture("pdf_upload_failed");
       console.error("Error uploading file:", error);
       throw error;
     }
@@ -203,12 +207,7 @@ const UploadPDFComponent = ({
 
   return (
     <div>
-      <p>
-        Upload previous bids here for the AI to use as context in the Q&A
-        Generator. This might take a while for large documents because we need
-        to convert the documents into a format the AI can understand so sit
-        tight!
-      </p>
+      <p>{descriptionText}</p>
       <div
         className={`drop-zone ${dragActive ? "active" : ""}`}
         onDragEnter={handleDrag}

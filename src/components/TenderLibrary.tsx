@@ -30,6 +30,7 @@ import { Menu, MenuItem } from "@mui/material";
 import { displayAlert } from "../helper/Alert.tsx";
 import InterrogateTenderModal from "./InterrogateTenderModal.tsx";
 import posthog from "posthog-js";
+import UploadPDF from "../views/UploadPDF.tsx";
 
 const getFileMode = (fileType) => {
   if (fileType === "application/pdf") {
@@ -287,280 +288,32 @@ const TenderLibrary = ({ object_id }) => {
     ));
   };
 
-  const UploadPDFModal = ({ show, onHide, object_id }) => {
-    const [files, setFiles] = useState([]);
-    const [dragActive, setDragActive] = useState(false);
-    const [uploading, setUploading] = useState(false);
-    const [uploadStatus, setUploadStatus] = useState({});
-    const fileInputRef = useRef(null);
-
-    const handleDrag = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.type === "dragenter" || e.type === "dragover") {
-        setDragActive(true);
-      } else if (e.type === "dragleave") {
-        setDragActive(false);
-      }
-    };
-
-    const handleDrop = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setDragActive(false);
-      console.log("Drop event triggered");
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        const droppedFiles = Array.from(e.dataTransfer.files);
-        console.log("Dropped files:", droppedFiles);
-        handleFiles(droppedFiles);
-      }
-    };
-
-    const handleFiles = (newFiles) => {
-      console.log("handleFiles called with:", newFiles);
-      const allowedTypes = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "application/vnd.ms-excel",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      ];
-
-      const validFiles = newFiles.filter((file) => {
-        console.log("Checking file:", file.name, file.type);
-        const isAllowedType = allowedTypes.includes(file.type);
-        const mode = getFileMode(file.type);
-        if (!isAllowedType || !mode) {
-          displayAlert(
-            `File "${file.name}" was not added. Only PDF, Word, and Excel documents are allowed.`,
-            "warning"
-          );
-          return false;
-        }
-        return true;
-      });
-
-      console.log("Valid files:", validFiles);
-
-      setFiles((prevFiles) => {
-        const updatedFiles = [...prevFiles];
-        validFiles.forEach((file) => {
-          const exists = updatedFiles.some(
-            (existingFile) => existingFile.name === file.name
-          );
-          if (!exists) {
-            updatedFiles.push(file);
-          }
-        });
-        console.log("Updated files state:", updatedFiles);
-        return updatedFiles;
-      });
-    };
-
-    const handleFileSelect = (e) => {
-      console.log("File select triggered");
-      if (e.target.files && e.target.files.length > 0) {
-        console.log("Selected files:", e.target.files);
-        const filesArray = Array.from(e.target.files);
-        handleFiles(filesArray);
-      }
-      // Reset the input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    };
-
-    const handleUpload = async () => {
-      if (files.length === 0) {
-        displayAlert("Please select files to upload", "warning");
-        return;
-      }
-
-      setUploading(true);
-      let successCount = 0;
-      let failCount = 0;
-
-      for (const file of files) {
-        const mode = getFileMode(file.type);
-        if (!mode) {
-          failCount++;
-          setUploadStatus((prev) => ({ ...prev, [file.name]: "fail" }));
-          continue;
-        }
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("bid_id", object_id);
-        formData.append("mode", mode);
-        setUploadStatus((prev) => ({ ...prev, [file.name]: "uploading" }));
-
-        try {
-          const response = await axios.post(
-            `http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${tokenRef.current}`,
-                "Content-Type": "multipart/form-data"
-              }
-            }
-          );
-
-          if (response.data.status === "success") {
-            successCount++;
-            setUploadStatus((prev) => ({ ...prev, [file.name]: "success" }));
-          } else {
-            failCount++;
-            setUploadStatus((prev) => ({ ...prev, [file.name]: "fail" }));
-          }
-        } catch (error) {
-          console.error("Error uploading file:", error);
-          failCount++;
-          setUploadStatus((prev) => ({ ...prev, [file.name]: "fail" }));
-
-          // Extract and display the detailed error message from the backend
-          const errorMessage =
-            error.response?.data?.detail ||
-            error.response?.data?.message ||
-            error.message ||
-            "Failed to upload file";
-
-          displayAlert(
-            `Error uploading ${file.name}: ${errorMessage}`,
-            "danger"
-          );
-          continue; // Continue with next file even if current one failed
-        }
-      }
-
-      setUploading(false);
-
-      if (successCount > 0) {
-        displayAlert(
-          `Successfully uploaded ${successCount} file(s)`,
-          "success"
-        );
-        setDocumentListVersion((prev) => prev + 1);
-        posthog.capture("tender_library_files_uploaded", {
-          successCount,
-          failCount,
-          fileTypes: files.map((f) => f.type)
-        });
-      }
-
-      setTimeout(() => {
-        setFiles([]);
-        setUploadStatus({});
-        onHide();
-      }, 2000);
-    };
-
-    return (
-      <Modal show={show} onHide={onHide} size="lg" centered>
-        <Modal.Header className="px-4">
-          <Modal.Title>Upload Files to Tender Library</Modal.Title>
-          <button className="close-button ms-auto" onClick={onHide}>
-            ×
-          </button>
-        </Modal.Header>
-        <Modal.Body className="px-4 py-4">
-          <p>
-            Documents uploaded to the Tender Library will be used as context by
-            our AI to generate compliance requirements and opportunity
-            information for the Tender.
-          </p>
-          <div
-            className={`drop-zone ${dragActive ? "active" : ""}`}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current.click()}
-            style={{
-              border: "2px dashed #cccccc",
-              borderRadius: "4px",
-              padding: "20px",
-              textAlign: "center",
-              cursor: "pointer",
-              backgroundColor: dragActive ? "#f0f0f0" : "white",
-              transition: "all 0.3s ease"
-            }}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.doc,.docx,.xls,.xlsx"
-              onChange={handleFileSelect}
-              style={{ display: "none" }}
-              multiple
-              key={files.length}
-            />
-            <FontAwesomeIcon
-              icon={faCloudUploadAlt}
-              size="3x"
-              style={{ marginBottom: "10px", color: "#ff7f50" }}
-            />
-            <p>
-              Drag and drop your PDF, Word, or Excel documents here or click to
-              select files
-            </p>
-            {files.length > 0 && (
-              <div
-                style={{
-                  textAlign: "center",
-                  maxWidth: "400px",
-                  margin: "0 auto"
-                }}
-              >
-                <p>Selected files:</p>
-                <ul style={{ listStyleType: "none", padding: 0 }}>
-                  {files.map((file, index) => (
-                    <li
-                      key={index}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                        justifyContent: "center"
-                      }}
-                    >
-                      <span style={{ marginRight: "10px" }}>
-                        {file.name} ({getFileMode(file.type)})
-                      </span>
-                      {uploadStatus[file.name] === "uploading" && (
-                        <FontAwesomeIcon
-                          icon={faSpinner}
-                          spin
-                          style={{ color: "#ff7f50" }}
-                        />
-                      )}
-                      {uploadStatus[file.name] === "success" && (
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          style={{ color: "green" }}
-                        />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            className="upload-button"
-            onClick={handleUpload}
-            disabled={uploading || files.length === 0}
-          >
-            {uploading
-              ? "Uploading..."
-              : `Upload ${files.length} File${files.length !== 1 ? "s" : ""}`}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    );
+  const handleOnClose = () => {
+    setShowPDFModal(false);
+    fetchDocuments();
   };
+
+  const UploadPDFModal = ({ show, onHide, get_collections, onClose }) => (
+    <Modal show={show} onHide={onHide} size="lg" centered>
+      <Modal.Header className="px-4">
+        <Modal.Title>Upload Files</Modal.Title>
+        <button className="close-button ms-auto" onClick={onHide}>
+          ×
+        </button>
+      </Modal.Header>
+      <Modal.Body className="px-4 py-4">
+        <UploadPDF
+          bid_id={object_id}
+          get_collections={get_collections}
+          onClose={onClose}
+          apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
+          descriptionText="Documents uploaded to the Tender Library will be used as context by
+    our AI to generate compliance requirements and opportunity
+    information for the Tender."
+        />
+      </Modal.Body>
+    </Modal>
+  );
 
   const DeleteFileModal = ({ show, onHide, onDelete, fileName }) => (
     <Modal show={show} onHide={onHide} size="lg">
@@ -708,7 +461,8 @@ const TenderLibrary = ({ object_id }) => {
       <UploadPDFModal
         show={showPDFModal}
         onHide={() => setShowPDFModal(false)}
-        object_id={object_id}
+        get_collections={fetchDocuments}
+        onClose={handleOnClose}
       />
 
       <ExcelViewerModal

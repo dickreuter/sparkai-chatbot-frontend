@@ -214,11 +214,19 @@
 .subheading-input {
   flex: 1;
   border: none;
-  padding: 4px 8px;
   margin: 0 8px;
   font-size: 0.875rem;
   background: transparent;
   color: black;
+  /* Add these properties for single-line behavior */
+  resize: none;
+  height: 24px;
+  /* or 1.5em for consistent height */
+  min-height: 24px;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 16px;
+  /* matches the content height within the 24px container */
 }
 
 .subheading-input:focus {

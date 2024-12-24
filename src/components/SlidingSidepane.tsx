@@ -235,14 +235,13 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                           size="sm"
                           className="text-black me-2"
                         />
-                        <input
-                          type="text"
+                        <DebouncedTextArea
                           value={subheading.title}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newSubheadings = [...section.subheadings];
                             newSubheadings[subIndex] = {
                               ...newSubheadings[subIndex],
-                              title: e.target.value
+                              title: value
                             };
                             handleSectionChange(
                               index,

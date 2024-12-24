@@ -128,6 +128,26 @@
   z-index: 2;
 }
 
+.section-heading-input {
+  flex: 1;
+  border: none;
+  padding: 4px 0;
+  font-size: 1.5rem;
+  font-weight: 550;
+  /* h3 equivalent size */
+  font-weight: bold;
+  background: transparent;
+  color: black;
+  resize: none;
+  height: 28px;
+  /* adjusted for heading size */
+  min-height: 28px;
+  overflow: hidden;
+  white-space: nowrap;
+  line-height: 20px;
+  margin: 0;
+}
+
 .sidepane-header h3 {
   margin: 0;
   font-size: 1.5rem;

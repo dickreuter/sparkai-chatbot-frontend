@@ -77,13 +77,17 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
       <div className={`sidepane ${isOpen ? "open" : ""}`}>
         <div className="sidepane-content-wrapper">
           <div className="sidepane-header">
-            <h3>{section.heading}</h3>
-
+            <DebouncedTextArea
+              value={section.heading}
+              onChange={(value) => {
+                handleSectionChange(index, "heading", value);
+              }}
+              className="section-heading-input"
+            />
             <button className="close-button" onClick={onClose}>
               ×
             </button>
           </div>
-
           <div className="sidepane-content">
             <div className="proposal-header mb-3">
               <div className="navigation-container">

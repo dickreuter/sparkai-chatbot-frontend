@@ -282,6 +282,20 @@ const ProposalSidepane: React.FC<ProposalSidepaneProps> = ({
                 className="writingplan-text-area"
               />
             </div>
+
+            <div className="sidepane-section">
+              <div className="proposal-header mb-2">
+                Compliance Requirements
+              </div>
+              <DebouncedTextArea
+                value={section.compliance_requirements}
+                onChange={(value) =>
+                  handleSectionChange(index, "compliance_requirements", value)
+                }
+                placeholder="These are the compliance requirments relevant to the section..."
+                className="compliance-text-area"
+              />
+            </div>
           </div>
         </div>
       </div>

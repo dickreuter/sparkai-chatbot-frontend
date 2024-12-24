@@ -267,3 +267,15 @@
 .delete-subheading-button:hover {
   opacity: 1;
 }
+
+.compliance-text-area {
+  width: 100%;
+  background-color: white;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  height: 400px;
+  resize: none;
+  color: black;
+  border-radius: 8px;
+}

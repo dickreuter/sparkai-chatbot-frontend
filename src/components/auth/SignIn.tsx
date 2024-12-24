@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./Signin.css";
 import {
   Alert,
@@ -11,11 +11,11 @@ import {
 } from "@mui/material";
 import useAuthSignIn from "./UseAuthsignIn";
 import AuthState from "./AuthState";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import InfoIcon from "@mui/icons-material/Info";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 
-const FullScreenTwoCards = () => {
+const Signin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const { submitSignIn, isLoading } = useAuthSignIn();
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
@@ -25,26 +25,55 @@ const FullScreenTwoCards = () => {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState<boolean>(false);
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState<string>("");
+  const [isMounted, setIsMounted] = useState(true);
 
-  const onSubmit = async (e: any) => {
+  // Set up cleanup when component unmounts
+  useEffect(() => {
+    return () => {
+      setIsMounted(false);
+    };
+  }, []);
+
+  // Safe setState wrapper
+  const safeSetState = useCallback(
+    <T extends unknown>(
+      setter: React.Dispatch<React.SetStateAction<T>>,
+      value: T
+    ) => {
+      if (isMounted) {
+        setter(value);
+      }
+    },
+    [isMounted]
+  );
+
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      setSnackbarMessage("Username and Password are required");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      safeSetState(setSnackbarMessage, "Username and Password are required");
+      safeSetState(setSnackbarSeverity, "error");
+      safeSetState(setSnackbarOpen, true);
       return;
     }
 
     try {
       const { success, message } = await submitSignIn(formData);
-      setSnackbarMessage(success ? message : "Incorrect Username or Password");
-      setSnackbarSeverity(success ? "success" : "error");
+      if (isMounted) {
+        safeSetState(
+          setSnackbarMessage,
+          success ? message : "Incorrect Username or Password"
+        );
+        safeSetState(setSnackbarSeverity, success ? "success" : "error");
+        safeSetState(setSnackbarOpen, true);
+      }
     } catch (error) {
-      setSnackbarMessage("Incorrect Username or Password");
-      setSnackbarSeverity("error");
+      if (isMounted) {
+        safeSetState(setSnackbarMessage, "Incorrect Username or Password");
+        safeSetState(setSnackbarSeverity, "error");
+        safeSetState(setSnackbarOpen, true);
+      }
     }
-    setSnackbarOpen(true);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -54,22 +83,42 @@ const FullScreenTwoCards = () => {
   };
 
   const handleForgotPassword = async () => {
+    const controller = new AbortController();
+
     try {
       const response = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/forgot_password`,
-        { email: forgotPasswordEmail }
+        { email: forgotPasswordEmail },
+        { signal: controller.signal }
       );
-      setSnackbarMessage("Password reset email sent successfully");
-      setSnackbarSeverity("success");
+
+      if (isMounted) {
+        safeSetState(
+          setSnackbarMessage,
+          "Password reset email sent successfully"
+        );
+        safeSetState(setSnackbarSeverity, "success");
+        safeSetState(setSnackbarOpen, true);
+        safeSetState(setForgotPasswordOpen, false);
+      }
     } catch (err) {
-      setSnackbarMessage(
-        "Failed to send password reset email. Please try again."
-      );
-      setSnackbarSeverity("error");
-    } finally {
-      setSnackbarOpen(true);
-      setForgotPasswordOpen(false);
+      if (axios.isCancel(err)) {
+        return; // Request was cancelled, do nothing
+      }
+
+      if (isMounted) {
+        safeSetState(
+          setSnackbarMessage,
+          "Failed to send password reset email. Please try again."
+        );
+        safeSetState(setSnackbarSeverity, "error");
+        safeSetState(setSnackbarOpen, true);
+      }
     }
+
+    return () => {
+      controller.abort(); // Cleanup: cancel any in-flight request
+    };
   };
 
   const inputProps = {
@@ -94,68 +143,64 @@ const FullScreenTwoCards = () => {
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              marginBottom: "20px" // Add spacing below the header + icon
+              marginBottom: "20px"
             }}
           >
-            <h2 style={{ margin: 0 }}>Login</h2>{" "}
-            {/* Remove default margin from h2 */}
+            <h2 style={{ margin: 0 }}>Login</h2>
             <Tooltip
               title="Disclaimer: Answers generated with AI should always be checked for accuracy, we view our platform as a tool to create amazing proposals, but with the guidance of a human!"
               arrow
             >
-              <IconButton
-                size="small"
-                style={{
-                  padding: 0
-                  // Fine-tune vertical alignment with the header
-                }}
-              >
+              <IconButton size="small" style={{ padding: 0 }}>
                 <InfoIcon fontSize="small" color="action" />
               </IconButton>
             </Tooltip>
           </div>
 
-          <div className="input-field">
-            <TextField
-              id="email-input"
-              fullWidth
-              label="Enter your username"
-              variant="outlined"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              onKeyPress={handleKeyPress}
-              InputProps={inputProps}
-              InputLabelProps={labelProps}
-              autoComplete="username"
-            />
-          </div>
-          <div className="input-field">
-            <TextField
-              id="password-input"
-              fullWidth
-              label="Password"
-              variant="outlined"
-              type="password"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              onKeyPress={handleKeyPress}
-              InputProps={inputProps}
-              InputLabelProps={labelProps}
-              autoComplete="current-password"
-            />
-          </div>
-          <Button
-            className="login-button"
-            variant="contained"
-            onClick={onSubmit}
-            disabled={isLoading}
-          >
-            {isLoading ? "Loading..." : "Login"}
-          </Button>
+          <form onSubmit={onSubmit}>
+            <div className="input-field">
+              <TextField
+                id="email-input"
+                fullWidth
+                label="Enter your username"
+                variant="outlined"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                onKeyPress={handleKeyPress}
+                InputProps={inputProps}
+                InputLabelProps={labelProps}
+                autoComplete="username"
+              />
+            </div>
+            <div className="input-field">
+              <TextField
+                id="password-input"
+                fullWidth
+                label="Password"
+                variant="outlined"
+                type="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                onKeyPress={handleKeyPress}
+                InputProps={inputProps}
+                InputLabelProps={labelProps}
+                autoComplete="current-password"
+              />
+            </div>
+            <Button
+              className="login-button"
+              variant="contained"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? "Loading..." : "Login"}
+            </Button>
+          </form>
+
           <p
             style={{ cursor: "pointer" }}
             onClick={() => setForgotPasswordOpen(true)}
@@ -167,7 +212,7 @@ const FullScreenTwoCards = () => {
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={3000}
-          onClose={() => setSnackbarOpen(false)}
+          onClose={() => safeSetState(setSnackbarOpen, false)}
           style={{
             position: "fixed",
             bottom: "-25%",
@@ -175,7 +220,7 @@ const FullScreenTwoCards = () => {
           }}
         >
           <Alert
-            onClose={() => setSnackbarOpen(false)}
+            onClose={() => safeSetState(setSnackbarOpen, false)}
             severity={snackbarSeverity}
           >
             {snackbarMessage}
@@ -184,7 +229,7 @@ const FullScreenTwoCards = () => {
 
         <Modal
           open={forgotPasswordOpen}
-          onClose={() => setForgotPasswordOpen(false)}
+          onClose={() => safeSetState(setForgotPasswordOpen, false)}
         >
           <div className="modal-container">
             <h2>Forgot Password</h2>
@@ -203,7 +248,7 @@ const FullScreenTwoCards = () => {
             />
             <div className="modal-actions">
               <Button
-                onClick={() => setForgotPasswordOpen(false)}
+                onClick={() => safeSetState(setForgotPasswordOpen, false)}
                 color="primary"
               >
                 Cancel
@@ -221,4 +266,4 @@ const FullScreenTwoCards = () => {
   );
 };
 
-export default FullScreenTwoCards;
+export default Signin;

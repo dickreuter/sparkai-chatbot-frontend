@@ -12,16 +12,11 @@
 }
 
 .drop-zone {
-  border: 2px dashed #cccccc;
   border-radius: 10px;
   padding: 20px;
   text-align: center;
   position: relative;
   height: 200px;
-}
-
-.drop-zone.active {
-  background-color: #f8f8f8;
 }
 
 .upload-label {

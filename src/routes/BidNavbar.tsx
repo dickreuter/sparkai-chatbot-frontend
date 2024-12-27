@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Button, Spinner } from "react-bootstrap";
+import { Button, Modal, Spinner } from "react-bootstrap";
 import { BidContext } from "../views/BidWritingStateManagerView";
 import {
   faArrowLeft,
+  faBook,
   faCheckCircle,
   faEdit,
   faEye,
@@ -17,6 +18,27 @@ import { useAuthUser } from "react-auth-kit";
 import BidTitle from "../components/BidTitle";
 import { displayAlert } from "../helper/Alert";
 import GenerateProposalModal from "../modals/GenerateProposalModal";
+import TenderLibrary from "../components/TenderLibrary";
+import InterrogateTenderModal from "../components/InterrogateTenderModal";
+
+const TenderLibraryModal = ({ show, onHide, object_id }) => {
+  console.log(object_id);
+  return (
+    <Modal show={show} onHide={onHide} size="lg" centered>
+      <Modal.Header className="px-4">
+        <Modal.Title>Tender Library</Modal.Title>
+        <button className="close-button ms-auto" onClick={onHide}>
+          ×
+        </button>
+      </Modal.Header>
+      <Modal.Body className="px-4 py-4">
+        <div className="selectfolder-container mt-0 p-0">
+          <TenderLibrary key={object_id} object_id={object_id} />
+        </div>
+      </Modal.Body>
+    </Modal>
+  );
+};
 
 const BidNavbar = ({
   showViewOnlyMessage = () => {},
@@ -27,6 +49,7 @@ const BidNavbar = ({
 }) => {
   const { sharedState, setSharedState } = useContext(BidContext);
   const { isLoading, saveSuccess, bidInfo } = sharedState;
+  const [showLibraryModal, setShowLibraryModal] = useState(false);
 
   const getAuth = useAuthUser();
   const [auth, setAuth] = useState(null);
@@ -64,32 +87,6 @@ const BidNavbar = ({
       console.log("auth", auth);
     }
   }, [auth]);
-
-  const getPermissionDetails = (permission) => {
-    switch (permission) {
-      case "admin":
-        return {
-          icon: faUsers,
-          text: "Admin",
-          description: "You have full access to edit and manage this proposal."
-        };
-      case "editor":
-        return {
-          icon: faEdit,
-          text: "Editor",
-          description:
-            "You can edit this proposal but cannot change permissions."
-        };
-      default:
-        return {
-          icon: faEye,
-          text: "Viewer",
-          description: "You can view this proposal but cannot make changes."
-        };
-    }
-  };
-
-  const permissionDetails = getPermissionDetails(currentUserPermission);
 
   const handleBackClick = () => {
     if (location.pathname == "/question-crafter") {
@@ -155,6 +152,7 @@ const BidNavbar = ({
           >
             Preview Proposal
           </NavLink>
+          <InterrogateTenderModal bid_id={object_id} />
         </div>
         {outline.length === 0 ? (
           <div></div>

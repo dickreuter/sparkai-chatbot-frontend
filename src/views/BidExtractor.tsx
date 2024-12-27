@@ -487,6 +487,7 @@ const BidExtractor = () => {
           <BidNavbar
             showViewOnlyMessage={showViewOnlyMessage}
             initialBidName={initialBidName}
+            object_id={object_id}
           />
           <div>
             <div className="input-container mt-3">
@@ -726,14 +727,6 @@ const BidExtractor = () => {
                     ></textarea>
                   </Card.Body>
                 </Card>
-              </Col>
-            </Row>
-
-            <Row></Row>
-
-            <Row className="mb-0">
-              <Col md={12}>
-                <TenderLibrary key={object_id} object_id={object_id} />
               </Col>
             </Row>
 

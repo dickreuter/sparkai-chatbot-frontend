@@ -48,7 +48,7 @@
   padding: 6px 14px;
   border: none;
   cursor: pointer;
-  font-weight: 550;
+  font-weight: 500;
   font-size: 0.9rem;
   border-radius: 4px;
   outline: none !important;
@@ -85,4 +85,23 @@
   box-shadow: none !important;
   background-color: #262626;
   /* Ensures it doesn't flash blue */
+}
+
+.tenderlibrary-button {
+  background-color: #f5f5f5 !important;
+  color: #4a4a4a !important;
+  border: 1px solid #e0e0e0 !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.tenderlibrary-button:hover {
+  background-color: #e8e8e8 !important;
+  color: #333333 !important;
+}
+
+.tenderlibrary-button:active {
+  background-color: #e0e0e0 !important;
 }

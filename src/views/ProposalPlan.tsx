@@ -715,7 +715,7 @@ const ProposalPlan = () => {
                       <th className="text-center" style={{ width: "120px" }}>
                         Subsections
                       </th>
-                      <th className="text-center" style={{ width: "100px" }}>
+                      <th className="text-center" style={{ width: "120px" }}>
                         Words
                       </th>
                       <th className="text-center" style={{ width: "80px" }}>
@@ -788,7 +788,7 @@ const ProposalPlan = () => {
                                 step="50"
                                 className="form-control d-inline-block word-count-input"
                                 style={{
-                                  width: "80px",
+                                  width: "100px",
                                   textAlign: "center"
                                 }}
                                 onChange={(e) => {

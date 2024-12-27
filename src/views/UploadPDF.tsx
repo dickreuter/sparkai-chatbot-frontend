@@ -17,7 +17,6 @@ interface UploadPDFProps {
   folder?: string;
   bid_id?: string;
   get_collections: () => void;
-  onClose?: () => void;
   apiUrl: string;
   descriptionText: string;
 }
@@ -30,7 +29,7 @@ const UploadPDFComponent: React.FC<UploadPDFProps> = ({
   folder,
   bid_id,
   get_collections,
-  onClose,
+
   apiUrl,
   descriptionText
 }) => {
@@ -110,7 +109,7 @@ const UploadPDFComponent: React.FC<UploadPDFProps> = ({
     if (validFiles.length > 0) {
       posthog.capture("pdf_upload_files_selected", {
         fileCount: validFiles.length,
-        fileTypes: validFiles.map((f) => f.type),
+        fileTypes: validFiles.map((f) => f.type)
       });
     }
 
@@ -199,15 +198,10 @@ const UploadPDFComponent: React.FC<UploadPDFProps> = ({
     if (failCount > 0) {
       displayAlert(`Failed to upload ${failCount} file(s)`, "danger");
     }
-
-    if (onClose) {
-      onClose();
-    }
   };
 
   return (
     <div>
-      <p>{descriptionText}</p>
       <div
         className={`drop-zone ${dragActive ? "active" : ""}`}
         onDragEnter={handleDrag}
@@ -216,13 +210,14 @@ const UploadPDFComponent: React.FC<UploadPDFProps> = ({
         onDrop={handleDrop}
         onClick={() => fileInputRef.current.click()}
         style={{
-          border: "2px dashed #cccccc",
-          borderRadius: "4px",
-          padding: "20px",
+          border: "3.5px dashed #666666",
+          borderRadius: "12px",
+          padding: "35px",
           textAlign: "center",
           cursor: "pointer",
           backgroundColor: dragActive ? "#f0f0f0" : "white",
-          transition: "all 0.3s ease"
+          transition: "all 0.3s ease",
+          marginBottom: "20px"
         }}
       >
         <input
@@ -233,64 +228,82 @@ const UploadPDFComponent: React.FC<UploadPDFProps> = ({
           style={{ display: "none" }}
           multiple
         />
-        <FontAwesomeIcon
-          icon={faCloudUploadAlt}
-          size="3x"
-          style={{ marginBottom: "10px", color: "#ff7f50" }}
-        />
-        <p>
-          Drag and drop your PDF, Word, or Excel documents here or click to
-          select files
-        </p>
-
-        {selectedFiles.length > 0 && (
-          <div
-            style={{ textAlign: "center", maxWidth: "400px", margin: "0 auto" }}
-          >
-            <p>Selected files:</p>
-            <ul style={{ listStyleType: "none", padding: 0 }}>
-              {selectedFiles.map((file, index) => (
-                <li
-                  key={index}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "5px",
-                    justifyContent: "center"
-                  }}
-                >
-                  <span style={{ marginRight: "10px" }}>
-                    {file.name} ({getFileMode(file.type)})
-                  </span>
-                  {isUploading && !uploadedFiles[file.name] ? (
-                    <FontAwesomeIcon
-                      icon={faSpinner}
-                      spin
-                      style={{ color: "#ff7f50" }}
-                    />
-                  ) : uploadedFiles[file.name] ? (
-                    <FontAwesomeIcon
-                      icon={faCheck}
-                      style={{ color: "green" }}
-                    />
-                  ) : null}
-                </li>
-              ))}
-            </ul>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <FontAwesomeIcon
+            icon={faCloudUploadAlt}
+            size="3x"
+            style={{ marginBottom: "10px", color: "#ff7f50" }}
+            className="me-4"
+          />
+          <div style={{ textAlign: "left" }}>
+            <h5 style={{ fontWeight: "550" }}>
+              Drag and drop your PDF, Word, or Excel documents here or click to
+              select files
+            </h5>
+            <p>{descriptionText}</p>
           </div>
-        )}
+          <div>
+            <Button
+              className="browse-button ms-2"
+              style={{
+                backgroundColor: "#ff7f50",
+                border: "none",
+                borderRadius: "50px",
+                padding: "12px 16px",
+                color: "white",
+                fontWeight: "550",
+                fontSize: "19px",
+                transition: "background-color 0.2s ease",
+                width: "160px",
+                margin: "0"
+              }}
+            >
+              Browse Files
+            </Button>
+          </div>
+        </div>
       </div>
-      <div style={{ marginTop: "20px", textAlign: "right" }}>
-        <Button
-          onClick={handleUpload}
-          disabled={isUploading || selectedFiles.length === 0}
-          className="upload-button"
-        >
-          {isUploading
-            ? "Uploading..."
-            : `Upload ${selectedFiles.length} File${selectedFiles.length !== 1 ? "s" : ""}`}
-        </Button>
-      </div>
+
+      {selectedFiles.length > 0 && (
+        <div>
+          <p>Selected files:</p>
+          <ul style={{ listStyleType: "none", padding: 0 }}>
+            {selectedFiles.map((file, index) => (
+              <li
+                key={index}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "5px",
+                  justifyContent: "center"
+                }}
+              >
+                <span style={{ marginRight: "10px" }}>
+                  {file.name} ({getFileMode(file.type)})
+                </span>
+                {isUploading && !uploadedFiles[file.name] ? (
+                  <FontAwesomeIcon
+                    icon={faSpinner}
+                    spin
+                    style={{ color: "#ff7f50" }}
+                  />
+                ) : uploadedFiles[file.name] ? (
+                  <FontAwesomeIcon icon={faCheck} style={{ color: "green" }} />
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          <Button
+            onClick={handleUpload}
+            disabled={isUploading || selectedFiles.length === 0}
+            className="upload-button"
+          >
+            {isUploading
+              ? "Uploading..."
+              : `Upload ${selectedFiles.length} File${selectedFiles.length !== 1 ? "s" : ""}`}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

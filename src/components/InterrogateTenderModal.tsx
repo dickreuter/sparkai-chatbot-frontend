@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import TenderLibraryChat from "./TenderLibraryChat";
 import "./InterrogateTenderModal.css";
+import TenderLibrary from "./TenderLibrary";
 
 const InterrogateTenderModal = ({ bid_id }) => {
   const [show, setShow] = useState(false);
@@ -21,7 +22,7 @@ const InterrogateTenderModal = ({ bid_id }) => {
   const [isViewingText, setIsViewingText] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isLoadingText, setIsLoadingText] = useState(false);
-  const [activeTab, setActiveTab] = useState("chat");
+  const [activeTab, setActiveTab] = useState("library");
 
   const textContentRef = useRef(null);
 
@@ -238,6 +239,8 @@ const InterrogateTenderModal = ({ bid_id }) => {
         );
       case "chat":
         return <TenderLibraryChat bid_id={bid_id} />;
+      case "library":
+        return <TenderLibrary key={bid_id} object_id={bid_id} />;
       default:
         return null;
     }
@@ -245,8 +248,12 @@ const InterrogateTenderModal = ({ bid_id }) => {
 
   return (
     <>
-      <Button className="upload-button" id="select-folder" onClick={handleShow}>
-        Interrogate Tender
+      <Button
+        className="tenderlibrary-button"
+        id="select-folder"
+        onClick={handleShow}
+      >
+        Tender Library
       </Button>
       <Modal
         show={show}
@@ -255,10 +262,17 @@ const InterrogateTenderModal = ({ bid_id }) => {
         contentClassName="interrogate-modal-content"
       >
         <Modal.Header
-          closeButton
           style={{ padding: "0", paddingTop: "10px", paddingRight: "20px" }}
         >
           <Nav variant="tabs" className="w-100">
+            <Nav.Item>
+              <Nav.Link
+                active={activeTab === "library"}
+                onClick={() => setActiveTab("library")}
+              >
+                Tender Library
+              </Nav.Link>
+            </Nav.Item>
             <Nav.Item>
               <Nav.Link
                 active={activeTab === "chat"}
@@ -290,6 +304,9 @@ const InterrogateTenderModal = ({ bid_id }) => {
               </Nav.Link>
             </Nav.Item>
           </Nav>
+          <button className="close-button ms-auto" onClick={handleClose}>
+            ×
+          </button>
         </Modal.Header>
         <Modal.Body>
           <div className="content-scaler">

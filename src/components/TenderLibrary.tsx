@@ -3,53 +3,12 @@ import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
-import {
-  Button,
-  Col,
-  Row,
-  Card,
-  Modal,
-  FormControl,
-  InputGroup,
-  Spinner,
-  Table
-} from "react-bootstrap";
+import { Button, Col, Row, Modal, Spinner, Table } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faTrash,
-  faFileAlt,
-  faSearch,
-  faQuestionCircle,
-  faPlus,
-  faTimes,
-  faCloudUploadAlt,
-  faCheck,
-  faSpinner
-} from "@fortawesome/free-solid-svg-icons";
-import { Menu, MenuItem } from "@mui/material";
+import { faTrash, faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { displayAlert } from "../helper/Alert.tsx";
-import InterrogateTenderModal from "./InterrogateTenderModal.tsx";
 import posthog from "posthog-js";
 import UploadPDF from "../views/UploadPDF.tsx";
-
-const getFileMode = (fileType) => {
-  if (fileType === "application/pdf") {
-    return "pdf";
-  } else if (
-    fileType === "application/msword" ||
-    fileType ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  ) {
-    return "word";
-  } else if (
-    fileType === "application/vnd.ms-excel" ||
-    fileType ===
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  ) {
-    return "excel";
-  }
-  return null;
-};
 
 const TenderLibrary = ({ object_id }) => {
   const getAuth = useAuthUser();
@@ -57,10 +16,7 @@ const TenderLibrary = ({ object_id }) => {
   const tokenRef = useRef(auth?.token || "default");
 
   const [documents, setDocuments] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [modalContent, setModalContent] = useState("");
   const [currentFileName, setCurrentFileName] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 6;
   const [totalPages, setTotalPages] = useState(0);
   const [showPDFModal, setShowPDFModal] = useState(false);
@@ -76,23 +32,6 @@ const TenderLibrary = ({ object_id }) => {
   const [wordFileContent, setWordFileContent] = useState(null);
   const [showExcelModal, setShowExcelModal] = useState(false);
   const [excelData, setExcelData] = useState(null);
-
-  const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const handleMenuItemClick = (action) => {
-    handleMenuClose();
-    if (action === "pdf") setShowPDFModal(true);
-  };
 
   const handleDeleteFileClick = (event, filename) => {
     event.stopPropagation();
@@ -308,7 +247,7 @@ const TenderLibrary = ({ object_id }) => {
           onClose={onClose}
           apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
           descriptionText="Documents uploaded to the Tender Library will be used as context by
-    our AI to generate compliance requirements and opportunity
+    our AI when generating the compliance requirements and opportunity
     information for the Tender."
         />
       </Modal.Body>
@@ -335,116 +274,42 @@ const TenderLibrary = ({ object_id }) => {
     </Modal>
   );
 
-  // Add Excel Modal Component
-  const ExcelViewerModal = ({ show, onHide, data, fileName }) => (
-    <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>{fileName}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body style={{ maxHeight: "70vh", overflowY: "auto" }}>
-        {data && data.sheets ? (
-          Object.entries(data.sheets).map(([sheetName, sheetData]) => (
-            <div key={sheetName} className="mb-4">
-              <h4>{sheetName}</h4>
-              <Table striped bordered hover responsive>
-                <thead>
-                  <tr>
-                    {sheetData[0] &&
-                      sheetData[0].map((header, index) => (
-                        <th key={index}>{header}</th>
-                      ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {sheetData.slice(1).map((row, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {row.map((cell, cellIndex) => (
-                        <td key={cellIndex}>{cell}</td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
-          ))
-        ) : (
-          <p>No data available</p>
-        )}
-      </Modal.Body>
-    </Modal>
-  );
-
   return (
     <>
       <Row>
         <Col md={12}>
-          <Card className="mb-2">
-            <Card.Body className="tenderlibrary-card-body-content">
-              <div className="library-card-content-wrapper">
-                <div className="header-row mt-2" id="tender-library">
-                  <div className="lib-title">Tender Upload</div>
-                  <div>
-                    <InterrogateTenderModal bid_id={object_id} />
-                    <Button
-                      aria-controls="simple-menu"
-                      aria-haspopup="true"
-                      onClick={handleMenuClick}
-                      className="upload-button"
-                      style={{ marginLeft: "5px" }}
-                    >
-                      <FontAwesomeIcon
-                        icon={faPlus}
-                        style={{ marginRight: "8px" }}
-                      />
-                      Upload Document
-                    </Button>
-                    <Menu
-                      id="long-menu"
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={open}
-                      onClose={handleMenuClose}
-                      PaperProps={{
-                        style: {
-                          width: "220px" // Reduced width
-                        }
-                      }}
-                    >
-                      <MenuItem
-                        onClick={() => handleMenuItemClick("pdf")}
-                        className="styled-menu-item"
-                      >
-                        <i className="fas fa-file-pdf styled-menu-item-icon"></i>
-                        Upload PDF/Word/Excel
-                      </MenuItem>
-                    </Menu>
-                  </div>
-                </div>
-                <div style={{ width: "100%", marginTop: "30px" }}>
-                  <table className="library-table">
-                    <thead>
-                      <tr>
-                        <th>Documents</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                  </table>
-                  <div
-                    style={{
-                      overflowY: "auto",
-                      maxHeight: "400px",
-                      height: "100%",
-                      width: "100%"
-                    }}
-                  >
-                    <table style={{ width: "100%" }} className="library-table">
-                      <tbody>{renderDocuments()}</tbody>
-                    </table>
-                  </div>
-                </div>
+          <div className="library-card-content-wrapper">
+            <div style={{ width: "100%" }}>
+              <UploadPDF
+                bid_id={object_id}
+                get_collections={fetchDocuments}
+                apiUrl={`http${HTTP_PREFIX}://${API_URL}/uploadfile_tenderlibrary`}
+                descriptionText="Documents uploaded to the Tender Library will be used as context by
+                our AI when generating the compliance requirements and opportunity
+                information for the Tender."
+              />
+              <table className="library-table">
+                <thead>
+                  <tr>
+                    <th>Documents</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+              </table>
+              <div
+                style={{
+                  overflowY: "auto",
+                  maxHeight: "300px",
+                  height: "100%",
+                  width: "100%"
+                }}
+              >
+                <table style={{ width: "100%" }} className="library-table">
+                  <tbody>{renderDocuments()}</tbody>
+                </table>
               </div>
-            </Card.Body>
-          </Card>
+            </div>
+          </div>
         </Col>
       </Row>
 
@@ -456,20 +321,6 @@ const TenderLibrary = ({ object_id }) => {
           setShowDeleteFileModal(false);
         }}
         fileName={fileToDelete ? fileToDelete.filename : ""}
-      />
-
-      <UploadPDFModal
-        show={showPDFModal}
-        onHide={() => setShowPDFModal(false)}
-        get_collections={fetchDocuments}
-        onClose={handleOnClose}
-      />
-
-      <ExcelViewerModal
-        show={showExcelModal}
-        onHide={() => setShowExcelModal(false)}
-        data={excelData}
-        fileName={currentFileName}
       />
 
       {showPdfViewerModal && (

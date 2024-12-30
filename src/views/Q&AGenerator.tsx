@@ -5,20 +5,10 @@ import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
 import handleGAEvent from "../utilities/handleGAEvent";
-import {
-  Button,
-  Col,
-  Dropdown,
-  Form,
-  Row,
-  Spinner
-} from "react-bootstrap";
+import { Button, Col, Dropdown, Form, Row, Spinner } from "react-bootstrap";
 import "./QuestionsCrafter.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheck,
-  faPaperPlane
-} from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import FolderLogic from "../components/Folders.tsx";
 import {
   Editor,
@@ -26,12 +16,11 @@ import {
   Modifier,
   SelectionState,
   convertToRaw,
-  ContentState,
+  ContentState
 } from "draft-js";
 import "draft-js/dist/Draft.css";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
 import SelectFolderModal from "../components/SelectFolderModal.tsx";
-
 
 const QAGenerator = () => {
   const getAuth = useAuthUser();
@@ -1145,6 +1134,11 @@ const QAGenerator = () => {
       const word_amounts = selectedChoices.map((choice) =>
         String(wordAmounts[choice] || "250")
       );
+      console.log("selectedChoices");
+      console.log(selectedChoices);
+      console.log(word_amounts);
+      const compliance_requirements = Array(word_amounts.length).fill("");
+      console.log(compliance_requirements);
       const result = await axios.post(
         `http${HTTP_PREFIX}://${API_URL}/question_multistep`,
         {
@@ -1155,7 +1149,7 @@ const QAGenerator = () => {
           selected_choices: selectedChoices,
           datasets: selectedFolders,
           word_amounts,
-          compliance_requirements: [""],
+          compliance_requirements: compliance_requirements,
           bid_id: ""
         },
         {
@@ -1301,8 +1295,6 @@ const QAGenerator = () => {
 
       <div className="lib-container">
         <div className="scroll-container">
-        
-
           <div>
             <Row
               className="justify-content-md-center"
@@ -1337,7 +1329,6 @@ const QAGenerator = () => {
                   placeholder="Enter question here..."
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                 
                 ></textarea>
               </div>
               <div className="text-muted mt-2">
@@ -1387,8 +1378,12 @@ const QAGenerator = () => {
                   </Button>
                 </div>
 
-                <div className="response-box draft-editor" style={{height: "800px"}} ref={responseBoxRef}>
-                  <div className="editor-container"  ref={editorRef}>
+                <div
+                  className="response-box draft-editor"
+                  style={{ height: "800px" }}
+                  ref={responseBoxRef}
+                >
+                  <div className="editor-container" ref={editorRef}>
                     <Editor
                       editorState={responseEditorState}
                       placeholder="Your response will be generated here..."
@@ -1397,7 +1392,6 @@ const QAGenerator = () => {
                         ...styleMap,
                         BOLD: { fontWeight: "bold" }
                       }}
-                  
                     />
                   </div>
                 </div>
@@ -1412,7 +1406,6 @@ const QAGenerator = () => {
                       .filter(Boolean).length
                   }
                 </div>
-
               </Col>
               <Col lg={5} md={12}>
                 <div className="input-header">
@@ -1634,7 +1627,6 @@ const QAGenerator = () => {
                         onBlur={handleCustomPromptBlur}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyDown={handleKeyDown}
-                     
                         style={{
                           color:
                             selectedDropdownOption === "custom-prompt"

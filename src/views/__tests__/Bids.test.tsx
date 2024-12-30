@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import axios from "axios";
 import Bids from "../Bids";
 import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
+import React from "react";
 
 // Create the mock before using it
 jest.mock("axios", () => {

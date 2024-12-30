@@ -1,6 +1,6 @@
 import ReactGA from "react-ga4";
 
-const handleGAEvent = (category, action, label) => {
+const handleGAEvent = (category: string, action: string, label: string) => {
   ReactGA.event({
     category: category,
     action: action,

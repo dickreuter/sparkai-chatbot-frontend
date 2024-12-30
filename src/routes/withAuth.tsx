@@ -1,10 +1,10 @@
 // src/hoc/withAuth.js
-import React, { useEffect } from "react";
+import { ComponentType, useEffect } from "react";
 import { useIsAuthenticated } from "react-auth-kit";
 import { useNavigate } from "react-router-dom";
 
-const withAuth = (WrappedComponent) => {
-  return (props) => {
+const withAuth = (WrappedComponent: ComponentType) => {
+  return (props: any) => {
     const isAuth = useIsAuthenticated();
     const navigate = useNavigate();
 

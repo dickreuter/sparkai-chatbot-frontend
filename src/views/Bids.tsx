@@ -7,7 +7,7 @@ import "./Bids.css";
 import { useNavigate } from "react-router-dom";
 import SideBarSmall from "../routes/SidebarSmall.tsx";
 import handleGAEvent from "../utilities/handleGAEvent.tsx";
-import { Button, Form, Modal, Pagination } from "react-bootstrap";
+import { Button, Form, Modal } from "react-bootstrap";
 import { displayAlert } from "../helper/Alert.tsx";
 import {
   faPlus,
@@ -18,16 +18,17 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select, MenuItem, FormControl, Skeleton } from "@mui/material";
+import { SelectChangeEvent } from "@mui/material/Select";
 import { styled } from "@mui/material/styles";
 import withAuth from "../routes/withAuth.tsx";
-import DashboardWizard from "../wizards/DashboardWizard.tsx"; // Adjust the import path as needed
 
 const Bids = () => {
   const [bids, setBids] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [bidName, setBidName] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [bidToDelete, setBidToDelete] = useState(null);
+  const [bidToDelete, setBidToDelete] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(true);
   const getAuth = useAuthUser();
   const auth = getAuth();
@@ -35,18 +36,51 @@ const Bids = () => {
   const navigate = useNavigate();
 
   // Sorting bids based on the selected criteria
-  const [sortConfig, setSortConfig] = useState({
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: "timestamp",
     direction: "desc"
-  });
+  } as const);
 
-  const sortData = (data, sortConfig) => {
-    const sortedData = [...data].sort((a, b) => {
+  interface Bid {
+    _id: string;
+    bid_title: string;
+    status: "ongoing" | "complete";
+    timestamp?: string;
+    submission_deadline?: string;
+    client_name?: string;
+    bid_manager?: string;
+    opportunity_owner?: string;
+    bid_qualification_result?: string;
+    [key: string]: string | undefined; // Index signature for dynamic access
+  }
+
+  interface SortConfig {
+    key: keyof Bid;
+    direction: "asc" | "desc";
+  }
+
+  interface StyledSelectProps {
+    status?: "ongoing" | "complete";
+  }
+
+  interface ApiResponse {
+    status: string;
+    data?: {
+      detail?: string;
+    };
+  }
+
+  interface ModalSubmitEvent extends React.FormEvent<HTMLFormElement> {
+    preventDefault(): void;
+  }
+
+  const sortData = (data: Bid[], sortConfig: SortConfig): Bid[] => {
+    const sortedData = [...data].sort((a: Bid, b: Bid) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
 
-      // Helper function to check if value is empty (null, undefined, or empty string)
-      const isEmpty = (value) => {
+      // Helper function to check if value is empty
+      const isEmpty = (value: unknown): boolean => {
         return (
           value === null ||
           value === undefined ||
@@ -56,29 +90,30 @@ const Bids = () => {
       };
 
       // Always put empty values at the end
-      if (isEmpty(aValue) && !isEmpty(bValue)) return 1; // a is empty, b has value -> a goes to end
-      if (!isEmpty(aValue) && isEmpty(bValue)) return -1; // a has value, b is empty -> b goes to end
-      if (isEmpty(aValue) && isEmpty(bValue)) return 0; // both empty -> keep original order
+      if (isEmpty(aValue) && !isEmpty(bValue)) return 1;
+      if (!isEmpty(aValue) && isEmpty(bValue)) return -1;
+      if (isEmpty(aValue) && isEmpty(bValue)) return 0;
 
       let comparison = 0;
       switch (sortConfig.key) {
         case "timestamp":
         case "submission_deadline":
-          const dateA = new Date(aValue);
-          const dateB = new Date(bValue);
-          const isValidDateA = !isNaN(dateA);
-          const isValidDateB = !isNaN(dateB);
+          const dateA = new Date(aValue as string);
+          const dateB = new Date(bValue as string);
+          const isValidDateA = !isNaN(dateA.getTime());
+          const isValidDateB = !isNaN(dateB.getTime());
 
-          // Handle invalid dates
-          if (!isValidDateA && isValidDateB) return 1; // Invalid date goes to end
-          if (isValidDateA && !isValidDateB) return -1; // Invalid date goes to end
-          if (!isValidDateA && !isValidDateB) return 0; // Both invalid, keep order
+          if (!isValidDateA && isValidDateB) return 1;
+          if (isValidDateA && !isValidDateB) return -1;
+          if (!isValidDateA && !isValidDateB) return 0;
 
-          comparison = dateA - dateB;
+          comparison = dateA.getTime() - dateB.getTime();
           break;
 
         case "status":
-          comparison = aValue.toLowerCase().localeCompare(bValue.toLowerCase());
+          comparison = String(aValue)
+            .toLowerCase()
+            .localeCompare(String(bValue).toLowerCase());
           break;
 
         default:
@@ -87,22 +122,21 @@ const Bids = () => {
             .localeCompare(String(bValue).toLowerCase());
       }
 
-      // Apply sort direction for non-empty values
       return sortConfig.direction === "asc" ? comparison : -comparison;
     });
 
     return sortedData;
   };
 
-  const requestSort = (key) => {
-    let direction = "asc";
+  const requestSort = (key: keyof Bid): void => {
+    let direction: "asc" | "desc" = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
     setSortConfig({ key, direction });
   };
 
-  const getSortIcon = (columnKey) => {
+  const getSortIcon = (columnKey: keyof Bid): JSX.Element => {
     if (sortConfig.key !== columnKey) {
       return <FontAwesomeIcon icon={faSort} />;
     }
@@ -112,7 +146,6 @@ const Bids = () => {
       <FontAwesomeIcon icon={faSortDown} />
     );
   };
-
   // Update the table header to include sorting
   const headers = [
     { key: "bid_title", label: "Tender Name", width: "18%" },
@@ -136,16 +169,19 @@ const Bids = () => {
   const currentBids = sortedBids.slice(indexOfFirstBid, indexOfLastBid);
 
   // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber: React.SetStateAction<number>) =>
+    setCurrentPage(pageNumber);
 
-  const navigateToChatbot = (bid) => {
+  const navigateToChatbot = (bid: any) => {
     localStorage.setItem("navigatedFromBidsTable", "true");
     localStorage.removeItem("bidState");
     navigate("/bid-extractor", { state: { bid: bid, fromBidsTable: true } });
     handleGAEvent("Bid Tracker", "Navigate to Bid", "Bid Table Link");
   };
 
-  const StyledSelect = styled(Select)(({ theme, status }) => ({
+  const StyledSelect = styled(
+    Select<"ongoing" | "complete">
+  )<StyledSelectProps>(({ status }) => ({
     fontFamily: '"ClashDisplay", sans-serif',
     fontWeight: "bold",
     fontSize: "14px",
@@ -210,7 +246,6 @@ const Bids = () => {
     if (bidToDelete) {
       const formData = new FormData();
       formData.append("bid_id", bidToDelete);
-
       try {
         const response = await axios.post(
           `http${HTTP_PREFIX}://${API_URL}/delete_bid/`,
@@ -222,35 +257,40 @@ const Bids = () => {
             }
           }
         );
-
         if (response.data && response.data.status === "success") {
           fetchBids();
           handleGAEvent("Bid Tracker", "Delete Bid", "Delete Bid Button");
         } else {
           displayAlert("Failed to delete bid", "error");
         }
-      } catch (error) {
-        console.error("Error deleting bid:", error);
-        if (error.response) {
-          if (error.response.status === 403) {
+      } catch (err) {
+        // Type guard to check if error is AxiosError
+        if (axios.isAxiosError(err)) {
+          console.error("Error deleting bid:", err);
+
+          if (err.response) {
+            if (err.response.status === 403) {
+              displayAlert(
+                "Only admins can delete bids. You don't have permission to delete this bid",
+                "danger"
+              );
+            } else if (err.response.status === 404) {
+              displayAlert("Bid not found", "danger");
+            } else {
+              displayAlert(
+                `Error: ${err.response.data.detail || "Failed to delete bid"}`,
+                "danger"
+              );
+            }
+          } else if (err.request) {
             displayAlert(
-              "Only admins can delete bids. You don't have permission to delete this bid",
-              "danger"
-            );
-          } else if (error.response.status === 404) {
-            displayAlert("Bid not found", "danger");
-          } else {
-            displayAlert(
-              `Error: ${error.response.data.detail || "Failed to delete bid"}`,
+              "No response received from server. Please try again.",
               "danger"
             );
           }
-        } else if (error.request) {
-          displayAlert(
-            "No response received from server. Please try again.",
-            "danger"
-          );
         } else {
+          // Handle non-Axios errors
+          console.error("Non-Axios error:", err);
           displayAlert("Error deleting bid. Please try again.", "danger");
         }
       } finally {
@@ -259,12 +299,15 @@ const Bids = () => {
     }
   };
 
-  const handleDeleteClick = (bidId) => {
+  const handleDeleteClick = (bidId: string): void => {
     setBidToDelete(bidId);
     setShowDeleteModal(true);
   };
 
-  const updateBidStatus = async (bidId, newStatus) => {
+  const updateBidStatus = async (
+    bidId: string,
+    newStatus: "ongoing" | "complete"
+  ): Promise<void> => {
     try {
       const formData = new FormData();
       formData.append("bid_id", bidId);
@@ -281,43 +324,44 @@ const Bids = () => {
         }
       );
 
-      if (response.data && response.data.status === "success") {
+      if (
+        response.data &&
+        (response.data as ApiResponse).status === "success"
+      ) {
         handleGAEvent(
           "Bid Tracker",
           "Change Bid Status",
           "Bid Status Dropdown"
         );
-
         setTimeout(fetchBids, 500);
       } else {
         displayAlert("Failed to update bid status", "danger");
       }
-    } catch (error) {
-      console.error("Error updating bid status:", error);
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        if (error.response.status === 403) {
+    } catch (err) {
+      console.error("Error updating bid status:", err);
+
+      if (axios.isAxiosError(err)) {
+        if (err.response) {
+          if (err.response.status === 403) {
+            displayAlert(
+              "You are a viewer. You don't have permission to update this bid's status",
+              "danger"
+            );
+          } else if (err.response.status === 404) {
+            displayAlert("Bid not found", "error");
+          } else {
+            displayAlert(
+              `Error: ${err.response.data?.detail || "Failed to update bid status"}`,
+              "danger"
+            );
+          }
+        } else if (err.request) {
           displayAlert(
-            "You are a viewer. You don't have permission to update this bid's status",
-            "danger"
-          );
-        } else if (error.response.status === 404) {
-          displayAlert("Bid not found", "error");
-        } else {
-          displayAlert(
-            `Error: ${error.response.data.detail || "Failed to update bid status"}`,
+            "No response received from server. Please try again.",
             "danger"
           );
         }
-      } else if (error.request) {
-        // The request was made but no response was received
-        displayAlert(
-          "No response received from server. Please try again.",
-          "danger"
-        );
       } else {
-        // Something happened in setting up the request that triggered an Error
         displayAlert("Error updating bid status. Please try again.", "danger");
       }
     }
@@ -332,7 +376,7 @@ const Bids = () => {
     setBidName("");
   };
 
-  const handleOngoingSidebarLinkClick = (label) => {
+  const handleOngoingSidebarLinkClick = () => {
     handleGAEvent(
       "Sidebar Navigation",
       "Ongoing Link Click",
@@ -340,7 +384,7 @@ const Bids = () => {
     );
   };
 
-  const handleModalSubmit = (e) => {
+  const handleModalSubmit = (e: ModalSubmitEvent): void => {
     e.preventDefault();
     if (!bidName) {
       displayAlert("Bid name cannot be empty", "danger");
@@ -350,7 +394,7 @@ const Bids = () => {
       displayAlert("Bid name cannot exceed 80 characters", "danger");
       return;
     }
-    if (bids.some((bid) => bid.bid_title === bidName)) {
+    if (bids.some((bid: Bid) => bid.bid_title === bidName)) {
       displayAlert("Bid name already exists", "danger");
       return;
     }
@@ -362,7 +406,8 @@ const Bids = () => {
     localStorage.removeItem("editorState");
     localStorage.removeItem("messages");
     localStorage.removeItem("bidState");
-    handleOngoingSidebarLinkClick("Write a Proposal click");
+
+    handleOngoingSidebarLinkClick();
     navigate("/bid-extractor", { state: { bidName } });
     setShowModal(false);
   };
@@ -466,11 +511,24 @@ const Bids = () => {
                       <td>
                         <FormControl fullWidth>
                           <StyledSelect
-                            value={bid.status.toLowerCase()}
-                            onChange={(e) =>
-                              updateBidStatus(bid._id, e.target.value)
+                            value={
+                              bid.status.toLowerCase() as "ongoing" | "complete"
                             }
+                            onChange={(
+                              e: SelectChangeEvent<"ongoing" | "complete">
+                            ) => {
+                              // Type guard to ensure value is either "ongoing" or "complete"
+                              if (
+                                e.target.value === "ongoing" ||
+                                e.target.value === "complete"
+                              ) {
+                                updateBidStatus(bid._id, e.target.value);
+                              }
+                            }}
                             className={`status-dropdown ${bid.status.toLowerCase()}`}
+                            status={
+                              bid.status.toLowerCase() as "ongoing" | "complete"
+                            }
                           >
                             <StyledMenuItem value="ongoing">
                               Ongoing
@@ -484,7 +542,7 @@ const Bids = () => {
                       <td>{bid.client_name}</td>
                       <td>
                         {bid.submission_deadline &&
-                        !isNaN(new Date(bid.submission_deadline))
+                        !isNaN(Date.parse(bid.submission_deadline))
                           ? new Date(
                               bid.submission_deadline
                             ).toLocaleDateString()

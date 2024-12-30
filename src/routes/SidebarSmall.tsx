@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./SidebarSmall.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,18 +10,32 @@ import {
   faComments,
   faCircleQuestion,
   faUser,
-  faCircleExclamation,
   faFileWord,
   faGraduationCap
 } from "@fortawesome/free-solid-svg-icons";
 // Import the image import sidebarIcon from '../resources/images/mytender.io_badge.png';
 
-const SideBarSmall = () => {
-  const location = useLocation(); // Hook to get the current location
-  const navigate = useNavigate();
-  const [lastActiveBid, setLastActiveBid] = useState(null);
+// Define interface for lastActiveBid
+interface LastActiveBid {
+  _id: string;
+  bid_title: string;
+  status: string;
+  [key: string]: any; // for any additional properties
+}
 
-  const isActive = (path) => location.pathname === path;
+// Define custom event type
+interface BidUpdateEvent extends Event {
+  detail: LastActiveBid;
+}
+
+const SideBarSmall = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [lastActiveBid, setLastActiveBid] = useState<LastActiveBid | null>(
+    null
+  );
+
+  const isActive = (path: string): boolean => location.pathname === path;
 
   useEffect(() => {
     const storedBid = localStorage.getItem("lastActiveBid");
@@ -29,20 +43,23 @@ const SideBarSmall = () => {
       setLastActiveBid(JSON.parse(storedBid));
     }
 
-    const handleBidUpdate = (event) => {
+    const handleBidUpdate = (event: BidUpdateEvent) => {
       const updatedBid = event.detail;
       setLastActiveBid(updatedBid);
       localStorage.setItem("lastActiveBid", JSON.stringify(updatedBid));
     };
 
-    window.addEventListener("bidUpdated", handleBidUpdate);
+    window.addEventListener("bidUpdated", handleBidUpdate as EventListener);
 
     return () => {
-      window.removeEventListener("bidUpdated", handleBidUpdate);
+      window.removeEventListener(
+        "bidUpdated",
+        handleBidUpdate as EventListener
+      );
     };
   }, []);
 
-  const handleDashboardClick = (e) => {
+  const handleDashboardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     if (lastActiveBid) {
       const lastActiveTab =
@@ -55,23 +72,12 @@ const SideBarSmall = () => {
     }
   };
 
-  const handleShowTips = () => {
-    localStorage.setItem("dashboardTourCompleted", "false");
-    localStorage.setItem("bidCompilerTourCompleted", "false");
-    localStorage.setItem("bidExtractorTourCompleted", "false");
-    localStorage.setItem("libraryTourCompleted", "false");
-    localStorage.setItem("questionCrafterTourCompleted", "false");
-    localStorage.setItem("quickquestionWizardTourCompleted", "false");
-    // Dispatch a custom event to notify other components
-    window.dispatchEvent(new Event("showTips"));
+  const handleWordAddInClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const url =
+      "https://appsource.microsoft.com/en-us/product/office/WA200007690?src=office&corrid=bd0c24c3-6022-e897-73ad-0dc9bdf3558b&omexanonuid=&referralurl=";
+    window.open(url, "_blank", "noopener,noreferrer");
   };
-
-  const handleWordAddInClick = (e) => {
-    e.preventDefault(); // Prevent any default navigation
-    const url = 'https://appsource.microsoft.com/en-us/product/office/WA200007690?src=office&corrid=bd0c24c3-6022-e897-73ad-0dc9bdf3558b&omexanonuid=&referralurl=';
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
-  
 
   return (
     <div className="sidebarsmall">
@@ -130,10 +136,11 @@ const SideBarSmall = () => {
         <Link
           to="https://app.storylane.io/demo/tui6kl0bnkrw?embed=inline"
           className="sidebarsmalllink"
-          target="_blank"  // Opens in new tab
-          rel="noopener noreferrer"  // Security best practice for external links
+          target="_blank" // Opens in new tab
+          rel="noopener noreferrer" // Security best practice for external links
         >
-          <FontAwesomeIcon icon={faGraduationCap} />  {/* Academic cap icon - perfect for tutorials */}
+          <FontAwesomeIcon icon={faGraduationCap} />{" "}
+          {/* Academic cap icon - perfect for tutorials */}
           <span>Tutorial</span>
         </Link>
 

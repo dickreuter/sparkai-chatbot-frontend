@@ -1,24 +1,32 @@
 name: App or Dev Build and Deploy
-
 on:
   push:
     branches: [main, dev]
-
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
-
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
           node-version: "20"
-
       - name: Install Dependencies
         run: npm install
+      - name: Run Tests
+        run: npm test
 
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "20"
+      - name: Install Dependencies
+        run: npm install
       - name: Build
         run: |
           if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
@@ -26,7 +34,6 @@ jobs:
           else
             npm run build:prod
           fi
-
       - name: Set Target Directory
         run: |
           if [ "${{ github.ref }}" == "refs/heads/dev" ]; then
@@ -34,7 +41,6 @@ jobs:
           else
             echo "TARGET_DIR=/home/ec2-user/www" >> $GITHUB_ENV
           fi
-
       - name: Deploy to Server
         run: |
           mkdir -p ~/.ssh

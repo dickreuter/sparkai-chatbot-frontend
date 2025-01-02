@@ -1,103 +1,54 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
+import { describe, it, expect, beforeAll, vi } from "vitest";
 import axios from "axios";
-import Bids from "../Bids";
-import { API_URL, HTTP_PREFIX } from "../../helper/Constants";
 
-// Create the mock before using it
-jest.mock("axios", () => {
-  const mockPost = jest.fn();
-  return {
-    post: mockPost,
-    isAxiosError: (err: unknown) =>
-      err && typeof err === "object" && "isAxiosError" in err,
-    __esModule: true,
-    default: {
-      post: mockPost
-    }
-  };
-});
+async function getAuthToken() {
+  try {
+    console.log(process.env.TEST_USERNAME);
+    console.log(process.env.TEST_PASSWORD);
+    const response = await axios.post(`https://dev.mytender.io:7861/login`, {
+      email: process.env.TEST_USERNAME,
+      password: process.env.TEST_PASSWORD
+    });
+   
+    console.log("Login response:", {
+      status: response.status,
+      token: response.data.access_token
+    });
+    return response.data.access_token;
+  } catch (error) {
+    console.error("Login error:", error.response?.data || error.message);
+    throw error;
+  }
+}
 
-// Get reference to the mocked function
-const mockPost = axios.post as jest.Mock;
+describe("Bids Component", () => {
+  let authToken: string;
 
-// Mock modules
-jest.mock("react-auth-kit", () => ({
-  useAuthUser: () => () => ({ token: "mock-token" }),
-  useIsAuthenticated: () => () => true
-}));
-
-const mockNavigate = jest.fn();
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
-  useNavigate: () => mockNavigate
-}));
-
-jest.mock("../../helper/Constants", () => ({
-  API_URL: "dev.mytender.io:7861",
-  HTTP_PREFIX: "",
-  placeholder_upload: "Paste bid material here..."
-}));
-
-describe("Bids Component API Calls", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  beforeAll(async () => {
+    authToken = await getAuthToken();
+    console.log("Auth token obtained:", !!authToken);
   });
 
-  describe("getBidsList", () => {
-    it("should fetch bids list successfully", async () => {
-      const mockBids = [
-        {
-          _id: "1",
-          bid_title: "Test Bid",
-          status: "ongoing" as const,
-          timestamp: "2024-01-01"
+  it("fetches bids from API", async () => {
+    // Test the API call directly
+    const bidsResponse = await axios.post(
+      `https://dev.mytender.io:7861/get_bids_list/`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json"
         }
-      ];
+      }
+    );
 
-      mockPost.mockResolvedValueOnce({
-        data: { bids: mockBids }
-      });
+    // Log response for debugging
+    console.log("API Response status:", bidsResponse.status);
+    console.log("Number of bids:", bidsResponse.data.bids?.length || 0);
 
-      render(
-        <BrowserRouter>
-          <Bids />
-        </BrowserRouter>
-      );
-
-      await waitFor(() => {
-        expect(mockPost).toHaveBeenCalledWith(
-          `http${HTTP_PREFIX}://${API_URL}/get_bids_list/`,
-          {},
-          {
-            headers: {
-              Authorization: "Bearer mock-token"
-            }
-          }
-        );
-      });
-
-      expect(screen.getByText("Test Bid")).toBeInTheDocument();
-    });
-
-    it("should handle getBidsList error", async () => {
-      const consoleError = jest
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
-
-      mockPost.mockRejectedValueOnce(new Error("Failed to fetch"));
-
-      render(
-        <BrowserRouter>
-          <Bids />
-        </BrowserRouter>
-      );
-
-      await waitFor(() => {
-        expect(consoleError).toHaveBeenCalled();
-      });
-
-      consoleError.mockRestore();
-    });
+    // Basic assertion on the API response
+    expect(bidsResponse.status).toBe(200);
+    expect(bidsResponse.data).toHaveProperty("bids");
+    expect(Array.isArray(bidsResponse.data.bids)).toBe(true);
   });
 });

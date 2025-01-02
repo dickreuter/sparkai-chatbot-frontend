@@ -7,7 +7,7 @@
     "skipLibCheck": true,
     // Update types to include Jest
     "types": ["vitest/globals", "jest", "@testing-library/jest-dom"],
-    
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -15,11 +15,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    
+
     /* Testing Configuration */
-    "esModuleInterop": true,        // Needed for Jest
-    "allowJs": true,                // Allow JavaScript files to be compiled
-    
+    "esModuleInterop": true, // Needed for Jest
+    "allowJs": true, // Allow JavaScript files to be compiled
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

@@ -1,9 +1,16 @@
-import { defineConfig } from "vitest/config";
+/// <reference types="vitest" />
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
+  plugins: [react()],
   test: {
-    environment: "jsdom",
     globals: true,
-    setupFiles: "tests/setup.ts"
+    environment: "jsdom",
+    setupFiles: "./src/test/setup.ts"
+    // you can uncomment the following line if you want code coverage
+    // coverage: {
+    //   provider: 'c8'
+    // },
   }
 });

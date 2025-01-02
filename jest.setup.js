@@ -1,6 +1,7 @@
 require("@testing-library/jest-dom");
+require("dotenv").config({ path: ".env.test" });
 
-// Mock window.matchMedia
+// Existing window.matchMedia mock
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
@@ -15,7 +16,7 @@ Object.defineProperty(window, "matchMedia", {
   }))
 });
 
-// Mock IntersectionObserver
+// Existing IntersectionObserver mock
 window.IntersectionObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
   unobserve: jest.fn(),

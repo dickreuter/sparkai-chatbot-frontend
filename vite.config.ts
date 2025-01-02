@@ -10,6 +10,7 @@ export default defineConfig({
       }
     })
   ],
+  
   optimizeDeps: {
     include: ["@mui/material/Tooltip", "@emotion/styled"]
   },

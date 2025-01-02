@@ -5,6 +5,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js
@@ -15,7 +18,6 @@ jobs:
         run: npm install
       - name: Run Tests
         run: npm test
-
   build:
     needs: test
     runs-on: ubuntu-latest

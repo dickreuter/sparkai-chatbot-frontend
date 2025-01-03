@@ -20,7 +20,7 @@ import {
 } from "draft-js";
 import "draft-js/dist/Draft.css";
 import QuestionCrafterWizard from "../wizards/QuestionCrafterWizard.tsx";
-import SelectFolderModal from "../components/SelectFolderModal.tsx";
+import SelectFolderModal from "../modals/SelectFolderModal.tsx";
 
 const QAGenerator = () => {
   const getAuth = useAuthUser();

@@ -1,13 +1,13 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { Modal, Button, Spinner, Nav } from "react-bootstrap";
-import InterrogateTender from "./InterrogateTender";
+import InterrogateTender from "../components/InterrogateTender";
 import { displayAlert } from "../helper/Alert";
 import { API_URL, HTTP_PREFIX } from "../helper/Constants";
 import axios from "axios";
 import { useAuthUser } from "react-auth-kit";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import TenderLibraryChat from "./TenderLibraryChat";
+import TenderLibraryChat from "../components/TenderLibraryChat";
 import "./InterrogateTenderModal.css";
 
 const InterrogateTenderModal = ({ bid_id }) => {

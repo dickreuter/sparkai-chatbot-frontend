@@ -28,7 +28,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Menu, MenuItem } from "@mui/material";
 import { displayAlert } from "../helper/Alert.tsx";
-import InterrogateTenderModal from "./InterrogateTenderModal.tsx";
+import InterrogateTenderModal from "../modals/InterrogateTenderModal.tsx";
 import posthog from "posthog-js";
 import UploadPDF from "../views/UploadPDF.tsx";
 

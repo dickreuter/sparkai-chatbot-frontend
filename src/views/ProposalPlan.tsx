@@ -15,17 +15,10 @@ import { displayAlert } from "../helper/Alert.tsx";
 import "./ProposalPlan.css";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowRight,
-  faChevronDown,
-  faChevronRight,
-  faSquare,
-  faTrash,
-  faWandMagicSparkles
-} from "@fortawesome/free-solid-svg-icons";
-import StatusMenu from "../components/StatusMenu.tsx";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import StatusMenu from "../buttons/StatusMenu.tsx";
 import OutlineInstructionsModal from "../modals/OutlineInstructionsModal.tsx";
-import SectionMenu from "../components/SectionMenu.tsx";
+import SectionMenu from "../buttons/SectionMenu.tsx";
 import { MenuItem, Select, SelectChangeEvent, Skeleton } from "@mui/material";
 import posthog from "posthog-js";
 import { Button, Form, Row, Spinner } from "react-bootstrap";
@@ -739,16 +732,7 @@ const ProposalPlan = () => {
                                   to="#"
                                   className="bg-transparent border-0 cursor-pointer text-black me-2"
                                   onClick={() => toggleSection(index)}
-                                >
-                                  <FontAwesomeIcon
-                                    icon={
-                                      isExpanded
-                                        ? faChevronDown
-                                        : faChevronRight
-                                    }
-                                    size="sm"
-                                  />
-                                </Link>
+                                ></Link>
                                 <span>{section.heading}</span>
                               </div>
                             </td>

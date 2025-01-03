@@ -17,7 +17,7 @@ import {
 } from "./BidWritingStateManagerView.tsx";
 import { useLocation, useNavigate } from "react-router-dom";
 import { displayAlert } from "../helper/Alert.tsx";
-import StatusMenu from "../components/StatusMenu.tsx";
+import StatusMenu from "../buttons/StatusMenu.tsx";
 import SectionTitle from "../components/SectionTitle.tsx";
 import { IconButton, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";

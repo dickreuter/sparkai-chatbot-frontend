@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
-import SelectFolder from "./SelectFolder";
+import SelectFolder from "../components/SelectFolder";
 import "./SelectFolderModal.css";
 
 const SelectFolderModal = ({

@@ -19,11 +19,11 @@ import "./BidExtractor.css";
 import { BidContext } from "./BidWritingStateManagerView.tsx";
 import { displayAlert } from "../helper/Alert";
 import { FormControl } from "@mui/material";
-import ContributorModal from "../components/ContributorModal.tsx";
+import ContributorModal from "../modals/ContributorModal.tsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
 import TenderLibrary from "../components/TenderLibrary.tsx";
-import CustomDateInput from "../components/CustomDateInput.tsx";
+import CustomDateInput from "../buttons/CustomDateInput.tsx";
 
 import {
   StyledSelect,

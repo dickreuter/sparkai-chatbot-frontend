@@ -11,7 +11,7 @@ import {
 import DebouncedTextArea from "./DeboucedTextArea";
 import "./SlidingSidepane.css";
 import { Contributor, Section } from "../views/BidWritingStateManagerView";
-import StatusMenu from "./StatusMenu";
+import StatusMenu from "../buttons/StatusMenu";
 import ReviewerDropdown from "./dropdowns/ReviewerDropdown";
 import QuestionTypeDropdown from "./dropdowns/QuestionTypeDropdown";
 

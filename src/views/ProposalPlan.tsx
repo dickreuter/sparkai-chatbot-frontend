@@ -725,12 +725,12 @@ const ProposalPlan = () => {
                       <th className="text-center" style={{ width: "120px" }}>
                         Subsections
                       </th>
-                      <th className="text-center" style={{ width: "120px" }}>
+                      <th className="text-center" style={{ width: "130px" }}>
                         Words
                       </th>
                       <th
                         className="text-center"
-                        style={{ width: "50px" }}
+                        style={{ width: "60px" }}
                       ></th>
                     </tr>
                   </thead>
@@ -807,7 +807,7 @@ const ProposalPlan = () => {
                             </td>
 
                             <td className="text-center">
-                              <div className="d-flex justify-content-center">
+                              <div className="d-flex justify-content-center pe-2">
                                 <SectionControls
                                   onDelete={() =>
                                     handleDeleteClick(section, index)

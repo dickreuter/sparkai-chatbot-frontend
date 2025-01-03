@@ -33,7 +33,8 @@ import { UploadButtonWithDropdown } from "./UploadButtonWithDropdown.tsx";
 import { Menu, MenuItem } from "@mui/material";
 import FileContentModal from "../components/FileContentModal.tsx";
 import { displayAlert } from "../helper/Alert.tsx";
-import LibraryWizard from "../wizards/LibraryWizard.tsx"; // Adjust the import path as needed
+import LibraryContextMenu from "../modals/LibraryContextMenu.tsx";
+import EllipsisMenu from "../components/EllipsisMenu.tsx";
 
 const NewFolderModal = React.memo(
   ({ show, onHide, onCreateFolder, title, parentFolder }) => {
@@ -731,6 +732,9 @@ const Library = () => {
         <tr
           key={folderName}
           onClick={() => handleFolderClick(folderName)}
+          onContextMenu={(e) =>
+            handleContextMenu(e, true, folderName, folderName)
+          }
           style={{ cursor: "pointer" }}
         >
           <td>
@@ -744,11 +748,11 @@ const Library = () => {
           <td colSpan={3}>
             <UploadButtonWithDropdown
               folder={folderName}
-              get_collections={fetchFolderStructure}
               handleShowPDFModal={handleShowPDFModal}
               handleShowTextModal={handleShowTextModal}
               setShowDeleteFolderModal={setShowDeleteFolderModal}
               setFolderToDelete={setFolderToDelete}
+              handleNewFolderClick={handleNewFolderClick}
             />
           </td>
         </tr>
@@ -756,18 +760,80 @@ const Library = () => {
     });
   };
 
+  const [contextMenu, setContextMenu] = useState<{
+    mouseX: number;
+    mouseY: number;
+  } | null>(null);
+  const [contextMenuTarget, setContextMenuTarget] = useState<{
+    isFolder: boolean;
+    id: string;
+    path: string;
+  } | null>(null);
+
+  const handleContextMenu = (
+    event: React.MouseEvent,
+    isFolder: boolean,
+    id: string,
+    path: string
+  ) => {
+    event.preventDefault();
+    setContextMenu({
+      mouseX: event.clientX,
+      mouseY: event.clientY
+    });
+    setContextMenuTarget({ isFolder, id, path });
+  };
+
+  const handleContextMenuClose = () => {
+    setContextMenu(null);
+    setContextMenuTarget(null);
+  };
+
   const renderFolderContents = (folderPath) => {
+    console.log("Rendering contents for folder:", folderPath);
     const contents = folderContents[folderPath] || [];
+    console.log("Raw contents:", contents);
 
-    const contentsToRender = contents;
+    // Filter to only show direct children
+    const directChildren = contents.filter(
+      ({ filename, unique_id, isFolder }) => {
+        console.log("\nChecking item:", unique_id);
 
-    return contentsToRender.map(({ filename, unique_id, isFolder }, index) => {
+        if (!isFolder) return true; // Files are always direct children
+
+        // Get the relative path by removing the current folder path
+        const relativePath = unique_id.replace(folderPath + "FORWARDSLASH", "");
+        console.log("Relative path:", relativePath);
+
+        // Count how many FORWARDSLASH are in the relative path
+        const forwardSlashCount = (relativePath.match(/FORWARDSLASH/g) || [])
+          .length;
+        console.log("Forward slash count:", forwardSlashCount);
+
+        // A direct child should have no additional FORWARDSLASH in its relative path
+        const isDirectChild = forwardSlashCount === 0;
+        console.log("Is direct child?", isDirectChild);
+
+        return isDirectChild;
+      }
+    );
+
+    console.log("Filtered direct children:", directChildren);
+
+    return directChildren.map(({ filename, unique_id, isFolder }, index) => {
       const fullPath = isFolder
         ? `${folderPath}FORWARDSLASH${filename}`
         : folderPath;
       const displayName = formatDisplayName(filename);
+
       return (
-        <tr key={`${folderPath}-${index}`} style={{ cursor: "pointer" }}>
+        <tr
+          key={`${folderPath}-${index}`}
+          style={{ cursor: "pointer" }}
+          onContextMenu={(e) =>
+            handleContextMenu(e, isFolder, unique_id, fullPath)
+          }
+        >
           <td
             onClick={() =>
               isFolder
@@ -786,59 +852,24 @@ const Library = () => {
             {isFolder ? (
               <UploadButtonWithDropdown
                 folder={fullPath}
-                get_collections={fetchFolderStructure}
                 handleShowPDFModal={handleShowPDFModal}
                 handleShowTextModal={handleShowTextModal}
                 setShowDeleteFolderModal={setShowDeleteFolderModal}
                 setFolderToDelete={setFolderToDelete}
+                handleNewFolderClick={handleNewFolderClick}
               />
             ) : (
-              <div>
-                <Button
-                  aria-controls="simple-menu"
-                  aria-haspopup="true"
-                  onClick={(event) =>
-                    handleClick(event, { filename, unique_id })
-                  }
-                  sx={{
-                    borderRadius: "50%",
-                    minWidth: 0,
-                    padding: "10px",
-                    backgroundColor: "transparent",
-                    "&.MuiButton-root:active": {
-                      boxShadow: "none"
-                    }
-                  }}
-                  className="ellipsis-button"
-                >
-                  <FontAwesomeIcon
-                    icon={faEllipsisVertical}
-                    className="ellipsis-icon"
-                  />
-                </Button>
-                <Menu
-                  id="simple-menu"
-                  anchorEl={anchorElFile}
-                  keepMounted
-                  open={Boolean(anchorElFile)}
-                  onClose={handleClose}
-                  PaperProps={{
-                    elevation: 1, // Reduced elevation for lighter shadow
-                    style: {
-                      width: "120px",
-                      boxShadow: "0 2px 5px rgba(0,0,0,0.1)" // Custom subtle shadow
-                    }
-                  }}
-                >
-                  <MenuItem
-                    onClick={handleDeleteClick}
-                    className="styled-menu-item"
-                  >
-                    <i className="fas fa-trash-alt styled-menu-item-icon"></i>
-                    Delete File
-                  </MenuItem>
-                </Menu>
-              </div>
+              <EllipsisMenu
+                filename={filename}
+                unique_id={unique_id}
+                onDelete={() => {
+                  setFileToDelete({
+                    unique_id: unique_id,
+                    filename: filename
+                  });
+                  setShowDeleteFileModal(true);
+                }}
+              />
             )}
           </td>
         </tr>
@@ -1234,6 +1265,44 @@ const Library = () => {
             }
             parentFolder={newFolderParent}
           />
+
+          {contextMenu && contextMenuTarget && (
+            <LibraryContextMenu
+              anchorPosition={{ x: contextMenu.mouseX, y: contextMenu.mouseY }}
+              isOpen={Boolean(contextMenu)}
+              onClose={handleContextMenuClose}
+              onDelete={() => {
+                if (contextMenuTarget.isFolder) {
+                  setFolderToDelete(contextMenuTarget.path);
+                  setShowDeleteFolderModal(true);
+                } else {
+                  setFileToDelete({
+                    unique_id: contextMenuTarget.id,
+                    filename:
+                      folderContents[activeFolder]?.find(
+                        (item) => item.unique_id === contextMenuTarget.id
+                      )?.filename || ""
+                  });
+                  setShowDeleteFileModal(true);
+                }
+                handleContextMenuClose();
+              }}
+              isFolder={contextMenuTarget.isFolder}
+              folderPath={contextMenuTarget.path}
+              onUploadPDF={(event) => {
+                handleShowPDFModal(event, contextMenuTarget.path);
+                handleContextMenuClose();
+              }}
+              onUploadText={(event) => {
+                handleShowTextModal(event, contextMenuTarget.path);
+                handleContextMenuClose();
+              }}
+              onNewSubfolder={() => {
+                handleNewFolderClick(contextMenuTarget.path);
+                handleContextMenuClose();
+              }}
+            />
+          )}
 
           {showPdfViewerModal && (
             <div className="pdf-viewer-modal" onClick={closeModal}>

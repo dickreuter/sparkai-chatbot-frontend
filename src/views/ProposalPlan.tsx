@@ -25,6 +25,7 @@ import { Button, Form, Row, Spinner } from "react-bootstrap";
 import ProposalSidepane from "../components/SlidingSidepane.tsx";
 import ReviewerDropdown from "../components/dropdowns/ReviewerDropdown.tsx";
 import QuestionTypeDropdown from "../components/dropdowns/QuestionTypeDropdown.tsx";
+import SectionControls from "../buttons/SectionControls.tsx";
 
 const EditableCell = ({
   value: initialValue,
@@ -103,6 +104,22 @@ const ProposalPlan = () => {
       setIsSidepaneOpen(true);
       setApiChoices([]);
     }
+  };
+
+  // Add these types and functions to your ProposalPlan component:
+  const handleMoveSection = (index: number, direction: "up" | "down") => {
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+
+    setSharedState((prevState) => {
+      const newOutline = [...prevState.outline];
+      const [movedItem] = newOutline.splice(index, 1);
+      newOutline.splice(newIndex, 0, movedItem);
+
+      return {
+        ...prevState,
+        outline: newOutline
+      };
+    });
   };
 
   // Add this function to handle toggling sections
@@ -708,12 +725,13 @@ const ProposalPlan = () => {
                       <th className="text-center" style={{ width: "120px" }}>
                         Subsections
                       </th>
-                      <th className="text-center" style={{ width: "100px" }}>
+                      <th className="text-center" style={{ width: "120px" }}>
                         Words
                       </th>
-                      <th className="text-center" style={{ width: "80px" }}>
-                        Delete
-                      </th>
+                      <th
+                        className="text-center"
+                        style={{ width: "50px" }}
+                      ></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -772,7 +790,7 @@ const ProposalPlan = () => {
                                 step="50"
                                 className="form-control d-inline-block word-count-input"
                                 style={{
-                                  width: "80px",
+                                  width: "110px",
                                   textAlign: "center"
                                 }}
                                 onChange={(e) => {
@@ -790,16 +808,19 @@ const ProposalPlan = () => {
 
                             <td className="text-center">
                               <div className="d-flex justify-content-center">
-                                <Link
-                                  to="#"
-                                  className="bg-transparent border-0 cursor-pointer text-black"
-                                  onClick={() =>
+                                <SectionControls
+                                  onDelete={() =>
                                     handleDeleteClick(section, index)
                                   }
-                                  title="Delete section"
-                                >
-                                  <FontAwesomeIcon icon={faTrash} size="sm" />
-                                </Link>
+                                  onMoveDown={() =>
+                                    handleMoveSection(index, "down")
+                                  }
+                                  onMoveUp={() =>
+                                    handleMoveSection(index, "up")
+                                  }
+                                  isFirst={index === 0}
+                                  isLast={index === outline.length - 1}
+                                />
                               </div>
                             </td>
                           </tr>

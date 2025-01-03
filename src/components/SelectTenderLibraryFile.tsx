@@ -4,14 +4,16 @@ import axios from "axios";
 import withAuth from "../routes/withAuth";
 import { useAuthUser } from "react-auth-kit";
 import { Button, Card, Form, Spinner } from "react-bootstrap";
-import {
-  faFileAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { faFileAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import './SelectFolderModal.css';
+import "../modals/SelectFolderModal.css";
 import { displayAlert } from "../helper/Alert";
 
-const SelectTenderLibraryFile = ({ bid_id, onFileSelect, initialSelectedFiles = [] }) => {
+const SelectTenderLibraryFile = ({
+  bid_id,
+  onFileSelect,
+  initialSelectedFiles = []
+}) => {
   const getAuth = useAuthUser();
   const auth = getAuth();
   const tokenRef = useRef(auth?.token || "default");
@@ -107,7 +109,6 @@ const SelectTenderLibraryFile = ({ bid_id, onFileSelect, initialSelectedFiles = 
     <Card className="select-tenderlibrary-card-custom mt-0 mb-0 p-0">
       <Card.Body className="select-library-card-body-content">
         <div className="select-library-card-content-wrapper">
-
           {isLoading ? (
             <div className="spinner-container">
               <Spinner
@@ -119,7 +120,6 @@ const SelectTenderLibraryFile = ({ bid_id, onFileSelect, initialSelectedFiles = 
               </Spinner>
             </div>
           ) : (
-            
             <table className="library-table mt-0 mb-0">
               <thead>
                 <tr>

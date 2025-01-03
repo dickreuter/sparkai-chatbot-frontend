@@ -10,7 +10,7 @@ import {
   faReply
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "./SelectFolderModal.css";
+import "../modals/SelectFolderModal.css";
 
 const SelectFolder = ({ onFolderSelect, initialSelectedFolders = [] }) => {
   const getAuth = useAuthUser();

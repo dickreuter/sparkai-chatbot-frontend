@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuthUser } from "react-auth-kit";
 import SideBarSmall from "../routes/SidebarSmall";
 import "./ChatbotResponse.css"; // Import the CSS file
@@ -10,7 +9,6 @@ import handleGAEvent from "../utilities/handleGAEvent";
 import { HTTP_PREFIX, API_URL } from "../helper/Constants";
 import axios from "axios";
 import { Button, Modal } from "react-bootstrap";
-import QuickQuestionWizard from "../wizards/QuickQuestionWizard";
 
 const ChatbotResponse = () => {
   const getAuth = useAuthUser();

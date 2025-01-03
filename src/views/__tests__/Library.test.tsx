@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeAll, vi } from "vitest";
-import axios from "axios";
 import { getAuthenticatedAxios } from "../../test/setup";
 
 const authenticatedAxios = await getAuthenticatedAxios();
